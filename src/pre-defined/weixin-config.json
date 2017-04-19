@@ -1,0 +1,39 @@
+{
+  "open_web_site": {
+    "appid": "wx20091713c7ee1dd2",
+    "secret": "3f75ab4a61e818a62f877bb7be6e38f6",
+    "redirect_uri": "http://sh.okertrip.com/services/open/WeiXin$ConnectCallback",
+    "qr_css_href": "https://www.2ciyun.com/css/weixin.css"
+  },
+  "open_mobile_site":{
+    "appid": "wx1c6c736837b3a396",
+    "secret": "db8bfa0a305489c461db1b302897d345",
+    "redirect_uri": "http://weixin.okertrip.com/#/weixin-auth",
+    "qr_css_href": "https://www.2ciyun.com/css/weixin.css"
+  },
+  "apps": [
+    {
+      "appid": "wx47dcb6f48e7a35c2",
+      "secret": "66ac1b53b9c870e37279ae3069ac7fac",
+      "mch_id": "1383760402",
+      "mch_api_secret": "webstoretobc2017webstoretobc2017",
+      "notify_url": "https://sh.okertrip.com/me-services/weixin/app/payNotify",
+      "trade_des": "抱城网上商城-智能设备"
+    },
+    {
+      "appid": "wx8e6c48755aaf4fc9",
+      "secret": "870d9862afa64f1450349de469447f34",
+      "mch_id": "1274534001",
+      "mch_api_secret": "webstoretowsy017webstoretowsy017",
+      "notify_url": "https://sh.okertrip.com/me-services/weixin/app/payNotify",
+      "trade_des": "梧斯源网上商城-智能设备"
+    },
+    {
+      "appid": "wx451d050b8e477dd3",
+      "secret": "d21f2f7f9705d20cff3ce0614ba47fc4",
+      "mch_id": "none",
+      "mch_api_secret": "none",
+      "notify_url": "none",
+      "trade_des": "梧斯源个人健康助手+"
+    }]
+}

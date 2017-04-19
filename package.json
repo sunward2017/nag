@@ -1,6 +1,6 @@
 {
-  "name": "4gtour",
-  "version": "0.8.5",
+  "name": "nag",
+  "version": "1.0.0",
   "description": "",
   "main": "src/app.js",
   "scripts": {
@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zppro/4gtour.git"
+    "url": "git+https://192.168.30.215/pension-group/nag.git"
   },
   "keywords": [
     "trip",
@@ -23,9 +23,9 @@
   "author": "zppro",
   "license": "GPL-3.0",
   "bugs": {
-    "url": "https://github.com/zppro/4gtour/issues"
+    "url": "http://192.168.30.215/pension-group/nag/issues"
   },
-  "homepage": "https://github.com/zppro/4gtour#readme",
+  "homepage": "http://192.168.30.215/pension-group/nag/#readme",
   "devDependencies": {
     "del": "^2.2.0",
     "gulp": "^3.9.0",

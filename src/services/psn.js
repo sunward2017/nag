@@ -872,7 +872,8 @@ module.exports = {
                                     tenantId: tenantId
                                 }
                             });
-                            elderlyNursingPlan.work_items = [];
+                            elderlyNursingPlan.work_items =  elderlyNursingPlan.work_items.filter(function(item){ return item.type == DIC.D3017.DRUG_USE_ITEM });
+                            
                             yield elderlyNursingPlan.save();
 
                             this.body = app.wrapper.res.ret({ oldNursingLevelId: oldNursingLevelId, nursingLevelId: nursingLevelId, nursingLevelName: nursingLevel.name });
@@ -4685,7 +4686,7 @@ module.exports = {
                                                 str = str.replace(reg, workItem.description);
                                             }
                                         }
-                                        console.log("$$$$",str);
+                                         
                                         nursingRecord.voice_content = str;
 
                                         if (workItem.repeat_type == DIC.D0103.AS_NEEDED) {

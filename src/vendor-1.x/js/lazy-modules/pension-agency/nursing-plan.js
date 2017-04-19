@@ -98,16 +98,16 @@
 
 
         function fetchNursingPlan() {
-            console.log('parse nursingPlanCatalogs:');
             vmh.psnService.nursingPlansByRoom(vm.tenantId, ['name', 'sex', 'nursingLevelId'], ['elderlyId', 'work_items','remark']).then(function(data){
                 vm.aggrData = data;
+                   // tarnckedKey room + bed ;
                 for(var trackedKey in vm.aggrData) {
                     vm.$editings[trackedKey] = {};
                     var nursingLevelId = vm.aggrData[trackedKey]['elderly']['nursingLevelId'];
 
                     if (nursingLevelId) {
                         var workItemkey = trackedKey + '$' +nursingLevelId ;
-                        // console.log("***workItemkey",workItemkey);
+                       
                         if (!vm.work_items['A0001'][workItemkey]) {
                             vm.work_items['A0001'][workItemkey] = {};
                         }
@@ -128,7 +128,7 @@
                         var drugUseItemkey = trackedKey + '$' + elderlyId;
 
                         if (!vm.work_items['A0003'][drugUseItemkey]) {
-                            vm.work_items['A0003'][drugUseItemkey] = {};
+                             vm.work_items['A0003'][drugUseItemkey] = {};
                         }
                         var nursingPlanId = vm.aggrData[trackedKey]['nursing_plan']['id'];
                         if (nursingPlanId) {
@@ -144,6 +144,7 @@
                     }
                 }
             });
+             console.log("***workItemkey",vm.work_items);
         }
         
         function onRoomChange () { 
@@ -177,13 +178,16 @@
                     // console.log('更改前:', vm.work_items)
                     var key = trackedKey + '$' + data.oldNursingLevelId;
                     var workItemsOfNursingLevel = vm.workItemMap[data.oldNursingLevelId];
+
                     if (workItemsOfNursingLevel) {
+                         
                         for (var i = 0, len = workItemsOfNursingLevel.length; i < len; i++) {
-                            // console.log('workItemsOfNursingLevel[i]:', workItemsOfNursingLevel[i]);
-                            vm.work_items["A0001"][key][workItemsOfNursingLevel[i].id] = false;
+                            if(vm.work_items["A0001"][key]){
+                               vm.work_items["A0001"][key][workItemsOfNursingLevel[i].id] = false;  
+                            }
                         }
                     }
-                    // console.log('更改后:', vm.work_items)
+                    console.log('更改后:', vm.work_items)
                 }
 
                 vm.aggrData[trackedKey]['elderly']['nursingLevelId'] = data.nursingLevelId;

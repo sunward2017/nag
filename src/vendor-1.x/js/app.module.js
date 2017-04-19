@@ -16,7 +16,7 @@
     'use strict';
 
     angular
-        .module('4gtour', [
+        .module('nag', [
             'app.core',
             'app.settings',
             'app.routes',

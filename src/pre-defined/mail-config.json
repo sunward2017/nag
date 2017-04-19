@@ -1,0 +1,10 @@
+{
+  "test":{
+    "user":"service@carrycheng.com",
+    "pass":"Service2016"
+  },
+  "orderPaySuccess": {
+    "user": "service@carrycheng.com",
+    "pass": "Service2016"
+  }
+}

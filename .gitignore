@@ -43,7 +43,7 @@ pub-client-develop
 pub-client-production
 
 #config
-*-config.json
+#*-config.json
 
 #sublime代码跟踪
 .tags

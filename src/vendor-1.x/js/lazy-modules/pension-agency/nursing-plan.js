@@ -187,7 +187,7 @@
                             }
                         }
                     }
-                    console.log('更改后:', vm.work_items)
+                    // console.log('更改后:', vm.work_items)
                 }
 
                 vm.aggrData[trackedKey]['elderly']['nursingLevelId'] = data.nursingLevelId;

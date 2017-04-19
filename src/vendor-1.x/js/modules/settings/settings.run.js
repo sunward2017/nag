@@ -12,8 +12,8 @@
         // Global Settings
         // -----------------------------------
         $rootScope.app = {
-            name: '梧斯源-综合业务平台',
-            description: '集养老、旅游、服务于一体综合性业务平台',
+            name: '梧斯源-养老业务集成平台',
+            description: '新一代养老业务集成平台平台',
             year: ((new Date()).getFullYear()),
             layout: {
                 isFixed: false,

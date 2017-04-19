@@ -1,5 +1,5 @@
 #!/bin/sh
-cd ~/github/4gtour/
+cd ~/gitlab/nag/
 
 if [ $1 == "vendor-1.x" ]
     then

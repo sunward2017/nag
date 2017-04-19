@@ -1,0 +1,11 @@
+{
+  "member_repository_php":{
+    "api_url":"http://im.okertrip.com"
+  },
+  "member_repository_java": {
+    "api_url": "http://apij.okertrip.com"
+  },
+  "bed_monitor_provider": {
+    "api_url": "http://www.qinkeshi.com:8080"
+  }
+}

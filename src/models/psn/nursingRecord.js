@@ -54,6 +54,14 @@ module.exports = function(ctx, name) {
         //     return null;
         // });
 
+        nursingRecordSchema.virtual('expire_on').get(function(){
+            if(this.exec_on && this.duration){
+                var expireDate =ctx.moment(this.exec_on).add(this.duration, 'M');
+                return expireDate;
+            }
+            return null;
+        });
+
         nursingRecordSchema.pre('update', function(next) {
             this.update({}, { $set: { operated_on: new Date() } });
             next();

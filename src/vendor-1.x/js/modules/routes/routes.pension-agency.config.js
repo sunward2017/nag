@@ -197,16 +197,10 @@
                             type: 'string',
                             width: 120
                         }, {
-                            label: '评估等级',
-                            name: 'nursing_assessment_grade',
+                            label: '护理信息',
+                            name: 'nursing_info',
                             type: 'string',
-                            width: 120,
-                            formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D3015/object')
-                        }, {
-                            label: '护理等级',
-                            name: 'nursing_level_name',
-                            type: 'string',
-                            width: 80
+                            width: 120
                         },{
                             label: '状态',
                             name: 'begin_exit_flow',

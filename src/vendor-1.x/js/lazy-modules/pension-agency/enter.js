@@ -416,8 +416,9 @@
             vm.elderlyModel.nursing_summary = nursing_info.item_name;
         }
 
-        function setBindingNursingLevelsByAssessmentGrade(nursing_assessment_grade){
+        function setBindingNursingLevelsByAssessmentGrade(nursing_assessment_grade,nursing_assessment_grade_name){
             vm.elderlyModel.nursing_assessment_grade = nursing_assessment_grade;
+            vm.nursing_assessment_grade_name = nursing_assessment_grade_name;
             console.log("nursing_assessment_grade:"+nursing_assessment_grade);
             vmh.psnService.nursingLevelsByAssessmentGrade(vm.tenantId,nursing_assessment_grade).then(function(rows){
                 console.log(rows);
@@ -425,8 +426,10 @@
             });
         }
 
-        function setNursingLevel(nursingLevelId){
+        function setNursingLevel(nursingLevelId,nursingLevelName){
             vm.elderlyModel.nursingLevelId = nursingLevelId;
+            vm.elderlyModel.nursing_info = vm.nursing_assessment_grade_name +'-'+nursingLevelName;
+            console.log(vm.elderlyModel.nursing_info);
         }
 
         function sumPeriodPrice() {

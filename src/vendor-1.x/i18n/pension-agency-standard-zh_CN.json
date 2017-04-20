@@ -147,8 +147,12 @@
       "config": {
         "TITLE": "养老机构-老人管理-在院-配置",
         "TAB1": "配置信息",
-        "TAB1-LABEL-NAME": "睡眠带超时时间（分钟）",
-        "TAB1-PLACEHOLDER-NAME": "5.."
+        "TAB1-LABEL-BED_MONITOR_TIMEOUT": "睡眠带超时时间（分钟）",
+        "TAB1-PLACEHOLDER-BED_MONITOR_TIMEOUT": "5..",
+        "TAB1-LABEL-BED_MONITOR_TIMEOUT_ALARM_BEGIN": "超时报警起始时间",
+        "TAB1-PLACEHOLDER-BED_MONITOR_TIMEOUT_ALARM_BEGIN": "22:00",
+        "TAB1-LABEL-BED_MONITOR_TIMEOUT_ALARM_END": "超时报警起始时间",
+        "TAB1-PLACEHOLDER-BED_MONITOR_TIMEOUT_ALARM_END": "06:00"
       }
     },
     "exit": {
@@ -760,8 +764,12 @@
     "other-config":{
       "TITLE":"养老机构-系统管理-其它配置",
       "TAB1": "配置信息",
-      "TAB1-LABEL-NAME": "睡眠带超时时间（分钟）",
-      "TAB1-PLACEHOLDER-NAME": "5.."
+      "TAB1-LABEL-BED_MONITOR_TIMEOUT": "睡眠带超时时间（分钟）",
+      "TAB1-PLACEHOLDER-BED_MONITOR_TIMEOUT": "5..",
+      "TAB1-LABEL-BED_MONITOR_TIMEOUT_ALARM_BRGIN": "超时报警起始时间",
+      "TAB1-PLACEHOLDER-BED_MONITOR_TIMEOUT_ALARM_BRGIN": "22:00",
+      "TAB1-LABEL-BED_MONITOR_TIMEOUT_ALARM_END": "超时报警结束时间",
+      "TAB1-PLACEHOLDER-BED_MONITOR_TIMEOUT_ALARM_END": "06:00"
     }
   }
 }

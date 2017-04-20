@@ -27,6 +27,8 @@
             vmh.fetch(tenantService.query({_id: vm.tenantId})).then(function(results){
                 vm.other_configs = results[0].other_config;
                 console.log(vm.other_configs.psn_bed_monitor_timeout);
+                console.log(vm.other_configs.psn_bed_monitor_timeout_alarm_begin);
+                console.log(vm.other_configs.psn_bed_monitor_timeout_alarm_end);
                 console.log(vm.tenantId);
             });
 
@@ -36,8 +38,9 @@
             if ($scope.theForm.$valid) {
                 
                 console.log(vm.other_configs.psn_bed_monitor_timeout);
-
-                vmh.exec(vmh.extensionService.saveTenantOtherConfig(vm.model['tenantId'], vm.other_configs.psn_bed_monitor_timeout));
+                console.log(vm.other_configs.psn_bed_monitor_timeout_alarm_begin);
+                console.log(vm.other_configs.psn_bed_monitor_timeout_alarm_end);
+                vmh.exec(vmh.extensionService.saveTenantOtherConfig(vm.model['tenantId'], vm.other_configs.psn_bed_monitor_timeout,vm.other_configs.psn_bed_monitor_timeout_alarm_begin,vm.other_configs.psn_bed_monitor_timeout_alarm_end));
             }
             else {
                 if ($scope.utils.vtab(vm.tab1.cid)) {

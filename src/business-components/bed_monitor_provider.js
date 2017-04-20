@@ -543,8 +543,10 @@ module.exports = {
                 if (value.fallAsleepTime == '0') {
                     ret = {
                         fallAsleepTime: 0,
+                        awakeTime:0,
                         sleepTime: 0,
                         deepSleepTime: 0,
+                        lightSleepTime:0,
                         evalution: evalution
                     }
                     return self.ctx.wrapper.res.ret(ret);
@@ -555,10 +557,13 @@ module.exports = {
                 // var deepSleepTime = self.ctx.moment.unix(value.deepSleepTime).format('HH:MM:SS');
                 console.log("sleepTime:", sleepTime);
                 var deepSleepTime = (Number(value.deepSleepTime) / 3600000).toFixed(2);
+                var lightSleepTime = (Number(value.lightSleepTime) / 3600000).toFixed(2);
                 ret = {
                     fallAsleepTime: fallAsleepTime.format('HH:MM:SS'),
+                    awakeTime:awakeTime.format('HH:MM:SS'),
                     sleepTime: sleepTime,
                     deepSleepTime: deepSleepTime,
+                    lightSleepTime:lightSleepTime,
                     evalution: evalution
                 }
 

@@ -226,7 +226,11 @@ module.exports = {
                                 return;
                             }
                             console.log(this.request.body.psn_bed_monitor_timeout);
+                            console.log(this.request.body.psn_bed_monitor_timeout_alarm_begin);
+                            console.log(this.request.body.psn_bed_monitor_timeout_alarm_end);
                             tenant.other_config.psn_bed_monitor_timeout = this.request.body.psn_bed_monitor_timeout;
+                            tenant.other_config.psn_bed_monitor_timeout_alarm_begin = this.request.body.psn_bed_monitor_timeout_alarm_begin;
+                            tenant.other_config.psn_bed_monitor_timeout_alarm_end = this.request.body.psn_bed_monitor_timeout_alarm_end;
                             yield tenant.save();
                             this.body = app.wrapper.res.default();
                         } catch (e) {

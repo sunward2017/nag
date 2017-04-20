@@ -1277,6 +1277,7 @@ module.exports = {
                         tenantId: tenantId
                     }
                 });
+               
                 var member = yield self.ctx.modelFactory().model_one(self.ctx.models['het_member'], {
                     where: {
                         open_id: openid,
@@ -1284,6 +1285,7 @@ module.exports = {
                         tenantId: tenantId
                     }
                 });
+              
                 var memberCarePerson = yield self.ctx.modelFactory().model_one(self.ctx.models['het_memberCarePerson'], {
                     where: {
                         care_by: member._id,
@@ -1292,16 +1294,17 @@ module.exports = {
                         tenantId: tenantId
                     }
                 });
+                 
                 var reports = yield self.ctx.modelFactory().model_query(self.ctx.models['dwh_sleepDateReportOfHZFanWeng'], {
                     where: {
-                        check_in_time: { $gte: memberCarePerson.check_in_time },
+                        check_in_time: { $gte: self.ctx.moment(self.ctx.moment(memberCarePerson.check_in_time).format('YYYY-MM-DD')) },
                         status: 1,
                         devId: devId,
                         tenantId: tenantId
                     },
                     sort: { check_in_time: -1 }
                 }, { limit: 5, skip: skip });
-
+            
                 var dateReports = [];//数据格式修改 封装
                 for (var i = 0, length = reports.length; i < length; i++) {
                     var report = reports[i];
@@ -1327,6 +1330,7 @@ module.exports = {
                         dateReports.push(dateReport);
                     }
                 }
+                    console.log("dateReports",dateReports);
                     return self.ctx.wrapper.res.rows(dateReports);
                 }
             catch (e) {

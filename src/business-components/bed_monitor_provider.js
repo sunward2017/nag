@@ -835,10 +835,13 @@ module.exports = {
                     }
                 });
                 // console.log('获取全部监控睡眠带 ', bedMonitors);
+
+                var beginDay = self.ctx.moment().format('YYYY MM DD');
+                var beginTime,endTime,endDay,beginMoment,endMonent;//定义报警范围的一些变量,20170421,by yrm
+
                 for (var i = 0; i < bedMonitors.length; i++) {
                     var bedMonitor = bedMonitors[i], key, oldBedStatus, bedStatus, sessionId;
 
-                    //20170418-yrm-modify-satrt
                     var room = yield self.ctx.modelFactory().model_one(self.ctx.models['psn_room'], {
                         where: {
                             status: 1,
@@ -862,17 +865,43 @@ module.exports = {
                         });
 
                         if(elderly){
-                            if(elderly.bed_monitor_timeout){
-                                timeout = elderly.bed_monitor_timeout;
+                            //进行报警时间范围判断，20170421,by yrm
+                            var tenant = self.ctx._.findWhere(tenants, { _id: bedMonitor.tenantId });
+                            if(elderly.bed_monitor_timeout_alarm_begin && elderly.bed_monitor_timeout_alarm_end){
+                                beginTime = elderly.bed_monitor_timeout_alarm_begin;
+                                endTime = elderly.bed_monitor_timeout_alarm_end;
                             }else{
-                                var tenant = self.ctx._.findWhere(tenants, { _id: bedMonitor.tenantId });
-                                if(tenant && tenant.other_config && tenant.other_config.psn_bed_monitor_timeout){
-                                    timeout = tenant.other_config.psn_bed_monitor_timeout;
+                                if(tenant && tenant.other_config && tenant.other_config.psn_bed_monitor_timeout_alarm_begin && tenant.other_config.psn_bed_monitor_timeout_alarm_end){
+                                    beginTime = tenant.other_config.psn_bed_monitor_timeout_alarm_begin;
+                                    endTime = tenant.other_config.psn_bed_monitor_timeout_alarm_end;
                                 }
+                            }
+                            if(beginTime > endTime){
+                                endDay = app.moment(beginDay,'YYYY MM DD').add(1,'days').format('YYYY MM DD');
+                            }else{
+                                endDay = beginDay;
+                            }
+                            beginMoment = app.moment(beninDay + ' ' +beginTime,'YYYY MM DD mm:hh');
+                            endMoment = app.moment(endDay + ' ' +endTime,'YYYY MM DD mm:hh');
+                            console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
+                            console.log('>>>>> 睡眠带报警范围起始时间： >>>>>');
+                            console.log(beginMoment);
+                            console.log('>>>>> 睡眠带报警范围结束时间： >>>>>');
+                            console.log(endMoment);
+                            console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
+                            if(self.ctx.moment().isBetween(beginMoment,endMoment)){
+                                if(elderly.bed_monitor_timeout){
+                                    timeout = elderly.bed_monitor_timeout;
+                                }else{
+                                    if(tenant && tenant.other_config && tenant.other_config.psn_bed_monitor_timeout){
+                                        timeout = tenant.other_config.psn_bed_monitor_timeout;
+                                    }
+                                }
+                            }else{
+                                continue;
                             }
                         }
                     }
-                    //20170418-yrm-modify-end
 
                     console.log('>>>>> 睡眠带 >>>>> ', bedMonitor.name);
                     self.logger.info('>>>>> 睡眠带 >>>>> ' + bedMonitor.name);

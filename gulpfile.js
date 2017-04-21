@@ -217,10 +217,10 @@ gulp.task('npm:app', function() {
     return gulp.src(npm.source_app, {base: paths.npm_modules})
         .pipe($plugins.expectFile(npm.source_app))
         .pipe(jsFilter)
-        .pipe($plugins.if(isProduction, $plugins.uglify(vendorUglifyOpts)))
+        // .pipe($plugins.if(isProduction, $plugins.uglify(vendorUglifyOpts)))
         .pipe(jsFilter.restore)
         .pipe(cssFilter)
-        .pipe($plugins.if(isProduction, $plugins.minifyCss()))
+        // .pipe($plugins.if(isProduction, $plugins.minifyCss()))
         .pipe(cssFilter.restore)
         .pipe(gulp.dest(isProduction ? npm.dest_production : npm.dest_develop))
 });

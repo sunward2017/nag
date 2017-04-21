@@ -499,6 +499,7 @@ co(function*() {
     // console.log(member1);
     // console.log(member2);
     // yield app.spu_service.appendSaleInfoByOrderPaySuccess(order);
+    // console.log(app.moment(1492705810785).format('YYYY-MM-DD HH:mm:ss'))
 
 
 }).catch(app.coOnError);

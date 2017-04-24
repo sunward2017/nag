@@ -144,7 +144,7 @@
                     }
                 }
             });
-             console.log("***workItemkey",vm.work_items);
+             
         }
         
         function onRoomChange () { 

@@ -4697,7 +4697,7 @@ module.exports = {
 
                                         if (workItem.repeat_type == DIC.D0103.AS_NEEDED) {
                                             //按需工作不需要提醒
-                                            nursingRecord.exec_on = app.moment(now.format('YYYY-MM-DD'));
+                                            nursingRecord.exec_on =  app.moment(app.moment().format('YYYY-MM-DD') + " 23:59:59");;
                                             nursingRecord.assigned_worker = null; // 待补
                                             nursingRecordsToSave.push(app._.extend({}, nursingRecord));
                                         } else if (workItem.repeat_type == DIC.D0103.TIME_IN_DAY) {
@@ -4997,7 +4997,7 @@ module.exports = {
 
                                 if (workItem.repeat_type == DIC.D0103.AS_NEEDED) {
                                     //按需工作不需要提醒
-                                    nursingRecord.exec_on = app.moment(now.format('YYYY-MM-DD'));
+                                    nursingRecord.exec_on = app.moment(app.moment().format('YYYY-MM-DD') + " 00:00:00");
                                     nursingRecord.assigned_worker = null; // 待补
                                     nursingRecordsToSave.push(app._.extend({}, nursingRecord));
                                 } else if (workItem.repeat_type == DIC.D0103.TIME_IN_DAY) {

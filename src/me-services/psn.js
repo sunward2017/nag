@@ -45,6 +45,7 @@ module.exports = {
                             });
                             if (!robot) {
                                 this.body = app.wrapper.res.error({message: '无效的机器人编号'});
+                                return;
                             }
 
                             // 通过机器人->房间->护理等级
@@ -53,7 +54,8 @@ module.exports = {
                             rooms = yield app.modelFactory().model_query(app.models['psn_room'], {
                                 select: '_id',
                                 where: {
-                                    robots: {$elemMatch: robot._id},
+                                    // robots: {$elemMatch: {_id: robot._id}},
+                                    robots: {$in: [robot._id]},
                                     tenantId: tenantId
                                 },
                                 sort: 'exec_on'
@@ -63,10 +65,14 @@ module.exports = {
                                 return o._id;
                             });
 
+                            console.log('roomsIds:', roomIds);
+
                             var today = app.moment(app.moment().format('YYYY-MM-DD') + " 00:00:00");
+
                             var rows = yield app.modelFactory().model_query(app.models['psn_nursingRecord'], {
                                 select: 'exec_on executed_flag name description duration assigned_worker confirmed_flag confirmed_on workItemId voice_content',
                                 where: {
+                                    exec_on: { '$gte': today.toDate(), '$lt': today.add(1, 'days').toDate() },
                                     roomId: {$in: roomIds},
                                     tenantId: tenantId
                                 },

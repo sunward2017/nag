@@ -53,7 +53,7 @@ module.exports = {
                             rooms = yield app.modelFactory().model_query(app.models['psn_room'], {
                                 select: '_id',
                                 where: {
-                                    roomId: roomId,
+                                    robots: {$elemMatch: robot._id},
                                     tenantId: tenantId
                                 },
                                 sort: 'exec_on'
@@ -68,7 +68,6 @@ module.exports = {
                                 select: 'exec_on executed_flag name description duration assigned_worker confirmed_flag confirmed_on workItemId voice_content',
                                 where: {
                                     roomId: {$in: roomIds},
-                                    robots: {$elemMatch: robot._id},
                                     tenantId: tenantId
                                 },
                                 sort: 'exec_on'

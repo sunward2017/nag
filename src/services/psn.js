@@ -873,13 +873,14 @@ module.exports = {
                                 }
                             });
                             
-                            if(elderlyNursingPlan.work_items){
-                                elderlyNursingPlan.work_items =  elderlyNursingPlan.work_items.filter(function(item){ return item.type == DIC.D3017.DRUG_USE_ITEM });  
-                            }else{
-                                elderlyNursingPlan.work_items =[];
-                            }
+
+                            if(elderlyNursingPlan&&elderlyNursingPlan.work_items){
+                                
+                                elderlyNursingPlan.work_items =  elderlyNursingPlan.work_items.filter(function(item){ return item.type == DIC.D3017.DRUG_USE_ITEM }); 
+                                
+                                yield elderlyNursingPlan.save(); 
+                            } 
                                                     
-                            yield elderlyNursingPlan.save();
 
                             this.body = app.wrapper.res.ret({ oldNursingLevelId: oldNursingLevelId, nursingLevelId: nursingLevelId, nursingLevelName: nursingLevel.name });
                         } catch (e) {

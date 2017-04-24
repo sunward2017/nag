@@ -32,7 +32,10 @@ module.exports = function(ctx,name) {
             bedMonitorId: {type: mongoose.Schema.Types.ObjectId, ref: 'pub_bedMonitor'},  // 睡眠带Id
             tenantId: {type: mongoose.Schema.Types.ObjectId},
             evalution:{type:String},//睡眠质量评估 优，良，一般，差
-            off_bed_frequency:{type: Number, min: 0}//离床次数
+            off_bed_frequency:{type: Number, min: 0},//离床次数
+            max_heart_rate:{type: Number, min: 0},//最大呼吸
+            min_heart_rate:{type: Number, min: 0},//最小呼吸
+            body_move_frequency:{type: Number, min: 0}//体动次数
         }, {
             toObject: {
                 virtuals: true

@@ -551,19 +551,20 @@ module.exports = {
                     }
                     return self.ctx.wrapper.res.ret(ret);
                 }
-                var fallAsleepTime = self.ctx.moment.unix(value.fallAsleepTime / 1000);
-                var awakeTime = self.ctx.moment.unix(value.awakeTime / 1000);
+                var fallAsleepTime = self.ctx.moment(value.fallAsleepTime);
+                var awakeTime = self.ctx.moment(value.awakeTime);
                 var sleepTime = awakeTime.diff(fallAsleepTime, 'hours');
+                
                 // var deepSleepTime = self.ctx.moment.unix(value.deepSleepTime).format('HH:MM:SS');
-                console.log("sleepTime:", sleepTime);
-                var deepSleepTime = (Number(value.deepSleepTime) / 3600000).toFixed(2);
-                var lightSleepTime = (Number(value.lightSleepTime) / 3600000).toFixed(2);
+                var deepSleepTime = self.ctx.moment.duration(value.deepSleepTime).asHours();
+                var lightSleepTime = self.ctx.moment.duration(value.lightSleepTime).asHours();
+                var sleepTime = parseFloat(deepSleepTime)+parseFloat(lightSleepTime);
                 ret = {
-                    fallAsleepTime: fallAsleepTime.format('HH:MM:SS'),
-                    awakeTime:awakeTime.format('HH:MM:SS'),
+                    fallAsleepTime: self.ctx.moment(fallAsleepTime).format('HH:mm'),
+                    awakeTime:self.ctx.moment(awakeTime).format('HH:mm'),
                     sleepTime: sleepTime,
-                    deepSleepTime: deepSleepTime,
-                    lightSleepTime:lightSleepTime,
+                    deepSleepTime: deepSleepTime.toFixed(1),
+                    lightSleepTime:lightSleepTime.toFixed(1),
                     evalution: evalution
                 }
 
@@ -1225,7 +1226,7 @@ module.exports = {
                 var endTime = self.ctx.moment(self.ctx.moment().format('YYYY-MM-DD 12:00:00'));
                 var startTime = self.ctx.moment(endTime).subtract(1, 'days');
                 var fallAsleepTime, awakeTime, bedTime, wakeUpTime;
-                var turnOverFrequency, offBedFrequency;
+                var turnOverFrequency, offBedFrequency,bodyMoveFrequency,maxHeartRate,minHeartRate;
                 var deepSleepTime, lightSleepTime;
 
                 var report = yield self.ctx.modelFactory().model_one(self.ctx.models['dwh_sleepDateReportOfHZFanWeng'], {
@@ -1258,16 +1259,23 @@ module.exports = {
                     evalution = undefined;
                     turnOverFrequency = undefined;
                     offBedFrequency = undefined;
+                    bodyMoveFrequency = undefined;
+                    maxHeartRate=undefined;
+                    minHeartRate=undefined;
                 } else {
-                    fallAsleepTime = self.ctx.moment.unix(dateReport.fallAsleepTime / 1000);
-                    awakeTime = self.ctx.moment.unix(dateReport.awakeTime / 1000);
-                    bedTime = self.ctx.moment.unix(dateReport.bedTime / 1000);
-                    wakeUpTime = self.ctx.moment.unix(dateReport.wakeUpTime / 1000);
-                    deepSleepTime = Number(dateReport.deepSleepTime) / 3600000;
-                    lightSleepTime = Number(dateReport.lightSleepTime) / 3600000;
+                    
+                    fallAsleepTime = self.ctx.moment(dateReport.fallAsleepTime);
+                    awakeTime = self.ctx.moment(dateReport.awakeTime);
+                    bedTime = self.ctx.moment(dateReport.bedTime);
+                    wakeUpTime = self.ctx.moment(dateReport.wakeUpTime);
+                    deepSleepTime = dateReport.deepSleepTime;
+                    lightSleepTime =dateReport.lightSleepTime;
                     evalution = dateReport.evalution;
-                    turnOverFrequency = dateReport.turnOverFrequency
-                    offBedFrequency = dateReport.offBedFrequency
+                    turnOverFrequency = dateReport.turnOverFrequency;
+                    offBedFrequency = dateReport.offBedFrequency;
+                    bodyMoveFrequency = dateReport.bodyMoveFrequency;
+                    maxHeartRate=dateReport.maxHeartRate;
+                    minHeartRate=dateReport.minHeartRate;
                 }
 
                 yield self.ctx.modelFactory().model_create(self.ctx.models['dwh_sleepDateReportOfHZFanWeng'], {
@@ -1285,8 +1293,12 @@ module.exports = {
                     bedMonitorId: device._id,
                     tenantId: tenantId,
                     evalution: evalution,
-                    off_bed_frequency: offBedFrequency
+                    off_bed_frequency:offBedFrequency,
+                    body_move_frequency:bodyMoveFrequency,
+                    max_heart_rate:maxHeartRate,
+                    min_heart_rate:minHeartRate
                 });
+               
                 return self.ctx.wrapper.res.default();
             }
             catch (e) {
@@ -1336,25 +1348,38 @@ module.exports = {
             
                 var dateReports = [];//数据格式修改 封装
                 for (var i = 0, length = reports.length; i < length; i++) {
-                    var report = reports[i];
-                    var date_end_result =  report.date_end.format("yyyy-MM-dd");
+                     var report = reports[i];
+                     var date =  self.ctx.moment(report.date_end).format("YYYY-MM-DD");
+                     var week=  self.ctx.moment(report.date_end).format("dddd");
                     if (report.fallasleep_time) {
-                        var light_sleep_duraion = Number(report.light_sleep_duraion).toFixed(2);
-                        var deep_sleep_duraion = Number(report.deep_sleep_duraion).toFixed(2);
+                        var light_sleep_duraion = self.ctx.moment.duration(report.light_sleep_duraion).asHours();
+                        var deep_sleep_duraion = self.ctx.moment.duration(report.deep_sleep_duraion).asHours();
+                        var fallasleep_time = self.ctx.moment(report.fallasleep_time);
+                        var awake_time = self.ctx.moment(report.awake_time);
+                        var bodyMoveFrequency=report.body_move_frequency;
+                        var maxHeartRate=report.max_heart_rate;
+                        var minHeartRate=report.min_heart_rate;
+                        var heartTime = Number(maxHeartRate+maxHeartRate)/2
+                        //var sleepTime = awake_time.diff(fallasleep_time, 'hours');
+                        var sleepTime = (Number(deep_sleep_duraion)+Number(light_sleep_duraion)).toFixed(1);
                         var dateReport = {
                             fallasleep_time:report.fallasleep_time.format("hh:mm:ss"),
                             awake_time:report.awake_time.format("hh:mm:ss"),
-                            light_sleep_duraion:light_sleep_duraion,
-                            deep_sleep_duraion:deep_sleep_duraion,
-                            endTime:date_end_result,
+                            light_sleep_duraion:light_sleep_duraion.toFixed(1),
+                            deep_sleep_duraion:deep_sleep_duraion.toFixed(1),
+                            date:date,
                             turn_over_frequency:report.turn_over_frequency,
-                            off_bed_frequency:report.off_bed_frequency
+                            off_bed_frequency:report.off_bed_frequency,
+                            sleepTime:sleepTime,
+                            bodyMoveFrequency:bodyMoveFrequency,
+                            heartTime:heartTime,
+                            week:week
                         }
                         dateReports.push(dateReport);             
                     } else {
                          var dateReport = {
-                            endTime:date_end_result
-                            
+                            week:week,
+                            date:date
                         }
                         dateReports.push(dateReport);
                     }

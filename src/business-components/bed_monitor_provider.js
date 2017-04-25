@@ -1638,8 +1638,6 @@ module.exports = {
                         var minHeartRate = report.min_heart_rate;
                         var heartTime = Number(maxHeartRate + minHeartRate) / 2
                         //var sleepTime = awake_time.diff(fallasleepHH_time, 'hours');
-                        console.log("bed_time", bed_time.format("hh:mm:ss"));
-                        console.log("wakeup_time", wakeup_time.format("hh:mm:ss"));
                         var sleepTime = (Number(deep_sleep_duraion) + Number(light_sleep_duraion)).toFixed(1);
                         var dateReport = {
                             fallasleep_time: report.fallasleep_time.format("hh:mm:ss"),

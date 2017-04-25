@@ -266,7 +266,7 @@
                          try {
                              console.log("body:");
                              console.log(this.request.body)
-                             this.body =  yield app.bed_monitor_provider.getDateReport(this.request.body.devId,this.request.body.tenantId,this.openid,this.request.body.skip);
+                             this.body =  yield app.bed_monitor_provider.getDateReport(this.openid,this.request.body.devId,this.request.body.tenantId,this.openid,this.request.body.skip,this.request.body.lastDate);
                             
                          } catch (e) {
                              self.logger.error(e.message);

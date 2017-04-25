@@ -872,9 +872,15 @@ module.exports = {
                                     tenantId: tenantId
                                 }
                             });
-                            elderlyNursingPlan.work_items =  elderlyNursingPlan.work_items.filter(function(item){ return item.type == DIC.D3017.DRUG_USE_ITEM });
                             
-                            yield elderlyNursingPlan.save();
+
+                            if(elderlyNursingPlan&&elderlyNursingPlan.work_items){
+                                
+                                elderlyNursingPlan.work_items =  elderlyNursingPlan.work_items.filter(function(item){ return item.type == DIC.D3017.DRUG_USE_ITEM }); 
+                                
+                                yield elderlyNursingPlan.save(); 
+                            } 
+                                                    
 
                             this.body = app.wrapper.res.ret({ oldNursingLevelId: oldNursingLevelId, nursingLevelId: nursingLevelId, nursingLevelName: nursingLevel.name });
                         } catch (e) {
@@ -4691,8 +4697,8 @@ module.exports = {
 
                                         if (workItem.repeat_type == DIC.D0103.AS_NEEDED) {
                                             //按需工作不需要提醒
-                                            nursingRecord.exec_on = app.moment(now.format('YYYY-MM-DD'));
-                                            nursingRecord.assigned_worker = null; // 待补
+                                            nursingRecord.exec_on =  app.moment(app.moment().format('YYYY-MM-DD') + " 23:59:59");
+                                            // nursingRecord.assigned_worker = null; // 待补
                                             nursingRecordsToSave.push(app._.extend({}, nursingRecord));
                                         } else if (workItem.repeat_type == DIC.D0103.TIME_IN_DAY) {
                                             exec_date_string = now.format('YYYY-MM-DD');
@@ -4991,8 +4997,8 @@ module.exports = {
 
                                 if (workItem.repeat_type == DIC.D0103.AS_NEEDED) {
                                     //按需工作不需要提醒
-                                    nursingRecord.exec_on = app.moment(now.format('YYYY-MM-DD'));
-                                    nursingRecord.assigned_worker = null; // 待补
+                                    nursingRecord.exec_on = app.moment(app.moment().format('YYYY-MM-DD') + " 23:59:59");
+                                    // nursingRecord.assigned_worker = null; // 待补
                                     nursingRecordsToSave.push(app._.extend({}, nursingRecord));
                                 } else if (workItem.repeat_type == DIC.D0103.TIME_IN_DAY) {
                                     //Whether the current record is the last one

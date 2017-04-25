@@ -4998,7 +4998,7 @@ module.exports = {
                                 if (workItem.repeat_type == DIC.D0103.AS_NEEDED) {
                                     //按需工作不需要提醒
                                     nursingRecord.exec_on = app.moment(app.moment().format('YYYY-MM-DD') + " 23:59:59");
-                                    nursingRecord.assigned_worker = null; // 待补
+                                    // nursingRecord.assigned_worker = null; // 待补
                                     nursingRecordsToSave.push(app._.extend({}, nursingRecord));
                                 } else if (workItem.repeat_type == DIC.D0103.TIME_IN_DAY) {
                                     //Whether the current record is the last one

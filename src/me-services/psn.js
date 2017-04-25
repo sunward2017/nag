@@ -77,7 +77,7 @@ module.exports = {
                                     tenantId: tenantId
                                 },
                                 sort: 'exec_on'
-                            }).populate('assigned_worker','name').populate('workItemId').populate('elderlyId','avatar');
+                            }).populate('assigned_worker','name').populate('workItemId','repeat_type').populate('elderlyId','avatar');
                             console.log(rows);
 
                             this.body = app.wrapper.res.rows(rows);

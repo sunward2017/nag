@@ -54,10 +54,25 @@ module.exports = function(ctx, name) {
         //     return null;
         // });
 
+        nursingRecordSchema.virtual('exec_on_ts').get(function(){
+            if(this.exec_on){
+                return ctx.moment(this.exec_on);
+            }
+            return null;
+        });
+
         nursingRecordSchema.virtual('expire_on').get(function(){
             if(this.exec_on && this.duration){
-                var expireDate =ctx.moment(this.exec_on).add(this.duration, 'm');
-                return expireDate;
+                return ctx.moment(this.exec_on).add(this.duration, 'm').toDate();
+            }
+            return null;
+        });
+
+       
+
+        nursingRecordSchema.virtual('expire_on_ts').get(function(){
+            if(this.exec_on && this.duration){
+                return ctx.moment(this.exec_on).add(this.duration, 'm');
             }
             return null;
         });

@@ -448,12 +448,7 @@ module.exports = {
                 self.logger.info('memberCarePersons:', memberCarePersons);
                 for (var i = 0, len = memberCarePersons.length, memberCarePerson; i < len; i++) {
                     memberCarePerson = memberCarePersons[i];
-                    // var device = yield self.ctx.modelFactory().model_one(self.ctx.models['pub_bedMonitor'], {
-                    //     where: {
-                    //         status: 1,
-                    //         _id:memberCarePersons[i].bedMonitorId
-                    //     }
-                    // });
+
                     self.logger.info('device name:' + memberCarePerson.bedMonitorId.name);
                     self.logger.info('getDeviceInfo sessionId:' + (sessionId || 'null or undefined'));
                     if (memberCarePerson.bedMonitorId.name) {
@@ -547,25 +542,41 @@ module.exports = {
                         sleepTime: 0,
                         deepSleepTime: 0,
                         lightSleepTime: 0,
-                        evalution: evalution
+                        evalution: evalution,
+                        turn_over_frequency: 0,
+                        off_bed_frequency: 0,
+                        bodyMoveFrequency: 0,
+                        heartTime: 0,
+                        bed_time: 0,
+                        wakeup_time: 0
                     }
                     return self.ctx.wrapper.res.ret(ret);
                 }
                 var fallAsleepTime = self.ctx.moment(value.fallAsleepTime);
                 var awakeTime = self.ctx.moment(value.awakeTime);
+                var bedTime = self.ctx.moment(value.bedTime);
+                var wakeUpTime = self.ctx.moment(value.wakeUpTime);
                 var sleepTime = awakeTime.diff(fallAsleepTime, 'hours');
-
                 // var deepSleepTime = self.ctx.moment.unix(value.deepSleepTime).format('HH:MM:SS');
                 var deepSleepTime = self.ctx.moment.duration(value.deepSleepTime).asHours();
                 var lightSleepTime = self.ctx.moment.duration(value.lightSleepTime).asHours();
                 var sleepTime = parseFloat(deepSleepTime) + parseFloat(lightSleepTime);
-                ret = {
+                var maxHeartRate = value.maxHeartRate;
+                var minHeartRate = value.minHeartRate;
+                var heartTime = Number(maxHeartRate + minHeartRate) / 2
+                  ret = {
                     fallAsleepTime: self.ctx.moment(fallAsleepTime).format('HH:mm'),
                     awakeTime: self.ctx.moment(awakeTime).format('HH:mm'),
                     sleepTime: sleepTime,
                     deepSleepTime: deepSleepTime.toFixed(1),
                     lightSleepTime: lightSleepTime.toFixed(1),
-                    evalution: evalution
+                    evalution: evalution,
+                    turn_over_frequency: value.turnOverFrequency,
+                    off_bed_frequency: value.offBedFrequency,
+                    bodyMoveFrequency: value.bodyMoveFrequency,
+                    heartTime: heartTime,
+                    bed_time: self.ctx.moment(bedTime).format('HH:mm'),
+                    wakeup_time: self.ctx.moment(wakeUpTime).format('HH:mm')
                 }
 
 
@@ -1232,12 +1243,19 @@ module.exports = {
                 var report = yield self.ctx.modelFactory().model_one(self.ctx.models['dwh_sleepDateReportOfHZFanWeng'], {
                     where: {
                         status: 1,
-                        date_begin: startTime,
-                        date_end: endTime,
+                        date_begin: {
+                            $gte: self.ctx.moment(startTime.format('YYYY-MM-DD')),
+                            $lt: self.ctx.moment(startTime.add(1, 'day').format('YYYY-MM-DD'))
+                        },
+                        date_end: {
+                            $gte: self.ctx.moment(endTime.format('YYYY-MM-DD')),
+                            $lt: self.ctx.moment(endTime.add(1, 'day').format('YYYY-MM-DD'))
+                        },
                         devId: devId,
                         tenantId: tenantId
                     }
                 });
+
                 var device = yield self.ctx.modelFactory().model_one(self.ctx.models['pub_bedMonitor'], {
                     where: {
                         status: 1,
@@ -1281,8 +1299,8 @@ module.exports = {
                 yield self.ctx.modelFactory().model_create(self.ctx.models['dwh_sleepDateReportOfHZFanWeng'], {
                     status: 1,
                     devId: devId,
-                    date_begin: startTime,
-                    date_end: endTime,
+                    date_begin: self.ctx.moment(self.ctx.moment().format('YYYY-MM-DD 12:00:00')).subtract(1, 'days'),
+                    date_end: self.ctx.moment(self.ctx.moment().format('YYYY-MM-DD 12:00:00')),
                     bed_time: bedTime,
                     wakeup_time: wakeUpTime,
                     fallasleep_time: fallAsleepTime,
@@ -1298,7 +1316,8 @@ module.exports = {
                     max_heart_rate: maxHeartRate,
                     min_heart_rate: minHeartRate
                 });
-
+                console.log(self.ctx.moment(endTime).format('YYYY-MM-DD'));
+                console.log(self.ctx.moment(startTime).format('YYYY-MM-DD'));
                 return self.ctx.wrapper.res.default();
             }
             catch (e) {
@@ -1307,7 +1326,7 @@ module.exports = {
             }
         }).catch(self.ctx.coOnError);
     },
-    getDateReport: function (openid, devId, tenantId, openid, skip, lastDate) {
+    getDateReport: function (openid, devId, tenantId, skip, lastDate) {
         var self = this;
         return co(function* () {
             try {
@@ -1319,7 +1338,8 @@ module.exports = {
                 }
                 var todayTime = self.ctx.moment(self.ctx.moment().format('YYYY-MM-DD 12:00:00'));
                 if (skip != 0) {
-                    todayTime = self.ctx.moment(self.ctx.moment(lastDate).format('YYYY-MM-DD 12:00:00'))
+                    todayTime = self.ctx.moment(self.ctx.moment(lastDate).subtract(1, 'days').format('YYYY-MM-DD 12:00:00'))
+                    console.log("最后时间：", todayTime.format('YYYY-MM-DD 12:00:00'));
                 }
                 var fiveDaysAgoTime = self.ctx.moment(todayTime).subtract(4, 'days');
                 var device = yield self.ctx.modelFactory().model_one(self.ctx.models['pub_bedMonitor'], {
@@ -1346,30 +1366,33 @@ module.exports = {
                         tenantId: tenantId
                     }
                 });
-
+                if (self.ctx.moment(lastDate).isSame(self.ctx.moment(memberCarePerson.check_in_time), 'day') || self.ctx.moment(lastDate).isBefore(self.ctx.moment(memberCarePerson.check_in_time), 'day')) {
+                    console.log("最后时间：", lastDate);
+                    return self.ctx.wrapper.res.rows([]);
+                }
+                //判断关心时间与获取开始时间是否一致，以关心时间为首要条件
                 if (fiveDaysAgoTime.isSame(self.ctx.moment(memberCarePerson.check_in_time), 'day')) {
                     var date_end_check_time = fiveDaysAgoTime;
-                    console.log("相同", date_end_check_time.format('YYYY-MM-DD'));
                 } else if (fiveDaysAgoTime.isAfter(self.ctx.moment(memberCarePerson.check_in_time), 'day')) {
                     var date_end_check_time = fiveDaysAgoTime
-                    console.log("大于", date_end_check_time.format('YYYY-MM-DD'));
                 } else {
                     var date_end_check_time = self.ctx.moment(memberCarePerson.check_in_time)
-                    console.log("小于", date_end_check_time.format('YYYY-MM-DD'));
                 }
-                console.log("todayTime", todayTime.format('YYYY-MM-DD'));
+                
                 var reports = yield self.ctx.modelFactory().model_query(self.ctx.models['dwh_sleepDateReportOfHZFanWeng'], {
                     where: {
                         date_end: {
-                            $gte: date_end_check_time.format('YYYY-MM-DD'),
-                            $lt: self.ctx.moment(todayTime.add(1, 'day')).format('YYYY-MM-DD')
+                            $gt: self.ctx.moment(date_end_check_time).subtract(1, 'day').format('YYYY-MM-DD'),
+                            $lt: self.ctx.moment(todayTime).format('YYYY-MM-DD')
                         },
                         status: 1,
                         devId: devId,
                         tenantId: tenantId
                     },
                     sort: { date_end: -1 }
-                }, { limit: 5, skip: skip });
+                }, { limit: 5 });
+              
+                //满足五条数据
                 if (reports.length == 5) {
                     for (var i = 0, length = reports.length; i < length; i++) {
                         var report = reports[i];
@@ -1411,84 +1434,104 @@ module.exports = {
                     }
                     return self.ctx.wrapper.res.rows(dateReports);
                 }
+
+                //不满足
                 var statisticsReports = yield self.getStatisticsReportByDevId(sessionId, devId, fiveDaysAgoTime, todayTime);
-                console.log("reports", reports);
-                console.log("reports length", reports.length);
+                console.log("fiveDaysAgoTime:", fiveDaysAgoTime.format('YYYY-MM-DD'));
+                console.log("todayTime:", todayTime.format('YYYY-MM-DD'));
+                console.log("statisticsReports:",statisticsReports);
                 var i = 1;
+                var new_statisticsReports = [];
+                //远程不足五条
+                if(statisticsReports == "no_day_report"||statisticsReports =="unknown_device"||statisticsReports =="err_date_invalid"||statisticsReports =="err_day_params"||statisticsReports =="bad param"||statisticsReports =="0x8005"){
+                           self.ctx.wrapper.res.error({ message: 'get statistics reports fail' });
+                }else{
                 while (statisticsReports.length < 5) {
+
                     fiveDaysAgoTime = self.ctx.moment(fiveDaysAgoTime).subtract(5 * i - 1, 'days');
                     i = i * 10;
                     statisticsReports = yield self.getStatisticsReportByDevId(sessionId, devId, fiveDaysAgoTime, todayTime);
                 }
+
                 statisticsReports = statisticsReports.splice(-5);
-                console.log("后五条数据",statisticsReports);
-                // yield self.ctx.modelFactory().model_bulkInsert(app.models['dwh_sleepDateReportOfHZFanWeng'], {
-                //     removeWhere: {
-                //         date_end: {
-                //             $gte: date_end_check_time.format('YYYY-MM-DD'),
-                //             $lt: self.ctx.moment(todayTime.add(1, 'day')).format('YYYY-MM-DD')
-                //         },
-                //         status: 1,
-                //         devId: devId,
-                //         tenantId: tenantId
+                console.log("后五条数据", statisticsReports);
+                for (var i = 0, len = statisticsReports.length; i < len; i++) {
+                    var statisticsReport = statisticsReports[i];
+                    console.log("后五条数据123", self.ctx.moment(statisticsReport.dateString).format('YYYY-MM-DD'));
+                    var new_statisticsReport = {
+                        status: 1,
+                        devId: devId,
+                        date_begin: self.ctx.moment(self.ctx.moment(statisticsReport.dateString).subtract(1, 'days').format('YYYY-MM-DD 12:00:00')),
+                        date_end: self.ctx.moment(self.ctx.moment(statisticsReport.dateString).format('YYYY-MM-DD 12:00:00')),
+                        bed_time: self.ctx.moment(statisticsReport.bedTime),
+                        wakeup_time: self.ctx.moment(statisticsReport.wakeUpTime),
+                        fallasleep_time: self.ctx.moment(statisticsReport.fallAsleepTime),
+                        awake_time: self.ctx.moment(statisticsReport.awakeTime),
+                        deep_sleep_duraion: statisticsReport.deepSleepTime,
+                        light_sleep_duraion: statisticsReport.lightSleepTime,
+                        turn_over_frequency: statisticsReport.turnOverFrequency,
+                        bedMonitorId: device._id,
+                        tenantId: tenantId,
+                        evalution: statisticsReport.evalution,
+                        off_bed_frequency: statisticsReport.offBedFrequency,
+                        body_move_frequency: statisticsReport.bodyMoveFrequency,
+                        max_heart_rate: statisticsReport.maxHeartRate,
+                        min_heart_rate: statisticsReport.minHeartRate
+                    }
+                    new_statisticsReports.push(new_statisticsReport)
+                }
+                //如果有当天数据则不删除
+                if (self.ctx.moment(statisticsReports[statisticsReports.length - 1].dateString).isSame(todayTime, 'day')) {
 
-                //     },
-                //     rows: statisticsReports.splice(-5)
-                // });
+                    //console.log("新五条数据", new_statisticsReports);
+                    yield self.ctx.modelFactory().model_bulkInsert(self.ctx.models['dwh_sleepDateReportOfHZFanWeng'], {
+                        removeWhere: {
+                            date_end: {
+                                $gt: self.ctx.moment(statisticsReports[0].dateString).subtract(1, 'days').format('YYYY-MM-DD'),
+                                $lt: self.ctx.moment(todayTime).add(1, 'day').format('YYYY-MM-DD')
+                            },
+                            status: 1,
+                            devId: devId,
+                            tenantId: tenantId
 
-                // if (reports.length < statisticsReports.length) {
-                //     for (var i = 0, length = reports.length; i < length; i++) {
-                //         var reports = reports[i];
-                //         for (var j = 0, len = statisticsReports.length; j < len; j++) {
-                //             var statisticsReport = statisticsReports[j];
-                //             if (statisticsReport) {
-                //                 if (self.ctx.moment(report.fallasleep_time).isSame(self.ctx.moment(statisticsReport.fallAsleepTime), 'day')) {
-                //                     console.log("相同", report.fallasleep_time)
-                //                     delete statisticsReports[j];
-                //                 } else {
-                //     console.log("不相同",report.fallasleep_time)
-                //     console.log("存在")
-                //     yield self.ctx.modelFactory().model_create(self.ctx.models['dwh_sleepDateReportOfHZFanWeng'], {
-                //     status: 1,
-                //     devId: devId,
-                //     date_begin: self.ctx.moment(statisticsReport.awakeTime).subtract(1, 'days'),
-                //     date_end: self.ctx.moment(statisticsReport.awakeTime),
-                //     bed_time: self.ctx.moment(statisticsReport.bedTime),
-                //     wakeup_time: self.ctx.moment(statisticsReport.wakeUpTime),
-                //     fallasleep_time: self.ctx.moment(statisticsReport.fallAsleepTime),
-                //     awake_time: self.ctx.moment(statisticsReport.awakeTime),
-                //     deep_sleep_duraion: statisticsReport.deepSleepTime,
-                //     light_sleep_duraion: statisticsReport.lightSleepTime,
-                //     turn_over_frequency: statisticsReport.turnOverFrequency,
-                //     bedMonitorId: device._id,
-                //     tenantId: tenantId,
-                //     evalution: statisticsReport.evalution,
-                //     off_bed_frequency: statisticsReport.offBedFrequency,
-                //     body_move_frequency: statisticsReport.bodyMoveFrequency,
-                //     max_heart_rate: statisticsReport.maxHeartRate,
-                //     min_heart_rate: statisticsReport.minHeartRate
-                // });
-                //             delete statisticsReports[j];
-                //         }
-                //     }
+                        },
+                        rows: new_statisticsReports
+                    });
 
-                // }
-                // }
-                // console.log("statisticsReport length", statisticsReports);
+                }
+                else {
+                    //console.log("新五条数据", new_statisticsReports);
+                    yield self.ctx.modelFactory().model_bulkInsert(self.ctx.models['dwh_sleepDateReportOfHZFanWeng'], {
+                        removeWhere: {
+                            date_end: {
+                                $gt: self.ctx.moment(statisticsReports[0].dateString).subtract(1, 'days').format('YYYY-MM-DD'),
+                                $lt: todayTime.format('YYYY-MM-DD')
+                            },
+                            status: 1,
+                            devId: devId,
+                            tenantId: tenantId
 
+                        },
+                        rows: new_statisticsReports
+                    });
+
+                }
+                }
+                console.log("上拉：", date_end_check_time.format('YYYY-MM-DD'));
+                console.log("上拉：", self.ctx.moment(todayTime).add(1, 'day').format('YYYY-MM-DD'));
                 reports = yield self.ctx.modelFactory().model_query(self.ctx.models['dwh_sleepDateReportOfHZFanWeng'], {
                     where: {
                         date_end: {
-                            $gte: date_end_check_time.format('YYYY-MM-DD'),
-                            $lt: self.ctx.moment(todayTime.add(1, 'day')).format('YYYY-MM-DD')
+                            $gt: self.ctx.moment(date_end_check_time).subtract(1, 'days').format('YYYY-MM-DD'),
+                            $lt: self.ctx.moment(todayTime).format('YYYY-MM-DD')
                         },
                         status: 1,
                         devId: devId,
                         tenantId: tenantId
                     },
                     sort: { date_end: -1 }
-                }, { limit: 5, skip: skip });
-
+                }, { limit: 5 });
+                console.log("reports", reports);
                 for (var i = 0, length = reports.length; i < length; i++) {
                     var report = reports[i];
                     var date = self.ctx.moment(report.date_end).format("YYYY-MM-DD");
@@ -1519,8 +1562,8 @@ module.exports = {
                             bodyMoveFrequency: bodyMoveFrequency,
                             heartTime: heartTime,
                             week: week,
-                            bed_time: bed_time,
-                            wakeup_time: wakeup_time
+                            bed_time: bed_time.format("hh:mm:ss"),
+                            wakeup_time: wakeup_time.format("hh:mm:ss")
                         }
                         dateReports.push(dateReport);
                     } else {
@@ -1551,6 +1594,76 @@ module.exports = {
                 });
                 ret = JSON.parse(ret);
                 return ret.retValue;
+            }
+            catch (e) {
+                console.log(e);
+                self.logger.error(emessage);
+            }
+        }).catch(self.ctx.coOnError);
+    },
+    getTodayReport: function (openid,devId,tenantId) {
+        var self = this;
+        return co(function* () {
+            try {
+                var sessionId = yield self.getSession(openid);
+                var sessionIsExpired = yield self.checkSessionIsExpired(sessionId);
+                if (sessionIsExpired) {
+                    sessionId = yield self.login(openid);
+                }
+                var endTime = self.ctx.moment(self.ctx.moment().format('YYYY-MM-DD 12:00:00'));
+                var startTime = self.ctx.moment(endTime).subtract(1, 'days');
+                var report = yield self.ctx.modelFactory().model_one(self.ctx.models['dwh_sleepDateReportOfHZFanWeng'], {
+                    where: {
+                        status: 1,
+                        date_begin: {
+                            $gte: self.ctx.moment(startTime.format('YYYY-MM-DD')),
+                            $lt: self.ctx.moment(startTime.add(1, 'day').format('YYYY-MM-DD'))
+                        },
+                        date_end: {
+                            $gte: self.ctx.moment(endTime.format('YYYY-MM-DD')),
+                            $lt: self.ctx.moment(endTime.add(1, 'day').format('YYYY-MM-DD'))
+                        },
+                        devId: devId,
+                        tenantId: tenantId
+                    }
+                });
+                if(report){
+                 if (report.fallasleep_time) {
+                        var light_sleep_duraion = self.ctx.moment.duration(report.light_sleep_duraion).asHours();
+                        var deep_sleep_duraion = self.ctx.moment.duration(report.deep_sleep_duraion).asHours();
+                        var fallasleep_time = self.ctx.moment(report.fallasleep_time);
+                        var awake_time = self.ctx.moment(report.awake_time);
+                        var bodyMoveFrequency = report.body_move_frequency;
+                        var maxHeartRate = report.max_heart_rate;
+                        var minHeartRate = report.min_heart_rate;
+                        var heartTime = Number(maxHeartRate + minHeartRate) / 2
+                        //var sleepTime = awake_time.diff(fallasleepHH_time, 'hours');
+                        console.log("bed_time", bed_time.format("hh:mm:ss"));
+                        console.log("wakeup_time", wakeup_time.format("hh:mm:ss"));
+                        var sleepTime = (Number(deep_sleep_duraion) + Number(light_sleep_duraion)).toFixed(1);
+                        var dateReport = {
+                            fallasleep_time: report.fallasleep_time.format("hh:mm:ss"),
+                            awake_time: report.awake_time.format("hh:mm:ss"),
+                            light_sleep_duraion: light_sleep_duraion.toFixed(1),
+                            deep_sleep_duraion: deep_sleep_duraion.toFixed(1),
+                            turn_over_frequency: report.turn_over_frequency,
+                            off_bed_frequency: report.off_bed_frequency,
+                            sleepTime: sleepTime,
+                            bodyMoveFrequency: bodyMoveFrequency,
+                            heartTime: heartTime,
+                            bed_time: report.bed_time.format("hh:mm:ss"),
+                            wakeup_time: report.wakeup_time.format("hh:mm:ss")
+                        }
+                    } else {
+                        var dateReport = {
+
+                        }   
+                    }
+                    return self.ctx.wrapper.res.ret(dateReport);
+                }
+                var sleepStatu = yield self.getSleepBriefReport(sessionId, devId, tenantId);
+                sleepStatu = JSON.parse(sleepStatu);
+                return self.ctx.wrapper.res.ret(sleepStatu);
             }
             catch (e) {
                 console.log(e);

@@ -76,13 +76,9 @@ module.exports = function(ctx, name) {
         });
 
         nursingRecordSchema.virtual('remind_on_ts').get(function(){
-            var remind_on_ts_array = [];
-            if(this.remind_on){
-                for(var i=0;i<remind_on.length;i++){
-                    remind_on_ts_array.push(ctx.moment(remind_on[i]));
-                }
-            }
-            return remind_on_ts_array;
+            return ctx._.map(this.remind_on, function(o){
+              return ctx.moment(o);  
+            });
         });
 
 

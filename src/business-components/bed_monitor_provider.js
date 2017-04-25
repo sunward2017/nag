@@ -1414,19 +1414,28 @@ module.exports = {
                 var statisticsReports = yield self.getStatisticsReportByDevId(sessionId, devId, fiveDaysAgoTime, todayTime);
                 console.log("reports", reports);
                 console.log("reports length", reports.length);
-                yield self.ctx.modelFactory().model_bulkInsert(app.models['dwh_sleepDateReportOfHZFanWeng'], {
-                    removeWhere: {
-                        date_end: {
-                            $gte: date_end_check_time.format('YYYY-MM-DD'),
-                            $lt: self.ctx.moment(todayTime.add(1, 'day')).format('YYYY-MM-DD')
-                        },
-                        status: 1,
-                        devId: devId,
-                        tenantId: tenantId
+                var i = 1;
+                while (statisticsReports.length < 5) {
+                    fiveDaysAgoTime = self.ctx.moment(fiveDaysAgoTime).subtract(5 * i - 1, 'days');
+                    i = i * 10;
+                    statisticsReports = yield self.getStatisticsReportByDevId(sessionId, devId, fiveDaysAgoTime, todayTime);
+                }
+                statisticsReports = statisticsReports.splice(-5);
+                console.log("后五条数据",statisticsReports);
+                // yield self.ctx.modelFactory().model_bulkInsert(app.models['dwh_sleepDateReportOfHZFanWeng'], {
+                //     removeWhere: {
+                //         date_end: {
+                //             $gte: date_end_check_time.format('YYYY-MM-DD'),
+                //             $lt: self.ctx.moment(todayTime.add(1, 'day')).format('YYYY-MM-DD')
+                //         },
+                //         status: 1,
+                //         devId: devId,
+                //         tenantId: tenantId
 
-                    },
-                    rows: nursingRecordsToSave
-                });
+                //     },
+                //     rows: statisticsReports.splice(-5)
+                // });
+
                 // if (reports.length < statisticsReports.length) {
                 //     for (var i = 0, length = reports.length; i < length; i++) {
                 //         var reports = reports[i];
@@ -1466,7 +1475,7 @@ module.exports = {
                 // }
                 // }
                 // console.log("statisticsReport length", statisticsReports);
-            
+
                 reports = yield self.ctx.modelFactory().model_query(self.ctx.models['dwh_sleepDateReportOfHZFanWeng'], {
                     where: {
                         date_end: {
@@ -1479,54 +1488,58 @@ module.exports = {
                     },
                     sort: { date_end: -1 }
                 }, { limit: 5, skip: skip });
-       
+
                 for (var i = 0, length = reports.length; i < length; i++) {
-                var report = reports[i];
-                var date = self.ctx.moment(report.date_end).format("YYYY-MM-DD");
-                var week = self.ctx.moment(report.date_end).format("dddd");
-                if (report.fallasleep_time) {
-                    var light_sleep_duraion = self.ctx.moment.duration(report.light_sleep_duraion).asHours();
-                    var deep_sleep_duraion = self.ctx.moment.duration(report.deep_sleep_duraion).asHours();
-                    var fallasleep_time = self.ctx.moment(report.fallasleep_time);
-                    var awake_time = self.ctx.moment(report.awake_time);
-                    var bodyMoveFrequency = report.body_move_frequency;
-                    var maxHeartRate = report.max_heart_rate;
-                    var minHeartRate = report.min_heart_rate;
-                    var heartTime = Number(maxHeartRate + minHeartRate) / 2
-                    //var sleepTime = awake_time.diff(fallasleep_time, 'hours');
-                    console.log("heartTime", heartTime);
-                    var sleepTime = (Number(deep_sleep_duraion) + Number(light_sleep_duraion)).toFixed(1);
-                    var dateReport = {
-                        fallasleep_time: report.fallasleep_time.format("hh:mm:ss"),
-                        awake_time: report.awake_time.format("hh:mm:ss"),
-                        light_sleep_duraion: light_sleep_duraion.toFixed(1),
-                        deep_sleep_duraion: deep_sleep_duraion.toFixed(1),
-                        date: date,
-                        turn_over_frequency: report.turn_over_frequency,
-                        off_bed_frequency: report.off_bed_frequency,
-                        sleepTime: sleepTime,
-                        bodyMoveFrequency: bodyMoveFrequency,
-                        heartTime: heartTime,
-                        week: week
+                    var report = reports[i];
+                    var date = self.ctx.moment(report.date_end).format("YYYY-MM-DD");
+                    var week = self.ctx.moment(report.date_end).format("dddd");
+                    if (report.fallasleep_time) {
+                        var light_sleep_duraion = self.ctx.moment.duration(report.light_sleep_duraion).asHours();
+                        var deep_sleep_duraion = self.ctx.moment.duration(report.deep_sleep_duraion).asHours();
+                        var fallasleep_time = self.ctx.moment(report.fallasleep_time);
+                        var awake_time = self.ctx.moment(report.awake_time);
+                        var bodyMoveFrequency = report.body_move_frequency;
+                        var maxHeartRate = report.max_heart_rate;
+                        var minHeartRate = report.min_heart_rate;
+                        var heartTime = Number(maxHeartRate + minHeartRate) / 2
+                        var bed_time = self.ctx.moment(report.bedTime);
+                        var wakeup_time = self.ctx.moment(report.wakeUpTime);
+                        //var sleepTime = awake_time.diff(fallasleep_time, 'hours');
+                        console.log("heartTime", heartTime);
+                        var sleepTime = (Number(deep_sleep_duraion) + Number(light_sleep_duraion)).toFixed(1);
+                        var dateReport = {
+                            fallasleep_time: report.fallasleep_time.format("hh:mm:ss"),
+                            awake_time: report.awake_time.format("hh:mm:ss"),
+                            light_sleep_duraion: light_sleep_duraion.toFixed(1),
+                            deep_sleep_duraion: deep_sleep_duraion.toFixed(1),
+                            date: date,
+                            turn_over_frequency: report.turn_over_frequency,
+                            off_bed_frequency: report.off_bed_frequency,
+                            sleepTime: sleepTime,
+                            bodyMoveFrequency: bodyMoveFrequency,
+                            heartTime: heartTime,
+                            week: week,
+                            bed_time: bed_time,
+                            wakeup_time: wakeup_time
+                        }
+                        dateReports.push(dateReport);
+                    } else {
+                        var dateReport = {
+                            week: week,
+                            date: date
+                        }
+                        dateReports.push(dateReport);
                     }
-                    dateReports.push(dateReport);
-                } else {
-                    var dateReport = {
-                        week: week,
-                        date: date
-                    }
-                    dateReports.push(dateReport);
                 }
+                console.log("dateReports", dateReports);
+                return self.ctx.wrapper.res.rows(dateReports);
             }
-            console.log("dateReports", dateReports);
-            return self.ctx.wrapper.res.rows(dateReports);
-        }
             catch (e) {
-            console.log(e);
-            self.logger.error(e.message);
-        }
-    }).catch(self.ctx.coOnError);
-},
+                console.log(e);
+                self.logger.error(e.message);
+            }
+        }).catch(self.ctx.coOnError);
+    },
     getStatisticsReportByDevId: function (sessionId, devId, startTime, endTime) {
         var self = this;
         return co(function* () {

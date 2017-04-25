@@ -70,7 +70,7 @@ module.exports = {
                             var today = app.moment(app.moment().format('YYYY-MM-DD') + " 00:00:00");
 
                             var rows = yield app.modelFactory().model_query(app.models['psn_nursingRecord'], {
-                                select: 'exec_on executed_flag name description duration assigned_worker confirmed_flag confirmed_on workItemId voice_content remind_on elderlyId',
+                                select: 'exec_on executed_flag name description duration assigned_worker confirmed_flag confirmed_on workItemId voice_content remind_on elderlyId elderly_name',
                                 where: {
                                     exec_on: { '$gte': today.toDate(), '$lt': today.add(1, 'days').toDate() },
                                     roomId: {$in: roomIds},

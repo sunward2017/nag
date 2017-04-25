@@ -68,8 +68,6 @@ module.exports = function(ctx, name) {
             return null;
         });
 
-       
-
         nursingRecordSchema.virtual('expire_on_ts').get(function(){
             if(this.exec_on && this.duration){
                 return ctx.moment(this.exec_on).add(this.duration, 'm');

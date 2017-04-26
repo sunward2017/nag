@@ -38,6 +38,11 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                             span.text-danger(ng-show="utils.vinput(this.theForm,'capacity','number')") {{ "validator.NUMBER" | translate}}
                             span.text-danger(ng-show="utils.vinput(this.theForm,'capacity','validator')") {{ "validator.MIN" | translate:{min:1} }}
                     fieldset: .form-group
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-FORBIDDEN') | translate}}:
+                        .col-md-10
+                            input.form-control(ng-disabled="!vm.model.capacity", type='text', name='forbiddens',ng-model='vm.forbiddens',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-FORBIDDEN")|translate}}' ,required='')
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'forbiddens','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset: .form-group
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-FLAG-COLLECTION') | translate}}:
                         .col-md-2
                             .checkbox.c-checkbox

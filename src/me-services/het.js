@@ -266,7 +266,26 @@
                          try {
                              console.log("body:");
                              console.log(this.request.body)
-                             this.body =  yield app.bed_monitor_provider.getDateReport(this.openid,this.request.body.devId,this.request.body.tenantId,this.openid,this.request.body.skip,this.request.body.lastDate);
+                             this.body =  yield app.bed_monitor_provider.getDateReport(this.openid,this.request.body.devId,this.request.body.tenantId,this.request.body.skip,this.request.body.lastDate);
+                            
+                         } catch (e) {
+                             self.logger.error(e.message);
+                             this.body = app.wrapper.res.error(e);
+                         }
+                         yield next;
+                     };
+                 }
+             },
+              {
+                 method: 'sleepDevicews$getTodayReport',
+                 verb: 'post',
+                 url: this.service_url_prefix + "/sleepDevicews$getTodayReport",
+                 handler: function (app, options) {
+                     return function *(next) {
+                         try {
+                             console.log("body:");
+                             console.log(this.request.body)
+                             this.body =  yield app.bed_monitor_provider.getTodayReport(this.openid,this.request.body.devId,this.request.body.tenantId);
                             
                          } catch (e) {
                              self.logger.error(e.message);

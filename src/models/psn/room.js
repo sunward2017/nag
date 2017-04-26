@@ -21,6 +21,7 @@ module.exports = function(ctx,name) {
             floor: {type: Number, min: -99, max: 99},
             number_in_floor: {type: Number, min: 1, max: 99},
             capacity: {type: Number, required: true, min: 1},
+            forbiddens: [Number],
             stop_flag: {type: Boolean, default: false},
             districtId: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'psn_district'},
             robots:[{type: mongoose.Schema.Types.ObjectId, ref: 'pub_robot'}],

@@ -294,6 +294,25 @@
                          yield next;
                      };
                  }
+             },
+             {
+                 method: 'sleepDevicews$getReportByDate',
+                 verb: 'post',
+                 url: this.service_url_prefix + "/sleepDevicews$getReportByDate",
+                 handler: function (app, options) {
+                     return function *(next) {
+                         try {
+                             console.log("body:");
+                             console.log(this.request.body)
+                             this.body =  yield app.bed_monitor_provider.getReportByDate(this.request.body.devId,this.request.body.tenantId,this.request.body.targetdDate);
+                            
+                         } catch (e) {
+                             self.logger.error(e.message);
+                             this.body = app.wrapper.res.error(e);
+                         }
+                         yield next;
+                     };
+                 }
              }
          ];
          return this;

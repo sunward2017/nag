@@ -123,14 +123,15 @@ module.exports = {
                     url: externalSystemConfig.bed_monitor_provider.api_url + '/ECSServer/userws/sessionIsExpired.json',
                     form: { sessionId: sessionId },
                 });
+                // console.log('checkSessionIsExpired:', ret);
                 ret = JSON.parse(ret);
-                if (ret.retCode == "fail") {
-                    if (ret.retValue == "0x0020") {
+                if (ret.retCode == "success") {
+                    if (ret.retValue == "0x0021") {
 
-                        return true;
+                        return false;
                     }
                 }
-                return false;
+                return true;
             }
 
             catch (e) {
@@ -846,15 +847,24 @@ module.exports = {
                         }
                     }
                 });
-                // console.log('获取全部监控睡眠带 ', bedMonitors);
+                console.log('获取全部监控睡眠带 ',  self.ctx._.map(bedMonitors, function(o) {return o.name}));
 
-                var beginDay = self.ctx.moment().format('YYYY MM DD');
-                var beginTime, endTime, endDay, beginMoment, endMonent;//定义报警范围的一些变量,20170421,by yrm
+                var beginDay = self.ctx.moment().format('YYYY-MM-DD');
+                var beginTime, endTime, endDay, beginMoment, endMoment;//定义报警范围的一些变量,20170421,by yrm
 
                 for (var i = 0; i < bedMonitors.length; i++) {
-                    var bedMonitor = bedMonitors[i], key, oldBedStatus, bedStatus, sessionId;
+                    var bedMonitor = bedMonitors[i], key, oldBedStatus, bedStatus, sessionId, tenant, elderly, room;
+                    self.ctx.clog.log(self.logger, '>>>>> 睡眠带 >>>>> ' + bedMonitor.name);
 
-                    var room = yield self.ctx.modelFactory().model_one(self.ctx.models['psn_room'], {
+                    var ret = yield self.getLatestSmbPerMinuteRecord(sessionId, bedMonitor.name);
+                    var isOffLine = ret.retValue == 'device_offline';
+                    // console.log('当前状态:', isOffLine ? '离线' : '在线');
+                    // self.logger.info('当前状态:' + (isOffLine ? '离线' : '在线'));
+                    self.ctx.clog.log(self.logger, '当前状态:' + (isOffLine ? '离线' : '在线'));
+                    bedMonitor.device_status = isOffLine ? DIC.D3009.OffLine: DIC.D3009.OnLine;
+                    yield bedMonitor.save();
+
+                    room = yield self.ctx.modelFactory().model_one(self.ctx.models['psn_room'], {
                         where: {
                             status: 1,
                             "bedMonitors.bedMonitorName": bedMonitor.name,
@@ -862,148 +872,214 @@ module.exports = {
                         }
                     });
 
-                    if (room) {
-                        var room_bedMonitors = room.bedMonitors;
-                        var bed_no = (self.ctx._.find(room.bedMonitors, function (o) {
-                            return o.bedMonitorId == bedMonitor._id;
-                        })).bed_no;
-                        var elderly = yield self.ctx.modelFactory().model_one(self.ctx.models['psn_elderly'], {
-                            where: {
-                                status: 1,
-                                "room_value.roomId": room._id,
-                                "room_value.bed_no": bed_no,
-                                tenantId: bedMonitor.tenantId
-                            }
-                        });
+                    if(!room) {
+                        self.ctx.clog.log(self.logger, 'updatebedMonitorInfo skip because bedMonitor no room');
+                        continue;
+                    }
 
-                        if (elderly) {
-                            //进行报警时间范围判断，20170421,by yrm
-                            var tenant = self.ctx._.findWhere(tenants, { _id: bedMonitor.tenantId });
-                            if (elderly.bed_monitor_timeout_alarm_begin && elderly.bed_monitor_timeout_alarm_end) {
-                                beginTime = elderly.bed_monitor_timeout_alarm_begin;
-                                endTime = elderly.bed_monitor_timeout_alarm_end;
-                            } else {
-                                if (tenant && tenant.other_config && tenant.other_config.psn_bed_monitor_timeout_alarm_begin && tenant.other_config.psn_bed_monitor_timeout_alarm_end) {
-                                    beginTime = tenant.other_config.psn_bed_monitor_timeout_alarm_begin;
-                                    endTime = tenant.other_config.psn_bed_monitor_timeout_alarm_end;
-                                }
-                            }
-                            if (beginTime > endTime) {
-                                endDay = app.moment(beginDay, 'YYYY MM DD').add(1, 'days').format('YYYY MM DD');
-                            } else {
-                                endDay = beginDay;
-                            }
-                            beginMoment = app.moment(beninDay + ' ' + beginTime, 'YYYY MM DD mm:hh');
-                            endMoment = app.moment(endDay + ' ' + endTime, 'YYYY MM DD mm:hh');
-                            console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
-                            console.log('>>>>> 睡眠带报警范围起始时间： >>>>>');
-                            console.log(beginMoment);
-                            console.log('>>>>> 睡眠带报警范围结束时间： >>>>>');
-                            console.log(endMoment);
-                            console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
-                            if (self.ctx.moment().isBetween(beginMoment, endMoment)) {
-                                if (elderly.bed_monitor_timeout) {
-                                    timeout = elderly.bed_monitor_timeout;
-                                } else {
-                                    if (tenant && tenant.other_config && tenant.other_config.psn_bed_monitor_timeout) {
-                                        timeout = tenant.other_config.psn_bed_monitor_timeout;
-                                    }
-                                }
-                            } else {
-                                continue;
-                            }
+                    var room_bedMonitors = room.bedMonitors;
+                    // self.ctx.clog.log(self.logger, 'room_bedMonitors', room_bedMonitors);
+                    // self.ctx.clog.log(self.logger, 'bedMonitor', bedMonitor);
+
+                    var bed_no = (self.ctx._.find(room_bedMonitors, function (o) {
+                        return o.bedMonitorId.toString() == bedMonitor._id.toString();
+                    }) || {}).bed_no;
+
+                    if (!bed_no) {
+                        self.ctx.clog.log(self.logger, 'updatebedMonitorInfo skip because bed_no not matched');
+                        continue;
+                    }
+
+                    elderly = yield self.ctx.modelFactory().model_one(self.ctx.models['psn_elderly'], {
+                        where: {
+                            status: 1,
+                            "room_value.roomId": room._id,
+                            "room_value.bed_no": bed_no,
+                            tenantId: bedMonitor.tenantId
+                        }
+                    });
+
+                    if (!elderly) {
+                        self.ctx.clog.log(self.logger, 'updatebedMonitorInfo skip because elderly not matched roomid and bed_no');
+                        continue;
+                    }
+
+                    self.ctx.clog.log(self.logger, 'room:', room.name, ' bed_no:', bed_no, ' elderly:', elderly.name);
+
+                    var isInAlarmRange = false;
+                    //进行报警时间范围判断，20170421,by yrm
+                    if (elderly.bed_monitor_timeout_alarm_begin && elderly.bed_monitor_timeout_alarm_end) {
+                        self.ctx.clog.log(self.logger, 'use elderly define alarm range');
+                        beginTime = elderly.bed_monitor_timeout_alarm_begin;
+                        endTime = elderly.bed_monitor_timeout_alarm_end;
+                    } else {
+                        // console.log('tenants:', tenants);
+                        // console.log('bedMonitor:', bedMonitor);
+                        tenant = self.ctx._.find(tenants, function (o){
+                            return o._id.toString() == bedMonitor.tenantId.toString();
+                        });
+                        // console.log('tenant:', tenant);
+                        if (tenant && tenant.other_config && tenant.other_config.psn_bed_monitor_timeout_alarm_begin && tenant.other_config.psn_bed_monitor_timeout_alarm_end) {
+                            self.ctx.clog.log(self.logger, 'use tenant define alarm range');
+                            beginTime = tenant.other_config.psn_bed_monitor_timeout_alarm_begin;
+                            endTime = tenant.other_config.psn_bed_monitor_timeout_alarm_end;
+                        } else {
+                            self.ctx.clog.log(self.logger, '>>>>> 睡眠带报警范围： >>>>>');
+                            self.ctx.clog.log(self.logger, 'use 24 hours alarm range');
+                            self.ctx.clog.log(self.logger, '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
+                            isInAlarmRange = true;
                         }
                     }
 
-                    console.log('>>>>> 睡眠带 >>>>> ', bedMonitor.name);
-                    self.logger.info('>>>>> 睡眠带 >>>>> ' + bedMonitor.name);
+                    // console.log('beginTime:', beginTime, 'endTime:', endTime);
+                    if (beginTime && endTime) {
+                        if (beginTime >= endTime) {
+                            endDay = self.ctx.moment(beginDay).add(1, 'days').format('YYYY-MM-DD');
+                        } else {
+                            endDay = beginDay;
+                        }
+                        // console.log('beginDay:', beginDay, 'endDay:', endDay);
+                        beginMoment = self.ctx.moment(beginDay + ' ' + beginTime);
+                        endMoment = self.ctx.moment(endDay + ' ' + endTime);
+                        self.ctx.clog.log(self.logger, '>>>>> 睡眠带报警范围： >>>>>');
+                        self.ctx.clog.log(self.logger, 'beginMoment:', beginMoment.format('YYYY-MM-DD HH:mm'));
+                        self.ctx.clog.log(self.logger, 'endMoment:', endMoment.format('YYYY-MM-DD HH:mm'));
+                        self.ctx.clog.log(self.logger, '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
+                        isInAlarmRange = self.ctx.moment().isBetween(beginMoment, endMoment)
+                    }
+
+                    if (isInAlarmRange) {
+                        if (elderly.bed_monitor_timeout) {
+                            // console.log('elderly:', elderly.bed_monitor_timeout);
+                            timeout = elderly.bed_monitor_timeout * 60 * 1000;
+                        } else {
+                            if (tenant && tenant.other_config && tenant.other_config.psn_bed_monitor_timeout) {
+                                // console.log('tenant:', tenant.other_config.psn_bed_monitor_timeout);
+                                timeout = tenant.other_config.psn_bed_monitor_timeout * 60 * 1000;
+                            }
+                        }
+                        self.ctx.clog.log(self.logger, '>>>>> 睡眠带超时时间(ms)： >>>>>');
+                        self.ctx.clog.log(self.logger, 'timeout:', timeout);
+                        self.ctx.clog.log(self.logger, '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
+                    } else {
+                        self.ctx.clog.log(self.logger, 'updatebedMonitorInfo skip because elderly not matched roomid and bed_no');
+                        continue;
+                    }
+
                     key = bedMonitor.name;
-                    var ret = yield self.getLatestSmbPerMinuteRecord(sessionId, bedMonitor.name);
-                    var isOffLine = ret.retValue == 'device_offline';
-                    console.log('当前状态:', isOffLine ? '离线' : '在线');
-                    self.logger.info('当前状态:' + (isOffLine ? '离线' : '在线'));
+
                     if (isOffLine) {
                         if (bedMonitor.device_status != DIC.D3009.OffLine) {
-                            bedMonitor.device_status = DIC.D3009.OffLine;
-                            yield bedMonitor.save();
-                            console.log('睡眠带状态变化 在线 -> 离线');
-                            self.logger.info('睡眠带状态变化 在线 -> 离线');
+                            // console.log('睡眠带状态变化 在线 -> 离线');
+                            // self.logger.info('睡眠带状态变化 在线 -> 离线');
+                            self.ctx.clog.log(self.logger, '睡眠带状态变化 在线 -> 离线');
                             self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR.OFF_LINE, { bedMonitorName: bedMonitor.name });
                             self.ctx.cache.del(key);
                         }
+
                     } else {
                         if (bedMonitor.device_status != DIC.D3009.OnLine) {
-                            bedMonitor.device_status = DIC.D3009.OnLine;
-                            yield bedMonitor.save();
-                            console.log('睡眠带状态变化 离线 -> 在线');
-                            self.logger.info('睡眠带状态变化 离线 -> 在线');
+                            // console.log('睡眠带状态变化 离线 -> 在线');
+                            // self.logger.info('睡眠带状态变化 离线 -> 在线');
+                            self.ctx.clog.log(self.logger, '睡眠带状态变化 离线 -> 在线');
                             self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR.ON_LINE, { bedMonitorName: bedMonitor.name });
                         }
                         oldBedStatus = self.ctx.cache.get(key);
                         bedStatus = {
                             tenantId: bedMonitor.tenantId,
+                            bedMonitorId: bedMonitor._id,
+                            elderlyId: elderly._id,
                             isBed: ret.retValue.inBed
                         };
                         if (!oldBedStatus) {
                             // 旧状态不存在,表示刚启动
                             // 从当前开始计算离床时间
                             if (bedStatus.isBed) {
-                                console.log('a系统启动或者刚报警 -> 在床 不做任何事情');
-                                self.logger.info('a系统启动或者刚报警 -> 在床 不做任何事情');
+                                // console.log('a系统启动或者刚报警 -> 在床 不做任何事情');
+                                // self.logger.info('a系统启动或者刚报警 -> 在床 不做任何事情');
+                                self.ctx.clog.log(self.logger, 'a系统启动或者刚报警 -> 在床 不做任何事情');
                                 self.ctx.cache.put(key, bedStatus);
                                 self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR.COME, { bedMonitorName: bedMonitor.name });
                             } else {
-                                console.log('a系统启动或者刚报警 -> 离床 重置报警');
-                                self.logger.info('a系统启动或者刚报警 -> 离床 重置报警');
+                                // console.log('a系统启动或者刚报警 -> 离床 重置报警');
+                                // self.logger.info('a系统启动或者刚报警 -> 离床 重置报警');
+                                self.ctx.clog.log(self.logger, 'a系统启动或者刚报警 -> 离床 重置报警');
                                 self.ctx.cache.put(key, bedStatus, timeout, function (k, v) {
-                                    console.log('a离床超过时限报警 睡眠带:', k);
-                                    self.logger.info('a离床超过时限报警 睡眠带:' + k);
+                                    // console.log('a离床超过时限报警 睡眠带:', k);
+                                    // self.logger.info('a离床超过时限报警 睡眠带:' + k);
+                                    self.ctx.clog.log(self.logger, 'a离床超过时限报警 睡眠带:' + k);
                                     self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR.ALARM_LEAVE_TIMEOUT, {
                                         bedMonitorName: k,
                                         reason: DIC.D3016.LEAVE_BED_TIMEOUT
                                     });
-                                    v.alarm = true;
-                                    self.ctx.cache.put(k, v);
+                                    // 保存警报 
+                                    console.log('a bedMonitor:', k);
+                                    console.log('a bedStatus:', v);
+                                    self.ctx.pub_alarm_service.saveBedMonitorAlarmForElderly(k.bedMonitorId, v.elderlyId).then(function (alarmId) {
+                                        "use strict";
+                                        v.alarmId = alarmId;
+                                        self.ctx.cache.put(k, v);
+                                    });
+
                                 });
                                 self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR.LEAVE, { bedMonitorName: bedMonitor.name });
                             }
                         } else {
-                            if (!oldBedStatus.alarm) {
+                            if (!oldBedStatus.alarmId) {
                                 // 当前设备没有处于报警
                                 if (oldBedStatus.isBed == bedStatus.isBed) {
                                     if (bedStatus.isBed == true) {
-                                        console.log('b在床 -> 在床 不做任何事情');
-                                        self.logger.info('b在床 -> 在床 不做任何事情');
+                                        // console.log('b在床 -> 在床 不做任何事情');
+                                        // self.logger.info('b在床 -> 在床 不做任何事情');
+                                        self.ctx.clog.log(self.logger, 'b在床 -> 在床 不做任何事情');
                                     } else {
                                         // 离床 -> 离床 不做任何事情
-                                        console.log('b离床 -> 离床 处于离床计时,不做任何事情');
-                                        self.logger.info('b离床 -> 离床 处于离床计时,不做任何事情');
+                                        // console.log('b离床 -> 离床 处于离床计时,不做任何事情');
+                                        // self.logger.info('b离床 -> 离床 处于离床计时,不做任何事情');
+                                        self.ctx.clog.log(self.logger, 'b离床 -> 离床 处于离床计时,不做任何事情');
                                     }
                                 } else {
                                     if (bedStatus.isBed == true) {
-                                        console.log('b离床 -> 在床 时限内回来了');
-                                        self.logger.info('b离床 -> 在床 时限内回来了');
+                                        // console.log('b离床 -> 在床 时限内回来了');
+                                        // self.logger.info('b离床 -> 在床 时限内回来了');
+                                        self.ctx.clog.log(self.logger, 'b离床 -> 在床 时限内回来了');
                                         self.ctx.cache.put(key, bedStatus);
                                         self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR.COME, { bedMonitorName: bedMonitor.name });
                                     } else {
-                                        console.log('b在床 -> 离床 开始离床计时');
-                                        self.logger.info('b在床 -> 离床 开始离床计时');
+                                        // console.log('b在床 -> 离床 开始离床计时');
+                                        // self.logger.info('b在床 -> 离床 开始离床计时');
+                                        self.ctx.clog.log(self.logger, 'b在床 -> 离床 开始离床计时');
                                         self.ctx.cache.put(key, bedStatus, timeout, function (k, v) {
-                                            console.log('b离床超过时限报警 睡眠带:', k);
-                                            self.logger.info('b离床超过时限报警 睡眠带:' + k);
+                                            // console.log('b离床超过时限报警 睡眠带:', k);
+                                            // self.logger.info('b离床超过时限报警 睡眠带:' + k);
+                                            self.ctx.clog.log(self.logger, 'b离床超过时限报警 睡眠带:' + k);
                                             self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR.ALARM_LEAVE_TIMEOUT, {
                                                 bedMonitorName: k,
                                                 reason: DIC.D3016.LEAVE_BED_TIMEOUT
                                             });
-                                            v.alarm = true;
-                                            self.ctx.cache.put(k, v);
+                                            
+                                            // // 保存警报
+                                            // self.ctx.pub_alarm_service.saveBedMonitorAlarmForElderly(bedMonitor, elderly).then(function (alarmId) {
+                                            //     "use strict";
+                                            //     v.alarmId = alarmId;
+                                            //     self.ctx.cache.put(k, v);
+                                            // });
+
+                                            // 保存警报
+                                            console.log('b bedMonitor:', k);
+                                            console.log('b bedStatus:', v);
+                                            self.ctx.pub_alarm_service.saveBedMonitorAlarmForElderly(k.bedMonitorId, v.elderlyId).then(function (alarmId) {
+                                                "use strict";
+                                                v.alarmId = alarmId;
+                                                self.ctx.cache.put(k, v);
+                                            });
+
                                         });
                                         self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR.LEAVE, { bedMonitorName: bedMonitor.name });
                                     }
                                 }
                             } else {
-                                console.log('c 报警中');
-                                self.logger.info('c 报警中');
+                                self.ctx.clog.log(self.logger, 'c 报警中');
                             }
                         }
                     }
@@ -1019,35 +1095,34 @@ module.exports = {
             }
         }).catch(self.ctx.coOnError);
     },
-    closeAlarm: function (bedMonitorName) {
-        var self = this;
-        var channelName = 'psn$bed_monitor';
-        return co(function* () {
-            try {
-                console.log('c 关闭报警');
-                var key = bedMonitorName;
-                self.ctx.cache.del(key);
-                self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR.COME, { bedMonitorName: bedMonitorName });
-            } catch (e) {
-                console.log(e);
-                self.logger.error(e.message);
-                self.isExecuting = false;
-            }
-        }).catch(self.ctx.coOnError);
-    },
+    // closeAlarm: function (bedMonitorName) {
+    //     var self = this;
+    //     var channelName = 'psn$bed_monitor';
+    //     return co(function* () {
+    //         try {
+    //             console.log('c 关闭报警');
+    //             var key = bedMonitorName;
+    //             self.ctx.cache.del(key);
+    //             self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR.COME, { bedMonitorName: bedMonitorName });
+    //         } catch (e) {
+    //             console.log(e);
+    //             self.logger.error(e.message);
+    //             self.isExecuting = false;
+    //         }
+    //     }).catch(self.ctx.coOnError);
+    // },
     getLatestSmbPerMinuteRecord: function (sessionId, devId) {
         var self = this;
         return co(function* () {
             try {
-                console.log('getLatestSmbPerMinuteRecord:')
+                // console.log('getLatestSmbPerMinuteRecord:')
                 var ret = yield rp({
                     method: 'POST',
                     url: externalSystemConfig.bed_monitor_provider.api_url + '/ECSServer/devicews/getLatestSmbPerMinuteRecord.json',
                     form: { sessionId: sessionId, devId: devId }
                 });
-                self.logger.info('b:' + ret);
+                // self.logger.info('b:' + ret);
                 ret = JSON.parse(ret);
-                self.logger.info('a:' + ret);
                 return ret;
             }
             catch (e) {

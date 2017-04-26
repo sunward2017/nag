@@ -419,6 +419,7 @@
         function checkForbidden(bed_no){
             console.log("bed_no is:"+bed_no);
             console.log("forbiddens is:"+vm.model.forbiddens);
+
             return !_.contains(vm.model.forbiddens,bed_no);
         }
 

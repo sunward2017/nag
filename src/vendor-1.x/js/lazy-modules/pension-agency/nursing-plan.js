@@ -151,7 +151,9 @@
             // console.log('onRoomChange: ', vm.yAxisData);
             var yAxisDataFlatten = [];
             _.each(vm.yAxisData, function (o) {
+                console.log('o is:'+o);
                 for (var i = 1, len = o.capacity; i <= len; i++) {
+                    if(_.contains(o.forbiddens,i)) continue;
                     var trackedKey =  o._id + '$' + i;
                     yAxisDataFlatten.push(_.extend({trackedKey: trackedKey, bed_no: i}, o));
                 }

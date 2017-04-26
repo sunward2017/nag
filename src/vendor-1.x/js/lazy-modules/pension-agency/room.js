@@ -64,8 +64,8 @@
 
             vm.selectBinding.districts = vm.modelNode.services['psn-district'].query(_.defaults(vm.selectFilterObject.districts, vm.selectFilterObject.common), '_id name');
 
-            vm.maxFloors = 10;
-            vm.maxNumbersInFloor = 8;
+            vm.maxFloors = 98;
+            vm.maxNumbersInFloor = 98;
 
             vm.selectBinding.floors = _.range(1, vm.maxFloors + 1);
             vm.selectBinding.numbers_in_floor = _.range(1, vm.maxNumbersInFloor + 1);
@@ -203,8 +203,8 @@
 
             vm.init({removeDialog: ngDialog});
 
-            vm.maxFloors = 10;
-            vm.maxNumbersInFloor = 16;
+            vm.maxFloors = 98;
+            vm.maxNumbersInFloor = 98;
 
             vm.selectBinding.districts = vm.modelNode.services['psn-district'].query(_.defaults(vm.selectFilterObject.districts, vm.selectFilterObject.common), '_id name');
 

@@ -10,7 +10,7 @@
  var printLog = true;
 
  module.exports = {
-     needRegister: false,
+     needRegister: true,
      register: function (ctx) {
          if (this.needRegister) {
              return co(function*() {

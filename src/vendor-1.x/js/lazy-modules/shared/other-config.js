@@ -40,7 +40,7 @@
                 console.log(vm.other_configs.psn_bed_monitor_timeout);
                 console.log(vm.other_configs.psn_bed_monitor_timeout_alarm_begin);
                 console.log(vm.other_configs.psn_bed_monitor_timeout_alarm_end);
-                vmh.exec(vmh.extensionService.saveTenantOtherConfig(vm.model['tenantId'], vm.other_configs.psn_bed_monitor_timeout,vm.other_configs.psn_bed_monitor_timeout_alarm_begin,vm.other_configs.psn_bed_monitor_timeout_alarm_end));
+                vmh.exec(vmh.extensionService.saveTenantOtherConfig(vm.model['tenantId'], vm.other_configs));
             }
             else {
                 if ($scope.utils.vtab(vm.tab1.cid)) {

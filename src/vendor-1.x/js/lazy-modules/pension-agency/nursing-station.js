@@ -231,7 +231,7 @@
                         return o === alarm;
                     });
                     if(index != -1) {
-                        vm.alarmQueue.splice(index);
+                        vm.alarmQueue.splice(index, 1);
                         vmh.alertSuccess('button.CLOSE', true);
                     }
                 }

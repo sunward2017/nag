@@ -57,8 +57,7 @@ module.exports = {
                                     // robots: {$elemMatch: {_id: robot._id}},
                                     robots: {$in: [robot._id]},
                                     tenantId: tenantId
-                                },
-                                sort: 'exec_on'
+                                }
                             });
 
                             roomIds = app._.map(rooms, function (o) {
@@ -175,6 +174,71 @@ module.exports = {
                             nursingRecord.confirmed_on = app.moment();
 
                             yield nursingRecord.save();
+
+                            this.body = app.wrapper.res.default();
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
+            {
+                method: 'robot$alarm$fetch',
+                verb: 'post',
+                url: this.service_url_prefix + "/robot/alarm/fetch",
+                handler: function (app, options) {
+                    return function *(next) {
+                        try {
+                            var robot_code = this.robot_code;
+                            console.log("robot_code:", robot_code);
+                            self.logger.info("robot_code:" +  (robot_code || 'not found'));
+                            console.log("body:", this.request.body);
+                            self.logger.info("body:" +  this.request.body);
+
+                            this.body = yield app.pub_alarm_service.fetchBedMonitorAlarmsByRobot(robot_code);
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
+            {
+                method: 'robot$alarm$close',
+                verb: 'post',
+                url: this.service_url_prefix + "/robot/alarm/close",
+                handler: function (app, options) {
+                    return function *(next) {
+                        try {
+                            var robot_code = this.robot_code || 'not found';
+                            console.log("robot_code:", robot_code);
+                            self.logger.info("robot_code:" + (robot_code || 'not found'));
+                            console.log("body:", this.request.body);
+                            self.logger.info("body:" + this.request.body);
+                            var alarmId = this.request.body.id;
+                            console.log('alarmId:', alarmId);
+
+                            var robot, tenantId, alarm;
+                            robot = yield app.modelFactory().model_one(app.models['pub_robot'], {
+                                where: {
+                                    status: 1,
+                                    code: robot_code
+                                }
+                            });
+                            if (!robot) {
+                                this.body = app.wrapper.res.error({message: '无效的机器人编号'});
+                                return;
+                            }
+                            alarm = yield app.modelFactory().model_read(app.models['pub_alarm'], alarmId);
+                            if (!alarm) {
+                                this.body = app.wrapper.res.error({message: '无效的警报'});
+                                return;
+                            }
+
+                            yield app.pub_alarm_service.closeBedMonitorAlarm(alarm, robot._id, robot.code + ' ' + robot.name);
 
                             this.body = app.wrapper.res.default();
                         } catch (e) {

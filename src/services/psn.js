@@ -5284,7 +5284,7 @@ module.exports = {
                         try {
                             
                             var alarmId = this.request.body.alarmId;
-                            alarm = yield app.modelFactory().model_read(app.models['pub_alarm'], tenantId);
+                            alarm = yield app.modelFactory().model_read(app.models['pub_alarm'], alarmId);
                             if (!alarm || alarm.status == 0) {
                                 this.body = app.wrapper.res.error({ message: '无法找到警报信息!' });
                                 yield next;

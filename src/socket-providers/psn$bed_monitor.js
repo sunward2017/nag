@@ -80,10 +80,11 @@ module.exports = {
                                 bedStatus = self.ctx.cache.get(bedMonitorName);
                                 console.log('bedStatus:', bedStatus);
                                 if (bedStatus) {
-                                    if (bedStatus.alarm) {
+                                    if (bedStatus.alarmId) {
                                         socket.emit(socketServerEvents.PSN.BED_MONITOR.ALARM_LEAVE_TIMEOUT, {
                                             bedMonitorName: bedMonitorName,
-                                            reason: DIC.D3016.LEAVE_BED_TIMEOUT
+                                            reason: DIC.D3016.LEAVE_BED_TIMEOUT,
+                                            alarmId: bedStatus.alarmId
                                         });
                                     } else {
                                         if (bedStatus.isBed) {
@@ -93,7 +94,7 @@ module.exports = {
                                         }
                                     }
                                 } else {
-                                    socket.emit(socketServerEvents.PSN.BED_MONITOR.LEAVE, {bedMonitorName: bedMonitorName});
+                                    socket.emit(socketServerEvents.PSN.BED_MONITOR.ON_LINE, {bedMonitorName: bedMonitorName});
                                 }
                             }
                         }

@@ -300,8 +300,7 @@
                 }]
             }).then(function () {
                 $scope.closeThisDialog({alarmClosed: true});
-                vmh.psnService.nursingStationCloseBedMonitorAlarm(vm.alarm, {
-                    tenantId: vm.tenantId,
+                vmh.psnService.nursingStationCloseBedMonitorAlarm(vm.alarm.alarmId, {
                     operated_by: vm.operated_by,
                     operated_by_name: vm.operated_by_name
                 }).then(function (ret) {

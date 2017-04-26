@@ -81,7 +81,7 @@ module.exports = function(ctx,name) {
                 psn_bed_monitor_timeout:{type:Number,default:5.00},//睡眠带超时时间设置，单位：分钟，默认5分钟
                 psn_bed_monitor_timeout_alarm_begin:{type:String,minlength: 5, maxlength: 5,default:'22:00'},//睡眠带报警时间范围，起始时间,22:00
                 psn_bed_monitor_timeout_alarm_end:{type:String,minlength: 5, maxlength: 5,default:'06:00'},//睡眠带报警时间范围，结束时间,06:00
-                pub_alarm_D3016_A0001:{type:String}
+                pub_alarm_D3016_A1000:{type:String}
             }
         });
 

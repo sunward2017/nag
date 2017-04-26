@@ -27,6 +27,7 @@ module.exports = function(ctx,name) {
             objectId: {type: mongoose.Schema.Types.ObjectId, required: true}, //报警对象编号
             object_name: {type: String, required: true}, //报警对象名称
             reason: {type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3016"])},//报警原因
+            content:{type: String},
             process_flag: {type: Boolean, default: false},//处理标识
             processed_on: {type: Date},
             processed_by: {type: mongoose.Schema.Types.ObjectId},

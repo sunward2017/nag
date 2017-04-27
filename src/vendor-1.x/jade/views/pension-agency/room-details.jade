@@ -28,8 +28,9 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                     fieldset: .form-group
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-NAME') | translate}}:
                         .col-md-10
-                            input.form-control(ng-disabled="!vm.model.number_in_floor", type='text', name='name',ng-model='vm.model.name',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-NAME")|translate}}' ,required='')
+                            input.form-control(ng-disabled="!vm.model.number_in_floor", type='text', name='name',ng-model='vm.model.name',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-NAME")|translate}}' ,required='',ui-validate-async="{alreadyExists: 'vm.notExist({name:$value,status:1,districtId: vm.model.districtId})'}")
                             span.text-danger(ng-show="utils.vinput(this.theForm,'name','required')") {{ "validator.REQUIRED" | translate}}
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'name','alreadyExists')") {{ "validator.ALREADY-EXISTS" | translate:{item:"房间名"} }}
                     fieldset: .form-group
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-CAPACITY') | translate}}:
                         .col-md-10

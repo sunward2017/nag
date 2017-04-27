@@ -32,7 +32,8 @@
             vm.selectGridCol = selectGridCol;
             vm.selectGridRow = selectGridRow;
             vm.selectGridCell = selectGridCell;
-            vm.saveSelected = saveSelected;
+            vm.replaceSelected = replaceSelected;
+            vm.appendSelected = appendSelected;
             vm.removeSelected = removeSelected;
             vm.importTemplate = importTemplate;
             vm.saveAsTemplate = saveAsTemplate;
@@ -225,7 +226,15 @@
             vm.cols[colId] = _checkWholeColIsSelected(colId);
         }
 
-        function saveSelected () {
+        function replaceSelected () {
+            saveSelected(true);
+        }
+
+        function appendSelected () {
+            saveSelected(false);
+        }
+
+        function saveSelected (isReplace) {
             if (!vm.selectedNursingWorker) {
                 vmh.alertWarning(vm.moduleTranslatePath('MSG-NO-PICK-NURSING'), true);
                 return;
@@ -237,12 +246,27 @@
                     var colId = vm.xAxisData[j]._id;
                     var date = vm.xAxisData[j].value;
                     if (vm.cells[rowId][colId]) {
-                        console.log(vm.selectedNursingWorker);
-                        vm.aggrData[rowId][colId] = vm.selectedNursingWorker;
                         vm.cells[rowId][colId] = false;
                         vm.cells[rowId]['row-selected'] = _checkWholeRowIsSelected(rowId);
                         vm.cols[colId] = _checkWholeColIsSelected(colId);
-                        toSaveRows.push({ x_axis: date, y_axis: rowId, aggr_value: vm.selectedNursingWorker.id });
+
+                        console.log(vm.selectedNursingWorker);
+                        if (isReplace) {
+                            vm.aggrData[rowId][colId] = [vm.selectedNursingWorker];
+                            toSaveRows.push({ x_axis: date, y_axis: rowId, aggr_value: vm.selectedNursingWorker.id });
+                        } else {
+                            // 追加
+                            var arr = vm.aggrData[rowId][colId];
+                            if (!_.contains(arr, function(o){
+                               return o.id == vm.selectedNursingWorker.id;
+                            })){
+                                vm.aggrData[rowId][colId].push(vm.selectedNursingWorker);
+
+                                _.each(arr, function (o){
+                                    toSaveRows.push({ x_axis: date, y_axis: rowId, aggr_value: o.id });
+                                })
+                            };
+                        }
                     }
                 }
             }

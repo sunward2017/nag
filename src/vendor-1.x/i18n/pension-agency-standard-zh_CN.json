@@ -591,6 +591,7 @@
         "TAB1-LABEL-DURATION": "时长(分)",
         "TAB1-PLACEHOLDER-DURATION": "10..",
         "TAB1-LABEL-REPEAT_TYPE": "重复类型",
+        "TAB1-LABEL-WORK_ITEM_FLAG": "项目类别",
         "TAB1-VOICE-TEMPLATE":"语音模板",
         "TAB1-PLACEHOLDER-VOICE":"${老人姓名},你该${护理项目}了,请您${工作描述}",
         "TAB1-LABEL-REPEAT_VALUES": "重复值域",

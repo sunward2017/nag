@@ -61,6 +61,10 @@ module.exports = function(ctx,name) {
             }
             return '';
         });
+        drugUseItemSchema.virtual('work_item_flag').get(function () {
+            return 'A0006';
+        });
+
 
         drugUseItemSchema.pre('update', function (next) {
             this.update({}, {$set: {operated_on: new Date()}});

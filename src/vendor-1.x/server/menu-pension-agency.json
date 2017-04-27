@@ -63,6 +63,11 @@
         "_id": "menu.pension-agency.NURSING-SCHEDULE-TEMPLATE",
         "name": "护理排班模版",
         "sref": "app.pension-agency.nursing-schedule-template.list"
+      },
+      {
+        "_id": "menu.pension-agency.NURSING-GROUP",
+        "name": "护理组",
+        "sref": "app.pension-agency.nursing-group.list"
       }
     ]
   },

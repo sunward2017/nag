@@ -30,6 +30,7 @@
         modelNode.factory('psn-nursingPlan');
         modelNode.factory('psn-nursingSchedule');
         modelNode.factory('psn-nursingScheduleTemplate');
+        modelNode.factory('psn-nursingGroup');
         modelNode.factory('psn-recharge');
         modelNode.factory('psn-drugUseItem');
         modelNode.factory('psn-drugDirectory');
@@ -46,9 +47,9 @@
         modelNode.factory('trv-scenerySpot');
 
         //票付通
-        modelNode.factory('idc-scenicSpot_PFT');
-        modelNode.factory('idc-ticket_PFT');
-        modelNode.factory('idc-order_PFT');
+        // modelNode.factory('idc-scenicSpot_PFT');
+        // modelNode.factory('idc-ticket_PFT');
+        // modelNode.factory('idc-order_PFT');
         // modelNode.factory('pfta-room');
         // modelNode.factory('pfta-district');
         // modelNode.factory('pfta-roomOccupancyChangeHistory');

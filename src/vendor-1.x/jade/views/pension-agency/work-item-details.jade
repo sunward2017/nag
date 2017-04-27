@@ -40,8 +40,8 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-WORK_ITEM_FLAG') | translate}}:
                         .col-md-10
                             .btn-group
-                                .btn.btn-primary(name='work_item_flag',ng-repeat='itemFlag in vm.selectBinding.workItemFlags',ng-model='vm.model.work_item_flag',btn-radio="itemFlag.value",required='') {{itemFlag.name}}
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'work_item_flag','required')") {{ "validator.REQUIRED" | translate}}        
+                                .btn.btn-primary(name='work_item_category',ng-repeat='itemFlag in vm.selectBinding.workItemFlags',ng-model='vm.model.work_item_category',btn-radio="itemFlag.value",required='') {{itemFlag.name}}
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'work_item_category','required')") {{ "validator.REQUIRED" | translate}}        
                     fieldset: .form-group
                         <!--重复类型-->
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-REPEAT_TYPE') | translate}}:

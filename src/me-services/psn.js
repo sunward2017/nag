@@ -248,6 +248,44 @@ module.exports = {
                         yield next;
                     };
                 }
+            },
+            {
+                method:'elderly$bloodpressure$fetch',
+                verb:'post',
+                url:this.service_url_prefix+"/elderly/bloodpressure/fetch",
+                handler:function(app,options){
+                    return function *(next){
+                         try {
+                            var elderlyId = this.elderlyId;
+                             
+                            self.logger.info("robot_code:" +  (elderlyId || 'not found'));
+                             
+                            self.logger.info("body:" +  this.request.body);
+
+                            var elderly, tenantId;
+                            elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], elderlyId);
+                            if (!elderly || elderly.status == 0) {
+                                this.body = app.wrapper.res.error({ message: '无法找到老人!' });
+                                yield next;
+                                return;
+                            }
+
+                            var rows = yield app.modelFactory().model_query(app.models['psn_bloodPressure'], {
+                                select: 'perform_on elderly_name systolic_blood_pressure diastolic_blood_pressure drugId blood_pressure_level current_symptoms',
+                                where: {
+                                    elderlyId: {$in: elderlyId},
+                                    tenantId: tenantId
+                                },
+                                sort: 'perform_on'
+                            }).populate('blood_pressure_level','name').populate('drugId','full_name');
+                            this.body = app.wrapper.res.rows(rows);
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;    
+                    }
+                }
             }
         ];
 

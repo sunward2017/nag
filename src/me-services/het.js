@@ -285,8 +285,9 @@
                          try {
                              console.log("body:");
                              console.log(this.request.body)
-                             this.body =  yield app.bed_monitor_provider.getTodayReport(this.openid,this.request.body.devId,this.request.body.tenantId);
-                            
+                            var ret =  yield app.bed_monitor_provider.getTodayReport(this.openid,this.request.body.devId,this.request.body.tenantId);
+                             console.log('返回的数据日报：',ret);
+                             this.body = ret;
                          } catch (e) {
                              self.logger.error(e.message);
                              this.body = app.wrapper.res.error(e);
@@ -305,7 +306,6 @@
                              console.log("body:");
                              console.log(this.request.body)
                              this.body =  yield app.bed_monitor_provider.getReportByDate(this.request.body.devId,this.request.body.tenantId,this.request.body.targetdDate);
-                            
                          } catch (e) {
                              self.logger.error(e.message);
                              this.body = app.wrapper.res.error(e);

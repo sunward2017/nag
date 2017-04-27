@@ -4495,7 +4495,7 @@ module.exports = {
                                 });
                                 if (!isRemoved) {
                                     // 加入
-                                    if (index == -1) {
+                                    if (index == -1) {                            
                                         workItems.push(toProcessWorkItem);
                                     }
                                 } else {
@@ -4679,6 +4679,8 @@ module.exports = {
                                         nursingRecord.remark = workItem.remark;
                                         nursingRecord.duration = workItem.duration;
                                         nursingRecord.remind_on = [];
+                                        nursingRecord.type = workItem.type;
+                                        nursingRecord.work_item_flag = workItem.work_item_flag;
                                         var str = workItem.voice_template;
                                         var reg = /\${([^}]+)}/, result;
                                         while ((result = reg.exec(str)) != null) {
@@ -4976,8 +4978,10 @@ module.exports = {
                                     name: workItem.name,
                                     description: workItem.description,
                                     remark: workItem.remark,
-                                    duration: workItem.duration
-                                }
+                                    duration: workItem.duration,
+                                    type:workItem.type,
+                                    work_item_flag:workItem.work_item_flag
+                                };
                                 var str = workItem.voice_template;
                                 var reg = /\${([^}]+)}/;
                                 while ((result = reg.exec(str)) != null) {

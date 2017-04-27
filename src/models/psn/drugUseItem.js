@@ -61,7 +61,7 @@ module.exports = function(ctx,name) {
             }
             return '';
         });
-        drugUseItemSchema.virtual('work_item_flag').get(function () {
+        drugUseItemSchema.virtual('work_item_category').get(function () {
             return 'A0006';
         });
 

@@ -30,7 +30,7 @@ module.exports = function(ctx, name) {
                 name: { type: String, maxlength: 100 },
                 description: { type: String, maxLength: 400 },
                 repeat_type: { type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D0103"]) },
-                work_item_flag: { type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3019"]) },
+                work_item_category: { type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3019"]) },
                 repeat_values: [{ type: Number, min: 0, max: 365, default: 0 }],
                 repeat_start: { type: String, minlength: 1, maxlength: 5, default: '*' },
                 duration: { type: Number, default: 0 }, // 完成时长 单为分

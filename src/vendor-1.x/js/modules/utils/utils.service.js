@@ -237,6 +237,7 @@
             isPhone: isPhone,
             changeProperyName: changeProperyName,
             unescapeHTML: unescapeHTML,
+            safeArrayMember: safeArrayMember,
             indexObj: indexObj,
             getPropery: getPropery
         };
@@ -291,6 +292,14 @@
             if(!str)
                 return '';
             return str.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'\"').replace(/&amp;#39;/g,'\'').replace(/&amp;/g,'&');
+        }
+
+        function safeArrayMember(arr, key) {
+            if (!arr || !angular.isArray(arr) || arr.length === 0)
+                return '';
+            return arr.map(function (o) {
+                return o[key] || ''
+            }).join()
         }
 
         function indexObj(obj,k) {

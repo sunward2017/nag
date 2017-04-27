@@ -97,7 +97,10 @@
                     if (!vm.aggrData[nursingScheduleItem.y_axis]) {
                         vm.aggrData[nursingScheduleItem.y_axis] = {};
                     }
-                    vm.aggrData[nursingScheduleItem.y_axis][nursingScheduleItem.x_axis_value] = nursingWorkerObject;
+                    if (!vm.aggrData[nursingScheduleItem.y_axis][nursingScheduleItem.x_axis_value]){
+                        vm.aggrData[nursingScheduleItem.y_axis][nursingScheduleItem.x_axis_value] = [];
+                    }
+                    vm.aggrData[nursingScheduleItem.y_axis][nursingScheduleItem.x_axis_value].push(nursingWorkerObject);
                 }
             }
         }

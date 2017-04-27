@@ -286,10 +286,8 @@ module.exports = {
                         yield next;    
                     }
                 }
-            },
-            {
-                method:''
             }
+           
         ];
 
         return this;

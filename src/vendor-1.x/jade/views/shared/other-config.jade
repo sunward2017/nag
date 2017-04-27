@@ -22,6 +22,10 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                         .col-md-10
                             input.form-control(type='text', ng-minlength=5,ng-maxlength=5,name='psn_bed_monitor_timeout_alarm_end',ng-model='vm.other_configs.psn_bed_monitor_timeout_alarm_end',placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-BED_MONITOR_TIMEOUT_ALARM_END")|translate}}' ,required='')
                             span.text-danger(ng-show="utils.vinput(this.theForm,'psn_bed_monitor_timeout_alarm_end','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset: .form-group
+                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-ALARM_D3016_A1000') | translate}}:
+                        .col-md-10
+                            input.form-control(type='text',name='pub_alarm_D3016_A1000',ng-model='vm.other_configs.pub_alarm_D3016_A1000',placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-ALARM_D3016_A1000")|translate}}')
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'pub_alarm_D3016_A1000','required')") {{ "validator.REQUIRED" | translate}}
     .text-right.mt-lg
-        button.btn.btn-warning(type="button",ng-click="vm.cancel()") {{'button.CANCEL'|translate}}
         button.btn.btn-success(type="submit") {{'button.SAVE'|translate}}

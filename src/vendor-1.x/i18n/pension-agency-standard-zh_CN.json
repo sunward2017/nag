@@ -282,6 +282,11 @@
         "SYNC_FAMILY_MEMBERS_SUCCESS":"同步老人家庭成员数据成功"
       }
     },
+    "assessment-enter":{
+      "list":{
+        "TITLE": "养老机构-评估管理-入院评估"
+      }
+    },
     "nursing-station": {
       "TITLE": "养老机构-护理管理-护士台",
       "EXPAND-ALARM-QUEUE": "展开报警队列",
@@ -636,6 +641,8 @@
         "TAB1-PLACEHOLDER-NAME": "1201..",
         "TAB1-LABEL-CAPACITY": "床位数量",
         "TAB1-PLACEHOLDER-CAPACITY": "4..",
+        "TAB1-LABEL-FORBIDDEN": "禁用床位",
+        "TAB1-PLACEHOLDER-FORBIDDEN": "床位号之间用英文逗号隔开，比如：1,2,3",
         "TAB1-LABEL-FLAG-COLLECTION": "标志集合",
         "TAB1-LABEL-STOP_FLAG": "停用"
       },
@@ -765,12 +772,14 @@
     "other-config":{
       "TITLE":"养老机构-系统管理-其它配置",
       "TAB1": "配置信息",
-      "TAB1-LABEL-BED_MONITOR_TIMEOUT": "睡眠带超时时间（分钟）",
+      "TAB1-LABEL-BED_MONITOR_TIMEOUT": "睡眠带超时时间（分）",
       "TAB1-PLACEHOLDER-BED_MONITOR_TIMEOUT": "5..",
       "TAB1-LABEL-BED_MONITOR_TIMEOUT_ALARM_BRGIN": "超时报警起始时间",
       "TAB1-PLACEHOLDER-BED_MONITOR_TIMEOUT_ALARM_BRGIN": "22:00",
       "TAB1-LABEL-BED_MONITOR_TIMEOUT_ALARM_END": "超时报警结束时间",
-      "TAB1-PLACEHOLDER-BED_MONITOR_TIMEOUT_ALARM_END": "06:00"
+      "TAB1-PLACEHOLDER-BED_MONITOR_TIMEOUT_ALARM_END": "06:00",
+      "TAB1-LABEL-ALARM_D3016_A1000": "离床报警模版",
+      "TAB1-PLACEHOLDER-ALARM_D3016_A1000": "${发生时间}${房间床位}${老人姓名}离床未归"
     }
   }
 }

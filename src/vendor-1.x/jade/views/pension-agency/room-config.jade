@@ -38,12 +38,12 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                                             td.text-left
                                                 span {{bedMonitor.name}}
                                             td.text-center
-                                                input.form-control(name="row$bed_no{{$index}}",type="number",ng-model='vm.bedNos[bedMonitor._id]',required='' , ui-validate="{min:'$value>=1', max:'$value<=vm.model.capacity'}")
+                                                input.form-control(name="row$bed_no{{$index}}",type="number",ng-model='vm.bedNos[bedMonitor._id]',required='' , ui-validate="{min:'$value>=1', max:'$value<=vm.model.capacity',bedForbidden:'vm.checkForbidden($value)'}")
                                                 span.text-danger(ng-show="utils.vinput(this.theForm,'row$bed_no{{$index}}','required')") {{ "validator.REQUIRED" | translate}}
                                                 span.text-danger(ng-show="utils.vinput(this.theForm,'row$bed_no{{$index}}','number')") {{ "validator.NUMBER" | translate}}
                                                 span.text-danger(ng-show="utils.vinput(this.theForm,'row$bed_no{{$index}}','min')") {{ "validator.MIN" | translate:{min:1} }}
                                                 span.text-danger(ng-show="utils.vinput(this.theForm,'row$bed_no{{$index}}','max')") {{ "validator.MAX" | translate:{max:vm.model.capacity} }}
-
+                                                span.text-danger(ng-show="utils.vinput(this.theForm,'row$bed_no{{$index}}','bedForbidden')") {{ "validator.BED-FORBIDDEN" | translate }}
     .text-right.mt-lg
         button.btn.btn-warning(type="button",ng-click="vm.cancel()") {{'button.CANCEL'|translate}}
         button.btn.btn-success(type="submit") {{'button.SAVE'|translate}}

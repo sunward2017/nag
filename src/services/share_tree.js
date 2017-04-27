@@ -192,7 +192,7 @@ module.exports = {
                                 where: {
                                     status: 1,
                                     tenantId: tenantId
-                                }, select: 'name capacity floor districtId'
+                                }, select: 'name capacity floor districtId forbiddens'
                             });
 
                             var districtFloorOfRooms = yield app.modelFactory().model_query(app.models['psn_room'], {
@@ -207,7 +207,11 @@ module.exports = {
                             }).map(function (o,k) {
                                 var arr = app._.chain(o).map(function (o2) {
                                     //console.log(roomNameGroupByFloorAndDistrict[_idOfFloor][0]);
-                                    var children = app._.chain(app._.range(1, o2.capacity + 1)).map(function (o3) {
+                                    console.log('o2 is:'+o2);
+                                    console.log('forbiddens is:'+o2.forbiddens);
+                                    var children = app._.chain(app._.range(1, o2.capacity + 1)).filter(function(o4){
+                                        return !app._.contains(o2.forbiddens,o4);
+                                    }).map(function (o3) {
                                         return {
                                             _id: o2.districtId + '$' + o2._id + '$' + o3,
                                             name: o3 + bedNoSuffix,
@@ -444,7 +448,7 @@ module.exports = {
                                 where: {
                                     status: 1,
                                     tenantId: tenantId
-                                }, select: 'name floor capacity districtId'
+                                }, select: 'name floor capacity districtId forbiddens'
                             });
 
                             rows = districts.map((o) => {
@@ -459,7 +463,7 @@ module.exports = {
                                     floorNode.children = app._.filter(rooms, (o4) => {
                                         return o4.districtId == districtNode._id && o4.floor == o3;
                                     }).map((o5) => {
-                                        return {_id: o5.id, name: o5.name, capacity: o5.capacity}
+                                        return {_id: o5.id, name: o5.name, capacity: o5.capacity,forbiddens:o5.forbiddens}
                                     });
                                     if (floorNode.children.length > 0) {
                                         return floorNode;

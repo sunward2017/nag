@@ -82,7 +82,8 @@
     "ALREADY-EXISTS": "已经存在相同的{{item}};",
     "ORDER-MUST_CHOOSE_ONE_FUNC": "订单必须选择至少一个功能;",
     "ID-NO": "身份证格式不正确;",
-    "SERVER-SIDE-CHECK":"后端验证错误：{{item}};"
+    "SERVER-SIDE-CHECK":"后端验证错误：{{item}};",
+    "BED-FORBIDDEN":"该床位被禁用;"
   },
   "dialog": {
     "remove": {
@@ -173,6 +174,10 @@
       "EXIT": "出院管理",
       "RECEPTION": "接待管理",
       "LEAVE": "外出管理",
+      "------------": "",
+      "ASSESSMENT": "评估管理",
+      "ASSESSMENT-ENTER": "入院评估",
+      "ASSESSMENT-REGULAR": "定期评估",
       "------------": "",
       "NURSING-MANAGE": "护理管理",
       "NURSING-STATION": "护士台",

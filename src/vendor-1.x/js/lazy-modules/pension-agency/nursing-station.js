@@ -231,7 +231,7 @@
                         return o === alarm;
                     });
                     if(index != -1) {
-                        vm.alarmQueue.splice(index);
+                        vm.alarmQueue.splice(index, 1);
                         vmh.alertSuccess('button.CLOSE', true);
                     }
                 }
@@ -300,8 +300,7 @@
                 }]
             }).then(function () {
                 $scope.closeThisDialog({alarmClosed: true});
-                vmh.psnService.nursingStationCloseBedMonitorAlarm(vm.alarm, {
-                    tenantId: vm.tenantId,
+                vmh.psnService.nursingStationCloseBedMonitorAlarm(vm.alarm.alarmId, {
                     operated_by: vm.operated_by,
                     operated_by_name: vm.operated_by_name
                 }).then(function (ret) {

@@ -288,8 +288,8 @@
                     return $http.post(baseUrl + 'saveTenantChargeItemCustomized/' + tenantId, chargeStandard);
                 }
 
-                function saveTenantOtherConfig(tenantId,psn_bed_monitor_timeout,psn_bed_monitor_timeout_alarm_begin,psn_bed_monitor_timeout_alarm_end){
-                    return $http.post(baseUrl + 'saveTenantOtherConfig/' + tenantId,{psn_bed_monitor_timeout:psn_bed_monitor_timeout,psn_bed_monitor_timeout_alarm_begin:psn_bed_monitor_timeout_alarm_begin,psn_bed_monitor_timeout_alarm_end:psn_bed_monitor_timeout_alarm_end} );
+                function saveTenantOtherConfig(tenantId, otherConfig){
+                    return $http.post(baseUrl + 'saveTenantOtherConfig/' + tenantId, otherConfig);
                 }
 
                 function queryVoucherNo(tenantId, modelName, keyword, where, select, sort){

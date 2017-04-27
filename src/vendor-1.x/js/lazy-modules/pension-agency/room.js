@@ -64,8 +64,8 @@
 
             vm.selectBinding.districts = vm.modelNode.services['psn-district'].query(_.defaults(vm.selectFilterObject.districts, vm.selectFilterObject.common), '_id name');
 
-            vm.maxFloors = 10;
-            vm.maxNumbersInFloor = 8;
+            vm.maxFloors = 98;
+            vm.maxNumbersInFloor = 98;
 
             vm.selectBinding.floors = _.range(1, vm.maxFloors + 1);
             vm.selectBinding.numbers_in_floor = _.range(1, vm.maxNumbersInFloor + 1);
@@ -177,7 +177,8 @@
             //}
 
             if ($scope.theForm.$valid) {
-
+                console.log(vm.forbiddens);
+                vm.model.forbiddens = vm.forbiddens.split(',');
                 vm.save();
             }
             else {
@@ -202,8 +203,8 @@
 
             vm.init({removeDialog: ngDialog});
 
-            vm.maxFloors = 10;
-            vm.maxNumbersInFloor = 16;
+            vm.maxFloors = 98;
+            vm.maxNumbersInFloor = 98;
 
             vm.selectBinding.districts = vm.modelNode.services['psn-district'].query(_.defaults(vm.selectFilterObject.districts, vm.selectFilterObject.common), '_id name');
 
@@ -373,6 +374,7 @@
             vm.init({removeDialog: ngDialog});
             vm.doSubmit = doSubmit;
             vm.onBedMonitorCheckChange = onBedMonitorCheckChange;
+            vm.checkForbidden = checkForbidden;
             vm.tab1 = {cid: 'contentTab1'};
 
             vm.treeDataPromiseOfRobots = vmh.shareService.tmp('T3005', 'name', {tenantId:vm.tenantId, roomId: vm.getParam('_id')}, true).then(function(nodes){
@@ -412,6 +414,13 @@
                 }
             }
 
+        }
+
+        function checkForbidden(bed_no){
+            console.log("bed_no is:"+bed_no);
+            console.log("forbiddens is:"+vm.model.forbiddens);
+
+            return !_.contains(vm.model.forbiddens,bed_no);
         }
 
         function doSubmit() {

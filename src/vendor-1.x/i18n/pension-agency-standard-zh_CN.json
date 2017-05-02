@@ -285,6 +285,22 @@
     "assessment-enter":{
       "list":{
         "TITLE": "养老机构-评估管理-入院评估"
+      },
+      "details":{
+        "TITLE": "养老机构-评估管理-入院评估-详情",
+        "TAB1":"基本信息",
+        "TAB1-LABEL-ELDERLY-NAME":"老人",
+        "TAB1-LABEL-DISEASE_EVALUATION":"病情",
+        "TAB1-LABEL-SHIT":"大便",
+        "TAB1-LABEL-PEE":"小便",
+        "TAB1-LABEL-DECORATOR":"修饰",
+        "TAB1-LABEL-WC":"用厕",
+        "TAB1-LABEL-EAT":"进食",
+        "TAB1-LABEL-TRANSFER":"转移",
+        "TAB1-LABEL-ACTIVITY":"活动",
+        "TAB1-LABEL-DRESS":"穿衣",
+        "TAB1-LABEL-STAIRS":"上下楼梯",
+        "TAB1-LABEL-BATH":"洗澡"
       }
     },
     "nursing-station": {
@@ -771,6 +787,7 @@
     "other-config":{
       "TITLE":"养老机构-系统管理-其它配置",
       "TAB1": "配置信息",
+      "TAB1-LABEL-TENANT_NAME": "机构名称",
       "TAB1-LABEL-BED_MONITOR_TIMEOUT": "睡眠带超时时间（分）",
       "TAB1-PLACEHOLDER-BED_MONITOR_TIMEOUT": "5..",
       "TAB1-LABEL-BED_MONITOR_TIMEOUT_ALARM_BRGIN": "超时报警起始时间",

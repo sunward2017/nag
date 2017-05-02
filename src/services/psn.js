@@ -4490,7 +4490,31 @@ module.exports = {
                         yield next;
                     };
                 }
-            }, {
+            },{
+                method: 'workItemQuery',
+                verb: 'post',
+                url: this.service_url_prefix + "/q/workItem",
+                handler: function(app, options) {
+                    return function*(next) {
+                        try {
+                            var workItemId = this.request.body.workItemId;
+                            console.log("workItemId",workItemId)
+                            var rows = yield app.modelFactory().model_read(app.models['psn_workItem'],workItemId);
+                            if(!rows){
+                                this.body = app.wrapper.res.error({ message: '无法找到工作项目!' });
+                                yield next;
+                                return; 
+                            }
+                            this.body = app.wrapper.res.rows(rows);
+                        } catch (e) {
+                            console.log(e);       
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },{
                 method: 'nursingPlanSaveNursingItem',
                 verb: 'post',
                 url: this.service_url_prefix + "/nursingPlanSaveNursingItem", //为老人保存一条护理类目

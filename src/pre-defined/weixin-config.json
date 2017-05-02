@@ -35,5 +35,14 @@
       "mch_api_secret": "none",
       "notify_url": "none",
       "trade_des": "梧斯源个人健康助手+"
+    },
+    {
+      "appid": "wx95d8eb082522a494",
+      "secret": "feef69123efe230d9f42b6058ac1dffe",
+      "mch_id": "none",
+      "mch_api_secret": "none",
+      "notify_url": "none",
+      "trade_des": "梧斯源护理用药小助手+"
     }]
+}
 }

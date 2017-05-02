@@ -24,7 +24,7 @@ module.exports = function(ctx, name) {
             bed_no: { type: Number, min: 1 },
             gen_batch_no: { type: String, required: true, minlength: 10, maxlength: 10 },
             workItemId: { type: mongoose.Schema.Types.ObjectId, ref: 'psn_workItem' },
-            work_item_flag: { type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3019"]) },
+            category: { type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3019"]) },
             name: { type: String, required: true, maxlength: 100 },
             description: { type: String, maxLength: 400 },
             remark: { type: String, maxLength: 200 },

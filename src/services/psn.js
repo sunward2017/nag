@@ -4680,7 +4680,7 @@ module.exports = {
                                         nursingRecord.duration = workItem.duration;
                                         nursingRecord.remind_on = [];
                                         nursingRecord.type = workItem.type;
-                                        nursingRecord.work_item_flag = workItem.work_item_flag;
+                                        nursingRecord.category = workItem.work_item_category;
                                         var str = workItem.voice_template;
                                         var reg = /\${([^}]+)}/, result;
                                         while ((result = reg.exec(str)) != null) {
@@ -4980,7 +4980,7 @@ module.exports = {
                                     remark: workItem.remark,
                                     duration: workItem.duration,
                                     type:workItem.type,
-                                    work_item_flag:workItem.work_item_flag
+                                    category:workItem.work_item_category
                                 };
                                 var str = workItem.voice_template;
                                 var reg = /\${([^}]+)}/;

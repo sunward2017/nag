@@ -20,7 +20,7 @@ module.exports = function(ctx,name) {
             valid_flag:{type:Boolean, default: true},
             elderly_name: {type: String, required: true, maxlength: 20},
             drugId:{type: mongoose.Schema.Types.ObjectId,required: true,ref:'psn_drugDirectory'},//关联药品
-            drug_no: {type: String, required: true, maxlength: 20},
+            drug_no: {type: String, maxlength: 20},
             drug_full_name: {type: String, required: true, maxlength: 20},
             in_out_no:{type: String},//出入库单号
             type:{type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3014"])},//出入库类别(子女送药、机构采购、过期……)

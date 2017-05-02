@@ -22,7 +22,7 @@ module.exports = function(ctx,name) {
             operated_on: {type: Date, default: Date.now},
             status: {type: Number, min: 0, max: 1, default: 1},
             nursingLevelId: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'psn_nursingLevel'},
-            elderlyId: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'psn_elderly'},
+            elderlyId: {type: mongoose.Schema.Types.ObjectId, ref: 'psn_elderly'},
             customize_flag: {type: Boolean, default: false}, // 自定义标识,一旦确定无法修改
             name: {type: String, required: true, maxlength: 100},
             description: {type: String,maxLength:400},

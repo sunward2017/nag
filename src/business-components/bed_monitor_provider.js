@@ -1491,7 +1491,9 @@ module.exports = {
                                 sleepTime: sleepTime,
                                 bodyMoveFrequency: bodyMoveFrequency,
                                 heartTime: heartTime,
-                                week: week
+                                week: week,
+					 maxHeartRate:report.max_heart_rate,
+			             minHeartRate:report.min_heart_rate
                             }
                             dateReports.push(dateReport);
                         } else {
@@ -1631,7 +1633,9 @@ module.exports = {
                             heartTime: heartTime,
                             week: week,
                             bed_time: bed_time.format("hh:mm:ss"),
-                            wakeup_time: wakeup_time.format("hh:mm:ss")
+                            wakeup_time: wakeup_time.format("hh:mm:ss"),
+				   maxHeartRate:report.max_heart_rate,
+			         minHeartRate:report.min_heart_rate
                         }
                         dateReports.push(dateReport);
                     } else {
@@ -1724,7 +1728,9 @@ module.exports = {
                             bodyMoveFrequency: bodyMoveFrequency,
                             heartTime: heartTime,
                             bed_time: report.bed_time.format("hh:mm:ss"),
-                            wakeup_time: report.wakeup_time.format("hh:mm:ss")
+                            wakeup_time: report.wakeup_time.format("hh:mm:ss"),
+ 				   maxHeartRate:report.max_heart_rate,
+			         minHeartRate:report.min_heart_rate
                         }
                     } else {
                         var dateReport = {
@@ -1758,6 +1764,7 @@ module.exports = {
                     }
 
                 });
+			//console.log("report.fallasleep_time",self.ctx.moment(targetdDate).format('YYYY-MM-DD 12:00:00'));
                 if (report.fallasleep_time) {
                     var light_sleep_duraion = self.ctx.moment.duration(report.light_sleep_duraion).asHours();
                     var deep_sleep_duraion = self.ctx.moment.duration(report.deep_sleep_duraion).asHours();
@@ -1784,7 +1791,9 @@ module.exports = {
                         bodyMoveFrequency: bodyMoveFrequency,
                         heartTime: heartTime,
                         bed_time: report.bed_time.format("hh:mm:ss"),
-                        wakeup_time: report.wakeup_time.format("hh:mm:ss")
+                        wakeup_time: report.wakeup_time.format("hh:mm:ss"),
+			     maxHeartRate:report.max_heart_rate,
+			     minHeartRate:report.min_heart_rate
                     }
                 } else {
                     var dateReport = {

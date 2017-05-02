@@ -10,6 +10,7 @@
         .controller('InGridController', InGridController)
         .controller('InDetailsController', InDetailsController)
         .controller('InConfigController',InConfigController)
+        .controller('DialogChangeElderlyBoardInfoController', DialogChangeElderlyBoardInfoController)
         .controller('DialogChangeElderlyRoomInfoController', DialogChangeElderlyRoomInfoController)
         .controller('DialogChangeElderlyChargeItemForOtherAndCustomizedController', DialogChangeElderlyChargeItemForOtherAndCustomizedController)
     ;
@@ -356,12 +357,13 @@
         function changeBoard() {
 
             ngDialog.open({
-                template: 'change-elderly-charge-item.html',
-                controller: 'DialogChangeElderlyChargeItemController',
+                template: 'change-elderly-board-info.html',
+                controller: 'DialogChangeElderlyBoardInfoController',
                 data: {
                     vmh: vmh,
                     viewTranslatePathRoot:vm.viewTranslatePath(),
                     titleTranslatePath: vm.viewTranslatePath('TAB1-BOARD-INFO'),
+                    _subsystem_: vm._subsystem_,
                     tenantId: vm.model.tenantId,
                     elderlyId: vm.model._id,
                     charge_item_catalog_id: PENSION_AGENCY_CHARGE_ITEM.BOARD + '-' + vm.model.charge_standard,
@@ -485,6 +487,99 @@
         }
     }
 
+    DialogChangeElderlyBoardInfoController.$inject = ['$scope','ngDialog','PENSION_AGENCY_DEFAULT_CHARGE_STANDARD'];
+
+    function DialogChangeElderlyBoardInfoController($scope,ngDialog, PENSION_AGENCY_DEFAULT_CHARGE_STANDARD) {
+
+        var vm = $scope.vm = {selectBinding:{}};
+        var vmh = $scope.ngDialogData.vmh;
+
+        $scope.utils = vmh.utils.v;
+
+        init();
+
+        function init() {
+            vm.viewTranslatePathRoot = $scope.ngDialogData.viewTranslatePathRoot;
+            vm.viewTranslatePath = function(key) {
+                return vm.viewTranslatePathRoot + '.' + key;
+            };
+            vm.title = $scope.ngDialogData.titleTranslatePath;
+            vm._subsystem_ = $scope.ngDialogData._subsystem_;
+            vm.tenantId = $scope.ngDialogData.tenantId;
+            vm.elderlyId = $scope.ngDialogData.elderlyId;
+            vm.charge_item_catalog_id = $scope.ngDialogData.charge_item_catalog_id;
+            vm.charge_item_id = $scope.ngDialogData.selectedItem.item_id;
+            vm.selected_charge_item =  $scope.ngDialogData.selectedItem;
+
+
+            vm.setChargeItem = setChargeItem;
+            vm.doSubmit = doSubmit;
+
+            vmh.parallel([
+                vmh.extensionService.tenantInfo(vm.tenantId, 'charge_standards'),
+                vmh.clientData.getJson('charge-standards-pension-agency')
+            ]).then(function (results) {
+
+                var charge_standard_standand = results[1][0], charge_items; //charge_standard_standand硬编码
+                vm.selectedStandard = _.find(results[0].charge_standards, function(o){
+                        return o.subsystem == vm._subsystem_;
+                    }) || {};
+                if (vm.selectedStandard.charge_items) {
+                    charge_items = vm.selectedStandard.charge_items;
+                    //将预订义收费标准模板替换为当前租户的收费标准
+                    _.each(charge_standard_standand.children, function (item) {
+                        item.children = _.chain(item.children).map(function (o) {
+                            var theChargeItem = _.findWhere(charge_items, {item_id: o._id});
+                            if (o.data) {
+                                theChargeItem = _.defaults(theChargeItem, {data: o.data});
+                            }
+                            return theChargeItem;
+                        }).compact().value();
+                    });
+                }
+                console.log('老人收费项目分类: ', vm.charge_item_catalog_id);
+                //老人收费项目分类
+                var elderly_charge_item_catalog = _.findWhere(charge_standard_standand.children, {_id: vm.charge_item_catalog_id});
+                if (elderly_charge_item_catalog) {
+                    vm.selectBinding.elderly_charge_items = elderly_charge_item_catalog.children;
+                }
+                
+            });
+        }
+
+        function setChargeItem(charge_item){
+            vm.new_charge_item = charge_item;
+        }
+
+        function doSubmit() {
+            vm.authMsg = null;
+            if ($scope.theForm.$valid) {
+                if ($scope.ngDialogData.selectedItem.item_id != vm.charge_item_id) {
+                    var promise = ngDialog.openConfirm({
+                        template: 'normalConfirmDialog.html',
+                        className: 'ngdialog-theme-default'
+                    }).then(function () {
+
+                        vmh.extensionService.changeElderlyChargeItem(vm.tenantId, vm.elderlyId, vm.charge_item_catalog_id, vm.selected_charge_item.item_id, vm.new_charge_item).then(function () {
+                            //修改elderly.charge_items中饮食套餐的收费项及饮食套餐描述
+                            console.log('invoked changeElderlyChargeItem');
+                            $scope.closeThisDialog(vm.new_charge_item);
+                        }, function (err) {
+                            vm.authMsg = err;
+                        });
+                    });
+                }
+                else {
+                    console.log('NO-CHANGE');
+
+                    return vmh.translate('notification.NO-CHANGE').then(function (ret) {
+                        vm.authMsg = ret;
+                    });
+                }
+            }
+        }
+    }
+
     DialogChangeElderlyRoomInfoController.$inject = ['$scope','ngDialog'];
 
     function DialogChangeElderlyRoomInfoController($scope,ngDialog) {
@@ -543,8 +638,8 @@
                 }
 
                 //老人收费项目分类
-                console.log('老人收费项目分类: ', $scope.ngDialogData.charge_item_catalog_id);
-                var elderly_charge_item_catalog = _.findWhere(charge_standard_standand.children, {_id: $scope.ngDialogData.charge_item_catalog_id});
+                console.log('老人收费项目分类: ', vm.charge_item_catalog_id);
+                var elderly_charge_item_catalog = _.findWhere(charge_standard_standand.children, {_id: vm.charge_item_catalog_id});
                 if (elderly_charge_item_catalog) {
                     vm.elderly_charge_items = elderly_charge_item_catalog.children;
                 }

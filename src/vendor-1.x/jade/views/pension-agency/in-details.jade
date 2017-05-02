@@ -131,13 +131,6 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                         .col-md-4
                             button.btn.btn-primary.pull-left(ng-if="vm.readonly && !vm.model.begin_exit_flow",type="button",ng-click="vm.changeBoard()") {{'button.CHANGE'|translate}}
                     fieldset: .form-group
-                        <!--护理信息-->
-                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-NURSING-INFO') | translate}}:
-                        .col-md-6
-                            .form-readable {{vm.model.nursing_info}}
-                        .col-md-4
-                            button.btn.btn-primary.pull-left(ng-if="vm.readonly && !vm.model.begin_exit_flow",type="button",ng-click="vm.changeNursing()") {{'button.CHANGE'|translate}}
-                    fieldset: .form-group
                         <!--床位信息-->
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-ROOM-INFO') | translate}}:
                         .col-md-6
@@ -319,7 +312,7 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
         button.btn.btn-primary(ng-if="vm.readonly",type="button",ng-click="vm.toListView()") {{'button.RETURN'|translate}}
     .text-left.mt-lg
 
-script(type="text/ng-template", id="change-elderly-charge-item.html")
+script(type="text/ng-template", id="change-elderly-board-info.html")
     form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="vm.doSubmit()")
         .ngdialog-message
             h3.mt0 {{ vm.title | translate}}

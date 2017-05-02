@@ -61,7 +61,6 @@
             vm.submitApplicationToExit = submitApplicationToExit;
             vm.doSubmit = doSubmit;
             vm.changeBoard = changeBoard;
-            vm.changeNursing = changeNursing;
             vm.changeRoom = changeRoom;
             vm.changeOtherAndCustomized = changeOtherAndCustomized;
 
@@ -379,30 +378,6 @@
             });
         }
 
-        function changeNursing() {
-
-            ngDialog.open({
-                template: 'change-elderly-charge-item.html',
-                controller: 'DialogChangeElderlyChargeItemController',
-                data: {
-                    vmh: vmh,
-                    viewTranslatePathRoot:vm.viewTranslatePath(),
-                    titleTranslatePath: vm.viewTranslatePath('TAB1-NURSING-INFO'),
-                    tenantId: vm.model.tenantId,
-                    elderlyId: vm.model._id,
-                    charge_item_catalog_id: PENSION_AGENCY_CHARGE_ITEM.NURSING + '-' + vm.model.charge_standard,
-                    selectedItem: vm.selectedNursing
-                }
-            }).closePromise.then(function (ret) {
-                if(ret.value!='$document' && ret.value!='$closeButton' && ret.value!='$escape' ) {
-                    console.log(ret);
-                    vm.selectedNursing = ret.value;
-                    vm.model.nursing_summary = vm.selectedNursing.item_name;
-                    vm.refreshJournalAccount();
-                }
-            });
-        }
-
         function changeRoom() {
             ngDialog.open({
                 template: 'change-elderly-room-info.html',
@@ -543,7 +518,7 @@
                 if (elderly_charge_item_catalog) {
                     vm.selectBinding.elderly_charge_items = elderly_charge_item_catalog.children;
                 }
-                
+
             });
         }
 

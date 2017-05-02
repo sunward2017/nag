@@ -21,6 +21,7 @@
     "RED": "pub_red"
   },
   "PENSION-AGENCY": {
+    "SUB_SYSTEM": "pension-agency",
     "DEFAULT_CHARGE_STANDARD": "S1",
     "ROOM_CATEGORIES": {
       "SINGLE-ROOM": 1,

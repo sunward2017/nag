@@ -10,6 +10,8 @@
         .controller('InGridController', InGridController)
         .controller('InDetailsController', InDetailsController)
         .controller('InConfigController',InConfigController)
+        .controller('DialogChangeElderlyRoomInfoController', DialogChangeElderlyRoomInfoController)
+        .controller('DialogChangeElderlyChargeItemForOtherAndCustomizedController', DialogChangeElderlyChargeItemForOtherAndCustomizedController)
     ;
 
 
@@ -132,6 +134,7 @@
 
 
                 //独立成方法单独调用
+                console.log('vm.model.charge_items:', vm.model.charge_items);
                 vm.selectedOtherAndCustomized = _.filter(vm.model.charge_items, function (item) {
                     return item.item_id.indexOf((PENSION_AGENCY_CHARGE_ITEM.OTHER + '-' + vm.model.charge_standard).toLowerCase()) != -1 ||
                         item.item_id.indexOf((PENSION_AGENCY_CHARGE_ITEM.CUSTOMIZED + '-' + vm.model.charge_standard).toLowerCase()) != -1
@@ -273,7 +276,7 @@
         }
 
         function refreshJournalAccount(){
-            vmh.extensionService.elderlyInfo(vm.model._id,'charge_items,subsidiary_ledger,journal_account').then(function(ret){
+            vmh.psnService.elderlyInfo(vm.model._id,'charge_items,subsidiary_ledger,journal_account').then(function(ret){
                 vm.model.charge_items = ret.charge_items;
                 vm.model.subsidiary_ledger = ret.subsidiary_ledger;
                 vm.model.journal_account = ret.journal_account;
@@ -283,7 +286,6 @@
         }
 
         function setOtherAndCustomized(){
-
             if(vm.selectedOtherAndCustomized.length>0){
                 var keys = _.map(vm.selectedOtherAndCustomized,function(o){
                     return o.item_id;
@@ -405,6 +407,7 @@
                     vmh: vmh,
                     viewTranslatePathRoot:vm.viewTranslatePath(),
                     titleTranslatePath: vm.viewTranslatePath('TAB1-ROOM-INFO'),
+                    _subsystem_: vm._subsystem_,
                     tenantId: vm.model.tenantId,
                     elderlyId: vm.model._id,
                     charge_item_catalog_id: PENSION_AGENCY_CHARGE_ITEM.ROOM + '-' + vm.model.charge_standard,
@@ -432,6 +435,7 @@
                     vmh: vmh,
                     viewTranslatePathRoot:vm.viewTranslatePath(),
                     titleTranslatePath: vm.viewTranslatePath('TAB1-OTHER-AND-CUSTOMIZED-INFO'),
+                    _subsystem_: vm._subsystem_,
                     tenantId: vm.model.tenantId,
                     elderlyId: vm.model._id,
                     charge_item_catalog_id: PENSION_AGENCY_CHARGE_ITEM.OTHER + '-' + vm.model.charge_standard
@@ -473,6 +477,342 @@
             else {
                 if ($scope.utils.vtab(vm.tab1.cid)) {
                     vm.tab1.active = true;
+                }
+            }
+        }
+    }
+
+    DialogChangeElderlyRoomInfoController.$inject = ['$scope','ngDialog'];
+
+    function DialogChangeElderlyRoomInfoController($scope,ngDialog) {
+
+        var vm = $scope.vm = {selectBinding:{}};
+        var vmh = $scope.ngDialogData.vmh;
+
+        $scope.utils = vmh.utils.v;
+
+        init();
+
+        function init() {
+            vm.viewTranslatePathRoot = $scope.ngDialogData.viewTranslatePathRoot;
+            vm.viewTranslatePath = function(key) {
+                return vm.viewTranslatePathRoot + '.' + key;
+            };
+            vm.title = $scope.ngDialogData.titleTranslatePath;
+            vm._subsystem_ = $scope.ngDialogData._subsystem_;
+            vm.tenantId = $scope.ngDialogData.tenantId;
+            vm.elderlyId = $scope.ngDialogData.elderlyId;
+            vm.charge_item_catalog_id = $scope.ngDialogData.charge_item_catalog_id;
+            vm.selected_charge_item =  $scope.ngDialogData.selectedItem;
+            vm.room_info = angular.copy($scope.ngDialogData.selectedRoomInfo);
+
+
+            vm.isDisabled = isDisabled;
+            vm.getOccupyElderlyName = getOccupyElderlyName;
+            vm.doSubmit = doSubmit;
+
+            vmh.parallel([
+                vmh.extensionService.tenantInfo(vm.tenantId, 'charge_standards'),
+                vmh.clientData.getJson('charge-standards-pension-agency'),
+                vmh.shareService.tmp('T3003', 'name', {
+                    tenantId: vm.tenantId,
+                    floorSuffix: 'F',
+                    bedNoSuffix: '#床'
+                }),
+                vmh.psnService.roomStatusInfo(vm.tenantId)
+            ]).then(function (results) {
+                var charge_standard_standand = results[1][0], charge_items; //charge_standard_standand硬编码
+                vm.selectedStandard = _.find(results[0].charge_standards, function(o){
+                        return o.subsystem == vm._subsystem_;
+                    }) || {};
+                if (vm.selectedStandard.charge_items) {
+                    charge_items = vm.selectedStandard.charge_items;
+                    //将预订义收费标准模板替换为当前租户的收费标准
+                    _.each(charge_standard_standand.children, function (item) {
+                        item.children = _.chain(item.children).map(function (o) {
+                            var theChargeItem = _.findWhere(charge_items, {item_id: o._id});
+                            if (o.data) {
+                                theChargeItem = _.defaults(theChargeItem, {data: o.data});
+                            }
+                            return theChargeItem;
+                        }).compact().value();
+                    });
+                }
+
+                //老人收费项目分类
+                console.log('老人收费项目分类: ', $scope.ngDialogData.charge_item_catalog_id);
+                var elderly_charge_item_catalog = _.findWhere(charge_standard_standand.children, {_id: $scope.ngDialogData.charge_item_catalog_id});
+                if (elderly_charge_item_catalog) {
+                    vm.elderly_charge_items = elderly_charge_item_catalog.children;
+                }
+
+                vm.treeData = results[2];
+                vm.roomStatusInfo = {};
+                _.each(results[3], function (roomStatus) {
+                    _.each(roomStatus.occupied, function (occupy) {
+                        if (occupy.elderlyId) {
+                            vm.roomStatusInfo[roomStatus.roomId + '$' + occupy.bed_no] = {
+                                elderly_name: occupy.elderlyId.name,
+                                bed_status: occupy.bed_status
+                            };
+                        }
+                    });
+                });
+
+            });
+
+            $scope.$on('tree:node:select', function ($event, node, treeObject) {
+                if (node.capacity) {
+                    var arrIndex = node.attrs.index.split(treeObject.levelSplitChar);
+                    var data = treeObject.treeData;
+                    vm.room_summary = '';
+                    for (var i = 0; i < arrIndex.length; i++) {
+                        var currentNode = data[arrIndex[i]];
+                        if (currentNode) {
+                            vm.room_summary += currentNode.name;
+                            if (currentNode.children) {
+                                vm.room_summary += treeObject.levelSplitChar;
+                                data = currentNode.children;
+                            }
+                        }
+                    }
+
+                    vm.roomCapacity = node.capacity;//房间类型选择
+                    for(var i=0;i< vm.elderly_charge_items.length;i++){
+                        var charge_item = vm.elderly_charge_items[i];
+                        var selected = false;
+                        //房间类型
+                        if (angular.isArray(charge_item.data.capacity)) {
+                            selected = _.contains(_.range(charge_item.data.capacity[0], charge_item.data.capacity[1]), vm.roomCapacity);
+                        }
+                        else {
+                            selected = charge_item.data.capacity == vm.roomCapacity;
+                        }
+
+                        if(selected) {
+                            vm.new_charge_item = charge_item;
+                            break;
+                        }
+                    }
+
+                }
+            });
+        }
+
+        function isDisabled(node) {
+            var key = node._id.split('$').slice(1).join('$');
+            var bed_status = vm.roomStatusInfo[key] && vm.roomStatusInfo[key].bed_status;
+            if (!bed_status)
+                bed_status = 'A0001';//空闲
+            return bed_status != 'A0001';
+        }
+
+        function getOccupyElderlyName(node) {
+            var key = node._id.split('$').slice(1).join('$');
+            var elderlyName = vm.roomStatusInfo[key] && vm.roomStatusInfo[key].elderly_name;
+            return elderlyName;
+        }
+
+
+        function doSubmit() {
+            vm.authMsg = null;
+            if ($scope.theForm.$valid) {
+
+
+                if ($scope.ngDialogData.selectedRoomInfo != vm.room_info) {
+
+                    var promise = ngDialog.openConfirm({
+                        template: 'normalConfirmDialog.html',
+                        className: 'ngdialog-theme-default'
+                    }).then(function () {
+
+                        var arrRoomInfo = vm.room_info.split('$');
+
+                        vmh.psnService.changeElderlyRoomBed(vm.tenantId, vm.elderlyId,arrRoomInfo[1],arrRoomInfo[2]).then(function(){
+                            console.log('invoked changeElderlyRoomBed');
+                            return vmh.psnService.changeElderlyChargeItem(vm.tenantId, vm.elderlyId, vm.charge_item_catalog_id, vm.selected_charge_item.item_id, vm.new_charge_item).then(function(){
+                                console.log('invoked changeElderlyChargeItem');
+                            }).catch(function(err){
+                                vm.authMsg = err;
+                                vmh.notify.alert('<div class="text-center"><em class="fa fa-warning"></em> ' + err + '</div>', 'warning');
+                            });
+                        }).then(function(){
+                            $scope.closeThisDialog({
+                                room_charge_item: vm.new_charge_item,
+                                room_info: vm.room_info,
+                                room_summary: vm.room_summary
+                            });
+                        }).catch(function(err){
+                            vm.authMsg = err;
+                        });
+
+                    });
+
+
+                }
+                else {
+                    console.log('NO-CHANGE');
+                    return vmh.translate('notification.NO-CHANGE').then(function (ret) {
+                        vm.authMsg = ret;
+                    });
+                }
+            }
+        }
+    }
+
+    DialogChangeElderlyChargeItemForOtherAndCustomizedController.$inject = ['$scope','ngDialog', 'PENSION_AGENCY_DEFAULT_CHARGE_STANDARD'];
+
+    function DialogChangeElderlyChargeItemForOtherAndCustomizedController($scope, ngDialog, PENSION_AGENCY_DEFAULT_CHARGE_STANDARD) {
+
+        var vm = $scope.vm = {selectBinding:{}};
+        var vmh = $scope.ngDialogData.vmh;
+
+        $scope.utils = vmh.utils.v;
+
+        init();
+
+        function init() {
+            vm.viewTranslatePathRoot = $scope.ngDialogData.viewTranslatePathRoot;
+            vm.viewTranslatePath = function(key) {
+                return vm.viewTranslatePathRoot + '.' + key;
+            };
+            vm.title = $scope.ngDialogData.titleTranslatePath;
+            vm._subsystem_ = $scope.ngDialogData._subsystem_;
+            vm.tenantId = $scope.ngDialogData.tenantId;
+            vm.elderlyId = $scope.ngDialogData.elderlyId;
+            vm.charge_item_catalog_id = $scope.ngDialogData.charge_item_catalog_id;//other
+
+            vm.isChanged = isChanged;
+            vm.sumPeriodPrice = sumPeriodPrice;
+            vm.isSelected = isSelected;
+            vm.doSubmit = doSubmit;
+
+            vmh.parallel([
+                vmh.psnService.elderlyInfo(vm.elderlyId, 'charge_standard,charge_items'),
+                vmh.extensionService.tenantInfo(vm.tenantId, 'charge_standards'),
+                vmh.clientData.getJson('charge-standards-pension-agency'),
+                vmh.extensionService.tenantChargeItemCustomizedAsTree(vm.tenantId, PENSION_AGENCY_DEFAULT_CHARGE_STANDARD, vm._subsystem_),
+                vmh.shareService.d('D1015')
+            ]).then(function (results) {
+                var charge_items_of_elderly = results[0].charge_items;
+                var tenantSelectedStandard = _.find(results[1].charge_standards, function(o){
+                        return o.subsystem == vm._subsystem_;
+                    }) || {};
+                var charge_items_of_tenant = tenantSelectedStandard.charge_items;
+                var charge_standard_standand = results[2][0]; //charge_standard_standand硬编码
+                if (charge_standard_standand) {
+                    //将预订义收费标准模板替换为当前租户的收费标准
+                    var selectedChargeItemCatalogs = _.where(charge_standard_standand.children, {_id: vm.charge_item_catalog_id});
+                    //增加特色服务
+                    if (results[3].children.length > 0) {
+                        selectedChargeItemCatalogs.push(results[3]);
+                    }
+                    var selectionOfManualSelectable = {};
+                    var rawSumedPeriodPrice = 0;
+                    _.each(selectedChargeItemCatalogs, function (item) {
+                        item.children = _.chain(item.children).map(function (o) {
+                            var theChargeItem = _.findWhere(charge_items_of_elderly, {item_id: o._id});
+                            var selected = true;
+                            if (!theChargeItem) {
+                                theChargeItem = _.findWhere(charge_items_of_tenant, {item_id: o._id});
+                                selected = false;
+                            }
+                            if (o.data) {
+                                theChargeItem = _.defaults(theChargeItem, {data: o.data});
+                            }
+
+
+                            if (theChargeItem.data.manual_seletable) {
+                                selectionOfManualSelectable[theChargeItem.item_id] = selected;
+                            }
+
+                            if(selected) {
+                                rawSumedPeriodPrice += theChargeItem.period_price;
+                            }
+
+                            return theChargeItem;
+                        }).compact().value();
+
+                    });
+
+
+                    vm.selectedChargeItemCatalogs = selectedChargeItemCatalogs;
+                    vm.selectionOfManualSelectable = selectionOfManualSelectable;
+                    vm.rawSumedPeriodPrice = rawSumedPeriodPrice;
+
+                    vm.raw_selectionOfManualSelectable = _.extend({}, selectionOfManualSelectable);
+
+                    vm.period_map = {};
+                    _.each(results[4], function (o) {
+                        vm.period_map[o.value] = o.name;
+                    });
+                }
+            });
+
+            vm.selected_charge_item_object = {};
+            vm.selectedChargeItem = {};
+        }
+
+        function isChanged(){
+            var notChanged = true;
+            for(var key in vm.selectionOfManualSelectable) {
+                notChanged = notChanged && (vm.selectionOfManualSelectable[key] == vm.raw_selectionOfManualSelectable[key]);
+            }
+            return !notChanged;
+        }
+
+        function sumPeriodPrice() {
+            var totals = 0;
+            for (var item_id in vm.selectedChargeItem) {
+                totals += vm.selectedChargeItem[item_id];
+            }
+            return totals;
+        }
+
+        function isSelected(charge_item) {
+            var selected = vm.selectionOfManualSelectable[charge_item.item_id];
+            if (selected) {
+                vm.selectedChargeItem[charge_item.item_id] = charge_item.period_price;
+                vm.selected_charge_item_object[charge_item.item_id] = charge_item;
+            }
+            else{
+                delete vm.selectedChargeItem[charge_item.item_id];
+                delete vm.selected_charge_item_object[charge_item.item_id];
+            }
+            return selected;
+        }
+
+        function doSubmit() {
+            vm.authMsg = null;
+            if ($scope.theForm.$valid) {
+                if (isChanged()) {
+                    var promise = ngDialog.openConfirm({
+                        template: 'normalConfirmDialog.html',
+                        className: 'ngdialog-theme-default'
+                    }).then(function () {
+
+                        //var selectedOtherAndCustomized = _.values(vm.selected_charge_item_object);
+                        //$scope.closeThisDialog({otherAndCustomized:selectedOtherAndCustomized});
+
+                        vmh.psnService.changeElderlyChargeItemForOtherAndCustomized(
+                            vm.tenantId,
+                            vm.elderlyId,
+                            vm.charge_item_catalog_id,
+                            _.keys(vm.selected_charge_item_object)
+                        ).then(function () {
+                            console.log('invoked changeElderlyChargeItemForOtherAndCustomized');
+                            $scope.closeThisDialog({otherAndCustomized:_.values(vm.selected_charge_item_object)});
+                        }, function (err) {
+                            vm.authMsg = err;
+                        });
+                    });
+                }
+                else {
+                    console.log('NO-CHANGE');
+
+                    return vmh.translate('notification.NO-CHANGE').then(function (ret) {
+                        vm.authMsg = ret;
+                    });
                 }
             }
         }

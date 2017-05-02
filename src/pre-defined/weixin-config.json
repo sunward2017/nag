@@ -5,7 +5,7 @@
     "redirect_uri": "http://sh.okertrip.com/services/open/WeiXin$ConnectCallback",
     "qr_css_href": "https://www.2ciyun.com/css/weixin.css"
   },
-  "open_mobile_site":{
+  "open_mobile_site": {
     "appid": "wx1c6c736837b3a396",
     "secret": "db8bfa0a305489c461db1b302897d345",
     "redirect_uri": "http://weixin.okertrip.com/#/weixin-auth",
@@ -35,5 +35,14 @@
       "mch_api_secret": "none",
       "notify_url": "none",
       "trade_des": "梧斯源个人健康助手+"
-    }]
+    },
+    {
+      "appid": "wx95d8eb082522a494",
+      "secret": "feef69123efe230d9f42b6058ac1dffe",
+      "mch_id": "none",
+      "mch_api_secret": "none",
+      "notify_url": "none",
+      "trade_des": "梧斯源护理用药小助手+"
+    }
+  ]
 }

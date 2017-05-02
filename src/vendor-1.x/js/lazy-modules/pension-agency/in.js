@@ -32,9 +32,9 @@
 
     }
 
-    InDetailsController.$inject = ['$scope','ngDialog','PENSION_AGENCY_CHARGE_ITEM', 'vmh', 'entityVM'];
+    InDetailsController.$inject = ['$scope','ngDialog','PENSION_AGENCY_DEFAULT_CHARGE_STANDARD', 'PENSION_AGENCY_CHARGE_ITEM', 'vmh', 'entityVM'];
 
-    function InDetailsController($scope,ngDialog,PENSION_AGENCY_CHARGE_ITEM, vmh, vm) {
+    function InDetailsController($scope,ngDialog,PENSION_AGENCY_DEFAULT_CHARGE_STANDARD, PENSION_AGENCY_CHARGE_ITEM, vmh, vm) {
 
         var vm = $scope.vm = vm;
         $scope.utils = vmh.utils.v;
@@ -134,14 +134,17 @@
 
 
                 //独立成方法单独调用
-                console.log('vm.model.charge_items:', vm.model.charge_items);
-                vm.selectedOtherAndCustomized = _.filter(vm.model.charge_items, function (item) {
-                    return item.item_id.indexOf((PENSION_AGENCY_CHARGE_ITEM.OTHER + '-' + vm.model.charge_standard).toLowerCase()) != -1 ||
-                        item.item_id.indexOf((PENSION_AGENCY_CHARGE_ITEM.CUSTOMIZED + '-' + vm.model.charge_standard).toLowerCase()) != -1
-                        ;
+                vmh.fetch(vmh.extensionService.tenantChargeItemCustomizedAsTree(vm.tenantId, PENSION_AGENCY_DEFAULT_CHARGE_STANDARD, vm._subsystem_)).then(function(ret) {
+                    var arrCustomized = _.map(ret.children, function (o) {
+                       return o._id;
+                    });
+                    vm.selectedOtherAndCustomized = _.filter(vm.model.charge_items, function (item) {
+                        return item.item_id.indexOf((PENSION_AGENCY_CHARGE_ITEM.OTHER + '-' + vm.model.charge_standard).toLowerCase()) != -1 ||
+                            _.contains(arrCustomized, item.item_id);
+                    });
+                    console.log('vm.selectedOtherAndCustomized:', vm.selectedOtherAndCustomized);
+                    setOtherAndCustomized();
                 });
-                setOtherAndCustomized();
-
             });
 
 

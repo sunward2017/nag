@@ -22,6 +22,7 @@ module.exports = function(ctx,name) {
             operated_on: {type: Date, default: Date.now},
             status: {type: Number, min: 0, max: 1, default: 1},
             nursingLevelId: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'psn_nursingLevel'},
+            elderlyId: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'psn_elderly'},
             customize_flag: {type: Boolean, default: false}, // 自定义标识,一旦确定无法修改
             name: {type: String, required: true, maxlength: 100},
             description: {type: String,maxLength:400},
@@ -36,7 +37,7 @@ module.exports = function(ctx,name) {
             remind_times: {type: Number}, // 提醒次数
             fee_flag: {type: Boolean, default: false}, // 是否需要收费
             fee: {type: Number}, // 费用
-            voice_template:{type:String,maxlength:400},
+            voice_template:{type:String,maxlength:400,default:'${老人姓名},你该${护理项目}了,请您${工作描述}'},
             tenantId: {type: mongoose.Schema.Types.ObjectId}
         }, {
             toObject: {

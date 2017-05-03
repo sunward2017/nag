@@ -4668,6 +4668,39 @@ module.exports = {
                     };
                 }
             },
+            /**********************自定义工作项目******************************/
+            {
+                method: 'customizedWorkItem',
+                verb: 'post',
+                url: this.service_url_prefix + "/customizedWorkItem",
+                handler: function (app, options) {
+                    return function* (next) {
+                        try {
+                            var workItemId = this.request.body.workItemId,newWorkItemId;
+                            // console.log("<<<workItemId", workItemId);
+                            var customizedWorkItem = this.request.body.customizedWorkItem;
+                            // console.log(">>>>>customizeWorkItem", customizedWorkItem);
+                            var workItem = yield app.modelFactory().model_read(app.models['psn_workItem'], workItemId);
+                            // console.log('<<<<workItem', workItem);
+                            if (!workItem.customize_flag) {
+                                delete customizedWorkItem._id;
+                                customizedWorkItem.customize_flag = true;
+                                customizedWorkItem.name+="+";
+                                yield app.modelFactory().model_create(app.models['psn_workItem'], customizedWorkItem);
+                            } else {
+                                workItem = app._.extend(workItem, customizedWorkItem);
+                                yield workItem.save();
+                            }
+                            this.body = app.wrapper.res.default();
+                        }catch(e){
+                            console.log(e);
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
             /**********************护理计划执行(护理记录)*****************************/
             {
                 method: 'nursingRecordGenerate',
@@ -4741,14 +4774,13 @@ module.exports = {
                                     }
                                 });
                             }
-
+                            // console.log('nursingPlanItems',nursingPlanItems);
                             if (nursingPlanItems.length) {
                                 now = app.moment();
                                 gen_batch_no = yield app.sequenceFactory.getSequenceVal(app.modelVariables.SEQUENCE_DEFS.CODE_OF_NURSING_RECORD);
                                 for (var i = 0, len = nursingPlanItems.length; i < len; i++) {
                                     nursingPlanItem = nursingPlanItems[i];
                                     elderlyRoomValue = elderlyMapRoom[nursingPlanItem.elderlyId];
-                                    // console.log(nursingPlanItem.elderlyId);
                                     nursingRecord = {
                                         elderlyId: nursingPlanItem.elderlyId,
                                         elderly_name: nursingPlanItem.elderly_name,
@@ -4758,6 +4790,7 @@ module.exports = {
                                         tenantId: tenantId
                                     }
                                     workItems = nursingPlanItem.work_items;
+                                    // console.log("workItems",workItems)
                                     for (var j = 0, len2 = workItems.length; j < len2; j++) {
                                         workItem = workItems[j];
                                         remind_max = workItem.remind_times || 1;
@@ -4937,7 +4970,7 @@ module.exports = {
                                     });
                                 }
                             }
-
+                            // console.log("warningMsg",warningMsg);
                             this.body = app.wrapper.res.default(warningMsg);
                         } catch (e) {
                             console.log(e);

@@ -1338,46 +1338,28 @@
                             width: 60,
                             sortable: true
                         }, {
-                            label: '英文名',
-                            name: 'english_name',
-                            type: 'string',
-                            width: 80,
-                            sortable: true
-                        }, {
-                            label: '功能主治',
-                            name: 'indications_function',
-                            type: 'string',
-                            width: 60,
-                            sortable: true
-                        }, {
                             label: '处方药',
                             name: 'otc_flag',
                             type: 'bool',
-                            width: 60,
+                            width: 40,
                             sortable: true
                         }, {
                             label: '医保',
                             name: 'health_care_flag',
                             type: 'bool',
-                            width: 60,
-                            sortable: true
-                        }, {
-                            label: '使用方法',
-                            name: 'usage',
-                            type: 'string',
-                            width: 60,
+                            width: 40,
                             sortable: true
                         }, {
                             label: '价格',
                             name: 'price',
                             type: 'string',
-                            width: 60,
+                            width: 50,
                             sortable: true
                         }, {
                             label: '规格',
                             name: 'specification',
                             type: 'string',
-                            width: 60,
+                            width: 70,
                             sortable: true
                         }, {
                             label: '操作',

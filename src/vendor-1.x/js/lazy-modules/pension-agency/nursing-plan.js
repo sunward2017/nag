@@ -270,9 +270,7 @@
             });
         }
 
-        function customizedWorkItem(workItemId) {
-
-            // vmh.psnService.workItemQuery(workItemId).then(function (data) {
+        function customizedWorkItem(workItemId,elderlyId) {  
             ngDialog.open({
                 template: 'work-item-custom.html',
                 controller: 'WorkItemCustomController',
@@ -280,10 +278,10 @@
                 data: {
                     vmh: vmh,
                     moduleTranslatePathRoot: vm.moduleTranslatePath(),
-                    workItemId: workItemId
+                    workItemId: workItemId,
+                    elderlyId:elderlyId,
                 }
             })
-            // })
         }
     }
 
@@ -294,12 +292,11 @@
         var vm = $scope.vm = {};
         var vmh = $scope.ngDialogData.vmh;
         var workItemId = $scope.ngDialogData.workItemId;
-
+        
+        vm.doSubmit = doSubmit;
+        vm.cancel = cancel;
         vm.selectBinding = {};
         $scope.utils = vmh.utils.v;
-        // vm.model = $scope.ngDialogData.data;
-        // console.log("<<<<<<", vm.model);
-
         init();
 
         function init() {
@@ -317,7 +314,6 @@
                 vm.selectBinding.repeatTypes = results[0];
                 vm.selectBinding.remindModes = results[1];
                 vm.selectBinding.workItemFlags = results[2].slice(0, results[2].length - 1);
-                console.log('results', results[3]);
                 vm.model = results[3];
             })
             function initVoiceTemplate() {
@@ -337,6 +333,16 @@
                     vm.repeatStartSwitch = false;
                 }
             }
+        }
+
+        function doSubmit(){
+           vm.model.elderlyId = $scope.ngDialogData.elderlyId; 
+           vmh.psnService.customizedWorkItem(workItemId,vm.model).then(function(){
+               
+           }) 
+        }
+        function cancel(){
+          ngDialog.close("#work-item-custom.html")   
         }
     }
 })();

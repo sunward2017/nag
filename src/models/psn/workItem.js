@@ -24,6 +24,7 @@ module.exports = function(ctx,name) {
             nursingLevelId: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'psn_nursingLevel'},
             elderlyId: {type: mongoose.Schema.Types.ObjectId, ref: 'psn_elderly'},
             customize_flag: {type: Boolean, default: false}, // 自定义标识,一旦确定无法修改
+            sourceId: {type: mongoose.Schema.Types.ObjectId, ref: 'psn_workItem'},
             name: {type: String, required: true, maxlength: 100},
             description: {type: String,maxLength:400},
             duration: {type: Number, default: 0}, // 完成时长 单为分

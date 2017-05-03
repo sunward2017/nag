@@ -339,7 +339,7 @@
 
 
         function serverSideCheck(id_no) {
-            if ((vm._action_ == 'add' && vm._id_ == 'new' && id_no.length == 18)
+            if ((vm._action_ == 'add' && vm._id_ == 'new' && (id_no.length == 18 || id_no.length == 15))
                 || vm._action == 'edit' && vm.elderlyModel.id_no != id_no) {
                 return vmh.q(function (resolve, reject) {
                     return vmh.psnService.checkBeforeAddEnter(id_no, vm.model.tenantId).then(function (ret) {

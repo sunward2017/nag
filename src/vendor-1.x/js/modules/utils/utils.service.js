@@ -174,11 +174,12 @@
             var pass= true;
 
             //if(!code || !/^\d{6}(18|19|20)?\d{2}(0[1-9]|1[12])(0[1-9]|[12]\d|3[01])\d{3}(\d|X)$/i.test(code)){
-            if(!code || !/^[1-9][0-9]{5}(19[0-9]{2}|200[0-9]|2010)(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])[0-9]{3}[0-9xX]$/i.test(code)){
+            //if(!code || !/^[1-9][0-9]{5}(19[0-9]{2}|200[0-9]|2010)(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])[0-9]{3}[0-9xX]$/i.test(code)){
+            if(!code || !/^(^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$)|(^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])((\d{4})|\d{3}[Xx])$)$/i.test(code)){
                 tip = "身份证号格式错误";
                 pass = false;
+                console.log(code);
             }
-
             else if(!city[code.substr(0,2)]){
                 tip = "地址编码错误";
                 pass = false;
@@ -206,6 +207,9 @@
                         pass = false;
                     }
                 }
+                else if (code.length == 15) {
+                    // 通过验证
+                }
                 else {
                     pass = false;
                 }
@@ -215,14 +219,22 @@
 
         function extractSex(idNo) {
             if (isIDNo(idNo)) {
-                return idNo.charAt(16) % 2 ? 'M' : 'F'
+                if(idNo.length == 18) {
+                    return idNo.charAt(16) % 2 ? 'M' : 'F'
+                } else if(idNo.length == 15) {
+                    return idNo.charAt(14) % 2 ? 'M' : 'F'
+                }
             }
             return 'N';
         }
 
         function extractBirthday(idNo) {
             if (isIDNo(idNo)) {
-                return idNo.substr(6, 4) + '-' + idNo.substr(10, 2) + '-' + idNo.substr(12, 2);
+                if(idNo.length == 18) {
+                    return idNo.substr(6, 4) + '-' + idNo.substr(10, 2) + '-' + idNo.substr(12, 2);
+                } else if(idNo.length == 15) {
+                    return '19' + idNo.substr(6, 2) + '-' + idNo.substr(8, 2) + '-' + idNo.substr(10, 2);
+                }
             }
             return '';
         }

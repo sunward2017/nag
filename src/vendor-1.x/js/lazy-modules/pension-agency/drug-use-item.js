@@ -44,7 +44,7 @@
             vm.selectElerly = selectElerly;
             vm.queryDrug = queryDrug;
             vm.selectDrug = selectDrug;
-
+            vm.initVoiceTemplate = initVoiceTemplate;
             vm.tab1 = { cid: 'contentTab1' };
 
             vmh.parallel([
@@ -106,6 +106,23 @@
                 if ($scope.utils.vtab(vm.tab1.cid)) {
                     vm.tab1.active = true;
                 }
+            }
+        }
+        function initVoiceTemplate() {
+            if (vm.model.repeat_type == "A0001") {
+                vm.model.voice_template = '';
+                vm.repeat_values = '';
+                vm.model.repeat_start = '*';
+                vm.voiceSwitch = true;
+                vm.repeatValuesSwitch = true;
+                vm.repeatStartSwitch = true;
+            } else {
+                vm.model.voice_template = "${老人姓名},您该服用${药品名称}了,请您依照${服用方法}服用哦";
+                vm.repeat_values = '';
+                vm.model.repeat_start = '';
+                vm.voiceSwitch = false;
+                vm.repeatValuesSwitch = false;
+                vm.repeatStartSwitch = false;
             }
         }
     }

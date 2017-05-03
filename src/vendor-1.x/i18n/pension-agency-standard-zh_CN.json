@@ -610,7 +610,7 @@
         "TAB1-LABEL-REPEAT_TYPE": "重复类型",
         "TAB1-LABEL-WORK_ITEM_FLAG": "项目类别",
         "TAB1-VOICE-TEMPLATE": "语音模板",
-        "TAB1-PLACEHOLDER-VOICE": "${老人姓名},你该${护理项目}了,请您${工作描述}",
+        "TAB1-PLACEHOLDER-VOICE": "${老人姓名},你该${项目名称}了,请您${工作描述}",
         "TAB1-LABEL-REPEAT_VALUES": "重复值域",
         "TAB1-PLACEHOLDER-REPEAT_VALUES": "重复类型是每周[1-7],每月[1-31],任意数字用逗号分割,如1,3",
         "TAB1-LABEL-REPEAT_START": "重复点",

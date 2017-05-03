@@ -304,6 +304,7 @@
 
         function init() {
             vm.moduleTranslatePathRoot = $scope.ngDialogData.moduleTranslatePathRoot;
+            vm.initVoiceTemplate = initVoiceTemplate;
             vm.moduleTranslatePath = function (key) {
                 return vm.moduleTranslatePathRoot + '.' + key;
             };
@@ -317,9 +318,25 @@
                 vm.selectBinding.remindModes = results[1];
                 vm.selectBinding.workItemFlags = results[2].slice(0, results[2].length - 1);
                 console.log('results', results[3]);
-                vm.model = results[3];    
+                vm.model = results[3];
             })
-
+            function initVoiceTemplate() {
+                if (vm.model.repeat_type == "A0001") {
+                    vm.model.voice_template = '';
+                    vm.model.repeat_values = '';
+                    vm.model.repeat_start = '*';
+                    vm.voiceSwitch = true;
+                    vm.repeatValuesSwitch = true;
+                    vm.repeatStartSwitch = true;
+                } else {
+                    vm.model.voice_template = "${老人姓名},你该${项目名称}了,请您${工作描述}了";
+                    vm.model.repeat_values = '';
+                    vm.model.repeat_start = '';
+                    vm.voiceSwitch = false;
+                    vm.repeatValuesSwitch = false;
+                    vm.repeatStartSwitch = false;
+                }
+            }
         }
     }
 })();

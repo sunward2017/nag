@@ -4779,7 +4779,7 @@ module.exports = {
                                             if (RegExp.$1 == "老人姓名") {
                                                 str = str.replace(reg, nursingPlanItem.elderly_name);
 
-                                            } else if (RegExp.$1 == "工作项目" || RegExp.$1 == "药品名称") {
+                                            } else if (RegExp.$1 == "项目名称" || RegExp.$1 == "药品名称") {
                                                 str = str.replace(reg, workItem.name);
 
                                             } else if (RegExp.$1 == "工作描述" || RegExp.$1 == "服用方法") {
@@ -5080,7 +5080,7 @@ module.exports = {
                                     if (RegExp.$1 == "老人姓名") {
                                         str = str.replace(reg, nursingPlanItem.elderly_name);
 
-                                    } else if (RegExp.$1 == "工作项目" || RegExp.$1 == "药品名称") {
+                                    } else if (RegExp.$1 == "项目名称" || RegExp.$1 == "药品名称") {
                                         str = str.replace(reg, workItem.name);
 
                                     } else if (RegExp.$1 == "工作描述" || RegExp.$1 == "服用方法") {

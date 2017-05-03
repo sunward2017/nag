@@ -218,6 +218,23 @@
                     }
                 }
             })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.DEMO_CENTER + 'backfiller', {
+                url: '/backfiller',
+                access_level: AUTH_ACCESS_LEVELS.ADMIN,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath(MODEL_VARIABLES.HEAD_TEMPLATES.DEMO_CENTER),
+                        controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER
+                    },
+                    "module-content": {
+                        templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.DEMO_CENTER + 'backfiller.html'),
+                        controller: 'DemoBackfillerController',
+                        resolve: {
+                            instanceVM: helper.buildInstanceVM(MODEL_VARIABLES.VM_PREFIXS.DEMO_CENTER + 'backfiller')
+                        }
+                    }
+                }
+            })
             .state(MODEL_VARIABLES.STATE_PREFIXS.DEMO_CENTER + 'box-input', {
                 url: '/box-input',
                 access_level: AUTH_ACCESS_LEVELS.ADMIN,

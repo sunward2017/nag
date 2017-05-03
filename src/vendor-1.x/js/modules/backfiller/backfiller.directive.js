@@ -1,48 +1,51 @@
 /**
- * utils.directive Created by zppro on 16-3-24.
+ * utils.directive Created by zppro on 17-5-3.
  */
 
 (function() {
     'use strict';
 
     angular
-        .module('app.backfill')
-        .directive('backfill', backfill)
+        .module('app.backfiller')
+        .directive('backfiller', backfiller)
     ;
 
-    sDropdown.$inject = ['$q', '$timeout'];
-    function sDropdown($q, $timeout) {
+    backfiller.$inject = ['$q', '$timeout', 'ngDialog'];
+    function backfiller($q, $timeout, ngDialog) {
 
 
         var directive = {
             restrict: 'EA',
-            templateUrl: function (elem, attrs) {
-                return attrs.dropdownTemplateUrl || 'dropdown-default-renderer.html';
-            },
+            templateUrl: 'backfiller-default-render.html',
             link: link,
-            scope: {sDropdownData: '=', onSelect: '&', model: '=ngModel', emptyPlaceholder: '='}
+            scope: {nameInput:'@', valInput:'@', readonly:'=', pickIcon:"@", fetchData: '=', onSelect: '&', model: '=ngModel'}
         };
         return directive;
 
         function link(scope, element, attrs) {
 
-            var data = scope.sDropdownData;
+            var data = scope.fetchData;
             if (!data) {
                 return;
             }
-            var option = scope.$eval(attrs.sDropdownOption) || {};
-            var selectItemFormat = option.selectItemFormat || 'value';
-            var valueKey = scope.valueKey = option.valueKey || 'value';
+            var option = scope.$eval(attrs.option) || {};
+            var selectItemFormat = option.selectItemFormat || 'id';
+            var valueKey = scope.valueKey = option.valueKey || 'id';
             var textKey =  scope.textKey = option.textKey || 'name';
 
-            scope.$watch("sDropdownData",function(newValue,oldValue) {
+            scope.icon = scope.pickIcon || 'glyphicon-search';
+
+            console.log('scope.pickIcon',scope.pickIcon);
+            
+
+            scope.$watch("fetchData",function(newValue,oldValue) {
                 if (newValue != oldValue) {
                     $timeout(function () {
                         $q.when(newValue).then(function (items) {
                             scope.items = items;
                             setShowText();
+                            console.log('backfill reload data end');
                         });
-                        console.log('dropdown recreate end')
                     }, 0);
                 }
             });
@@ -61,43 +64,55 @@
             //    scope.model = val;
             //});
 
-
-
-            scope.isButton = 'isButton' in attrs;
-
             element.on('click', function (event) {
                 event.preventDefault();
             });
 
-            scope.select = function (item) {
-                scope.model = selectItemFormat == 'object' ? item : item[valueKey];
-                if (scope.onSelect) {
-                    $timeout(function () {
-                        scope.onSelect({item: item});
-                    }, 0);
+            scope.pick = function () {
+                if(scope.readonly) {
+                   return;
                 }
+
+                console.log('open pick dialog...')
+                ngDialog.open({
+                    template: 'backfiller-default-pick.html',
+                    controller: 'BackfillerDefaultPickController',
+                }).closePromise.then(function (ret) {
+                    if(ret.value!='$document' && ret.value!='$closeButton' && ret.value!='$escape' ) {
+                        console.log(ret.value);
+                        var item = ret.value;
+                        scope.model = selectItemFormat == 'object' ? item : item[valueKey];
+                        if (scope.onSelect) {
+                            $timeout(function () {
+                                scope.onSelect({item: item});
+                            }, 0);
+                        }
+                    }
+                });
+
             };
+
             $q.when(data).then(function (items) {
                 scope.items = items;
+                console.log('backfiller:',scope.items);
                 setShowText();
             });
 
 
 
             function setShowText() {
-                scope.showText = scope.emptyPlaceholder || '请选择';
+                scope.text = '';
                 if (scope.items) {
                     for (var i = 0; i < scope.items.length; i++) {
                         if (selectItemFormat == 'object') {
                             if (scope.model && scope.items[i] == scope.model) { //|| (valueKey && scope.items[i][valueKey] == scope.model[valueKey])
-                                scope.showText = scope.items[i][textKey];
+                                scope.text = scope.items[i][textKey];
                                 break;
                             }
                         }
                         else {
-
                             if (scope.items[i][valueKey] == scope.model) {
-                                scope.showText = scope.items[i][textKey];
+                                scope.text = scope.items[i][textKey];
                                 break;
                             }
                         }

@@ -26,7 +26,7 @@ module.exports = function(ctx,name) {
             enter_on: {type: Date},
             elderlyId:{type: mongoose.Schema.Types.ObjectId, required: true,ref:'pub_elderly'},
             elderly_name: {type: String, required: true, maxlength: 20},
-            elderly_id_no: {type: String, required: true, minlength: 18, maxlength: 18},
+            elderly_id_no: {type: String, required: true, minlength: 15, maxlength: 18},
             elderly_sex: {type: String, required: true, minlength: 1, maxlength: 1, enum: ctx._.rest(ctx.dictionary.keys["D1006"])},
             elderly_birthday: {type: Date, required: true},
             elderly_home_address:{type:String, required: true},

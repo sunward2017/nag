@@ -48,7 +48,7 @@
                                     label
                                         input(id="{{row.trackedKey + '$' +workItem.id}}",type='checkbox', ng-disabled="!vm.$editings[row.trackedKey]['workItems']", ng-model="vm.work_items['A0001'][row.trackedKey + '$' + vm.aggrData[row.trackedKey]['elderly']['nursingLevelId']][workItem.id]" ng-change="vm.workItemChecked(row.trackedKey, workItem.id)")
                                         span.fa.fa-check
-                                label(for="{{row.trackedKey + '$' +workItem.id}}" ng-dblclick="vm.privateWorkItem(workItem.id)") {{ workItem.name }}
+                                label(for="{{row.trackedKey + '$' +workItem.id}}" ng-dblclick="vm.customizedWorkItem(workItem.id)") {{ workItem.name }}
                         <!--用药-->        
                         td
                             .btn-group(ng-if="vm.aggrData[row.trackedKey]['elderly']['id']")
@@ -89,6 +89,84 @@ script(type="text/ng-template", id="nursing-plan-save-as-template.html")
                 .cover-nursing-plan-template-tree
                     input.form-control(type='text', name='name',ng-model='vm.nursingPlanTemplateName',placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-SAVE-TO-TEMPLATE_NAME")|translate}}')
         .ngdialog-buttons
-            .col-md-12.text-right
+            .col-md-12.text-rightscript(type="text/ng-template" id="work-item-custom.html")
                 button.btn.btn-warning(type='button',ng-click="vm.cancel()") {{ "button.CANCEL" | translate}}
                 button.btn.btn-success(type='submit') {{ "button.CONFIRM" | translate}}
+script(type="text/ng-template", id="work-item-custom.html")
+    form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="vm.doSubmit()")
+        .ngdialog-title
+            i.glyphicon.glyphicon-info-sign
+            | {{ vm.moduleTranslatePath('DLG-WORK-ITEM-TITLE') | translate }}
+        .ngdialog-input
+            .col-md-12
+                fieldset: .form-group
+                    <!--重复类型-->
+                    label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-REPEAT_TYPE') | translate}}:
+                    .col-md-10
+                        .btn-group
+                            .btn.btn-primary(name='repeat_type',ng-repeat='repeatType in vm.selectBinding.repeatTypes',ng-model='vm.model.repeat_type',btn-radio="repeatType.value",required='') {{repeatType.name}}
+                        span.text-danger(ng-show="utils.vinput(this.theForm,'repeat_type','required')") {{ "validator.REQUIRED" | translate}}
+                fieldset: .form-group
+                    <!--重复值域-->
+                    label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-REPEAT_VALUES') | translate}}:
+                    .col-md-10
+                        input.form-control(type='text', name='repeat_values',ng-model='vm.model.repeat_values',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-REPEAT_VALUES")|translate}}')
+                fieldset: .form-group
+                    <!--重复点-->
+                    label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-REPEAT_START') | translate}}:
+                    .col-md-10
+                        input.form-control(type='text', name='repeat_start',ng-model='vm.model.repeat_start',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-REPEAT_START")|translate}}')
+                fieldset: .form-group
+                    <!--语音播报-->
+                    label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-VOICE-TEMPLATE') | translate}}:
+                    .col-md-10
+                        textarea.form-control(name='voice_template',ng-model='vm.model.voice_template',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-VOICE")|translate}}',maxlength="400")            
+                fieldset: .form-group
+                    <!--标识集合-->
+                    label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-FLAG-COLLECTION') | translate}}:
+                    .col-md-2
+                        .checkbox.c-checkbox
+                            label
+                                input#confirmFlag(type='checkbox',ng-model='vm.model.confirm_flag')
+                                span.fa.fa-check
+                        label(for="confirmFlag") {{ vm.moduleTranslatePath('TAB1-LABEL-CONFIRM_FLAG') | translate}}
+                    .col-md-2
+                        .checkbox.c-checkbox
+                            label
+                                input#remindFlag(type='checkbox',ng-model='vm.model.remind_flag')
+                                span.fa.fa-check
+                        label(for="remindFlag") {{ vm.moduleTranslatePath('TAB1-LABEL-REMIND_FLAG') | translate}}
+                    .col-md-2
+                        .checkbox.c-checkbox
+                            label
+                                input#feeFlag(type='checkbox',ng-model='vm.model.fee_flag')
+                                span.fa.fa-check
+                        label(for="feeFlag") {{ vm.moduleTranslatePath('TAB1-LABEL-FEE_FLAG') | translate}}
+                fieldset(ng-if="vm.model.remind_flag"): .form-group
+                    <!--提醒方式-->
+                    label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-REMIND_MODE') | translate}}:
+                    .col-md-10
+                        .btn-group
+                            .btn.btn-primary(name='remind_mode',ng-repeat='remindMode in vm.selectBinding.remindModes',ng-model='vm.model.remind_mode',btn-radio="remindMode.value",required='') {{remindMode.name}}
+                        span.text-danger(ng-show="utils.vinput(this.theForm,'remind_mode','required')") {{ "validator.REQUIRED" | translate}}
+                fieldset(ng-if="vm.model.remind_flag"): .form-group
+                    <!--提醒次数-->
+                    label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-REMIND_TIMES') | translate}}:
+                    .col-md-10
+                        input.form-control(type='number',name='remind_times' ,ng-model='vm.model.remind_times',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-REMIND_TIMES")|translate}}', required='' ui-validate="'$value>=1'" )
+                        span.text-danger(ng-show="utils.vinput(this.theForm,'remind_times','required')") {{ "validator.REQUIRED" | translate}}
+                        span.text-danger(ng-show="utils.vinput(this.theForm,'remind_times','number')") {{ "validator.NUMBER" | translate}}
+                        span.text-danger(ng-show="utils.vinput(this.theForm,'remind_times','validator')") {{ "validator.MIN" | translate:{min:1} }}
+                fieldset(ng-if="vm.model.fee_flag"): .form-group
+                    <!--费用(￥)-->
+                    label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-FEE') | translate}}:
+                    .col-md-10
+                        input.form-control(type='number',name='fee' ,ng-model='vm.model.fee',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-FEE")|translate}}', required='' ui-validate="'$value>=1'" )
+                        span.text-danger(ng-show="utils.vinput(this.theForm,'fee','required')") {{ "validator.REQUIRED" | translate}}
+                        span.text-danger(ng-show="utils.vinput(this.theForm,'fee','number')") {{ "validator.NUMBER" | translate}}
+                        span.text-danger(ng-show="utils.vinput(this.theForm,'fee','validator')") {{ "validator.MIN" | translate:{min:1} }}
+                 
+        .ngdialog-buttons
+            .col-md-12.text-rightscript(type="text/ng-template" id="work-item-custom.html")
+                button.btn.btn-warning(type='button',ng-click="vm.cancel()") {{ "button.CANCEL" | translate}}
+                button.btn.btn-success(type='submit') {{ "button.CONFIRM" | translate}}               

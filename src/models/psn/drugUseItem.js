@@ -24,7 +24,7 @@ module.exports = function(ctx,name) {
             elderlyId: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'psn_elderly'},
             elderly_name: {type: String},
             drugId:{type: mongoose.Schema.Types.ObjectId,required: true,ref:'psn_drugDirectory'},//关联药品
-            drug_no:{type: String, required: true},// 药品编码
+            drug_no:{type: String,},// 药品编码
             name:{type: String},
             description:{type: String},
             duration: {type: Number, default: 0}, // 完成时长 单为分
@@ -37,7 +37,7 @@ module.exports = function(ctx,name) {
             remind_times: {type: Number}, // 提醒次数
             fee_flag: {type: Boolean, default: false}, // 是否需要收费
             fee: {type: Number}, // 费用
-            voice_template:{type:String,maxlength:400},
+            voice_template:{type:String,maxlength:400,default:'${老人姓名},您该服用${药品名称}了,请您依照${服用方法}服用哦'},
             tenantId: {type: mongoose.Schema.Types.ObjectId}
         }, {
             toObject: {
@@ -61,6 +61,10 @@ module.exports = function(ctx,name) {
             }
             return '';
         });
+        drugUseItemSchema.virtual('work_item_category').get(function () {
+            return 'A0006';
+        });
+
 
         drugUseItemSchema.pre('update', function (next) {
             this.update({}, {$set: {operated_on: new Date()}});

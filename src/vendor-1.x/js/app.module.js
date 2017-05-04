@@ -13,29 +13,30 @@
 // ----------------------------------- 
 
 (function() {
-    'use strict';
+        'use strict';
 
-    angular
-        .module('nag', [
-            'app.core',
-            'app.settings',
-            'app.routes',
-            'app.socket',
-            'app.sidebar',
-            // 'app.navsearch',
-            'app.preloader',
-            'app.loadingbar',
-            'app.translate',
-            'app.pages',
-            'app.notify',
-            'app.utils',
-            'app.interceptor',
-            'app.auth',
-            'app.model',
-            // 'app.charts',
-            'app.grid',
-            'app.tree',
-            'app.dropdown'
-        ]);
+        angular
+            .module('nag', [
+                    'app.core',
+                    'app.settings',
+                    'app.routes',
+                    'app.socket',
+                    'app.sidebar',
+                    // 'app.navsearch',
+                    'app.preloader',
+                    'app.loadingbar',
+                    'app.translate',
+                    'app.pages',
+                    'app.notify',
+                    'app.utils',
+                    'app.interceptor',
+                    'app.auth',
+                    'app.model',
+                    // 'app.charts',
+                    'app.grid',
+                    'app.tree',
+                    'app.dropdown',
+                    'app.backfiller'
+            ]);
 })();
 

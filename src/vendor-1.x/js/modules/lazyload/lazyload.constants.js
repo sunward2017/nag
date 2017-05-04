@@ -67,6 +67,7 @@
                 {name:'subsystem.pension-agency.nursing-plan.js',files:['app/js/lazy-modules/pension-agency/nursing-plan.js']},
                 {name:'subsystem.pension-agency.nursing-schedule.js',files:['app/js/lazy-modules/pension-agency/nursing-schedule.js']},
                 {name:'subsystem.pension-agency.nursing-schedule-template.js',files:['app/js/lazy-modules/pension-agency/nursing-schedule-template.js']},
+                {name:'subsystem.pension-agency.nursing-group.js',files:['app/js/lazy-modules/pension-agency/nursing-group.js']},
                 {name:'subsystem.pension-agency.enter-payment.js',files:['app/js/lazy-modules/pension-agency/enter-payment.js']},
                 {name:'subsystem.pension-agency.recharge.js',files:['app/js/lazy-modules/pension-agency/recharge.js']},
                 {name:'subsystem.pension-agency.exit-settlement.js',files:['app/js/lazy-modules/pension-agency/exit-settlement.js']},

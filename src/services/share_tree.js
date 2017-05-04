@@ -290,7 +290,8 @@ module.exports = {
                             var robots = yield app.modelFactory().model_query(app.models['pub_robot'], {
                                 where: {
                                     status: 1,
-                                    stop_flag: false
+                                    stop_flag: false,
+                                    tenantId: tenantId
                                 }, select: data.select || 'name'
                             });
 
@@ -346,7 +347,8 @@ module.exports = {
                             var bedMonitors = yield app.modelFactory().model_query(app.models['pub_bedMonitor'], {
                                 where: {
                                     status: 1,
-                                    stop_flag: false
+                                    stop_flag: false,
+                                    tenantId: tenantId
                                 },
                                 select: data.select || 'name'
                             });
@@ -481,6 +483,66 @@ module.exports = {
                         } catch (e) {
                             console.log(e);
                             self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
+            {
+                method: 'fetch-T3011',
+                verb: 'post',
+                url: this.service_url_prefix + "/T3011", // 护理小组可选的护工
+                handler: function (app, options) {
+                    return function * (next) {
+                        try {
+
+                            var data = this.request.body;
+                            var tenantId = data.where.tenantId;
+                            var groupId = data.where.groupId;
+
+                            var nursingGroups = yield app.modelFactory().model_query(app.models['psn_nursingGroup'], {
+                                where: {
+                                    status: 1,
+                                    tenantId: tenantId
+                                }, select: 'name members'
+                            });
+
+                            nursingGroups = app._.reject(nursingGroups, function(o){return o.id == groupId;})
+                            var assignedNursingWorkers = [];
+                            var dicNursingWorkerToGroup = {};
+
+                            app._.each(nursingGroups, function(o){
+                                app._.each(o.members,function (o2) {
+                                    var nursingWorkerId = o2.nursingWorkerId.toString();
+                                    assignedNursingWorkers.push(nursingWorkerId);
+                                    dicNursingWorkerToGroup[nursingWorkerId] = o.name;
+                                });
+                            });
+
+                            var nursingWorkers = yield app.modelFactory().model_query(app.models['psn_nursingWorker'], {
+                                where: {
+                                    status: 1,
+                                    stop_flag: false
+                                },
+                                select: data.select || 'name'
+                            });
+
+                            var rows = app._.map(nursingWorkers, function(o){
+                                var nursingWorker = o.toObject();
+                                nursingWorker.disableCheck = app._.contains(assignedNursingWorkers, nursingWorker.id);
+
+                                if (nursingWorker.disableCheck ) {
+                                    nursingWorker.name = nursingWorker.name + ' (正服务于' + dicNursingWorkerToGroup[nursingWorker.id] + ')';
+                                }
+                                nursingWorker.nursingWorkerId = nursingWorker.id;
+
+                                return nursingWorker;
+                            });
+                            this.body = app.wrapper.res.rows(rows);
+
+                        } catch (e) {
+                            self.logger.error(e);
                             this.body = app.wrapper.res.error(e);
                         }
                         yield next;

@@ -13,7 +13,7 @@ module.exports = function(ctx, name) {
             status: { type: Number, min: 0, max: 1, default: 1 },
             elderlyId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'psn_elderly' }, //关联老人
             elderly_name: { type: String, maxlength: 20 },
-            operate_on: { type: Date, default: Date.now },
+            perform_on: { type: Date, default: Date.now },
             systolic_blood_pressure: { type: Number, min: 0, max: 250 }, // 收缩压
             diastolic_blood_pressure: { type: Number, min: 0, max: 250 },// 舒张压 
             drugId:{type: mongoose.Schema.Types.ObjectId,required: true,ref:'psn_drugDirectory'}, //关联药品
@@ -37,7 +37,7 @@ module.exports = function(ctx, name) {
         });
  
         bloodPressureSchema.pre('update', function(next) {
-            this.update({}, { $set: { test_on: new Date() } });
+            this.update({}, { $set: { perform_on: new Date() } });
             next();
         });
 

@@ -38,6 +38,7 @@
             vm.saveNursingPlanRemark = saveNursingPlanRemark;
             vm.cancelNursingPlanRemark = cancelNursingPlanRemark;
             vm.generateNursingRecord = generateNursingRecord;
+            vm.privateWorkItem = privateWorkItem;
 
             vm.tab1 = {cid: 'contentTab1'};
             vm.$editings = {};
@@ -257,6 +258,12 @@
                     vmh.alertSuccess('button.GEN', true);
                 });
             });
+        }
+
+        function privateWorkItem(workItemId){
+             vmh.psnService.workItemQuery(workItemId).then(function(data){
+                console.log("workItemIdBYdata",data);
+             })    
         }
     }
 })();

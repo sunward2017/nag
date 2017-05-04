@@ -36,6 +36,13 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                             span.text-danger(ng-show="utils.vinput(this.theForm,'duration','number')") {{ "validator.NUMBER" | translate}}
                             span.text-danger(ng-show="utils.vinput(this.theForm,'duration','validator')") {{ "validator.MIN" | translate:{min:0} }}
                     fieldset: .form-group
+                        <!--工作类别-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-WORK_ITEM_FLAG') | translate}}:
+                        .col-md-10
+                            .btn-group
+                                .btn.btn-primary(name='work_item_category',ng-repeat='itemFlag in vm.selectBinding.workItemFlags',ng-model='vm.model.work_item_category',btn-radio="itemFlag.value",required='') {{itemFlag.name}}
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'work_item_category','required')") {{ "validator.REQUIRED" | translate}}        
+                    fieldset: .form-group
                         <!--重复类型-->
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-REPEAT_TYPE') | translate}}:
                         .col-md-10

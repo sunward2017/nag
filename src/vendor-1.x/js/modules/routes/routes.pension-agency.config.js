@@ -787,6 +787,78 @@
                         //, deps: helper.resolveFor2('ui.select')
                 }
             })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'nursing-group', {
+                url: '/nursing-group',
+                title: '护理组管理',
+                abstract: true,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath(MODEL_VARIABLES.HEAD_TEMPLATES.PENSION_AGENCY),
+                        controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER_FOR_TENANT
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div>'
+                    }
+                },
+                data: {
+                    func_id: MODEL_VARIABLES.BIZ_FUNC_PREFIXS.PENSION_AGENCY + 'NURSING-GROUP' //业务系统使用
+                },
+                resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.PENSION_AGENCY + 'nursing-group.js')
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'nursing-group.list', {
+                url: '/list/:action',
+                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'nursing-group-list.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'NursingGroupGridController',
+                resolve: {
+                    entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'nursing-group.list', {
+                        modelName: 'psn-nursingGroup',
+                        searchForm: {"status": 1},
+                        serverPaging: true,
+                        columns: [{
+                            label: '护理组名称',
+                            name: 'name',
+                            type: 'string',
+                            width: 120,
+                            sortable: true
+                        }, {
+                            label: '组长',
+                            name: 'leader_name',
+                            type: 'string',
+                            width: 80,
+                            sortable: true
+                        }, {
+                            label: '组成员',
+                            name: 'members_summary',
+                            type: 'string',
+                            width: 240
+                        }, {
+                            label: '停用',
+                            name: 'stop_flag',
+                            type: 'bool',
+                            width: 80
+                        }, {
+                            label: '',
+                            name: 'actions',
+                            sortable: false,
+                            width: 60
+                        }]
+                    })
+                }
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'nursing-group.details', {
+                url: '/details/:action/:_id',
+                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'nursing-group-details.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'NursingGroupDetailsController',
+                resolve: {
+                    entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'nursing-group.details', {
+                        modelName: 'psn-nursingGroup',
+                        blockUI: true
+                    })
+                    //, deps: helper.resolveFor2('ui.select')
+                }
+            })
             .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'enter-payment', {
                 url: '/enter-payment',
                 title: '老人入院缴费',

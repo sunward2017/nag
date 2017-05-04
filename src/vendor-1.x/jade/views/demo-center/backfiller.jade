@@ -1,0 +1,6 @@
+.col-xs-6
+    .backfiller(backfiller,ng-model="vm.period",fetch-data="vm.fetchDataPromise", on-select="vm.onSelect(item)")
+    //.dropdown(s-dropdown,s-dropdown-option="{selectItemFormat:'object'}",is-button,ng-model="vm.period",s-dropdown-data="vm.dropdownDataPromise",dropdown-template-url='dropdown-demo-renderer.html', on-select="vm.onSelect(item)")
+    div selected:{{vm.period}}
+    div on select :{{vm.selected}}
+    button.btn(ng-click="vm.makeEmpty()") 清空选择

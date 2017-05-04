@@ -17,6 +17,7 @@
         .controller('DemoTreeTileController', DemoTreeTileController)
         .controller('DemoIMGProcessQiNiuController',DemoIMGProcessQiNiuController)
         .controller('DemoDropdownController', DemoDropdownController)
+        .controller('DemoBackfillerController', DemoBackfillerController)
         .controller('DemoBoxInputController', DemoBoxInputController)
         .controller('DemoPromiseController',DemoPromiseController)
     ;
@@ -666,6 +667,32 @@
         function makeEmpty(){
             vm.period = '';
         }
+    }
+
+    DemoBackfillerController.$inject = ['$scope','vmh', 'instanceVM'];
+
+    function DemoBackfillerController($scope, vmh, vm) {
+
+        $scope.vm = vm;
+
+        init();
+
+
+        function init() {
+            vm.init();
+            vm.fetchDataPromise = vmh.shareService.d('D1015').then(function(items){
+                //vm.period = items[2].value;
+                return items;
+            });
+
+            vm.onSelect = onSelect;
+
+        }
+
+        function onSelect(item){
+            vm.selected = 'callback received ' + angular.toJson(item);
+        }
+
     }
 
     DemoBoxInputController.$inject = ['$scope','vmh', 'instanceVM'];

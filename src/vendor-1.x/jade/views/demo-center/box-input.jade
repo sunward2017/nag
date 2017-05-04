@@ -7,7 +7,7 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
             <!--身份证号-->
             label.col-md-2.control-label {{ vm.moduleTranslatePath('ID_NO') | translate}}:
             .col-md-10
-                input(type='text', name='id_no',ng-model='vm.id_no',required='',maxlength="18",box-input,id-no2)
+                input(type='text', name='id_no',ng-model='vm.id_no',required='',minlength="15",maxlength="18",box-input,id-no2)
                 span.text-danger(ng-show="utils.vinput(this.theForm,'id_no','required')") {{ "validator.REQUIRED" | translate}}
                 span.text-danger(ng-show="utils.vinput(this.theForm,'id_no','IDNo')") {{ "validator.ID-NO" | translate}}
         fieldset: .form-group

@@ -290,7 +290,8 @@ module.exports = {
                             var robots = yield app.modelFactory().model_query(app.models['pub_robot'], {
                                 where: {
                                     status: 1,
-                                    stop_flag: false
+                                    stop_flag: false,
+                                    tenantId: tenantId
                                 }, select: data.select || 'name'
                             });
 
@@ -346,7 +347,8 @@ module.exports = {
                             var bedMonitors = yield app.modelFactory().model_query(app.models['pub_bedMonitor'], {
                                 where: {
                                     status: 1,
-                                    stop_flag: false
+                                    stop_flag: false,
+                                    tenantId: tenantId
                                 },
                                 select: data.select || 'name'
                             });

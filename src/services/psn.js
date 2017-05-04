@@ -4745,6 +4745,7 @@ module.exports = {
                             if (nursingPlanItems.length) {
                                 now = app.moment();
                                 gen_batch_no = yield app.sequenceFactory.getSequenceVal(app.modelVariables.SEQUENCE_DEFS.CODE_OF_NURSING_RECORD);
+                                console.log('gen_batch_no:',gen_batch_no);
                                 for (var i = 0, len = nursingPlanItems.length; i < len; i++) {
                                     nursingPlanItem = nursingPlanItems[i];
                                     elderlyRoomValue = elderlyMapRoom[nursingPlanItem.elderlyId];
@@ -4773,19 +4774,15 @@ module.exports = {
                                         nursingRecord.remind_on = [];
                                         nursingRecord.type = workItem.type;
                                         nursingRecord.category = workItem.work_item_category;
+
                                         var str = workItem.voice_template;
-                                        var reg = /\${([^}]+)}/, result;
-                                        while ((result = reg.exec(str)) != null) {
-                                            if (RegExp.$1 == "老人姓名") {
-                                                str = str.replace(reg, nursingPlanItem.elderly_name);
+                                        str = str.replace(/\${老人姓名}/g, nursingPlanItem.elderly_name);
+                                        str = str.replace(/\${项目名称}/g, workItem.name);
+                                        str = str.replace(/\${药品名称}/g, workItem.name);
+                                        str = str.replace(/\${工作描述}/g, workItem.description);
+                                        str = str.replace(/\${服用方法}/g, workItem.description);
 
-                                            } else if (RegExp.$1 == "工作项目" || RegExp.$1 == "药品名称") {
-                                                str = str.replace(reg, workItem.name);
-
-                                            } else if (RegExp.$1 == "工作描述" || RegExp.$1 == "服用方法") {
-                                                str = str.replace(reg, workItem.description);
-                                            }
-                                        }
+                                        console.log('voice_content', str);
 
                                         nursingRecord.voice_content = str;
 
@@ -5074,20 +5071,14 @@ module.exports = {
                                     type: workItem.type,
                                     category: workItem.work_item_category
                                 };
+
                                 var str = workItem.voice_template;
-                                var reg = /\${([^}]+)}/;
-                                while ((result = reg.exec(str)) != null) {
-                                    if (RegExp.$1 == "老人姓名") {
-                                        str = str.replace(reg, nursingPlanItem.elderly_name);
+                                str = str.replace(/\${老人姓名}/g, nursingPlanItem.elderly_name);
+                                str = str.replace(/\${项目名称}/g, workItem.name);
+                                str = str.replace(/\${药品名称}/g, workItem.name);
+                                str = str.replace(/\${工作描述}/g, workItem.description);
+                                str = str.replace(/\${服用方法}/g, workItem.description);
 
-                                    } else if (RegExp.$1 == "工作项目" || RegExp.$1 == "药品名称") {
-                                        str = str.replace(reg, workItem.name);
-
-                                    } else if (RegExp.$1 == "工作描述" || RegExp.$1 == "服用方法") {
-                                        str = str.replace(reg, workItem.description);
-                                    }
-
-                                }
                                 nursingRecord.voice_content = str;
                                 nursingRecord.remind_on = [];
 

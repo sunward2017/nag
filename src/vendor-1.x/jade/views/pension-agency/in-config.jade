@@ -1,4 +1,13 @@
 form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="vm.doSubmit()")
+    .row
+        .col-md-1.control-label {{ vm.viewTranslatePath('HEAD-LABEL-ELDERLY_NAME') | translate}}:
+        .col-md-3
+            input.read-control-underline(readonly,placeholder='',ng-model="vm.model.name")
+        .col-md-5
+        .col-md-1.control-label {{ vm.viewTranslatePath('HEAD-LABEL-ELDERLY_BED_NO') | translate}}:
+        .col-md-2
+            input.read-control-underline(readonly,placeholder='',ng-model="vm.model.room_summary")
+    .row-split
     .panel
         tabset(justified="true")
             tab(active="vm.tab1.active")

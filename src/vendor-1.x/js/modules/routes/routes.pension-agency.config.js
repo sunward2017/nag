@@ -497,6 +497,151 @@
                     deps: helper.resolveFor2('angucomplete-alt')
                 }
             })
+            
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'assessment-enter', {
+                url: '/assessment-enter',
+                title: '入院评估管理',
+                abstract: true,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath(MODEL_VARIABLES.HEAD_TEMPLATES.PENSION_AGENCY),
+                        controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER_FOR_TENANT
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div>'
+                    }
+                },
+                data: {
+                    func_id: MODEL_VARIABLES.BIZ_FUNC_PREFIXS.PENSION_AGENCY + 'ASSESSMENT-ENTER' //业务系统使用
+                },
+                resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.PENSION_AGENCY + 'assessment-enter.js')
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'assessment-enter.list', {
+                url: '/list/:action',
+                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'assessment-enter-list.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'AssessmentEnterGridController',
+                resolve: {
+                    entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'assessment-enter.list', {
+                        modelName: 'psn-assessment',
+                        searchForm: { "status": 1,"type":'A0001'},
+                        serverPaging: true,
+                        columns: [{
+                            label: '老人',
+                            name: 'elderlyId',
+                            type: 'string',
+                            width: 60,
+                            sortable: true
+                        },{
+                            label: '病情级别',
+                            name: 'current_disease_evaluation.level',
+                            type: 'string',
+                            width: 60,
+                            sortable: true,
+                            formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D3020/object'),
+                        },{
+                            label: '活动能力总分',
+                            name: 'current_adl.score',
+                            type: 'string',
+                            width: 60,
+                            sortable: true
+                        },{
+                            label: '评估等级',
+                            name: 'current_nursing_assessment_grade',
+                            type: 'string',
+                            width: 60,
+                            sortable: true,
+                            formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D3015/object'),
+                        }]
+                    })
+                }
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'assessment-regular', {
+                url: '/assessment-regular',
+                title: '定期评估管理',
+                abstract: true,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath(MODEL_VARIABLES.HEAD_TEMPLATES.PENSION_AGENCY),
+                        controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER_FOR_TENANT
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div>'
+                    }
+                },
+                data: {
+                    func_id: MODEL_VARIABLES.BIZ_FUNC_PREFIXS.PENSION_AGENCY + 'ASSESSMENT-REGULAR' //业务系统使用
+                },
+                resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.PENSION_AGENCY + 'assessment-regular.js')
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'assessment-enter.details', {
+                url: '/details/:action/:_id',
+                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'assessment-enter-details.html'),
+                controller: 'AssessmentEnterDetailsGridController',
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                resolve: {
+                    entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'assessment-enter.details', {
+                        modelName: 'psn-assessment',
+                        model: {},
+                        blockUI: true
+                    }),
+                    deps: helper.resolveFor2('angucomplete-alt')
+                }
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'assessment-regular.list', {
+                url: '/list/:action',
+                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'assessment-regular-list.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'AssessmentRegularGridController',
+                resolve: {
+                    entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'assessment-regular.list', {
+                        modelName: 'psn-assessment',
+                        searchForm: { "status": 1,"type":'A0003'},
+                        serverPaging: true,
+                        columns: [{
+                            label: '老人',
+                            name: 'elderlyId',
+                            type: 'string',
+                            width: 60,
+                            sortable: true
+                        },{
+                            label: '病情级别',
+                            name: 'current_disease_evaluation.level',
+                            type: 'string',
+                            width: 60,
+                            sortable: true,
+                            formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D3020/object'),
+                        },{
+                            label: '活动能力总分',
+                            name: 'current_adl.score',
+                            type: 'string',
+                            width: 60,
+                            sortable: true
+                        },{
+                            label: '评估等级',
+                            name: 'current_nursing_assessment_grade',
+                            type: 'string',
+                            width: 60,
+                            sortable: true,
+                            formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D3015/object'),
+                        }]
+                    })
+                }
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'assessment-regular.details', {
+                url: '/details/:action/:_id',
+                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'assessment-regular-details.html'),
+                controller: 'AssessmentRegularDetailsGridController',
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                resolve: {
+                    entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'assessment-regular.details', {
+                        modelName: 'psn-assessment',
+                        model: {},
+                        blockUI: true
+                    }),
+                    deps: helper.resolveFor2('angucomplete-alt')
+                }
+            })
             .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'nursing-station', {
                 url: '/nursing-station',
                 access_level: AUTH_ACCESS_LEVELS.USER,

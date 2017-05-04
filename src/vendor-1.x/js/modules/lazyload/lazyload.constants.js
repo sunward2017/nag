@@ -61,6 +61,8 @@
                 {name:'subsystem.pension-agency.exit.js',files:['app/js/lazy-modules/pension-agency/exit.js']},
                 {name:'subsystem.pension-agency.reception.js',files:['app/js/lazy-modules/pension-agency/reception.js']},
                 {name:'subsystem.pension-agency.leave.js',files:['app/js/lazy-modules/pension-agency/leave.js']},
+                {name:'subsystem.pension-agency.assessment-enter.js',files:['app/js/lazy-modules/pension-agency/assessment-enter.js']},
+                {name:'subsystem.pension-agency.assessment-regular.js',files:['app/js/lazy-modules/pension-agency/assessment-regular.js']},
                 {name:'subsystem.pension-agency.nursing-station.js',files:['app/js/lazy-modules/pension-agency/nursing-station.js']},
                 {name:'subsystem.pension-agency.nursing-plan.js',files:['app/js/lazy-modules/pension-agency/nursing-plan.js']},
                 {name:'subsystem.pension-agency.nursing-schedule.js',files:['app/js/lazy-modules/pension-agency/nursing-schedule.js']},

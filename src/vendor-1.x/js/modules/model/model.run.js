@@ -27,6 +27,7 @@
         modelNode.factory('psn-exit');
         modelNode.factory('psn-reception');
         modelNode.factory('psn-leave');
+        modelNode.factory('psn-assessment');
         modelNode.factory('psn-nursingPlan');
         modelNode.factory('psn-nursingSchedule');
         modelNode.factory('psn-nursingScheduleTemplate');

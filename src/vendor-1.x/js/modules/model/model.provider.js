@@ -288,8 +288,8 @@
                     return $http.post(baseUrl + 'saveTenantChargeItemCustomized/' + tenantId, chargeStandard);
                 }
 
-                function saveTenantOtherConfig(tenantId, otherConfig){
-                    return $http.post(baseUrl + 'saveTenantOtherConfig/' + tenantId, otherConfig);
+                function saveTenantOtherConfig(tenantId, otherConfig, name){
+                    return $http.post(baseUrl + 'saveTenantOtherConfig/' + tenantId, {otherConfig:otherConfig,name:name});
                 }
 
                 function queryVoucherNo(tenantId, modelName, keyword, where, select, sort){

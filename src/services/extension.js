@@ -226,7 +226,8 @@ module.exports = {
                                 return;
                             }
                             // console.log('saveTenantOtherConfig', this.request.body);
-                            tenant.other_config = this.request.body;
+                            tenant.other_config = this.request.body.otherConfig;
+                            tenant.name = this.request.body.name;
                             yield tenant.save();
                             this.body = app.wrapper.res.default();
                         } catch (e) {

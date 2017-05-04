@@ -79,6 +79,7 @@
             vm.tab1 = {cid: 'contentTab1'};
 
             vm.load().then(function () {
+                if(vm._action_ == 'edit' && vm.model.forbiddens.length) vm.forbiddens = vm.model.forbiddens;
                 switchDistrict();
                 switchFloor();
             });
@@ -178,7 +179,7 @@
 
             if ($scope.theForm.$valid) {
                 console.log(vm.forbiddens);
-                vm.model.forbiddens = vm.forbiddens.split(',');
+                if(vm.forbiddens) vm.model.forbiddens = vm.forbiddens.split(',');
                 vm.save();
             }
             else {

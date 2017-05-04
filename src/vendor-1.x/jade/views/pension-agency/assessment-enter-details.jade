@@ -1,0 +1,75 @@
+form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="vm.doSubmit()")
+    .panel
+        tabset(justified="true")
+            tab(active="vm.tab1.active")
+                tab-heading
+                    | {{ vm.viewTranslatePath('TAB1') | translate}}
+                    span.text-danger(title="{{'validator.FIELD-INVALID'|translate}}" , ng-show="utils.vtab('contentTab1')")
+                        i.glyphicon.glyphicon-minus-sign
+                div#contentTab1
+                    fieldset: .form-group
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-ELDERLY-NAME') | translate}}:
+                        .col-md-10
+                            div#elderly(angucomplete-alt,input-name="elderly",minlength="1",field-required="true",text-searching='{{"label.TEXT-SEARCHING"|translate}}',text-no-results='{{"label.TEXT-NO-RESULTS"|translate}}',placeholder="",pause="400",selected-object="vm.selectElerly",remote-api-handler="vm.queryElderly",title-field="name",initial-value="vm.selectedElderly",input-class="form-control form-control-small")
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'elderly','autocomplete-required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset: .form-group
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-DISEASE_EVALUATION') | translate}}:
+                        .col-md-10
+                            .tree.tree-dropdown(name='disease_evaluation',s-tree,s-tree-data="vm.disease_evaluation",s-tree-height="200", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{mode:'check',layout:'dropdown',readonly:{{vm.readonly}} }",ng-model="vm.base_on",required='')
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'disease_evaluation','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset: .form-group
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-SHIT') | translate}}:
+                        .col-md-10
+                            .tree.tree-dropdown(name='shit',s-tree,s-tree-data="vm.shit",s-tree-height="100", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{layout:'dropdown',readonly:{{vm.readonly}} }",ng-model="vm.adl_shit",required='')
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'shit','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset: .form-groupzz
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-PEE') | translate}}:
+                        .col-md-10
+                            .tree.tree-dropdown(name='pee',s-tree,s-tree-data="vm.pee",s-tree-height="100", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{layout:'dropdown',readonly:{{vm.readonly}} }",ng-model="vm.adl_pee",required='')
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'pee','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset: .form-group
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-DECORATOR') | translate}}:
+                        .col-md-10
+                            .tree.tree-dropdown(name='decorator',s-tree,s-tree-data="vm.decorator",s-tree-height="100", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{layout:'dropdown',readonly:{{vm.readonly}} }",ng-model="vm.adl_decorator",required='')
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'decorator','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset: .form-group
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-WC') | translate}}:
+                        .col-md-10
+                            .tree.tree-dropdown(name='wc',s-tree,s-tree-data="vm.wc",s-tree-height="100", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{layout:'dropdown',readonly:{{vm.readonly}} }",ng-model="vm.adl_wc",required='')
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'wc','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset: .form-group
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-EAT') | translate}}:
+                        .col-md-10
+                            .tree.tree-dropdown(name='eat',s-tree,s-tree-data="vm.eat",s-tree-height="100", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{layout:'dropdown',readonly:{{vm.readonly}} }",ng-model="vm.adl_eat",required='')
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'eat','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset: .form-group
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-TRANSFER') | translate}}:
+                        .col-md-10
+                            .tree.tree-dropdown(name='transfer',s-tree,s-tree-data="vm.transfer",s-tree-height="100", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{layout:'dropdown',readonly:{{vm.readonly}} }",ng-model="vm.adl_transfer",required='')
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'transfer','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset: .form-group
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-ACTIVITY') | translate}}:
+                        .col-md-10
+                            .tree.tree-dropdown(name='activity',s-tree,s-tree-data="vm.activity",s-tree-height="100", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{layout:'dropdown',readonly:{{vm.readonly}} }",ng-model="vm.adl_activity",required='')
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'activity','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset: .form-group
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-DRESS') | translate}}:
+                        .col-md-10
+                            .tree.tree-dropdown(name='dress',s-tree,s-tree-data="vm.dress",s-tree-height="100", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{layout:'dropdown',readonly:{{vm.readonly}} }",ng-model="vm.adl_dress",required='')
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'dress','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset: .form-group
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-STAIRS') | translate}}:
+                        .col-md-10
+                            .tree.tree-dropdown(name='stairs',s-tree,s-tree-data="vm.stairs",s-tree-height="100", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{layout:'dropdown',readonly:{{vm.readonly}} }",ng-model="vm.adl_stairs",required='')
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'stairs','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset: .form-group
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-BATH') | translate}}:
+                        .col-md-10
+                            .tree.tree-dropdown(name='bath',s-tree,s-tree-data="vm.bath",s-tree-height="100", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{layout:'dropdown',readonly:{{vm.readonly}} }",ng-model="vm.adl_bath",required='')
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'bath','required')") {{ "validator.REQUIRED" | translate}}
+
+
+
+    .text-right.mt-lg
+        button.btn.btn-warning(type="button",ng-click="vm.cancel()") {{'button.CANCEL'|translate}}
+        button.btn.btn-success(type="submit") {{'button.SAVE'|translate}}

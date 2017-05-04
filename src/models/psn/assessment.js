@@ -20,16 +20,16 @@ module.exports = function(ctx,name) {
             status: {type: Number, min: 0, max: 1, default: 1},
             elderlyId:{type: mongoose.Schema.Types.ObjectId,required: true,ref:'psn_elderly'},//关联老人
             elderly_name: {type: String, required: true, maxlength: 20},
-            type:{type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3019"])},//类别：入院评估、定期评估
+            type:{type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3020"])},//类别：入院评估、定期评估
             current_disease_evaluation:{
-                level:{type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3020"])},//病情级别：重度、中度、轻度
+                level:{type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3021"])},//病情级别：重度、中度、轻度
                 base_on:[String] // D3021 char5
             },//病情
             current_adl:{
                 score: {type: Number, default: 0.00},//总分数
                 base_on:[{
-                    item:{type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3022"])},//日常生活活动项目：大便、小便、爬楼梯、……
-                    standard:{type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3023"])},//标准：大便（失禁或昏迷、偶有失禁、控制）、小便（……）、……
+                    item:{type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3023"])},//日常生活活动项目：大便、小便、爬楼梯、……
+                    standard:{type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3024"])},//标准：大便（失禁或昏迷、偶有失禁、控制）、小便（……）、……
                     score:{type: Number, default: 0.00},//每项的分数
                 }]
             },//日常生活活动能力

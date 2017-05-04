@@ -50,86 +50,86 @@
  
 
             vmh.parallel([
-                vmh.shareService.d('D3021'),
-                vmh.shareService.d('D3023')
+                vmh.shareService.d('D3022'),
+                vmh.shareService.d('D3024')
             ]).then(function(results){
                 vm.disease_evaluation_array= results[0];
                 vm.adl_array = results[1];
             })  
 
-            vm.disease_evaluation = vmh.shareService.d('D3021').then(function (results) {
+            vm.disease_evaluation = vmh.shareService.d('D3022').then(function (results) {
                             vmh.utils.v.changeProperyName(results, [{o: 'value', n: '_id'}]);
                             return results;
                         });
 
-            vm.shit = vmh.shareService.d('D3023').then(function (results) {
+            vm.shit = vmh.shareService.d('D3024').then(function (results) {
                             var res = _.filter(results,function(o){
-                                return o.D3022 == 'A0001';
+                                return o.D3023 == 'A0001';
                             });
                             vmh.utils.v.changeProperyName(res, [{o: 'value', n: '_id'}]);
                             return res;
                         });
-            vm.pee = vmh.shareService.d('D3023').then(function (results) {
+            vm.pee = vmh.shareService.d('D3024').then(function (results) {
                             var res = _.filter(results,function(o){
-                                return o.D3022 == 'A0002';
+                                return o.D3023 == 'A0002';
                             });
                             vmh.utils.v.changeProperyName(res, [{o: 'value', n: '_id'}]);
                             return res;
                         }); 
-            vm.decorator =  vmh.shareService.d('D3023').then(function (results) {
+            vm.decorator =  vmh.shareService.d('D3024').then(function (results) {
                             var res = _.filter(results,function(o){
-                                return o.D3022 == 'A0003';
+                                return o.D3023 == 'A0003';
                             });
                             vmh.utils.v.changeProperyName(res, [{o: 'value', n: '_id'}]);
                             return res;
                         });    
-            vm.wc =  vmh.shareService.d('D3023').then(function (results) {
+            vm.wc =  vmh.shareService.d('D3024').then(function (results) {
                             var res = _.filter(results,function(o){
-                                return o.D3022 == 'A0004';
+                                return o.D3023 == 'A0004';
                             });
                             vmh.utils.v.changeProperyName(res, [{o: 'value', n: '_id'}]);
                             return res;
                         });    
-            vm.eat =  vmh.shareService.d('D3023').then(function (results) {
+            vm.eat =  vmh.shareService.d('D3024').then(function (results) {
                             var res = _.filter(results,function(o){
-                                return o.D3022 == 'A0005';
+                                return o.D3023 == 'A0005';
                             });
                             vmh.utils.v.changeProperyName(res, [{o: 'value', n: '_id'}]);
                             return res;
                         });    
-            vm.transfer =  vmh.shareService.d('D3023').then(function (results) {
+            vm.transfer =  vmh.shareService.d('D3024').then(function (results) {
                             var res = _.filter(results,function(o){
-                                return o.D3022 == 'A0006';
-                            });
-                            vmh.utils.v.changeProperyName(res, [{o: 'value', n: '_id'}]);
-                            return res;
-                        });    
-
-            vm.activity =  vmh.shareService.d('D3023').then(function (results) {
-                            var res = _.filter(results,function(o){
-                                return o.D3022 == 'A0007';
+                                return o.D3023 == 'A0006';
                             });
                             vmh.utils.v.changeProperyName(res, [{o: 'value', n: '_id'}]);
                             return res;
                         });    
 
-            vm.dress =  vmh.shareService.d('D3023').then(function (results) {
+            vm.activity =  vmh.shareService.d('D3024').then(function (results) {
                             var res = _.filter(results,function(o){
-                                return o.D3022 == 'A0008';
+                                return o.D3023 == 'A0007';
+                            });
+                            vmh.utils.v.changeProperyName(res, [{o: 'value', n: '_id'}]);
+                            return res;
+                        });    
+
+            vm.dress =  vmh.shareService.d('D3024').then(function (results) {
+                            var res = _.filter(results,function(o){
+                                return o.D3023 == 'A0008';
                             });
                             vmh.utils.v.changeProperyName(res, [{o: 'value', n: '_id'}]);
                             return res;
                         });  
-            vm.stairs =  vmh.shareService.d('D3023').then(function (results) {
+            vm.stairs =  vmh.shareService.d('D3024').then(function (results) {
                             var res = _.filter(results,function(o){
-                                return o.D3022 == 'A0009';
+                                return o.D3023 == 'A0009';
                             });
                             vmh.utils.v.changeProperyName(res, [{o: 'value', n: '_id'}]);
                             return res;
                         });
-            vm.bath =  vmh.shareService.d('D3023').then(function (results) {
+            vm.bath =  vmh.shareService.d('D3024').then(function (results) {
                             var res = _.filter(results,function(o){
-                                return o.D3022 == 'A0010';
+                                return o.D3023 == 'A0010';
                             });
                             vmh.utils.v.changeProperyName(res, [{o: 'value', n: '_id'}]);
                             return res;
@@ -165,11 +165,11 @@
                         return (item.value == o)||(item._id == o);
                     });
                     console.log(disease_evaluation_object);
-                    if(disease_evaluation_object.D3020 == 'A0001'){
+                    if(disease_evaluation_object.D3021 == 'A0001'){
                         a0001_flag = true;
-                    }else if(disease_evaluation_object.D3020 == 'A0003'){
+                    }else if(disease_evaluation_object.D3021 == 'A0003'){
                         a0003_flag = true;
-                    }else if(disease_evaluation_object.D3020 == 'A0005'){
+                    }else if(disease_evaluation_object.D3021 == 'A0005'){
                         a0005_flag = true;
                     }
                 });

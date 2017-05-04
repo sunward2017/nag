@@ -50,88 +50,86 @@
  
 
             vmh.parallel([
-                vmh.shareService.d('D3021'),
-                vmh.shareService.d('D3023')
+                vmh.shareService.d('D3022'),
+                vmh.shareService.d('D3024')
             ]).then(function(results){
                 vm.disease_evaluation_array= results[0];
                 vm.adl_array = results[1];
             })  
 
-            vm.disease_evaluation = vmh.shareService.d('D3021').then(function (results) {
-                            console.log(results);
+            vm.disease_evaluation = vmh.shareService.d('D3022').then(function (results) {
                             vmh.utils.v.changeProperyName(results, [{o: 'value', n: '_id'}]);
-                            console.log(results);
                             return results;
                         });
 
-            vm.shit = vmh.shareService.d('D3023').then(function (results) {
+            vm.shit = vmh.shareService.d('D3024').then(function (results) {
                             var res = _.filter(results,function(o){
-                                return o.D3022 == 'A0001';
+                                return o.D3023 == 'A0001';
                             });
                             vmh.utils.v.changeProperyName(res, [{o: 'value', n: '_id'}]);
                             return res;
                         });
-            vm.pee = vmh.shareService.d('D3023').then(function (results) {
+            vm.pee = vmh.shareService.d('D3024').then(function (results) {
                             var res = _.filter(results,function(o){
-                                return o.D3022 == 'A0002';
+                                return o.D3023 == 'A0002';
                             });
                             vmh.utils.v.changeProperyName(res, [{o: 'value', n: '_id'}]);
                             return res;
                         }); 
-            vm.decorator =  vmh.shareService.d('D3023').then(function (results) {
+            vm.decorator =  vmh.shareService.d('D3024').then(function (results) {
                             var res = _.filter(results,function(o){
-                                return o.D3022 == 'A0003';
+                                return o.D3023 == 'A0003';
                             });
                             vmh.utils.v.changeProperyName(res, [{o: 'value', n: '_id'}]);
                             return res;
                         });    
-            vm.wc =  vmh.shareService.d('D3023').then(function (results) {
+            vm.wc =  vmh.shareService.d('D3024').then(function (results) {
                             var res = _.filter(results,function(o){
-                                return o.D3022 == 'A0004';
+                                return o.D3023 == 'A0004';
                             });
                             vmh.utils.v.changeProperyName(res, [{o: 'value', n: '_id'}]);
                             return res;
                         });    
-            vm.eat =  vmh.shareService.d('D3023').then(function (results) {
+            vm.eat =  vmh.shareService.d('D3024').then(function (results) {
                             var res = _.filter(results,function(o){
-                                return o.D3022 == 'A0005';
+                                return o.D3023 == 'A0005';
                             });
                             vmh.utils.v.changeProperyName(res, [{o: 'value', n: '_id'}]);
                             return res;
                         });    
-            vm.transfer =  vmh.shareService.d('D3023').then(function (results) {
+            vm.transfer =  vmh.shareService.d('D3024').then(function (results) {
                             var res = _.filter(results,function(o){
-                                return o.D3022 == 'A0006';
-                            });
-                            vmh.utils.v.changeProperyName(res, [{o: 'value', n: '_id'}]);
-                            return res;
-                        });    
-
-            vm.activity =  vmh.shareService.d('D3023').then(function (results) {
-                            var res = _.filter(results,function(o){
-                                return o.D3022 == 'A0007';
+                                return o.D3023 == 'A0006';
                             });
                             vmh.utils.v.changeProperyName(res, [{o: 'value', n: '_id'}]);
                             return res;
                         });    
 
-            vm.dress =  vmh.shareService.d('D3023').then(function (results) {
+            vm.activity =  vmh.shareService.d('D3024').then(function (results) {
                             var res = _.filter(results,function(o){
-                                return o.D3022 == 'A0008';
+                                return o.D3023 == 'A0007';
+                            });
+                            vmh.utils.v.changeProperyName(res, [{o: 'value', n: '_id'}]);
+                            return res;
+                        });    
+
+            vm.dress =  vmh.shareService.d('D3024').then(function (results) {
+                            var res = _.filter(results,function(o){
+                                return o.D3023 == 'A0008';
                             });
                             vmh.utils.v.changeProperyName(res, [{o: 'value', n: '_id'}]);
                             return res;
                         });  
-            vm.stairs =  vmh.shareService.d('D3023').then(function (results) {
+            vm.stairs =  vmh.shareService.d('D3024').then(function (results) {
                             var res = _.filter(results,function(o){
-                                return o.D3022 == 'A0009';
+                                return o.D3023 == 'A0009';
                             });
                             vmh.utils.v.changeProperyName(res, [{o: 'value', n: '_id'}]);
                             return res;
                         });
-            vm.bath =  vmh.shareService.d('D3023').then(function (results) {
+            vm.bath =  vmh.shareService.d('D3024').then(function (results) {
                             var res = _.filter(results,function(o){
-                                return o.D3022 == 'A0010';
+                                return o.D3023 == 'A0010';
                             });
                             vmh.utils.v.changeProperyName(res, [{o: 'value', n: '_id'}]);
                             return res;
@@ -158,7 +156,6 @@
             if ($scope.theForm.$valid) {
 
                 //病情
-                //病情
                 var a0001_flag = false;
                 var a0003_flag = false;
                 var a0005_flag = false;
@@ -167,15 +164,16 @@
                     var disease_evaluation_object = _.find(vm.disease_evaluation_array,function(item){
                         return (item.value == o)||(item._id == o);
                     });
-
-                    if(disease_evaluation_object.D3020 == 'A0001'){
+                    console.log(disease_evaluation_object);
+                    if(disease_evaluation_object.D3021 == 'A0001'){
                         a0001_flag = true;
-                    }else if(disease_evaluation_object.D3020 == 'A0003'){
+                    }else if(disease_evaluation_object.D3021 == 'A0003'){
                         a0003_flag = true;
-                    }else if(disease_evaluation_object.D3020 == 'A0005'){
+                    }else if(disease_evaluation_object.D3021 == 'A0005'){
                         a0005_flag = true;
                     }
                 });
+
 
                 //活动能力
                 var adl_base_on= [];
@@ -185,7 +183,7 @@
                 var adl_shit_object = _.find(vm.adl_array,function(item){
                     return (item.value == vm.adl_shit)||(item._id == vm.adl_shit);
                 });
-                adl_shit_base_on_item.item = adl_shit_object.D3022;
+                adl_shit_base_on_item.item = adl_shit_object.D3023;
                 adl_shit_base_on_item.standard = vm.adl_shit;
                 adl_shit_base_on_item.score = adl_shit_object.score;
                 adl_base_on.push(adl_shit_base_on_item);
@@ -195,7 +193,7 @@
                 var adl_pee_object = _.find(vm.adl_array,function(item){
                     return (item.value == vm.adl_pee)||(item._id == vm.adl_pee);
                 });
-                adl_pee_base_on_item.item = adl_pee_object.D3022;
+                adl_pee_base_on_item.item = adl_pee_object.D3023;
                 adl_pee_base_on_item.standard = vm.adl_pee;
                 adl_pee_base_on_item.score = adl_pee_object.score;
                 adl_base_on.push(adl_pee_base_on_item);
@@ -205,7 +203,7 @@
                 var adl_decorator_object = _.find(vm.adl_array,function(item){
                     return (item.value == vm.adl_decorator)||(item._id == vm.adl_decorator);
                 });
-                adl_decorator_base_on_item.item = adl_decorator_object.D3022;
+                adl_decorator_base_on_item.item = adl_decorator_object.D3023;
                 adl_decorator_base_on_item.standard = vm.adl_decorator;
                 adl_decorator_base_on_item.score = adl_decorator_object.score;
                 adl_base_on.push(adl_decorator_base_on_item);
@@ -215,7 +213,7 @@
                 var adl_wc_object = _.find(vm.adl_array,function(item){
                     return (item.value == vm.adl_wc)||(item._id == vm.adl_wc);
                 });
-                adl_wc_base_on_item.item = adl_wc_object.D3022;
+                adl_wc_base_on_item.item = adl_wc_object.D3023;
                 adl_wc_base_on_item.standard = vm.adl_wc;
                 adl_wc_base_on_item.score = adl_wc_object.score;
                 adl_base_on.push(adl_wc_base_on_item);
@@ -225,7 +223,7 @@
                 var adl_eat_object = _.find(vm.adl_array,function(item){
                     return (item.value == vm.adl_eat)||(item._id == vm.adl_eat);
                 });
-                adl_eat_base_on_item.item = adl_eat_object.D3022;
+                adl_eat_base_on_item.item = adl_eat_object.D3023;
                 adl_eat_base_on_item.standard = vm.adl_eat;
                 adl_eat_base_on_item.score = adl_eat_object.score;
                 adl_base_on.push(adl_eat_base_on_item);
@@ -235,7 +233,7 @@
                 var adl_transfer_object = _.find(vm.adl_array,function(item){
                     return (item.value == vm.adl_transfer)||(item._id == vm.adl_transfer);
                 });
-                adl_transfer_base_on_item.item = adl_transfer_object.D3022;
+                adl_transfer_base_on_item.item = adl_transfer_object.D3023;
                 adl_transfer_base_on_item.standard = vm.adl_transfer;
                 adl_transfer_base_on_item.score = adl_transfer_object.score;
                 adl_base_on.push(adl_transfer_base_on_item);
@@ -245,7 +243,7 @@
                 var adl_activity_object = _.find(vm.adl_array,function(item){
                     return (item.value == vm.adl_activity)||(item._id == vm.adl_activity);
                 });
-                adl_activity_base_on_item.item = adl_activity_object.D3022;
+                adl_activity_base_on_item.item = adl_activity_object.D3023;
                 adl_activity_base_on_item.standard = vm.adl_activity;
                 adl_activity_base_on_item.score = adl_activity_object.score;
                 adl_base_on.push(adl_activity_base_on_item);
@@ -256,7 +254,7 @@
                 var adl_dress_object = _.find(vm.adl_array,function(item){
                     return (item.value == vm.adl_dress)||(item._id == vm.adl_dress);
                 });
-                adl_dress_base_on_item.item = adl_dress_object.D3022;
+                adl_dress_base_on_item.item = adl_dress_object.D3023;
                 adl_dress_base_on_item.standard = vm.adl_dress;
                 adl_dress_base_on_item.score = adl_dress_object.score;
                 adl_base_on.push(adl_dress_base_on_item);
@@ -266,7 +264,7 @@
                 var adl_stairs_object = _.find(vm.adl_array,function(item){
                     return (item.value == vm.adl_stairs)||(item._id == vm.adl_stairs);
                 });
-                adl_stairs_base_on_item.item = adl_stairs_object.D3022;
+                adl_stairs_base_on_item.item = adl_stairs_object.D3023;
                 adl_stairs_base_on_item.standard = vm.adl_stairs;
                 adl_stairs_base_on_item.score = adl_stairs_object.score;
                 adl_base_on.push(adl_stairs_base_on_item);
@@ -276,7 +274,7 @@
                 var adl_bath_object = _.find(vm.adl_array,function(item){
                     return (item.value == vm.adl_bath)||(item._id == vm.adl_bath);
                 });
-                adl_bath_base_on_item.item = adl_bath_object.D3022;
+                adl_bath_base_on_item.item = adl_bath_object.D3023;
                 adl_bath_base_on_item.standard = vm.adl_bath;
                 adl_bath_base_on_item.score = adl_bath_object.score;
                 adl_base_on.push(adl_bath_base_on_item);
@@ -309,7 +307,7 @@
                     }
                 }
                 vm.model.current_disease_evaluation = vm.disease_evaluation_json;
-                vm.model.type = 'A0003';//定期评估
+                vm.model.type = 'A0003';//入院评估
 
                 vm.save();
             }

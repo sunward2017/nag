@@ -538,7 +538,7 @@
                             type: 'string',
                             width: 60,
                             sortable: true,
-                            formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D3020/object'),
+                            formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D3021/object'),
                         },{
                             label: '活动能力总分',
                             name: 'current_adl.score',
@@ -610,7 +610,7 @@
                             type: 'string',
                             width: 60,
                             sortable: true,
-                            formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D3020/object'),
+                            formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D3021/object'),
                         },{
                             label: '活动能力总分',
                             name: 'current_adl.score',

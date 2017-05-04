@@ -18,6 +18,7 @@
         .controller('DemoIMGProcessQiNiuController',DemoIMGProcessQiNiuController)
         .controller('DemoDropdownController', DemoDropdownController)
         .controller('DemoBackfillerController', DemoBackfillerController)
+        .controller('BackfillerDemoPickDialogController', BackfillerDemoPickDialogController)
         .controller('DemoBoxInputController', DemoBoxInputController)
         .controller('DemoPromiseController',DemoPromiseController)
     ;
@@ -677,21 +678,80 @@
 
         init();
 
-
         function init() {
             vm.init();
-            vm.fetchDataPromise = vmh.shareService.d('D1015').then(function(items){
+            vm.fetchRowsPromise = vmh.shareService.d('D1013').then(function(items){
                 //vm.period = items[2].value;
+                console.log('items:',items);
+                // vm.period = items[3];// for object defaultCompareEqual
                 return items;
             });
+            vm.fetchColumnsPromise = [{label: '序号',name: 'order',width: 80},{label: '名称',name: 'name',width: 620},{label: '值',name: 'value',width: 80}];
+            vm.period = 'A0005' // for string
+            // vm.period = {value:'A0001'}; // for object customCompareEqual
+
+
+            vm.fetchRowsPromise2 = vmh.shareService.d('D1005').then(function(items){
+                //vm.period2 = items[2].value;
+                console.log('items:',items);
+                // vm.period2 = items[3];// for object defaultCompareEqual
+                return items;
+            });
+            vm.fetchColumnsPromise2 = [{label: '序号',name: 'order',width: 80},{label: '名称',name: 'name',width: 620},{label: '值',name: 'value',width: 80}];
+            vm.period2 = 'A1003' // for string
+            // vm.period2 = {value:'A1001'}; // for object customCompareEqual
 
             vm.onSelect = onSelect;
+            vm.onSelect2 = onSelect2;
+            vm.makeEmpty = makeEmpty;
+            vm.makeEmpty2 = makeEmpty2;
+            vm.onCompareEqual = onCompareEqual;
 
         }
 
-        function onSelect(item){
-            vm.selected = 'callback received ' + angular.toJson(item);
+        function onCompareEqual(one, other) {
+            return one.value === other.value;
         }
+
+        function onSelect(row){
+            vm.selected = 'callback received ' + angular.toJson(row);
+        }
+        function onSelect2(row){
+            vm.selected2 = 'callback received ' + angular.toJson(row);
+        }
+
+        function makeEmpty(){
+            vm.period = '';
+        }
+
+        function makeEmpty2(){
+            vm.period2 = '';
+        }
+    }
+
+    BackfillerDemoPickDialogController.$inject = ['$scope', 'RouteHelpers'];
+
+    function BackfillerDemoPickDialogController ($scope, helper) {
+        var vm = $scope.vm = {};
+        var vmh = $scope.vmh = helper.buildVMHelper();
+
+        init();
+
+        function init() {
+            vm.pickOne = pickOne;
+
+            vm.translatePath = $scope.ngDialogData.translatePath;
+            vm.title = $scope.ngDialogData.title;
+            vm.rows = $scope.ngDialogData.rows;
+            vm.columns = $scope.ngDialogData.columns;
+
+            vm.page =  {size: 5, no: 1};
+        }
+
+        function pickOne(row) {
+            $scope.closeThisDialog(row);
+        }
+
 
     }
 

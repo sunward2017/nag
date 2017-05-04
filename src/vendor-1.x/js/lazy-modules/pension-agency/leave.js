@@ -53,6 +53,7 @@
             vm.doSubmit = doSubmit;
             vm.clearEndOn = clearEndOn;
             vm.queryElderly = queryElderly;
+            vm.selectElerlyForBackFiller = selectElerlyForBackFiller;
             vm.selectElerly = selectElerly;
             vm.tab1 = {cid: 'contentTab1'};
 
@@ -63,6 +64,8 @@
                 vm.selectBinding.sex = results[0];
                 vm.selectBinding.relationsWithTheElderly = results[1];
             });
+            vm.queryElderlyPromise = queryElderly();
+            vm.fetchElderlyColumnsPromise = [{label: '入院登记号',name: 'enter_code',width: 100}, {label: '姓名',name: 'name',width: 100}];
 
             vm.load().then(function(){
                 if(vm.model.elderlyId){
@@ -81,6 +84,14 @@
                 live_in_flag: true,
                 begin_exit_flow: {'$in':[false,undefined]}
             }, 'name enter_code'));
+        }
+
+        function selectElerlyForBackFiller(row) {
+            if(row){
+                vm.model.enter_code = row.enter_code;
+                vm.model.elderlyId = row.id;
+                vm.model.elderly_name = row.name;
+            }
         }
 
         function selectElerly(o) {

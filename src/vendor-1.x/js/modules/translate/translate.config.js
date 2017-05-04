@@ -19,7 +19,8 @@
                     {prefix: 'app/i18n/organization-travel-standard-', suffix: '.json'},
                     {prefix: 'app/i18n/shared-charge-items-', suffix: '.json'},
                     {prefix: 'app/i18n/manage-center-', suffix: '.json'},
-                    {prefix: 'app/i18n/demo-center-', suffix: '.json'}
+                    {prefix: 'app/i18n/demo-center-', suffix: '.json'},
+                    {prefix: 'app/i18n/dialog-', suffix: '.json'}
                 ]
             }
         );//modified by zppro 2016.3.1 多文件支持

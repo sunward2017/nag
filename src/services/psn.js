@@ -4776,13 +4776,15 @@ module.exports = {
                                         nursingRecord.category = workItem.work_item_category;
 
                                         var str = workItem.voice_template || '';
-                                        str = str.replace(/\${老人姓名}/g, nursingPlanItem.elderly_name || '')
-                                                 .replace(/\${项目名称}/g, workItem.name || '')
-                                                 .replace(/\${药品名称}/g, workItem.name || '')
-                                                 .replace(/\${工作描述}/g, workItem.description || '')
-                                                 .replace(/\${服用方法}/g, workItem.description || '');
+                                        if(str) {
+                                            str = str.replace(/\${老人姓名}/g, nursingPlanItem.elderly_name || '')
+                                                .replace(/\${项目名称}/g, workItem.name || '')
+                                                .replace(/\${药品名称}/g, workItem.name || '')
+                                                .replace(/\${工作描述}/g, workItem.description || '')
+                                                .replace(/\${服用方法}/g, workItem.description || '');
+                                        }
 
-                                        console.log('voice_content', str);
+                                        // console.log('voice_content', str);
 
                                         nursingRecord.voice_content = str;
 
@@ -5073,11 +5075,14 @@ module.exports = {
                                 };
 
                                 var str = workItem.voice_template || '';
-                                str = str.replace(/\${老人姓名}/g, nursingPlanItem.elderly_name || '');
-                                str = str.replace(/\${项目名称}/g, workItem.name || '');
-                                str = str.replace(/\${药品名称}/g, workItem.name || '');
-                                str = str.replace(/\${工作描述}/g, workItem.description || '');
-                                str = str.replace(/\${服用方法}/g, workItem.description || '');
+                                if(str) {
+                                    str = str.replace(/\${老人姓名}/g, nursingPlanItem.elderly_name || '')
+                                        .replace(/\${项目名称}/g, workItem.name || '')
+                                        .replace(/\${药品名称}/g, workItem.name || '')
+                                        .replace(/\${工作描述}/g, workItem.description || '')
+                                        .replace(/\${服用方法}/g, workItem.description || '');
+                                }
+
 
                                 nursingRecord.voice_content = str;
                                 nursingRecord.remind_on = [];

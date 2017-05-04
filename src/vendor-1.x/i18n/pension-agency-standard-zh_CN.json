@@ -334,7 +334,8 @@
       "TAB1-LABEL-FEE_FLAG": "收费",
       "TAB1-LABEL-FEE": "费用(￥)",
       "TAB1-PLACEHOLDER-FEE": "100..",
-      "TAB1-PLACEHOLDER-REMIND_TIMES": "3.."
+      "TAB1-PLACEHOLDER-REMIND_TIMES": "3..",
+      "VOICE_TEPLATE_ERROR":"语音模板有错误"
     },
     "nursing-schedule": {
       "TITLE": "养老机构-护理管理-护理排班-编排",
@@ -481,7 +482,8 @@
         "TAB1-LABEL-FEE_FLAG": "收费",
         "TAB1-LABEL-FEE": "费用(￥)",
         "TAB1-PLACEHOLDER-FEE": "100..",
-        "TAB1-PLACEHOLDER-REMIND_TIMES": "3.."
+        "TAB1-PLACEHOLDER-REMIND_TIMES": "3..",
+        "VOICE_TEPLATE_ERROR":"语音模板有错误"
       }
     },
     "drug-directory": {
@@ -623,7 +625,8 @@
         "TAB1-LABEL-FEE_FLAG": "收费",
         "TAB1-LABEL-FEE": "费用(￥)",
         "TAB1-PLACEHOLDER-FEE": "100..",
-        "TAB1-PLACEHOLDER-REMIND_TIMES": "3.."
+        "TAB1-PLACEHOLDER-REMIND_TIMES": "3..",
+        "VOICE_TEPLATE_ERROR":"语音模板有错误"
       }
     },
     "robot": {

@@ -40,6 +40,7 @@
             vm.cancelNursingPlanRemark = cancelNursingPlanRemark;
             vm.generateNursingRecord = generateNursingRecord;
             vm.customizedWorkItem = customizedWorkItem;
+            vm.workItemByElderly = workItemByElderly;
 
             vm.tab1 = { cid: 'contentTab1' };
             vm.$editings = {};
@@ -47,7 +48,7 @@
             vmh.parallel([
                 vmh.clientData.getJson('nursingPlanAxis'),
                 vmh.shareService.tmp('T3001/psn-nursingLevel', 'name short_name', null),
-                vmh.shareService.tmp('T3001/psn-workItem', 'name nursingLevelId', null),
+                vmh.shareService.tmp('T3001/psn-workItem', 'name elderlyId sourceId nursingLevelId', null),
                 vmh.shareService.tmp('T3001/psn-drugUseItem', 'drugId name elderlyId', null),
 
             ]).then(function (results) {
@@ -65,7 +66,7 @@
                 vm.nursingLevelMap = nursingLevelMap;
 
                 var workItems = _.map(results[2], function (row) {
-                    return { id: row._id, name: row.name, nursingLevelId: row.nursingLevelId }
+                    return { id: row._id, name: row.name, sourceId: row.sourceId, elderlyId: row.elderlyId, nursingLevelId: row.nursingLevelId }
                 });
                 var workItemMap = {};
                 for (var i = 0, len = vm.selectBinding.nursingLevels.length; i < len; i++) {
@@ -77,7 +78,6 @@
                 var drugUseItems = _.map(results[3], function (row) {
                     return { id: row._id, name: row.name, drugId: row.drugId, elderlyId: row.elderlyId }
                 });
-                var drugUseItemMap = {};
                 var drugUseItemMap = {},
                     elderlys = [];
                 _.each(drugUseItems, function (v) {
@@ -200,7 +200,6 @@
                     }
                     // console.log('更改后:', vm.work_items)
                 }
-
                 vm.aggrData[trackedKey]['elderly']['nursingLevelId'] = data.nursingLevelId;
                 vm.$editings[trackedKey]['nursingLevelId'] = false;
             });
@@ -270,7 +269,31 @@
             });
         }
 
-        function customizedWorkItem(workItemId,elderlyId) {  
+        function workItemByElderly(workItems, elderlyId) {
+            // console.log(workItems);
+            // console.log(elderlyId);
+            var allWorkItems = _.filter(workItems, function (option) {
+                if ((!option.sourceId) || option.elderlyId == elderlyId)
+                    return option;
+            })
+            var customizedWorkItems = _.filter(allWorkItems, function (p) {
+                if (p.elderlyId = elderlyId);
+                return p;
+            })
+            console.log(customizedWorkItems);
+            for (var s = 0, l = customizedWorkItems.length; s < l; s++) {
+                workItemByElderly = _.filter(allWorkItems, function (item) {
+                    if (customizedWorkItems[s].sourceId !== item.id) {
+                        return item;
+                    };
+                })
+            }
+
+            return workItemByElderly;
+        }
+
+        function customizedWorkItem(workItemId, elderlyId) {
+            // console.log("elderlyId",elderlyId);
             ngDialog.open({
                 template: 'work-item-custom.html',
                 controller: 'WorkItemCustomController',
@@ -279,7 +302,7 @@
                     vmh: vmh,
                     moduleTranslatePathRoot: vm.moduleTranslatePath(),
                     workItemId: workItemId,
-                    elderlyId:elderlyId,
+                    elderlyId: elderlyId,
                 }
             })
         }
@@ -292,7 +315,6 @@
         var vm = $scope.vm = {};
         var vmh = $scope.ngDialogData.vmh;
         var workItemId = $scope.ngDialogData.workItemId;
-        
         vm.doSubmit = doSubmit;
         vm.cancel = cancel;
         vm.selectBinding = {};
@@ -322,6 +344,7 @@
                     vm.model.repeat_values = '';
                     vm.model.repeat_start = '*';
                     vm.voiceSwitch = true;
+                    vm.model.remind_flag = false;
                     vm.repeatValuesSwitch = true;
                     vm.repeatStartSwitch = true;
                 } else {
@@ -335,14 +358,40 @@
             }
         }
 
-        function doSubmit(){
-           vm.model.elderlyId = $scope.ngDialogData.elderlyId; 
-           vmh.psnService.customizedWorkItem(workItemId,vm.model).then(function(){
-               
-           }) 
+        function doSubmit() {
+            vm.model.elderlyId = $scope.ngDialogData.elderlyId;
+            if (vm.model.customize_flag == false) {
+                vm.model.sourceId = workItemId;
+            }
+            if (vm.model.repeat_values) {
+                vm.model.repeat_values = vm.model.repeat_values.split(",");
+            }
+
+            if (vm.model.voice_template) {
+                var reg = /\${[^}]+}/g;
+                var arr = vm.model.voice_template.match(reg);
+                console.log('arr', arr);
+                var isVerify = false;
+                for (var i = 0, len = arr.length; i < len; i++) {
+
+                    if (arr[i] == "${项目名称}" || arr[i] == "${工作描述}" || arr[i] == "${老人姓名}") {
+                        continue;
+                    } else {
+                        isVerify = true;
+                        break;
+                    }
+                }
+                if (isVerify) {
+                    vmh.alertWarning(vm.viewTranslatePath('VOICE_TEPLATE_ERROR'), true);
+                    return;
+                }
+            }
+            vmh.psnService.customizedWorkItem(workItemId, vm.model).then(function () {
+                ngDialog.close("#work-item-custom.html");
+            });
         }
-        function cancel(){
-          ngDialog.close("#work-item-custom.html")   
+        function cancel() {
+            ngDialog.close("#work-item-custom.html")
         }
     }
 })();

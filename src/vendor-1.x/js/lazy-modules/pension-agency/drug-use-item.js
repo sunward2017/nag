@@ -99,8 +99,26 @@
 
         function doSubmit() {
             vm.model.repeat_values = vm.repeat_values?vm.repeat_values.split(","):"";
-            if ($scope.theForm.$valid) {
+            if(vm.model.voice_template){
+                var reg = /\${[^}]+}/g;
+                var arr = vm.model.voice_template.match(reg);
+                console.log('arr', arr);
+                var isVerify = false;
+                for (var i = 0, len = arr.length; i < len; i++) {
 
+                    if (arr[i] == "${药品名称}" || arr[i] == "${服用方法}"|| arr[i] == "${老人姓名}") {
+                        continue;
+                    } else {
+                        isVerify = true;
+                        break;
+                    }
+                }
+                if (isVerify) {
+                    vmh.alertWarning(vm.viewTranslatePath('VOICE_TEPLATE_ERROR'), true);
+                    return;
+                } 
+            }
+            if ($scope.theForm.$valid) {
                 vm.save();
             } else {
                 if ($scope.utils.vtab(vm.tab1.cid)) {
@@ -114,6 +132,7 @@
                 vm.repeat_values = '';
                 vm.model.repeat_start = '*';
                 vm.voiceSwitch = true;
+                vm.model.remind_flag = false;
                 vm.repeatValuesSwitch = true;
                 vm.repeatStartSwitch = true;
             } else {

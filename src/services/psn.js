@@ -864,7 +864,7 @@ module.exports = {
                                 return;
                             }
 
-                            console.log('nursingLevelId:', nursingLevelId);
+                            // console.log('nursingLevelId:', nursingLevelId);
                             if (nursingLevelId === (elderly.nursingLevelId || '').toString()) {
                                 this.body = app.wrapper.res.error({message: '护理级别没有变化!'});
                                 yield next;
@@ -4498,7 +4498,7 @@ module.exports = {
                     return function*(next) {
                         try {
                             var workItemId = this.request.body.workItemId;
-                            console.log("workItemId",workItemId)
+                            // console.log("workItemId",workItemId)
                             var rows = yield app.modelFactory().model_read(app.models['psn_workItem'],workItemId);
                             if(!rows){
                                 this.body = app.wrapper.res.error({ message: '无法找到工作项目!' });
@@ -4691,6 +4691,26 @@ module.exports = {
                                 workItem = app._.extend(workItem, customizedWorkItem);
                                 yield workItem.save();
                             }
+                            var elderlyId = this.request.body.customizedWorkItem.elderlyId;
+                            var tenantId = this.request.body.customizedWorkItem.tenantId;
+                            var elderlyNursingPlan = yield app.modelFactory().model_one(app.models['psn_nursingPlan'], {
+                                select: 'work_items',
+                                where: {
+                                    status: 1,
+                                    elderlyId: elderlyId,
+                                    tenantId: tenantId
+                                }
+                            });
+                            // console.log("elderlyNursingPlan",elderlyNursingPlan);
+                            if (elderlyNursingPlan && elderlyNursingPlan.work_items) {
+
+                                elderlyNursingPlan.work_items = elderlyNursingPlan.work_items.filter(function (item) {
+                                    return item.workItemId !== workItemId;
+                                });
+                                // console.log("elderlyNursingPlan",elderlyNursingPlan);
+                                yield elderlyNursingPlan.save();
+                            }
+
                             this.body = app.wrapper.res.default();
                         }catch(e){
                             console.log(e);

@@ -47,23 +47,23 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-REPEAT_TYPE') | translate}}:
                         .col-md-10
                             .btn-group
-                                .btn.btn-primary(name='repeat_type',ng-repeat='repeatType in vm.selectBinding.repeatTypes',ng-model='vm.model.repeat_type',btn-radio="repeatType.value",required='') {{repeatType.name}}
+                                .btn.btn-primary(name='repeat_type',ng-change="vm.initVoiceTemplate()",ng-repeat='repeatType in vm.selectBinding.repeatTypes',ng-model='vm.model.repeat_type',btn-radio="repeatType.value",required='') {{repeatType.name}}
                             span.text-danger(ng-show="utils.vinput(this.theForm,'repeat_type','required')") {{ "validator.REQUIRED" | translate}}
                     fieldset: .form-group
                         <!--重复值域-->
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-REPEAT_VALUES') | translate}}:
                         .col-md-10
-                            input.form-control(type='text', name='repeat_values',ng-model='vm.repeat_values',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-REPEAT_VALUES")|translate}}')
+                            input.form-control(type='text',ng-disabled="vm.repeatValuesSwitch", name='repeat_values',ng-model='vm.repeat_values',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-REPEAT_VALUES")|translate}}')
                     fieldset: .form-group
                         <!--重复点-->
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-REPEAT_START') | translate}}:
                         .col-md-10
-                            input.form-control(type='text', name='repeat_start',ng-model='vm.model.repeat_start',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-REPEAT_START")|translate}}')
+                            input.form-control(type='text',ng-disabled="vm.repeatStartSwitch", name='repeat_start',ng-model='vm.model.repeat_start',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-REPEAT_START")|translate}}')
                     fieldset: .form-group
                         <!--语音播报-->
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-VOICE-TEMPLATE') | translate}}:
                         .col-md-10
-                            textarea.form-control(name='voice_template',ng-model='vm.model.voice_template',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-VOICE")|translate}}',maxlength="400")            
+                            textarea.form-control(name='voice_template',ng-disabled="vm.voiceSwitch", ng-model='vm.model.voice_template',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-VOICE")|translate}}',maxlength="400")            
                     fieldset: .form-group
                         <!--标识集合-->
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-FLAG-COLLECTION') | translate}}:

@@ -4,7 +4,7 @@
  =========================================================*/
 
 
-(function() {
+(function () {
     'use strict';
 
     angular
@@ -201,12 +201,12 @@
                             name: 'nursing_info',
                             type: 'string',
                             width: 120
-                        },{
+                        }, {
                             label: '状态',
                             name: 'begin_exit_flow',
                             type: 'string',
                             width: 80,
-                            formatter: function() {
+                            formatter: function () {
                                 return { "true": "正在出院", "false": "在院", "undefined": "在院" }
                             }
                         }, {
@@ -780,11 +780,11 @@
                 controller: 'NursingScheduleTemplateDetailsController',
                 resolve: {
                     entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'nursing-schedule-template.details', {
-                            modelName: 'psn-nursingScheduleTemplate',
-                            model: { type: 'A0001' },
-                            blockUI: true
-                        })
-                        //, deps: helper.resolveFor2('ui.select')
+                        modelName: 'psn-nursingScheduleTemplate',
+                        model: { type: 'A0001' },
+                        blockUI: true
+                    })
+                    //, deps: helper.resolveFor2('ui.select')
                 }
             })
             .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'nursing-group', {
@@ -813,7 +813,7 @@
                 resolve: {
                     entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'nursing-group.list', {
                         modelName: 'psn-nursingGroup',
-                        searchForm: {"status": 1},
+                        searchForm: { "status": 1 },
                         serverPaging: true,
                         columns: [{
                             label: '护理组名称',
@@ -1483,46 +1483,28 @@
                             width: 60,
                             sortable: true
                         }, {
-                            label: '英文名',
-                            name: 'english_name',
-                            type: 'string',
-                            width: 80,
-                            sortable: true
-                        }, {
-                            label: '功能主治',
-                            name: 'indications_function',
-                            type: 'string',
-                            width: 60,
-                            sortable: true
-                        }, {
                             label: '处方药',
                             name: 'otc_flag',
                             type: 'bool',
-                            width: 60,
+                            width: 40,
                             sortable: true
                         }, {
                             label: '医保',
                             name: 'health_care_flag',
                             type: 'bool',
-                            width: 60,
-                            sortable: true
-                        }, {
-                            label: '使用方法',
-                            name: 'usage',
-                            type: 'string',
-                            width: 60,
+                            width: 40,
                             sortable: true
                         }, {
                             label: '价格',
                             name: 'price',
                             type: 'string',
-                            width: 60,
+                            width: 50,
                             sortable: true
                         }, {
                             label: '规格',
                             name: 'specification',
                             type: 'string',
-                            width: 60,
+                            width: 70,
                             sortable: true
                         }, {
                             label: '操作',
@@ -1761,63 +1743,63 @@
                         searchForm: { "status": 1, "in_out_type": 0 },
                         serverPaging: true,
                         columns: [{
-                                label: '出库单',
-                                name: 'in_out_no',
-                                type: 'string',
-                                width: 60,
-                                sortable: true
-                            }, {
-                                label: '老人',
-                                name: 'elderly_name',
-                                type: 'string',
-                                width: 60,
-                                sortable: true
-                            }, {
-                                label: '药品名称',
-                                name: 'drug_full_name',
-                                type: 'string',
-                                width: 60,
-                                sortable: true
-                            }, {
-                                label: '药品编码',
-                                name: 'drug_no',
-                                type: 'string',
-                                width: 80,
-                                sortable: true
-                            }, {
-                                label: '药品去处',
-                                name: 'type',
-                                type: 'string',
-                                width: 100,
-                                sortable: true,
-                                formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D3014/object')
-                            }, {
-                                label: '出库数量',
-                                name: 'in_out_quantity',
-                                type: 'number',
-                                width: 80,
-                                sortable: true,
-                            }, {
-                                label: '包装单位',
-                                name: 'unit',
-                                type: 'string',
-                                width: 60,
-                                sortable: true,
-                                formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D3013/object')
-                            }, {
-                                label: '是否有效',
-                                name: 'valid_flag',
-                                type: 'bool',
-                                width: 80,
-                                sortable: false
-                            },
+                            label: '出库单',
+                            name: 'in_out_no',
+                            type: 'string',
+                            width: 60,
+                            sortable: true
+                        }, {
+                            label: '老人',
+                            name: 'elderly_name',
+                            type: 'string',
+                            width: 60,
+                            sortable: true
+                        }, {
+                            label: '药品名称',
+                            name: 'drug_full_name',
+                            type: 'string',
+                            width: 60,
+                            sortable: true
+                        }, {
+                            label: '药品编码',
+                            name: 'drug_no',
+                            type: 'string',
+                            width: 80,
+                            sortable: true
+                        }, {
+                            label: '药品去处',
+                            name: 'type',
+                            type: 'string',
+                            width: 100,
+                            sortable: true,
+                            formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D3014/object')
+                        }, {
+                            label: '出库数量',
+                            name: 'in_out_quantity',
+                            type: 'number',
+                            width: 80,
+                            sortable: true,
+                        }, {
+                            label: '包装单位',
+                            name: 'unit',
+                            type: 'string',
+                            width: 60,
+                            sortable: true,
+                            formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D3013/object')
+                        }, {
+                            label: '是否有效',
+                            name: 'valid_flag',
+                            type: 'bool',
+                            width: 80,
+                            sortable: false
+                        },
 
-                            {
-                                label: '操作',
-                                name: 'actions',
-                                sortable: false,
-                                width: 40
-                            }
+                        {
+                            label: '操作',
+                            name: 'actions',
+                            sortable: false,
+                            width: 40
+                        }
                         ]
                     })
                 }
@@ -1904,10 +1886,10 @@
                 controller: 'NursingWorkerDetailsController',
                 resolve: {
                     entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'nursing-worker.details', {
-                            modelName: 'psn-nursingWorker',
-                            blockUI: true
-                        })
-                        //, deps: helper.resolveFor2('ui.select')
+                        modelName: 'psn-nursingWorker',
+                        blockUI: true
+                    })
+                    //, deps: helper.resolveFor2('ui.select')
                 }
             })
             .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'work-item', {
@@ -1923,8 +1905,8 @@
                         template: '<div class="data-ui-view"></div>'
                     }
                 },
-                data:{
-                    treeFilterObject: {"status": 1}, //使用tmp时的过滤
+                data: {
+                    treeFilterObject: { "status": 1 }, //使用tmp时的过滤
                     func_id: MODEL_VARIABLES.BIZ_FUNC_PREFIXS.PENSION_AGENCY + 'WORK-ITEM'//业务系统使用
                 }
                 , resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.PENSION_AGENCY + 'work-item.js')
@@ -1937,7 +1919,7 @@
                 resolve: {
                     entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'work-item.list', {
                         modelName: 'psn-workItem',
-                        searchForm: { "status": 1 },
+                        searchForm: { "status": 1,customize_flag:false},
                         serverPaging: true,
                         columns: [{
                             label: '护理等级',
@@ -2083,11 +2065,11 @@
                 controller: 'RobotDetailsController',
                 resolve: {
                     entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'robot.details', {
-                            modelName: 'pub-robot',
-                            model: { robot_status: 'A0003' },
-                            blockUI: true
-                        })
-                        //, deps: helper.resolveFor2('ui.select')
+                        modelName: 'pub-robot',
+                        model: { robot_status: 'A0003' },
+                        blockUI: true
+                    })
+                    //, deps: helper.resolveFor2('ui.select')
                 }
             })
             .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'bed-monitor', {
@@ -2157,11 +2139,11 @@
                 controller: 'BedMonitorDetailsController',
                 resolve: {
                     entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'bed-monitor.details', {
-                            modelName: 'pub-bedMonitor',
-                            model: { device_status: 'A0003' },
-                            blockUI: true
-                        })
-                        //, deps: helper.resolveFor2('ui.select')
+                        modelName: 'pub-bedMonitor',
+                        model: { device_status: 'A0003' },
+                        blockUI: true
+                    })
+                    //, deps: helper.resolveFor2('ui.select')
                 }
             })
             .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'room', {
@@ -2179,9 +2161,9 @@
                 },
                 data: {
 
-                    selectFilterObject: {"districts": {"status": 1}},
-                    treeFilterObject: {"status": 1}, //使用tmp时的过滤
-                    func_id:MODEL_VARIABLES.BIZ_FUNC_PREFIXS.PENSION_AGENCY + 'ROOM'//业务系统使用
+                    selectFilterObject: { "districts": { "status": 1 } },
+                    treeFilterObject: { "status": 1 }, //使用tmp时的过滤
+                    func_id: MODEL_VARIABLES.BIZ_FUNC_PREFIXS.PENSION_AGENCY + 'ROOM'//业务系统使用
                 }
                 , resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.PENSION_AGENCY + 'room.js')
             })
@@ -2364,10 +2346,10 @@
                 controller: 'DistrictDetailsController',
                 resolve: {
                     entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'district.details', {
-                            modelName: 'psn-district',
-                            blockUI: true
-                        })
-                        //, deps: helper.resolveFor2('ui.select')
+                        modelName: 'psn-district',
+                        blockUI: true
+                    })
+                    //, deps: helper.resolveFor2('ui.select')
                 }
             })
             .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'nursing-level', {
@@ -2526,14 +2508,14 @@
                 controller: MODEL_VARIABLES.CONTROLLER_NAMES.ChargeItemCustomizedDetails,
                 resolve: {
                     entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'charge-item-customized.details', {
-                            modelName: 'pub-tenantChargeItemCustomized',
-                            model: {
-                                subsystem: MODEL_VARIABLES.SUBSYSTEM_NAMES.PENSION_AGENCY,
-                                catagory: MODEL_VARIABLES.PRE_DEFINED.SERVER_GEN
-                            },
-                            blockUI: true
-                        })
-                        //, deps: helper.resolveFor2('ui.select')
+                        modelName: 'pub-tenantChargeItemCustomized',
+                        model: {
+                            subsystem: MODEL_VARIABLES.SUBSYSTEM_NAMES.PENSION_AGENCY,
+                            catagory: MODEL_VARIABLES.PRE_DEFINED.SERVER_GEN
+                        },
+                        blockUI: true
+                    })
+                    //, deps: helper.resolveFor2('ui.select')
                 }
             })
             .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'user-manage', {
@@ -2717,7 +2699,7 @@
                         searchForm: { "status": 1 },
                         serverPaging: true,
                         blockUI: true,
-                          columns: [{
+                        columns: [{
                             label: '睡眠带超时时间(分钟)',
                             name: 'other_config.psn_bed_monitor_timeout',
                             type: 'string',

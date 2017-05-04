@@ -864,7 +864,7 @@ module.exports = {
                                 return;
                             }
 
-                            console.log('nursingLevelId:', nursingLevelId);
+                            // console.log('nursingLevelId:', nursingLevelId);
                             if (nursingLevelId === (elderly.nursingLevelId || '').toString()) {
                                 this.body = app.wrapper.res.error({message: '护理级别没有变化!'});
                                 yield next;
@@ -4498,7 +4498,7 @@ module.exports = {
                     return function*(next) {
                         try {
                             var workItemId = this.request.body.workItemId;
-                            console.log("workItemId",workItemId)
+                            // console.log("workItemId",workItemId)
                             var rows = yield app.modelFactory().model_read(app.models['psn_workItem'],workItemId);
                             if(!rows){
                                 this.body = app.wrapper.res.error({ message: '无法找到工作项目!' });
@@ -4668,6 +4668,59 @@ module.exports = {
                     };
                 }
             },
+            /**********************自定义工作项目******************************/
+            {
+                method: 'customizedWorkItem',
+                verb: 'post',
+                url: this.service_url_prefix + "/customizedWorkItem",
+                handler: function (app, options) {
+                    return function* (next) {
+                        try {
+                            var workItemId = this.request.body.workItemId,newWorkItemId;
+                            // console.log("<<<workItemId", workItemId);
+                            var customizedWorkItem = this.request.body.customizedWorkItem;
+                            // console.log(">>>>>customizeWorkItem", customizedWorkItem);
+                            var workItem = yield app.modelFactory().model_read(app.models['psn_workItem'], workItemId);
+                            // console.log('<<<<workItem', workItem);
+                            if (!workItem.customize_flag) {
+                                delete customizedWorkItem._id;
+                                customizedWorkItem.customize_flag = true;
+                                customizedWorkItem.name+="+";
+                                yield app.modelFactory().model_create(app.models['psn_workItem'], customizedWorkItem);
+                            } else {
+                                workItem = app._.extend(workItem, customizedWorkItem);
+                                yield workItem.save();
+                            }
+                            var elderlyId = this.request.body.customizedWorkItem.elderlyId;
+                            var tenantId = this.request.body.customizedWorkItem.tenantId;
+                            var elderlyNursingPlan = yield app.modelFactory().model_one(app.models['psn_nursingPlan'], {
+                                select: 'work_items',
+                                where: {
+                                    status: 1,
+                                    elderlyId: elderlyId,
+                                    tenantId: tenantId
+                                }
+                            });
+                            // console.log("elderlyNursingPlan",elderlyNursingPlan);
+                            if (elderlyNursingPlan && elderlyNursingPlan.work_items) {
+
+                                elderlyNursingPlan.work_items = elderlyNursingPlan.work_items.filter(function (item) {
+                                    return item.workItemId !== workItemId;
+                                });
+                                // console.log("elderlyNursingPlan",elderlyNursingPlan);
+                                yield elderlyNursingPlan.save();
+                            }
+
+                            this.body = app.wrapper.res.default();
+                        }catch(e){
+                            console.log(e);
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
             /**********************护理计划执行(护理记录)*****************************/
             {
                 method: 'nursingRecordGenerate',
@@ -4741,7 +4794,7 @@ module.exports = {
                                     }
                                 });
                             }
-
+                            // console.log('nursingPlanItems',nursingPlanItems);
                             if (nursingPlanItems.length) {
                                 now = app.moment();
                                 gen_batch_no = yield app.sequenceFactory.getSequenceVal(app.modelVariables.SEQUENCE_DEFS.CODE_OF_NURSING_RECORD);
@@ -4749,7 +4802,6 @@ module.exports = {
                                 for (var i = 0, len = nursingPlanItems.length; i < len; i++) {
                                     nursingPlanItem = nursingPlanItems[i];
                                     elderlyRoomValue = elderlyMapRoom[nursingPlanItem.elderlyId];
-                                    // console.log(nursingPlanItem.elderlyId);
                                     nursingRecord = {
                                         elderlyId: nursingPlanItem.elderlyId,
                                         elderly_name: nursingPlanItem.elderly_name,
@@ -4759,6 +4811,7 @@ module.exports = {
                                         tenantId: tenantId
                                     }
                                     workItems = nursingPlanItem.work_items;
+                                    // console.log("workItems",workItems)
                                     for (var j = 0, len2 = workItems.length; j < len2; j++) {
                                         workItem = workItems[j];
                                         remind_max = workItem.remind_times || 1;
@@ -4936,7 +4989,7 @@ module.exports = {
                                     });
                                 }
                             }
-
+                            // console.log("warningMsg",warningMsg);
                             this.body = app.wrapper.res.default(warningMsg);
                         } catch (e) {
                             console.log(e);
@@ -5073,6 +5126,7 @@ module.exports = {
                                     type: workItem.type,
                                     category: workItem.work_item_category
                                 };
+
 
                                 var str = workItem.voice_template || '';
                                 if(str) {

@@ -4745,7 +4745,7 @@ module.exports = {
                             if (nursingPlanItems.length) {
                                 now = app.moment();
                                 gen_batch_no = yield app.sequenceFactory.getSequenceVal(app.modelVariables.SEQUENCE_DEFS.CODE_OF_NURSING_RECORD);
-                                console.log('gen_batch_no:',gen_batch_no);
+                                // console.log('gen_batch_no:',gen_batch_no);
                                 for (var i = 0, len = nursingPlanItems.length; i < len; i++) {
                                     nursingPlanItem = nursingPlanItems[i];
                                     elderlyRoomValue = elderlyMapRoom[nursingPlanItem.elderlyId];
@@ -4775,12 +4775,12 @@ module.exports = {
                                         nursingRecord.type = workItem.type;
                                         nursingRecord.category = workItem.work_item_category;
 
-                                        var str = workItem.voice_template;
-                                        str = str.replace(/\${老人姓名}/g, nursingPlanItem.elderly_name);
-                                        str = str.replace(/\${项目名称}/g, workItem.name);
-                                        str = str.replace(/\${药品名称}/g, workItem.name);
-                                        str = str.replace(/\${工作描述}/g, workItem.description);
-                                        str = str.replace(/\${服用方法}/g, workItem.description);
+                                        var str = workItem.voice_template || '';
+                                        str = str.replace(/\${老人姓名}/g, nursingPlanItem.elderly_name || '')
+                                                 .replace(/\${项目名称}/g, workItem.name || '')
+                                                 .replace(/\${药品名称}/g, workItem.name || '')
+                                                 .replace(/\${工作描述}/g, workItem.description || '')
+                                                 .replace(/\${服用方法}/g, workItem.description || '');
 
                                         console.log('voice_content', str);
 
@@ -5072,12 +5072,12 @@ module.exports = {
                                     category: workItem.work_item_category
                                 };
 
-                                var str = workItem.voice_template;
-                                str = str.replace(/\${老人姓名}/g, nursingPlanItem.elderly_name);
-                                str = str.replace(/\${项目名称}/g, workItem.name);
-                                str = str.replace(/\${药品名称}/g, workItem.name);
-                                str = str.replace(/\${工作描述}/g, workItem.description);
-                                str = str.replace(/\${服用方法}/g, workItem.description);
+                                var str = workItem.voice_template || '';
+                                str = str.replace(/\${老人姓名}/g, nursingPlanItem.elderly_name || '');
+                                str = str.replace(/\${项目名称}/g, workItem.name || '');
+                                str = str.replace(/\${药品名称}/g, workItem.name || '');
+                                str = str.replace(/\${工作描述}/g, workItem.description || '');
+                                str = str.replace(/\${服用方法}/g, workItem.description || '');
 
                                 nursingRecord.voice_content = str;
                                 nursingRecord.remind_on = [];

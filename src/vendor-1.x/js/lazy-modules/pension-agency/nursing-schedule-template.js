@@ -59,9 +59,13 @@
                 vm.selectBinding.nursingWorkers = treeNodes;
             });
 
+            vm.aggrValuePromise = vmh.shareService.tmp('T3013', null, {tenantId:vm.tenantId}).then(function(nodes){
+                console.log('aggrValuePromise:', nodes);
+                return nodes;
+            });
 
             vm.yAxisDataPromise = vmh.shareService.tmp('T3009', null, {tenantId:vm.tenantId}).then(function(nodes){
-                console.log(nodes);
+                console.log('yAxisDataPromise:', nodes);
                 return nodes;
             });
             vm.load().then(function(){
@@ -230,10 +234,14 @@
         }
 
         function saveSelected (isReplace) {
-            if (!vm.selectedNursingWorker) {
+
+            if (!vm.selectedNursingWorkers || vm.selectedNursingWorkers.length == 0) {
                 vmh.alertWarning(vm.viewTranslatePath('MSG-NO-PICK-NURSING'), true);
                 return;
             }
+            var selectedNursingWorkers = _.map(vm.selectedNursingWorkers, function (o) {
+                return {_id: o._id, id: o.id, name: o.name};
+            });
             for(var i=0, ylen = vm.yAxisData.length;i< ylen;i++) {
                 var rowId = vm.yAxisData[i]._id;
                 for (var j=0, xlen = vm.xAxisData.length;j<xlen;j++) {
@@ -242,20 +250,28 @@
                         vm.cells[rowId][colId] = false;
                         vm.cells[rowId]['row-selected'] = _checkWholeRowIsSelected(rowId);
                         vm.cols[colId] = _checkWholeColIsSelected(colId);
-                        console.log(vm.selectedNursingWorker);
 
                         if (isReplace) {
-                            vm.aggrData[rowId][colId] = [vm.selectedNursingWorker];
+                            vm.aggrData[rowId][colId] = selectedNursingWorkers;
                         } else {
                             // 追加
                             var arr = vm.aggrData[rowId][colId];
-                            if (!_.contains(arr, function(o){
-                                    return o.id == vm.selectedNursingWorker.id;
-                                })){
-                                vm.aggrData[rowId][colId].push(vm.selectedNursingWorker);
-                            };
+                            // if (!_.contains(arr, function(o){
+                            //         return _.findIndex(selectedNursingWorkers,function(o2) {o.id == o2.id }) !=-1;
+                            //     })) {
+                            //     vm.aggrData[rowId][colId].push(vm.selectedNursingWorker);
+                            // };
+                            _.each(selectedNursingWorkers, function (o) {
+                                var findIndex = _.findIndex(arr, function (o2) {
+                                    return o.id == o2.id
+                                });
+                                console.log('findIndex:', findIndex);
+                                if (findIndex == -1) {
+                                    console.log('o:', o);
+                                    arr.push(o);
+                                }
+                            });
                         }
-
                     }
                 }
             }

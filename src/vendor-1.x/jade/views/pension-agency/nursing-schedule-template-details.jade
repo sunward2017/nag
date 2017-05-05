@@ -58,10 +58,11 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                                         .col-md-6(ng-show="vm.gridEditing")
                                             .btn-toolbar.pull-right
                                                 .btn-group
-                                                    ui-select(name="nursingWorkers",theme='bootstrap', ng-Model="vm.selectedNursingWorker" ,ng-style='{width: "120px"}')
-                                                        ui-select-match(placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-PICK_NURSING_WORKER")|translate}}') {{$select.selected.name}}
-                                                        ui-select-choices(repeat='nursingWorker in vm.selectBinding.nursingWorkers | filter: {name: $select.search}')
-                                                            div(ng-bind-html='nursingWorker.name | highlight: $select.search')
+                                                    .tree.tree-dropdown(name='nursingWorkers',s-tree, s-tree-data="vm.aggrValuePromise",s-tree-height="400", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{mode:'check',layout:'dropdown',selectNodeFormat:'object'}",ng-model="vm.selectedNursingWorkers")
+                                                    //ui-select(name="nursingWorkers",theme='bootstrap', ng-Model="vm.selectedNursingWorker" ,ng-style='{width: "120px"}')
+                                                    //    ui-select-match(placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-PICK_NURSING_WORKER")|translate}}') {{$select.selected.name}}
+                                                    //    ui-select-choices(repeat='nursingWorker in vm.selectBinding.nursingWorkers | filter: {name: $select.search}')
+                                                    //        div(ng-bind-html='nursingWorker.name | highlight: $select.search')
                                                 .btn-group
                                                     a.btn.btn-primary.btn-sm(ng-click="vm.replaceSelected()") {{'button.REPLACE'|translate}}
                                                     a.btn.btn-primary.btn-sm(ng-click="vm.appendSelected()") {{'button.APPEND'|translate}}

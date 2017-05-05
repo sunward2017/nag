@@ -302,7 +302,9 @@
         "TAB1-LABEL-ACTIVITY":"活动",
         "TAB1-LABEL-DRESS":"穿衣",
         "TAB1-LABEL-STAIRS":"上下楼梯",
-        "TAB1-LABEL-BATH":"洗澡"
+        "TAB1-LABEL-BATH":"洗澡",
+        "TAB1-LABEL-ASSESSMENT-GRADE":"评估等级",
+        "TAB1-LABEL-NURSING-LEVEL":"护理等级"
       }
     },
     "assessment-regular":{
@@ -323,7 +325,9 @@
         "TAB1-LABEL-ACTIVITY":"活动",
         "TAB1-LABEL-DRESS":"穿衣",
         "TAB1-LABEL-STAIRS":"上下楼梯",
-        "TAB1-LABEL-BATH":"洗澡"
+        "TAB1-LABEL-BATH":"洗澡",
+        "TAB1-LABEL-ASSESSMENT-GRADE":"评估等级",
+        "TAB1-LABEL-NURSING-LEVEL":"护理等级"
       }
     },
     "nursing-station": {

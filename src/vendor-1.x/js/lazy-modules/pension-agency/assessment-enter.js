@@ -44,6 +44,8 @@
 
 
             vm.doSubmit = doSubmit;
+            vm.beginAssessment = beginAssessment;
+            vm.setNursingLevel = setNursingLevel;
             vm.queryElderly = queryElderly;
             vm.selectElerly = selectElerly;
             vm.tab1 = {cid: 'contentTab1'};
@@ -51,10 +53,16 @@
 
             vmh.parallel([
                 vmh.shareService.d('D3022'),
-                vmh.shareService.d('D3024')
+                vmh.shareService.d('D3024'),
+                vmh.psnService.nursingLevels(vm.tenantId),
+                vmh.shareService.d('D3015'),
             ]).then(function(results){
                 vm.disease_evaluation_array= results[0];
                 vm.adl_array = results[1];
+                vm.selectBinding.nursing_levels = results[2];
+                vm.assessment_grades = results[3];
+                console.log('result3===');
+                console.log(vm.assessment_grades);
             })  
 
             vm.disease_evaluation = vmh.shareService.d('D3022').then(function (results) {
@@ -152,8 +160,13 @@
             }
         }
 
-        function doSubmit() {
-            if ($scope.theForm.$valid) {
+        function setNursingLevel(nursingLevelId,nursingLevelName){
+            vm.model.nursingLevelId = nursingLevelId;
+            vm.model.current_nursing_level_name = nursingLevelName;
+        }
+
+        function beginAssessment(){
+            if (true) {
 
                 //病情
                 var a0001_flag = false;
@@ -289,9 +302,9 @@
                     console.log('a0001_flag');
                     vm.disease_evaluation_json.level = 'A0001';//重度
                     if(score <= 40){
-                        vm.model.current_nursing_assessment_grade = 'A0005';//介护
+                        vm.model.current_nursing_assessment_grade = 'A0005';//介护老人(失能/失智)
                     }else{
-                        vm.model.current_nursing_assessment_grade = 'A0003';//介助
+                        vm.model.current_nursing_assessment_grade = 'A0003';//介助老人(半失能/半失智)
                     }
                 }else if(a0003_flag){
                     console.log('a0003_flag');
@@ -301,14 +314,32 @@
                     console.log('a0005_flag');
                     vm.disease_evaluation_json.level = 'A0005';//轻度
                     if(score <= 40){
-                        vm.model.current_nursing_assessment_grade = 'A0003';//介助
+                        vm.model.current_nursing_assessment_grade = 'A0003';//介助老人(半失能/半失智)
                     }else{
-                        vm.model.current_nursing_assessment_grade = 'A0001';//自理
+                        vm.model.current_nursing_assessment_grade = 'A0001';//自理老人
                     }
                 }
                 vm.model.current_disease_evaluation = vm.disease_evaluation_json;
                 vm.model.type = 'A0001';//入院评估
 
+                var selectAssessmentGrade = _.find(vm.assessment_grades,function(item){
+                    return item.value == vm.model.current_nursing_assessment_grade;
+                });
+                vm.assessment_grade_name = selectAssessmentGrade.name;
+                vmh.psnService.nursingLevelsByAssessmentGrade(vm.tenantId,vm.model.current_nursing_assessment_grade).then(function(rows){
+                console.log(rows);
+                vm.selectBinding.nursing_levels = rows;
+            });
+            }
+            else {
+                if ($scope.utils.vtab(vm.tab1.cid)) {
+                    vm.tab1.active = true;
+                }
+            }
+        }
+
+        function doSubmit() {
+            if ($scope.theForm.$valid) {
                 vm.save();
             }
             else {

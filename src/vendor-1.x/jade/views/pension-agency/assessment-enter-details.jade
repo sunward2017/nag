@@ -15,7 +15,7 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                     fieldset: .form-group
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-DISEASE_EVALUATION') | translate}}:
                         .col-md-10
-                            .tree.tree-dropdown(name='disease_evaluation',s-tree,s-tree-data="vm.disease_evaluation",s-tree-height="200", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{mode:'check',layout:'dropdown',readonly:{{vm.readonly}} }",ng-model="vm.base_on",required='')
+                            .tree.tree-dropdown(name='disease_evaluation',s-tree,s-tree-data="vm.disease_evaluation",s-tree-height="200", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{mode:'check',layout:'dropdown',readonly:{{vm.readonly}} }",ng-model="vm.base_on",required='',ng-change='vm.genAssessmentGrade()',)
                             span.text-danger(ng-show="utils.vinput(this.theForm,'disease_evaluation','required')") {{ "validator.REQUIRED" | translate}}
                     fieldset: .form-group
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-SHIT') | translate}}:
@@ -67,6 +67,24 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                         .col-md-10
                             .tree.tree-dropdown(name='bath',s-tree,s-tree-data="vm.bath",s-tree-height="100", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{layout:'dropdown',readonly:{{vm.readonly}} }",ng-model="vm.adl_bath",required='')
                             span.text-danger(ng-show="utils.vinput(this.theForm,'bath','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset: .form-group
+                        .col-md-2
+                        .col-md-10
+                            button.btn.btn-danger(type="button",ng-click="vm.beginAssessment()") {{'button.BEGIN-ASSESSMENT'|translate}}
+                    fieldset: .form-group
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-ASSESSMENT-GRADE') | translate}}:
+                        .col-md-10
+                            input.form-control(ng-disabled="true", type='text', name='assessment_grade',ng-model='vm.assessment_grade_name',placeholder='' ,required='')
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'assessment_grade','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset: .form-group
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-NURSING-LEVEL') | translate}}:
+                        .col-md-10(ng-if="!vm.readonly")
+                            .btn-group
+                                .btn.btn-primary(name='nursing_level',ng-disabled="!vm.model.current_nursing_assessment_grade",ng-repeat='nursing_level in vm.selectBinding.nursing_levels',ng-model='vm.model.nursingLevelId',ng-click='vm.setNursingLevel(nursing_level._id,nursing_level.name)',btn-radio="nursing_level._id",required='') {{nursing_level.name}}
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'nursing_level','required')") {{ "validator.REQUIRED" | translate}}
+                         .col-md-10(ng-if="vm.readonly")
+                            .btn-group
+                                .btn.btn-primary.cursor-not-allowed(name='nursing_level',ng-repeat='nursing_level in vm.selectBinding.nursing_levels',ng-class="{'active':vm.model.nursingLevelId==nursing_level._id}") {{nursing_level.name}}
 
 
 

@@ -29,6 +29,7 @@
                         td.text-left {{::row.current_disease_evaluation.level|formatter:'current_disease_evaluation.level':vm.columns}}
                         td.text-left {{::row.current_adl.score}}
                         td.text-left {{::row.current_nursing_assessment_grade|formatter:'current_nursing_assessment_grade':vm.columns}}
+                        td.text-left {{::row.current_nursing_level_name}}
                     tr(ng-if="vm.paged.length==0")
                         td(colspan="{{utils.noResultsColspan(vm)}}") {{ 'grid.NO-RESULTS' | translate}}
             .panel-footer

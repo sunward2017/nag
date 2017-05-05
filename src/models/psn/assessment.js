@@ -33,7 +33,9 @@ module.exports = function(ctx,name) {
                     score:{type: Number, default: 0.00},//每项的分数
                 }]
             },//日常生活活动能力
-            current_nursing_assessment_grade: {type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3015"])},//护理评估等级，对应国标的三个等级
+            current_nursing_assessment_grade: {type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3015"])},//评估等级，对应国标的三个等级
+            nursingLevelId: {type: mongoose.Schema.Types.ObjectId, ref: 'psn_nursingLevel'},//评估等级
+            current_nursing_level_name:{type:String},
             tenantId: {type: mongoose.Schema.Types.ObjectId}
         }, {
             toObject: {

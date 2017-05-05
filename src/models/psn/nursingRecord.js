@@ -32,7 +32,7 @@ module.exports = function(ctx, name) {
             exec_on: { type: Date, required: true },
             // exec_date_string:{type: String, minlength: 8, maxlength: 10}, //按需时不需要设置 2017-3-1(8) 2017-03-27(10)
             // exec_time_string:{type: String, minlength: 2, maxlength: 5}, //按需时不需要设置   :3(2) :30(3) 8:45(4) 08:30(5)
-            assigned_worker: { type: mongoose.Schema.Types.ObjectId, ref: 'psn_nursingWorker' }, // 分配的护工 可滞后分配
+            assigned_workers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'psn_nursingWorker' }], // 分配的护工 可滞后分配 支持多个
             executed_flag: { type: Boolean, default: false }, // 护工开始执行工作项目标识
             confirmed_flag: { type: Boolean, default: false }, // 护工已确认标识
             confirmed_on: { type: Date }, // 护工确认时间
@@ -47,15 +47,7 @@ module.exports = function(ctx, name) {
                 virtuals: true
             }
         });
-
-        // nursingRecordSchema.virtual('exec_on').get(function () {
-        //     if (this.exec_date_string) {
-        //         var datetimeString = this.exec_date_string + ' ' + (this.exec_time_string || '');
-        //         return ctx.moment(datetimeString).toDate();
-        //     }
-        //     return null;
-        // });
-
+        
         nursingRecordSchema.virtual('exec_on_ts').get(function(){
             if(this.exec_on){
                 return ctx.moment(this.exec_on);

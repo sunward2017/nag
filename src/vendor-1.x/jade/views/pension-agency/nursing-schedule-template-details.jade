@@ -43,7 +43,7 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                                             td.text-center(title="{{vm.viewTranslatePath('TAB1-TITLE-ROW')|translate}}",ng-click="vm.selectGridRow(row._id)")
                                                 | {{::row.name}}
                                             td.text-center(ng-repeat="col in vm.xAxisData",width="100", ng-class='{"grid-cell-selected": vm.cells[row._id][col._id] }',ng-click="vm.selectGridCell(row._id,col._id)" )
-                                                span {{(vm.aggrData[row._id][col._id] || {}).name }}
+                                                span {{vm.aggrData[row._id][col._id] | safeArrayMember:'name' }}
                                         tr(ng-if="vm.yAxisData.length==0")
                                             td.text-center(colspan="{{vm.xAxisData.length + 1}}") {{ 'grid.NO-RESULTS' | translate}}
                                 .panel-footer
@@ -54,8 +54,8 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                                                     a.btn.btn-primary.btn-sm(ng-click="vm.enterGridEditMode()") {{vm.viewTranslatePath('TAB1-LABEL-ENTER_EDIT_MODE')|translate}}
                                                 .btn-group(ng-show="vm.gridEditing")
                                                     a.btn.btn-danger.btn-sm(ng-click="vm.exitGridEditMode()") {{vm.viewTranslatePath('TAB1-LABEL-CANCEL_EDIT_MODE')|translate}}
-                                        .col-md-7
-                                        .col-md-3(ng-show="vm.gridEditing")
+                                        .col-md-4
+                                        .col-md-6(ng-show="vm.gridEditing")
                                             .btn-toolbar.pull-right
                                                 .btn-group
                                                     ui-select(name="nursingWorkers",theme='bootstrap', ng-Model="vm.selectedNursingWorker" ,ng-style='{width: "120px"}')
@@ -63,7 +63,10 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                                                         ui-select-choices(repeat='nursingWorker in vm.selectBinding.nursingWorkers | filter: {name: $select.search}')
                                                             div(ng-bind-html='nursingWorker.name | highlight: $select.search')
                                                 .btn-group
-                                                    a.btn.btn-primary.btn-sm(ng-click="vm.applyToSelected()") {{'button.APPLY'|translate}}
+                                                    a.btn.btn-primary.btn-sm(ng-click="vm.replaceSelected()") {{'button.REPLACE'|translate}}
+                                                    a.btn.btn-primary.btn-sm(ng-click="vm.appendSelected()") {{'button.APPEND'|translate}}
+                                                .btn-group
+                                                    a.btn.btn-danger.btn-sm(ng-click="vm.removeSelected()") {{'button.REMOVE'|translate}}
                     //fieldset: .form-group
                     //    {{vm.yAxisData}}
 

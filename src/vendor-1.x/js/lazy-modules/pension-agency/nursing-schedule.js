@@ -86,9 +86,19 @@
         function parseNursingSchedule(nursingSchedule) {
             console.log('parse nursingScheduleItems');
             var nursingScheduleItems = nursingSchedule.items;
+            console.log(nursingSchedule);
             // vm.yAxisData = nursingSchedule.yAxisData;  ?  //The default nursing scheduling state is not selected
             var nursingWorkers = vm.selectBinding.nursingWorkers;
             vm.aggrData = {};
+
+            // 确保vm.aggrData[rowId] 存在并初始化
+            for (var i=0,len= vm.yAxisData.length;i<len;i++) {
+                var rowId = vm.yAxisData[i]._id;
+                if (!vm.aggrData[rowId]) {
+                    vm.aggrData[rowId] = {};
+                }
+            }
+
             for(var i=0,len=nursingScheduleItems.length;i<len;i++) {
                 var nursingScheduleItem = nursingScheduleItems[i];
                 var nursingWorkerObject = _.find(nursingWorkers, function(o){
@@ -134,7 +144,7 @@
                     var colId = vm.xAxisData[j]._id;
                     var aggrValue = rowDataObject[colId];
                     if(aggrValue === undefined) {
-                        rowDataObject[colId] = "";
+                        rowDataObject[colId] = []; // "" => []
                     }
                     var cell = rowCellsObject[colId];
                     if(cell === undefined) {
@@ -251,6 +261,7 @@
                         vm.cols[colId] = _checkWholeColIsSelected(colId);
 
                         console.log(vm.selectedNursingWorker);
+
                         if (isReplace) {
                             vm.aggrData[rowId][colId] = [vm.selectedNursingWorker];
                             toSaveRows.push({ x_axis: date, y_axis: rowId, aggr_value: vm.selectedNursingWorker.id });
@@ -336,19 +347,28 @@
         function saveAsTemplate () {
 
             var toSaveRows = [];
+            var findNursingWorkerToSaveTemplate = false;
             for(var i=0, ylen = vm.yAxisData.length;i< ylen;i++) {
                 var rowId = vm.yAxisData[i]._id;
                 for (var j=0, xlen = vm.xAxisData.length;j<xlen;j++) {
                     var colId = vm.xAxisData[j]._id;
-                    if(!vm.aggrData[rowId][colId]){
-                        vmh.alertWarning(vm.moduleTranslatePath('MSG-SAVE-AS-TEMPLATE-DATA-INVALID'), true);
-                        return;
-                    } else {
-                        toSaveRows.push({ x_axis: moment(vm.xAxisData[j].value).day(), y_axis: rowId, aggr_value: vm.aggrData[rowId][colId] });
+                    if(vm.aggrData[rowId][colId]) {
+                        var assignedWorkers = vm.aggrData[rowId][colId];
+                        for(var k=0,zlen = assignedWorkers.length;k<zlen;k++) {
+                            toSaveRows.push({ x_axis: moment(vm.xAxisData[j].value).day(), y_axis: rowId, aggr_value: assignedWorkers[k] });
+                            if(!findNursingWorkerToSaveTemplate) {
+                                findNursingWorkerToSaveTemplate = true;
+                            }
+                        }
                     }
                 }
             }
-            
+
+            if(!findNursingWorkerToSaveTemplate) {
+                vmh.alertWarning(vm.moduleTranslatePath('MSG-SAVE-AS-TEMPLATE-DATA-INVALID'), true);
+                return;
+            }
+
             ngDialog.open({
                 template: 'nursing-schedule-save-as-template.html',
                 controller: 'NursingScheduleSaveAsTemplateController',

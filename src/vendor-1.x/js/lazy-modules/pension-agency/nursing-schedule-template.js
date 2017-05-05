@@ -50,7 +50,9 @@
             vm.selectGridCol = selectGridCol;
             vm.selectGridRow = selectGridRow;
             vm.selectGridCell = selectGridCell;
-            vm.applyToSelected = applyToSelected;
+            vm.replaceSelected = replaceSelected;
+            vm.appendSelected = appendSelected;
+            vm.removeSelected = removeSelected;
             vm.tab1 = {cid: 'contentTab1'};
 
             vmh.shareService.tmp('T3001/psn-nursingWorker', 'name', {tenantId: vm.tenantId, status: 1, stop_flag: false}).then(function (treeNodes) {
@@ -98,7 +100,11 @@
                 var nursingWorkerObject = _.find(nursingWorkers, function(o){
                     return o._id == aggrPoint.aggr_value
                 })
-                aggrY[aggrPoint.x_axis] = nursingWorkerObject;
+
+                if(!aggrY[aggrPoint.x_axis]){
+                    aggrY[aggrPoint.x_axis] = [];
+                }
+                aggrY[aggrPoint.x_axis].push(nursingWorkerObject);
             }
             vm.yAxisData = yAxisData;
         }
@@ -125,7 +131,7 @@
                     var colId = vm.xAxisData[j]._id;
                     var aggrValue = rowDataObject[colId];
                     if(aggrValue === undefined) {
-                        rowDataObject[colId] = "";
+                        rowDataObject[colId] = []; //""=>[]
                     }
                     var cell = rowCellsObject[colId];
                     if(cell === undefined) {
@@ -215,7 +221,15 @@
             vm.cols[colId] = _checkWholeColIsSelected(colId);
         }
 
-        function applyToSelected () {
+        function replaceSelected () {
+            saveSelected(true);
+        }
+
+        function appendSelected () {
+            saveSelected(false);
+        }
+
+        function saveSelected (isReplace) {
             if (!vm.selectedNursingWorker) {
                 vmh.alertWarning(vm.viewTranslatePath('MSG-NO-PICK-NURSING'), true);
                 return;
@@ -225,31 +239,82 @@
                 for (var j=0, xlen = vm.xAxisData.length;j<xlen;j++) {
                     var colId = vm.xAxisData[j]._id;
                     if (vm.cells[rowId][colId]) {
-                        console.log(vm.selectedNursingWorker);
-                        vm.aggrData[rowId][colId] = vm.selectedNursingWorker;
                         vm.cells[rowId][colId] = false;
                         vm.cells[rowId]['row-selected'] = _checkWholeRowIsSelected(rowId);
                         vm.cols[colId] = _checkWholeColIsSelected(colId);
+                        console.log(vm.selectedNursingWorker);
+
+                        if (isReplace) {
+                            vm.aggrData[rowId][colId] = [vm.selectedNursingWorker];
+                        } else {
+                            // 追加
+                            var arr = vm.aggrData[rowId][colId];
+                            if (!_.contains(arr, function(o){
+                                    return o.id == vm.selectedNursingWorker.id;
+                                })){
+                                vm.aggrData[rowId][colId].push(vm.selectedNursingWorker);
+                            };
+                        }
+
                     }
                 }
             }
+        }
 
+        function removeSelected () {
+            if(vm.aggrData) {
+                for(var i=0, ylen = vm.yAxisData.length;i< ylen;i++) {
+                    var rowId = vm.yAxisData[i]._id;
+                    if(vm.aggrData[rowId]) {
+                        for (var j=0, xlen = vm.xAxisData.length;j<xlen;j++) {
+                            var colId = vm.xAxisData[j]._id;
+                            var date = vm.xAxisData[j].value;
+                            if (vm.cells[rowId][colId]) {
+                                vm.cells[rowId][colId] = false;
+                                vm.cells[rowId]['row-selected'] = _checkWholeRowIsSelected(rowId);
+                                vm.cols[colId] = _checkWholeColIsSelected(colId);
+                                if (vm.aggrData[rowId][colId]) {
+                                    vm.aggrData[rowId][colId] = [];
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         function doSubmit() {
             if ($scope.theForm.$valid) {
-
+                var findNursingWorkerToSaveTemplate = false;
                 vm.model.content = [];
-                for(var i=0, ylen = vm.yAxisData.length;i< ylen;i++) {
-                    var rowId = vm.yAxisData[i]._id;
-                    for (var j=0, xlen = vm.xAxisData.length;j<xlen;j++) {
-                        var colId = vm.xAxisData[j]._id;
-                        if (!vm.aggrData[rowId] || !vm.aggrData[rowId][colId]) {
-                            vmh.alertWarning(vm.viewTranslatePath('MSG-NO-NURSING-WORKER-FOR-ROOM'), true);
-                            return;
+                if(vm.aggrData) {
+                    for(var i=0, ylen = vm.yAxisData.length;i< ylen;i++) {
+                        var rowId = vm.yAxisData[i]._id;
+                        if(vm.aggrData[rowId]) {
+                            for (var j=0, xlen = vm.xAxisData.length;j<xlen;j++) {
+                                var colId = vm.xAxisData[j]._id;
+                                // if (!vm.aggrData[rowId] || !vm.aggrData[rowId][colId]) {
+                                //     vmh.alertWarning(vm.viewTranslatePath('MSG-NO-NURSING-WORKER-FOR-ROOM'), true);
+                                //     return;
+                                // }
+                                if(vm.aggrData[rowId][colId]) {
+                                    var assignedWorkers = vm.aggrData[rowId][colId];
+                                    for(var k=0,zlen = assignedWorkers.length;k<zlen;k++) {
+                                        vm.model.content.push({x_axis: colId, y_axis: rowId, aggr_value: assignedWorkers[k]});
+                                        if(!findNursingWorkerToSaveTemplate) {
+                                            findNursingWorkerToSaveTemplate = true;
+                                        }
+                                    }
+                                }
+                            }
                         }
-                        vm.model.content.push({x_axis: colId, y_axis: rowId, aggr_value: vm.aggrData[rowId][colId]});
                     }
+                }
+
+
+                if(!findNursingWorkerToSaveTemplate) {
+                    vmh.alertWarning(vm.viewTranslatePath('MSG-NO-NURSING-WORKER-FOR-ROOM'), true);
+                    return;
                 }
 
                 var p;

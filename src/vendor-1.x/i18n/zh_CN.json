@@ -44,7 +44,9 @@
     "SYNC-INTERFACE-DATA":"同步接口数据",
     "PREVIEW":"预览",
     "SHIP":"发货",
-    "CONFIG": "配置"
+    "CONFIG": "配置",
+    "REPLACE": "替换",
+    "APPEND": "追加"
   },
   "label": {
     "NONE": "无",

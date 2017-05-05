@@ -4322,6 +4322,8 @@ module.exports = {
                                 o.tenantId = tenantId
                             });
 
+                            console.log('toSaveRows:', toSaveRows);
+
                             var nursingScheduleTemplate = yield app.modelFactory().model_one(app.models['psn_nursingScheduleTemplate'], {
                                 where: {
                                     status: 1,

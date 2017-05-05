@@ -4705,7 +4705,7 @@ module.exports = {
                             if (elderlyNursingPlan && elderlyNursingPlan.work_items) {
 
                                 elderlyNursingPlan.work_items = elderlyNursingPlan.work_items.filter(function (item) {
-                                    return item.workItemId !== workItemId;
+                                    return item.workItemId != workItemId;
                                 });
                                 // console.log("elderlyNursingPlan",elderlyNursingPlan);
                                 yield elderlyNursingPlan.save();

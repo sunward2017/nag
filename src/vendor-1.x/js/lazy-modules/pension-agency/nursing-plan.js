@@ -41,9 +41,11 @@
             vm.generateNursingRecord = generateNursingRecord;
             vm.customizedWorkItem = customizedWorkItem;
             vm.workItemByElderly = workItemByElderly;
+            vm.allWorkItemChecked= allWorkItemChecked;
 
             vm.tab1 = { cid: 'contentTab1' };
             vm.$editings = {};
+            vm.$selectAll = {};
 
             vmh.parallel([
                 vmh.clientData.getJson('nursingPlanAxis'),
@@ -112,6 +114,7 @@
                 // tarnckedKey room + bed ;
                 for (var trackedKey in vm.aggrData) {
                     vm.$editings[trackedKey] = {};
+                    vm.$selectAll[trackedKey] = {};
                     var nursingLevelId = vm.aggrData[trackedKey]['elderly']['nursingLevelId'];
 
                     if (nursingLevelId) {
@@ -217,6 +220,12 @@
             vm.$editings[trackedKey]['drugUseItems'] = !vm.$editings[trackedKey]['drugUseItems'];
         }
 
+        function allWorkItemChecked(trackedKey){
+            console.log("aaaa");
+            vm.$selectAll[trackedKey]['workItems'] = !vm.$selectAll[trackedKey]['workItems'];
+            console.log(vm.$selectAll[trackedKey]['workItems'])
+        }
+
         function workItemChecked(trackedKey, workItemId) {
             var elderlyId = vm.aggrData[trackedKey]['elderly'].id;
             var workItemKey = trackedKey + '$' + vm.aggrData[trackedKey]['elderly']['nursingLevelId'];
@@ -270,8 +279,6 @@
         }
 
         function workItemByElderly(workItems, elderlyId) {
-            // console.log(workItems);
-            // console.log(elderlyId);
             var allWorkItems = _.filter(workItems, function (option) {
                 if ((!option.sourceId) || option.elderlyId == elderlyId)
                     return option;
@@ -280,7 +287,7 @@
                 if (p.elderlyId = elderlyId);
                 return p;
             })
-            console.log(customizedWorkItems);
+            // console.log(customizedWorkItems);
             for (var s = 0, l = customizedWorkItems.length; s < l; s++) {
                 workItemByElderly = _.filter(allWorkItems, function (item) {
                     if (customizedWorkItems[s].sourceId !== item.id) {
@@ -363,14 +370,14 @@
             if (vm.model.customize_flag == false) {
                 vm.model.sourceId = workItemId;
             }
-            if (vm.model.repeat_values) {
+            if (vm.model.repeat_values && typeof (vm.model.repeat_values) === "string") {
                 vm.model.repeat_values = vm.model.repeat_values.split(",");
             }
 
             if (vm.model.voice_template) {
                 var reg = /\${[^}]+}/g;
                 var arr = vm.model.voice_template.match(reg);
-                console.log('arr', arr);
+                // console.log('arr', arr);
                 var isVerify = false;
                 for (var i = 0, len = arr.length; i < len; i++) {
 
@@ -382,12 +389,13 @@
                     }
                 }
                 if (isVerify) {
-                    vmh.alertWarning(vm.viewTranslatePath('VOICE_TEPLATE_ERROR'), true);
+                    vmh.alertWarning("语音模板设置有误", false);
                     return;
                 }
             }
             vmh.psnService.customizedWorkItem(workItemId, vm.model).then(function () {
                 ngDialog.close("#work-item-custom.html");
+                vmh.alertSuccess('自定义模板设置成功', false);
             });
         }
         function cancel() {

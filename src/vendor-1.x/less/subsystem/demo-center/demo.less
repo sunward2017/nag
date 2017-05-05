@@ -1,0 +1,54 @@
+/* ========================================================================
+   Component: nursing-station Created by zppro on 17-5-4.
+ ========================================================================== */
+
+.ngdialog.ngdialog-theme-default.ngdialog-backfiller-demo-picker{
+  .ngdialog-content {
+    width: 800px;
+    min-height: 300px;
+    background-color: wheat;
+    max-width: inherit;
+    .ngdialog-title{
+      width:100%;
+      position: absolute;
+      height:40px;
+      line-height: 40px;
+      top: 0;
+      left:0;
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+      background-color: #34BCE6;
+      color:white;
+      font-size: 20px;
+      font-weight: bold;
+      font-family: 黑体;
+      text-indent: 10px;
+      i{
+        height:40px;
+        line-height: 40px;
+        font-size: 20px;
+        margin-right:5px;
+      }
+    }
+    .ngdialog-body.backfiller {
+      margin-top: 40px;
+      margin-bottom: 0;
+      overflow-y: auto;
+      .search-form{
+        padding:4px;
+      }
+      .search-content {
+        thead {
+          display: block;
+          border-bottom: solid 1px #DDDDDD;
+        }
+        tbody{
+          display: block;
+          overflow-y: auto;    /* Trigger vertical scroll    */
+          overflow-x: auto;  /* Hide the horizontal scroll */
+
+        }
+      }
+    }
+  }
+}

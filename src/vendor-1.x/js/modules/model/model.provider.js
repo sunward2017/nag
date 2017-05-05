@@ -529,7 +529,8 @@
                     elderlysByDistrictFloors: elderlysByDistrictFloors,
                     nursingStationCloseBedMonitorAlarm: nursingStationCloseBedMonitorAlarm,
                     nursingLevelsByAssessmentGrade: nursingLevelsByAssessmentGrade,
-                    nursingLevels:nursingLevels
+                    nursingLevels:nursingLevels,
+                    customizedWorkItem:customizedWorkItem
                 };
 
                 function roomStatusInfo(tenantId) {
@@ -788,6 +789,9 @@
 
                 function nursingLevels(tenantId){
                     return $http.post(baseUrl + 'nursingLevels', {tenantId: tenantId});
+                }
+                function customizedWorkItem(workItemId,customizedWorkItem){
+                    return $http.post(baseUrl + 'customizedWorkItem',{workItemId:workItemId,customizedWorkItem:customizedWorkItem})
                 }
             }]
         };

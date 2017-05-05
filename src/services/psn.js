@@ -864,7 +864,7 @@ module.exports = {
                                 return;
                             }
 
-                            console.log('nursingLevelId:', nursingLevelId);
+                            // console.log('nursingLevelId:', nursingLevelId);
                             if (nursingLevelId === (elderly.nursingLevelId || '').toString()) {
                                 this.body = app.wrapper.res.error({message: '护理级别没有变化!'});
                                 yield next;
@@ -4021,50 +4021,65 @@ module.exports = {
                             });
 
                             console.log('排班保存成功');
-                            var now = app.moment(),
-                                toSaveRow, exec_start, exec_end, nursingRecordsMatched, nursingRecordIds, batchConditions, batchModel, needUpdateNursingRecord;
-                            for (var i = 0, len = toSaveRows.length; i < len; i++) {
-                                toSaveRow = toSaveRows[i];
-                                exec_start = app.moment(toSaveRow.x_axis);
-                                exec_end = app.moment(exec_start).add(1, 'days');
 
-                                if (now.isAfter(exec_end)) {
-                                    needUpdateNursingRecord = true;
-                                } else if (now.isBefore(exec_start)) {
-                                    needUpdateNursingRecord = false;
-                                } else {
-                                    // now 与排班是在同一天,计算时间部分
-                                    exec_start = now;
-                                }
+                            var groupedSaveRows = app._.groupBy(toSaveRows, (o)=> {
+                                "use strict";
+                                return o.x_axis + '$' + o.y_axis + '$' + o.tenantId;
+                            });
 
-                                // console.log('exec_start:', exec_start.format('YYYY-MM-DD HH:mm'));
-                                // console.log('exec_end:', exec_end.format('YYYY-MM-DD HH:mm'));
-                                // console.log('roomId:', toSaveRow.y_axis);
-                                // console.log('tenantId', toSaveRow.tenantId);
+                            var isSyncToNursingRecord = true;
+                            if (isSyncToNursingRecord) {
+                                var now = app.moment(),
+                                    toSaveRow, assigned_workers, groupKey_x_axis, groupKey_y_axis, groupKeyTenantId,
+                                    exec_start, exec_end, nursingRecordsMatched, nursingRecordIds, batchConditions, batchModel, needUpdateNursingRecord;
+                                for(var groupKey in groupedSaveRows) {
+                                    console.log('key:', groupKey);
+                                    var arr = groupKey.split('$');
+                                    groupKey_x_axis = arr[0];
+                                    groupKey_y_axis = arr[1];
+                                    groupKeyTenantId = arr[2];
+                                    console.log(groupKey_x_axis, groupKey_y_axis, groupKeyTenantId);
+                                    assigned_workers = app._.map(groupedSaveRows[groupKey], (o) => {
+                                        return o.aggr_value;
+                                    });
+                                    console.log('assigned_workers:', assigned_workers);
 
-                                nursingRecordsMatched = yield app.modelFactory().model_query(app.models['psn_nursingRecord'], {
-                                    select: '_id',
-                                    where: {
-                                        exec_on: {'$gte': exec_start, '$lt': exec_end},
-                                        roomId: toSaveRow.y_axis,
-                                        tenantId: toSaveRow.tenantId
+                                    exec_start = app.moment(groupKey_x_axis);
+                                    exec_end = app.moment(exec_start).add(1, 'days');
+
+                                    if (now.isAfter(exec_end)) {
+                                        needUpdateNursingRecord = true;
+                                    } else if (now.isBefore(exec_start)) {
+                                        needUpdateNursingRecord = false;
+                                    } else {
+                                        // now 与排班是在同一天,计算时间部分
+                                        exec_start = now;
                                     }
-                                });
 
-                                if (nursingRecordsMatched.length > 0) {
-                                    nursingRecordIds = app._.map(nursingRecordsMatched, (o) => {
-                                        return o._id;
+                                    nursingRecordsMatched = yield app.modelFactory().model_query(app.models['psn_nursingRecord'], {
+                                        select: '_id',
+                                        where: {
+                                            exec_on: {'$gte': exec_start, '$lt': exec_end},
+                                            roomId: groupKey_y_axis,
+                                            tenantId: groupKeyTenantId
+                                        }
                                     });
 
-                                    console.log('bulkUpdate nursingRecordIds:', nursingRecordIds);
+                                    if (nursingRecordsMatched.length > 0) {
+                                        nursingRecordIds = app._.map(nursingRecordsMatched, (o) => {
+                                            return o._id;
+                                        });
 
-                                    batchConditions = {"_id": {"$in": nursingRecordIds}};
-                                    batchModel = {assigned_worker: toSaveRow.aggr_value};
+                                        console.log('bulkUpdate nursingRecordIds:', nursingRecordIds);
 
-                                    yield app.modelFactory().model_bulkUpdate(app.models['psn_nursingRecord'], {
-                                        conditions: batchConditions,
-                                        batchModel: batchModel
-                                    });
+                                        batchConditions = {"_id": {"$in": nursingRecordIds}};
+                                        batchModel = {assigned_workers: assigned_workers};
+
+                                        yield app.modelFactory().model_bulkUpdate(app.models['psn_nursingRecord'], {
+                                            conditions: batchConditions,
+                                            batchModel: batchModel
+                                        });
+                                    }
                                 }
                             }
 
@@ -4165,7 +4180,7 @@ module.exports = {
                                     console.log('bulkUpdate nursingRecordIds:', nursingRecordIds);
 
                                     batchConditions = {"_id": {"$in": nursingRecordIds}};
-                                    batchModel = {$unset: {assigned_worker: 1}};
+                                    batchModel = {$unset: {assigned_workers: 1}};
 
                                     yield app.modelFactory().model_bulkUpdate(app.models['psn_nursingRecord'], {
                                         conditions: batchConditions,
@@ -4243,50 +4258,65 @@ module.exports = {
                             });
 
                             console.log('排班模版导入成功');
-                            var now = app.moment(),
-                                toSaveRow, exec_start, exec_end, nursingRecordsMatched, nursingRecordIds, batchConditions, batchModel, needUpdateNursingRecord;
-                            for (var i = 0, len = toSaveRows.length; i < len; i++) {
-                                toSaveRow = toSaveRows[i];
-                                exec_start = app.moment(toSaveRow.x_axis);
-                                exec_end = app.moment(exec_start).add(1, 'days');
 
-                                if (now.isAfter(exec_end)) {
-                                    needUpdateNursingRecord = true;
-                                } else if (now.isBefore(exec_start)) {
-                                    needUpdateNursingRecord = false;
-                                } else {
-                                    // now 与排班是在同一天,计算时间部分
-                                    exec_start = now;
-                                }
+                            var groupedSaveRows = app._.groupBy(toSaveRows, (o)=> {
+                                "use strict";
+                                return o.x_axis + '$' + o.y_axis + '$' + o.tenantId;
+                            });
 
-                                // console.log('exec_start:', exec_start.format('YYYY-MM-DD HH:mm'));
-                                // console.log('exec_end:', exec_end.format('YYYY-MM-DD HH:mm'));
-                                // console.log('roomId:', toSaveRow.y_axis);
-                                // console.log('tenantId', toSaveRow.tenantId);
+                            var isSyncToNursingRecord = true;
+                            if (isSyncToNursingRecord) {
+                                var now = app.moment(),
+                                    toSaveRow, assigned_workers, groupKey_x_axis, groupKey_y_axis, groupKeyTenantId,
+                                    exec_start, exec_end, nursingRecordsMatched, nursingRecordIds, batchConditions, batchModel, needUpdateNursingRecord;
+                                for(var groupKey in groupedSaveRows) {
+                                    console.log('key:', groupKey);
+                                    var arr = groupKey.split('$');
+                                    groupKey_x_axis = arr[0];
+                                    groupKey_y_axis = arr[1];
+                                    groupKeyTenantId = arr[2];
+                                    console.log(groupKey_x_axis, groupKey_y_axis, groupKeyTenantId);
+                                    assigned_workers = app._.map(groupedSaveRows[groupKey], (o) => {
+                                        return o.aggr_value;
+                                    });
+                                    console.log('assigned_workers:', assigned_workers);
 
-                                nursingRecordsMatched = yield app.modelFactory().model_query(app.models['psn_nursingRecord'], {
-                                    select: '_id',
-                                    where: {
-                                        exec_on: {'$gte': exec_start, '$lt': exec_end},
-                                        roomId: toSaveRow.y_axis,
-                                        tenantId: toSaveRow.tenantId
+                                    exec_start = app.moment(groupKey_x_axis);
+                                    exec_end = app.moment(exec_start).add(1, 'days');
+
+                                    if (now.isAfter(exec_end)) {
+                                        needUpdateNursingRecord = true;
+                                    } else if (now.isBefore(exec_start)) {
+                                        needUpdateNursingRecord = false;
+                                    } else {
+                                        // now 与排班是在同一天,计算时间部分
+                                        exec_start = now;
                                     }
-                                });
 
-                                if (nursingRecordsMatched.length > 0) {
-                                    nursingRecordIds = app._.map(nursingRecordsMatched, (o) => {
-                                        return o._id;
+                                    nursingRecordsMatched = yield app.modelFactory().model_query(app.models['psn_nursingRecord'], {
+                                        select: '_id',
+                                        where: {
+                                            exec_on: {'$gte': exec_start, '$lt': exec_end},
+                                            roomId: groupKey_y_axis,
+                                            tenantId: groupKeyTenantId
+                                        }
                                     });
 
-                                    console.log('bulkUpdate nursingRecordIds:', nursingRecordIds);
+                                    if (nursingRecordsMatched.length > 0) {
+                                        nursingRecordIds = app._.map(nursingRecordsMatched, (o) => {
+                                            return o._id;
+                                        });
 
-                                    batchConditions = {"_id": {"$in": nursingRecordIds}};
-                                    batchModel = {assigned_worker: toSaveRow.aggr_value};
+                                        console.log('bulkUpdate nursingRecordIds:', nursingRecordIds);
 
-                                    yield app.modelFactory().model_bulkUpdate(app.models['psn_nursingRecord'], {
-                                        conditions: batchConditions,
-                                        batchModel: batchModel
-                                    });
+                                        batchConditions = {"_id": {"$in": nursingRecordIds}};
+                                        batchModel = {assigned_workers: assigned_workers};
+
+                                        yield app.modelFactory().model_bulkUpdate(app.models['psn_nursingRecord'], {
+                                            conditions: batchConditions,
+                                            batchModel: batchModel
+                                        });
+                                    }
                                 }
                             }
 
@@ -4321,6 +4351,8 @@ module.exports = {
                             app._.each(toSaveRows, (o) => {
                                 o.tenantId = tenantId
                             });
+
+                            console.log('toSaveRows:', toSaveRows);
 
                             var nursingScheduleTemplate = yield app.modelFactory().model_one(app.models['psn_nursingScheduleTemplate'], {
                                 where: {
@@ -4498,7 +4530,7 @@ module.exports = {
                     return function*(next) {
                         try {
                             var workItemId = this.request.body.workItemId;
-                            console.log("workItemId",workItemId)
+                            // console.log("workItemId",workItemId)
                             var rows = yield app.modelFactory().model_read(app.models['psn_workItem'],workItemId);
                             if(!rows){
                                 this.body = app.wrapper.res.error({ message: '无法找到工作项目!' });
@@ -4668,6 +4700,59 @@ module.exports = {
                     };
                 }
             },
+            /**********************自定义工作项目******************************/
+            {
+                method: 'customizedWorkItem',
+                verb: 'post',
+                url: this.service_url_prefix + "/customizedWorkItem",
+                handler: function (app, options) {
+                    return function* (next) {
+                        try {
+                            var workItemId = this.request.body.workItemId,newWorkItemId;
+                            // console.log("<<<workItemId", workItemId);
+                            var customizedWorkItem = this.request.body.customizedWorkItem;
+                            // console.log(">>>>>customizeWorkItem", customizedWorkItem);
+                            var workItem = yield app.modelFactory().model_read(app.models['psn_workItem'], workItemId);
+                            // console.log('<<<<workItem', workItem);
+                            if (!workItem.customize_flag) {
+                                delete customizedWorkItem._id;
+                                customizedWorkItem.customize_flag = true;
+                                customizedWorkItem.name+="+";
+                                yield app.modelFactory().model_create(app.models['psn_workItem'], customizedWorkItem);
+                            } else {
+                                workItem = app._.extend(workItem, customizedWorkItem);
+                                yield workItem.save();
+                            }
+                            var elderlyId = this.request.body.customizedWorkItem.elderlyId;
+                            var tenantId = this.request.body.customizedWorkItem.tenantId;
+                            var elderlyNursingPlan = yield app.modelFactory().model_one(app.models['psn_nursingPlan'], {
+                                select: 'work_items',
+                                where: {
+                                    status: 1,
+                                    elderlyId: elderlyId,
+                                    tenantId: tenantId
+                                }
+                            });
+                            // console.log("elderlyNursingPlan",elderlyNursingPlan);
+                            if (elderlyNursingPlan && elderlyNursingPlan.work_items) {
+
+                                elderlyNursingPlan.work_items = elderlyNursingPlan.work_items.filter(function (item) {
+                                    return item.workItemId !== workItemId;
+                                });
+                                // console.log("elderlyNursingPlan",elderlyNursingPlan);
+                                yield elderlyNursingPlan.save();
+                            }
+
+                            this.body = app.wrapper.res.default();
+                        }catch(e){
+                            console.log(e);
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
             /**********************护理计划执行(护理记录)*****************************/
             {
                 method: 'nursingRecordGenerate',
@@ -4676,7 +4761,7 @@ module.exports = {
                 handler: function (app, options) {
                     return function*(next) {
                         var tenant, elderly, elderlyRoomValue, roomId, nursingPlanItems, nursingPlanItem, workItems, workItem,
-                            nursingRecord, now, gen_batch_no, nursingWorkerScheduleItem, exec_date, exec_on, exec_date_string, remind_on;
+                            nursingRecord, now, gen_batch_no, nursingWorkerScheduleItems, exec_date, exec_on, exec_date_string, remind_on;
                         var elderlyMapRoom = {},
                             nursingRecordsToSave = [],
                             nursingRecordToSave, work_item_repeat_values, allEdlerlyIds, allElderly, nursingRecordExist,
@@ -4741,7 +4826,7 @@ module.exports = {
                                     }
                                 });
                             }
-
+                            // console.log('nursingPlanItems',nursingPlanItems);
                             if (nursingPlanItems.length) {
                                 now = app.moment();
                                 gen_batch_no = yield app.sequenceFactory.getSequenceVal(app.modelVariables.SEQUENCE_DEFS.CODE_OF_NURSING_RECORD);
@@ -4749,7 +4834,6 @@ module.exports = {
                                 for (var i = 0, len = nursingPlanItems.length; i < len; i++) {
                                     nursingPlanItem = nursingPlanItems[i];
                                     elderlyRoomValue = elderlyMapRoom[nursingPlanItem.elderlyId];
-                                    // console.log(nursingPlanItem.elderlyId);
                                     nursingRecord = {
                                         elderlyId: nursingPlanItem.elderlyId,
                                         elderly_name: nursingPlanItem.elderly_name,
@@ -4759,6 +4843,7 @@ module.exports = {
                                         tenantId: tenantId
                                     }
                                     workItems = nursingPlanItem.work_items;
+                                    // console.log("workItems",workItems)
                                     for (var j = 0, len2 = workItems.length; j < len2; j++) {
                                         workItem = workItems[j];
                                         remind_max = workItem.remind_times || 1;
@@ -4791,8 +4876,7 @@ module.exports = {
                                         if (workItem.repeat_type == DIC.D0103.AS_NEEDED) {
                                             //按需工作不需要提醒
                                             nursingRecord.exec_on = app.moment(app.moment().format('YYYY-MM-DD') + " 23:59:59");
-                                            // nursingRecord.assigned_worker = null; // 待补
-                                            nursingRecordsToSave.push(app._.extend({}, nursingRecord));
+                                            nursingRecordsToSave.push(app._.extend({assigned_workers: []}, nursingRecord));
                                         } else if (workItem.repeat_type == DIC.D0103.TIME_IN_DAY) {
                                             exec_date_string = now.format('YYYY-MM-DD');
                                             if (workItem.repeat_values.length > 0) {
@@ -4812,7 +4896,7 @@ module.exports = {
                                                                 nursingRecord.remind_on.push(app.moment(remind_start.add(remind_step * remind_count, 'minutes')));
                                                             }
                                                         }
-                                                        nursingRecordsToSave.push(app._.extend({}, nursingRecord));
+                                                        nursingRecordsToSave.push(app._.extend({assigned_workers: []}, nursingRecord));
                                                     }
                                                 });
                                             } else {
@@ -4833,7 +4917,7 @@ module.exports = {
                                                         nursingRecord.remind_on.push(app.moment(app.moment(remind_start).add(remind_step * remind_count, 'minutes')));
                                                     }
                                                 }
-                                                nursingRecordsToSave.push(app._.extend({}, nursingRecord));
+                                                nursingRecordsToSave.push(app._.extend({assigned_workers: []}, nursingRecord));
                                             }
                                         } else if (workItem.repeat_type == DIC.D0103.DAY_IN_WEEK) {
                                             if (workItem.repeat_values) {
@@ -4858,7 +4942,7 @@ module.exports = {
                                                                     nursingRecord.remind_on.push(app.moment(app.moment(remind_start).add(remind_step * remind_count, 'minutes')));
                                                                 }
                                                             }
-                                                            nursingRecordsToSave.push(app._.extend({}, nursingRecord));
+                                                            nursingRecordsToSave.push(app._.extend({assigned_workers: []}, nursingRecord));
                                                             break;
                                                         }
                                                     }
@@ -4882,7 +4966,7 @@ module.exports = {
                                                                     nursingRecord.remind_on.push(app.moment(app.moment(remind_start).add(remind_step * remind_count, 'minutes')));
                                                                 }
                                                             }
-                                                            nursingRecordsToSave.push(app._.extend({}, nursingRecord));
+                                                            nursingRecordsToSave.push(app._.extend({assigned_workers: []}, nursingRecord));
                                                             break;
                                                         }
                                                     }
@@ -4902,7 +4986,8 @@ module.exports = {
                                     // console.log('exec_start:', exec_start.format('YYYY-MM-DD HH:mm'));
                                     // console.log('exec_end:', exec_end.format('YYYY-MM-DD HH:mm'));
                                     // console.log('elderlyRoomValue:', elderlyRoomValue);
-                                    nursingWorkerScheduleItem = yield app.modelFactory().model_one(app.models['psn_nursingSchedule'], {
+                                    // console.log('nursingRecordToSave.NAME:', nursingRecordToSave.name,elderlyRoomValue.roomId, exec_start.format('YYYY-MM-DD HH:mm:ss'), exec_end.format('YYYY-MM-DD HH:mm:ss'));
+                                    nursingWorkerScheduleItems = yield app.modelFactory().model_query(app.models['psn_nursingSchedule'], {
                                         select: 'aggr_value',
                                         where: {
                                             status: 1,
@@ -4911,9 +4996,13 @@ module.exports = {
                                             tenantId: tenantId
                                         }
                                     });
-                                    if (nursingWorkerScheduleItem) {
-                                        nursingRecordToSave.assigned_worker = nursingWorkerScheduleItem.aggr_value;
-                                        findNuringWorkerCount++;
+                                    if (nursingWorkerScheduleItems.length > 0) {
+                                        for (var j = 0, workerLen = nursingWorkerScheduleItems.length; j < workerLen; j++) {
+
+                                            nursingRecordToSave.assigned_workers.push(nursingWorkerScheduleItems[j].aggr_value);
+                                            findNuringWorkerCount++;
+                                        }
+                                        // console.log('nursingRecordToSave.assigned_workers:', nursingRecordToSave.assigned_workers);
                                     }
                                 }
                                 if (findNuringWorkerCount == 0) {
@@ -4936,7 +5025,7 @@ module.exports = {
                                     });
                                 }
                             }
-
+                            // console.log("warningMsg",warningMsg);
                             this.body = app.wrapper.res.default(warningMsg);
                         } catch (e) {
                             console.log(e);
@@ -4963,7 +5052,7 @@ module.exports = {
 
 
                             var tenant, elderly, elderlyRoomValue, roomId, nursingPlanItems, nursingPlanItem, workItems, workItem,
-                                nursingRecord, now, gen_batch_no, nursingWorkerScheduleItem, exec_date, exec_on, exec_date_string, remind_on;
+                                nursingRecord, now, gen_batch_no, nursingWorkerScheduleItems, exec_date, exec_on, exec_date_string, remind_on;
                             var elderlyMapRoom = {},
                                 nursingRecordsToSave = [],
                                 nursingRecordToSave, work_item_repeat_values, allEdlerlyIds, allElderly, nursingRecordExist,
@@ -5074,6 +5163,7 @@ module.exports = {
                                     category: workItem.work_item_category
                                 };
 
+
                                 var str = workItem.voice_template || '';
                                 if(str) {
                                     str = str.replace(/\${老人姓名}/g, nursingPlanItem.elderly_name || '')
@@ -5090,8 +5180,7 @@ module.exports = {
                                 if (workItem.repeat_type == DIC.D0103.AS_NEEDED) {
                                     //按需工作不需要提醒
                                     nursingRecord.exec_on = app.moment(app.moment().format('YYYY-MM-DD') + " 23:59:59");
-                                    // nursingRecord.assigned_worker = null; // 待补
-                                    nursingRecordsToSave.push(app._.extend({}, nursingRecord));
+                                    nursingRecordsToSave.push(app._.extend({assigned_workers: []}, nursingRecord));
                                 } else if (workItem.repeat_type == DIC.D0103.TIME_IN_DAY) {
                                     //Whether the current record is the last one
                                     var currentAllRecords = yield app.modelFactory().model_query(app.models['psn_nursingRecord'], {
@@ -5134,7 +5223,7 @@ module.exports = {
                                                         nursingRecord.remind_on.push(app.moment(app.moment(remind_start).add(remind_step * remind_count, 'minutes')));
                                                     }
                                                 }
-                                                nursingRecordsToSave.push(app._.extend({}, nursingRecord));
+                                                nursingRecordsToSave.push(app._.extend({assigned_workers: []}, nursingRecord));
 
                                             });
                                         } else {
@@ -5149,7 +5238,7 @@ module.exports = {
                                                     nursingRecord.remind_on.push(app.moment(app.moment(remind_start).add(remind_step * remind_count, 'minutes')));
                                                 }
                                             }
-                                            nursingRecordsToSave.push(app._.extend({}, nursingRecord));
+                                            nursingRecordsToSave.push(app._.extend({assigned_workers: []}, nursingRecord));
                                         }
                                     }
 
@@ -5172,7 +5261,7 @@ module.exports = {
                                                             nursingRecord.remind_on.push(app.moment(app.moment(remind_start).add(remind_step * remind_count, 'minutes')));
                                                         }
                                                     }
-                                                    nursingRecordsToSave.push(app._.extend({}, nursingRecord));
+                                                    nursingRecordsToSave.push(app._.extend({assigned_workers: []}, nursingRecord));
                                                     break;
                                                 }
                                             }
@@ -5197,7 +5286,7 @@ module.exports = {
                                                             nursingRecord.remind_on.push(app.moment(app.moment(remind_start).add(remind_step * remind_count, 'minutes')));
                                                         }
                                                     }
-                                                    nursingRecordsToSave.push(app._.extend({}, nursingRecord));
+                                                    nursingRecordsToSave.push(app._.extend({assigned_workers: []}, nursingRecord));
                                                     break;
                                                 }
                                             }
@@ -5212,7 +5301,7 @@ module.exports = {
                                 elderlyRoomValue = elderlyMapRoom[nursingRecordToSave.elderlyId];
                                 exec_start = app.moment(nursingRecordToSave.exec_on.format('YYYY-MM-DD'));
                                 exec_end = app.moment(exec_start).add(1, 'days');
-                                nursingWorkerScheduleItem = yield app.modelFactory().model_one(app.models['psn_nursingSchedule'], {
+                                nursingWorkerScheduleItems = yield app.modelFactory().model_query(app.models['psn_nursingSchedule'], {
                                     select: 'aggr_value',
                                     where: {
                                         status: 1,
@@ -5221,9 +5310,11 @@ module.exports = {
                                         tenantId: tenantId
                                     }
                                 });
-                                if (nursingWorkerScheduleItem) {
-                                    nursingRecordToSave.assigned_worker = nursingWorkerScheduleItem.aggr_value;
-                                    findNuringWorkerCount++;
+                                if (nursingWorkerScheduleItems.length > 0) {
+                                    for (var j = 0, workerLen = nursingWorkerScheduleItems.length; j < workerLen; j++) {
+                                        nursingRecordToSave.assigned_workers.push(nursingWorkerScheduleItems[j].aggr_value);
+                                        findNuringWorkerCount++;
+                                    }
                                 }
                             }
                             if (findNuringWorkerCount == 0) {
@@ -5275,14 +5366,14 @@ module.exports = {
 
                             var today = app.moment(app.moment().format('YYYY-MM-DD') + " 00:00:00");
                             var rows = yield app.modelFactory().model_query(app.models['psn_nursingRecord'], {
-                                select: 'exec_on executed_flag name description duration assigned_worker confirmed_flag confirmed_on workItemId',
+                                select: 'exec_on executed_flag name description duration assigned_workers confirmed_flag confirmed_on workItemId',
                                 where: {
                                     elderlyId: elderlyId,
                                     exec_on: {$gte: today.toDate(), $lte: today.add(1, 'days').toDate()},
                                     tenantId: tenantId
                                 },
                                 sort: 'exec_on'
-                            }).populate('assigned_worker').populate('workItemId');
+                            }).populate('assigned_workers').populate('workItemId');
                             // console.log(rows);
                             this.body = app.wrapper.res.rows(rows);
                         } catch (e) {

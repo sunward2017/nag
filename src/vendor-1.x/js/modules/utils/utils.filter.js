@@ -9,6 +9,7 @@
     angular
         .module('app.utils')
         .filter('unescapeHTML', unescapeHTMLFilter)
+        .filter('safeArrayMember', safeArrayMember)
     ;
 
 
@@ -18,6 +19,10 @@
         return ViewUtils.unescapeHTML;
     }
 
+    safeArrayMember.$inject = ['ViewUtils'];
 
+    function safeArrayMember(ViewUtils) {
+        return ViewUtils.safeArrayMember;
+    }
 
 })();

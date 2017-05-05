@@ -18,31 +18,41 @@
             restrict: 'EA',
             templateUrl: 'backfiller-default-render.html',
             link: link,
-            scope: {nameInput:'@', valInput:'@', readonly:'=', pickIcon:"@", fetchData: '=', onSelect: '&', model: '=ngModel'}
+            scope: {readonly:'=', inputName:'@', pickerIcon: '@', pickerTitle: '@', pickerClass:'@', fetchColumns: '=', fetchRows: '=', onSelect: '&', onCompareEqual:'&', model: '=ngModel'}
         };
         return directive;
 
         function link(scope, element, attrs) {
 
-            var data = scope.fetchData;
+            var data = scope.fetchRows;
             if (!data) {
                 return;
             }
-            var option = scope.$eval(attrs.option) || {};
-            var selectItemFormat = option.selectItemFormat || 'id';
-            var valueKey = scope.valueKey = option.valueKey || 'id';
-            var textKey =  scope.textKey = option.textKey || 'name';
+            var columns = scope.fetchColumns || [];
+            console.log('====================', columns);
 
-            scope.icon = scope.pickIcon || 'glyphicon-search';
+            var valueKey = scope.valueKey = attrs.valueKey || 'object';
+            var textKey =  scope.textKey = attrs.textKey || 'name';
+            var pickerUrl =  attrs.pickerUrl || 'dlg-backfiller-default-pick.html';
+            var pickerController = attrs.pickerController || 'BackfillerDefaultPickDialogController';
+            var useCustomCompareEqualFunc =  !!attrs.onCompareEqual;
 
-            console.log('scope.pickIcon',scope.pickIcon);
-            
+            var defaultCompareEqualFunc = function compareEqual(one, other) {return one === other;};
 
-            scope.$watch("fetchData",function(newValue,oldValue) {
+
+            scope.icon = scope.pickerIcon || 'glyphicon-search';
+            scope.formName = scope.inputName || 'backfiller';
+            var title = scope.pickerTitle || '待选数据';
+            var pickerDialogClass = scope.pickerClass || 'ngdialog-backfiller-default-picker';
+            console.log('pickerDialogClass:', pickerDialogClass)
+
+            console.log('pickerController', pickerController);
+
+            scope.$watch("fetchRows",function(newValue,oldValue) {
                 if (newValue != oldValue) {
                     $timeout(function () {
-                        $q.when(newValue).then(function (items) {
-                            scope.items = items;
+                        $q.when(newValue).then(function (rows) {
+                            scope.rows = rows;
                             setShowText();
                             console.log('backfill reload data end');
                         });
@@ -73,18 +83,29 @@
                    return;
                 }
 
-                console.log('open pick dialog...')
+                console.log('open pick dialog...');
                 ngDialog.open({
-                    template: 'backfiller-default-pick.html',
-                    controller: 'BackfillerDefaultPickController',
+                    template: pickerUrl,
+                    controller: pickerController,
+                    className: 'ngdialog-theme-default ' + pickerDialogClass,
+                    data: {
+                        title: title,
+                        columns: columns,
+                        rows: scope.rows,
+                        translatePath: function (key) {
+                            return pickerUrl + '.' + key;
+                        }
+                    }
                 }).closePromise.then(function (ret) {
                     if(ret.value!='$document' && ret.value!='$closeButton' && ret.value!='$escape' ) {
                         console.log(ret.value);
-                        var item = ret.value;
-                        scope.model = selectItemFormat == 'object' ? item : item[valueKey];
-                        if (scope.onSelect) {
+                        var row = ret.value;
+                        scope.model = valueKey == 'object' ? row : row[valueKey];
+                        console.log(scope.model)
+                        setShowText();
+                        if (attrs.onSelect) {
                             $timeout(function () {
-                                scope.onSelect({item: item});
+                                scope.onSelect({row: row});
                             }, 0);
                         }
                     }
@@ -92,9 +113,8 @@
 
             };
 
-            $q.when(data).then(function (items) {
-                scope.items = items;
-                console.log('backfiller:',scope.items);
+            $q.when(data).then(function (rows) {
+                scope.rows = rows;
                 setShowText();
             });
 
@@ -102,17 +122,26 @@
 
             function setShowText() {
                 scope.text = '';
-                if (scope.items) {
-                    for (var i = 0; i < scope.items.length; i++) {
-                        if (selectItemFormat == 'object') {
-                            if (scope.model && scope.items[i] == scope.model) { //|| (valueKey && scope.items[i][valueKey] == scope.model[valueKey])
-                                scope.text = scope.items[i][textKey];
-                                break;
+                if (scope.rows) {
+                    for (var i = 0; i < scope.rows.length; i++) {
+                        if (valueKey == 'object') {
+                            if (scope.model) {
+                                var isEqual;
+                                if(useCustomCompareEqualFunc) {
+                                    isEqual = scope.onCompareEqual({one: scope.rows[i], other: scope.model});
+                                    console.log(isEqual);
+                                } else {
+                                    isEqual = defaultCompareEqualFunc(scope.rows[i], scope.model);
+                                }
+                                if(isEqual) {
+                                    scope.text = scope.rows[i][textKey];
+                                    break;
+                                }
                             }
                         }
                         else {
-                            if (scope.items[i][valueKey] == scope.model) {
-                                scope.text = scope.items[i][textKey];
+                            if (defaultCompareEqualFunc(scope.rows[i][valueKey], scope.model)) {
+                                scope.text = scope.rows[i][textKey];
                                 break;
                             }
                         }

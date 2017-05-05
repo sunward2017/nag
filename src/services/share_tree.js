@@ -523,7 +523,8 @@ module.exports = {
                             var nursingWorkers = yield app.modelFactory().model_query(app.models['psn_nursingWorker'], {
                                 where: {
                                     status: 1,
-                                    stop_flag: false
+                                    stop_flag: false,
+                                    tenantId: tenantId
                                 },
                                 select: data.select || 'name'
                             });
@@ -540,6 +541,84 @@ module.exports = {
                                 return nursingWorker;
                             });
                             this.body = app.wrapper.res.rows(rows);
+
+                        } catch (e) {
+                            self.logger.error(e);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
+            {
+                method: 'fetch-T3013',
+                verb: 'post',
+                url: this.service_url_prefix + "/T3013", // 护理小组+护工树
+                handler: function (app, options) {
+                    return function * (next) {
+                        try {
+
+                            var data = this.request.body;
+                            var tenantId = data.where.tenantId;
+
+
+                            var nursingGroups = yield app.modelFactory().model_query(app.models['psn_nursingGroup'], {
+                                where: {
+                                    status: 1,
+                                    tenantId: tenantId
+                                }, select: 'name members'
+                            });
+
+                            var nursingWorkers = yield app.modelFactory().model_query(app.models['psn_nursingWorker'], {
+                                where: {
+                                    status: 1,
+                                    stop_flag: false,
+                                    tenantId: tenantId
+                                },
+                                select: 'name'
+                            });
+
+                            var findIndex, nursingWorker;
+
+                            var nursingGroupNodes = app._.compact(nursingGroups.map((o) => {
+                                "use strict";
+                                var includedNursingWorkers = []
+                                for(var i=0, len = o.members.length;i<len;i++) {
+                                    findIndex = app._.findIndex(nursingWorkers, (o1) => {
+                                        return o1.id == o.members[i].nursingWorkerId.toString();
+                                    });
+
+                                    if (findIndex != -1) {
+                                        nursingWorker = nursingWorkers.splice(findIndex, 1)[0];
+                                        includedNursingWorkers.push({
+                                            _id: nursingWorker.id,
+                                            id: nursingWorker.id,
+                                            name: nursingWorker.name
+                                        });
+                                    }
+                                }
+
+                                if(includedNursingWorkers.length > 0) {
+                                    var nursingGroupNode = {_id: o.id, name: o.name};
+                                    nursingGroupNode.children = includedNursingWorkers;
+                                    return nursingGroupNode;
+                                } else {
+                                    return null;
+                                }
+                            }));
+
+                            if(nursingWorkers.length > 0) {
+                                var nursingGroupIncludeOthers = {_id: '$nursingGroupIncludeOthers', name: '未分组'};
+                                nursingGroupIncludeOthers.children = nursingWorkers.map((o)=> {
+                                    return {_id: o.id, id: o.id, name: o.name};
+                                });
+
+                                nursingGroupNodes.push(nursingGroupIncludeOthers);
+                            }
+
+                            console.log('nursingGroupNodes:',nursingGroupNodes);
+
+                            this.body = app.wrapper.res.rows(nursingGroupNodes);
 
                         } catch (e) {
                             self.logger.error(e);

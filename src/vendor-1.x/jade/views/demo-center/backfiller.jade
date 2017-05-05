@@ -1,6 +1,57 @@
+script(type='text/ng-template', id="dlg-backfiller-demo-pick.html")
+    .ngdialog-title
+        i.glyphicon.glyphicon-info-sign
+        | {{ vm.translatePath('DLG-FETCH-DATA-GRID-TITLE') | translate }}
+    .ngdialog-body.backfiller
+        .search-form
+            .input-group.page-search
+                label.input-group-addon {{'grid.LABEL-SEARACH'|translate}}
+                input.form-control(type="text",ng-model="vm.filter.$")
+        .search-content
+            .panel.panel-default.panel-grid
+                table.grid.table.table-bordered.table-hover.table-striped
+                    tbody
+                        tr(ng-repeat="row in vm.rows|filter:vm.filter|paging:vm", ng-dblclick="vm.pickOne(row)")
+                            td(width="80") {{::row.order }}
+                            td(width="500") {{::row.name}}
+                            td(width="80") {{::row.value}}
+                .panel-footer
+                    .row
+                        .col-md-12
+                            pagination.pagination-sm.pull-right(total-items="vm.page.totals",ng-model="vm.page.no",max-size="5",items-per-page="vm.page.size",boundary-links="true")
+script(type='text/ng-template', id="dlg-backfiller-test-pick.html")
+    .ngdialog-title
+        i.glyphicon.glyphicon-info-sign
+        | {{ vm.title }}
+    .ngdialog-body.backfiller
+        .search-form
+            .input-group.page-search
+                label.input-group-addon {{'grid.LABEL-SEARACH'|translate}}
+                input.form-control(type="text",ng-model="vm.filter.$")
+        .search-content
+            .panel.panel-default.panel-grid
+                table.grid.table.table-bordered.table-hover.table-striped
+                    thead
+                        tr
+                            th.text-center(ng-repeat="column in vm.columns",width="{{column|width}}") {{column.label}}
+                    tbody
+                        tr(ng-repeat="row in vm.rows|filter:vm.filter|paging:vm", ng-dblclick="vm.pickOne(row)")
+                            td(ng-repeat="column in vm.columns", width="{{column|width}}") {{::row[column.name] }}
+                .panel-footer
+                    .row
+                        .col-md-12
+                            pagination.pagination-sm.pull-right(total-items="vm.page.totals",ng-model="vm.page.no",max-size="5",items-per-page="vm.page.size",boundary-links="true")
 .col-xs-6
-    .backfiller(backfiller,ng-model="vm.period",fetch-data="vm.fetchDataPromise", on-select="vm.onSelect(item)")
-    //.dropdown(s-dropdown,s-dropdown-option="{selectItemFormat:'object'}",is-button,ng-model="vm.period",s-dropdown-data="vm.dropdownDataPromise",dropdown-template-url='dropdown-demo-renderer.html', on-select="vm.onSelect(item)")
+    //.backfiller(backfiller,ng-model="vm.period", fetch-data="vm.fetchDataPromise", picker-url="dlg-backfiller-demo-pick.html", picker-controller="BackfillerDemoPickDialogController", pickerClass="ngdialog-backfiller-demo-picker", on-select="vm.onSelect(row)", on-compare-equal="vm.onCompareEqual(one, other)") // object customCompareEqual
+    //.backfiller(backfiller,ng-model="vm.period", fetch-data="vm.fetchDataPromise", picker-url="dlg-backfiller-demo-pick.html", picker-controller="BackfillerDemoPickDialogController", pickerClass="ngdialog-backfiller-demo-picker", on-select="vm.onSelect(row)") //object defaultCompareEqual
+    .backfiller(backfiller,ng-model="vm.period", fetch-rows="vm.fetchRowsPromise", fetch-columns="vm.fetchColumnsPromise", picker-title="D1013数据", picker-url="dlg-backfiller-test-pick.html", picker-controller="BackfillerDemoPickDialogController", picker-class="ngdialog-backfiller-demo-picker", value-key="value", on-select="vm.onSelect(row)") //string
     div selected:{{vm.period}}
     div on select :{{vm.selected}}
     button.btn(ng-click="vm.makeEmpty()") 清空选择
+.col-xs-6
+    //.backfiller(backfiller,ng-model="vm.period", fetch-data="vm.fetchDataPromise", on-select="vm.onSelect(row)", on-compare-equal="vm.onCompareEqual(one, other)") // object customCompareEqual
+    //.backfiller(backfiller,ng-model="vm.period", fetch-data="vm.fetchDataPromise", on-select="vm.onSelect(row)") //object defaultCompareEqual
+    .backfiller(backfiller,ng-model="vm.period2", fetch-rows="vm.fetchRowsPromise2", fetch-columns="vm.fetchColumnsPromise2", picker-title="D1005数据", value-key="value", on-select="vm.onSelect2(row)") //string
+    div selected:{{vm.period2}}
+    div on select :{{vm.selected2}}
+    button.btn(ng-click="vm.makeEmpty2()") 清空选择

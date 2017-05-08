@@ -744,6 +744,75 @@
                     //, deps: helper.resolveFor2('ui.select')
                 }
             })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.MANAGE_CENTER + 'job-status', {
+                url: '/job-status',
+                abstract: true,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath(MODEL_VARIABLES.HEAD_TEMPLATES.MANAGE_CENTER),
+                        controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div>'
+                    }
+                }
+                , resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.MANAGE_CENTER + 'job-status.js')
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.MANAGE_CENTER + 'job-status.list', {
+                url: '/list/:action',
+                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.MANAGE_CENTER + 'job-status-list.html'),
+                access_level: AUTH_ACCESS_LEVELS.ADMIN,
+                controller: 'JobStatusGridController',
+                resolve: {
+                    entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.MANAGE_CENTER + 'job-status.list', {
+                        modelName: 'pub-jobStatus',
+                        //切换客户端还是服务端分页
+                        serverPaging: true,
+                        columns: [
+                            {
+                                label: '停用',
+                                name: 'stop_flag',
+                                type: 'bool',
+                                width: 40
+                            },
+                            {
+                                label: '作业编号',
+                                name: 'job_id',
+                                type: 'string',
+                                width: 120,
+                                sortable: true
+                            },
+                            {
+                                label: '作业名称',
+                                name: 'job_name',
+                                type: 'string',
+                                width: 120,
+                                sortable: true
+                            },
+                            {
+                                label: '作业规则',
+                                name: 'phone',
+                                type: 'string',
+                                width: 120,
+                                sortable: true
+                            },
+                            {
+                                label: '最后执行',
+                                name: 'last_exec_on',
+                                type: 'date',
+                                width: 80,
+                                sortable: true
+                            },
+                            {
+                                label: '',
+                                name: 'actions',
+                                sortable: false,
+                                width: 60
+                            }
+                        ]
+                    })
+                }
+            })
             .state(MODEL_VARIABLES.STATE_PREFIXS.MANAGE_CENTER + 'platform-user-manage', {
                 url: '/platform-user-manage',
                 abstract: true,

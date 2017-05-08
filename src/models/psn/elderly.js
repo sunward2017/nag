@@ -26,6 +26,7 @@ module.exports = function(ctx,name) {
             name: {type: String, required: true, maxlength: 20},
             avatar:{type: String},
             id_no: {type: String, required: true, minlength: 15, maxlength: 18},
+            social_security_no:{type: String},//社保卡号
             sex: {type: String, required: true, minlength: 1, maxlength: 1, enum: ctx._.rest(ctx.dictionary.keys["D1006"])},
             birthday: {type: Date, required: true},
             marriage: {type: String, required: true, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D1007"])},

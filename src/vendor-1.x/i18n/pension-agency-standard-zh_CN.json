@@ -47,6 +47,7 @@
         "TAB1-LABEL-ELDERLY-NAME": "老人姓名",
         "TAB1-PLACEHOLDER-ELDERLY-NAME": "张三",
         "TAB1-LABEL-ELDERLY-ID_NO": "身份证号",
+        "TAB1-LABEL-ELDERLY-SOCIAL_SECURITY_NO":"社保卡号",
         "TAB1-LABEL-ELDERLY-SEX": "性别",
         "TAB1-LABEL-ELDERLY-BIRTHDAY": "出生日期",
         "TAB1-PLACEHOLDER-ELDERLY-BIRTHDAY": "从身份证读取..",

@@ -48,9 +48,9 @@
                             .btn-group.work-item(ng-if="vm.aggrData[row.trackedKey]['elderly']['id'] && vm.aggrData[row.trackedKey]['elderly']['nursingLevelId']", ng-repeat="workItem in vm.workItemByElderly(vm.workItemMap[vm.aggrData[row.trackedKey]['elderly']['nursingLevelId']],vm.aggrData[row.trackedKey]['elderly']['id']) ")
                                 .checkbox.c-checkbox
                                     label
-                                        input(id="{{row.trackedKey + '$' +workItem.id}}",type='checkbox',ng-checked="vm.$selectAll[row.trackedKey]['workItems']", ng-disabled="!vm.$editings[row.trackedKey]['workItems']", ng-model="vm.work_items['A0001'][row.trackedKey + '$' + vm.aggrData[row.trackedKey]['elderly']['nursingLevelId']][workItem.id]" ng-change="vm.workItemChecked(row.trackedKey, workItem.id)")
+                                        input(id="{{row.trackedKey + '$' +workItem.id}}",type='checkbox', ng-disabled="!vm.$editings[row.trackedKey]['workItems']", ng-model="vm.work_items['A0001'][row.trackedKey + '$' + vm.aggrData[row.trackedKey]['elderly']['nursingLevelId']][workItem.id]" ng-change="vm.workItemChecked(row.trackedKey, workItem.id)")
                                         span.fa.fa-check
-                                label(for="{{row.trackedKey + '$' +workItem.id}}" ng-dblclick="vm.customizedWorkItem(workItem.id,vm.aggrData[row.trackedKey]['elderly']['id'])") {{ workItem.name }}
+                                label(for="{{row.trackedKey + '$' +workItem.id}}" ng-dblclick="vm.customizedWorkItem(workItem.id,vm.aggrData[row.trackedKey]['elderly']['id'],row.trackedKey)") {{ workItem.name }}
                         <!--用药-->        
                         td
                             .btn-group(ng-if="vm.aggrData[row.trackedKey]['elderly']['id']")

@@ -246,7 +246,7 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                         .col-md-10(ng-if="!vm.readonly")
                             .btn-group
                                 .btn.btn-primary(name='nursing_assessment_grade',ng-repeat='nursing_assessment_grade in vm.selectBinding.nursing_assessment_grades',ng-model='vm.elderlyModel.nursing_assessment_grade',ng-click='vm.setBindingNursingLevelsByAssessmentGrade(nursing_assessment_grade.value,nursing_assessment_grade.name)',btn-radio="nursing_assessment_grade.value",required='') {{nursing_assessment_grade.name}}
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'nursing_assessment_grade','required')") {{ "validator.REQUIRED" | translate}}
+                            //- span.text-danger(ng-show="utils.vinput(this.theForm,'nursing_assessment_grade','required')") {{ "validator.REQUIRED" | translate}}
                         .col-md-10(ng-if="vm.readonly")
                             .btn-group
                                 .btn.btn-primary.cursor-not-allowed(name='nursing_assessment_grade',ng-repeat='nursing_assessment_grade in vm.selectBinding.nursing_assessment_grades',ng-class="{'active':vm.elderlyModel.nursing_assessment_grade==nursing_assessment_grade.value}") {{nursing_assessment_grade.name}}
@@ -256,7 +256,7 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                         .col-md-10(ng-if="!vm.readonly")
                             .btn-group
                                 .btn.btn-primary(name='nursing_level',ng-disabled="!vm.elderlyModel.nursing_assessment_grade",ng-repeat='nursing_level in vm.selectBinding.nursing_levels',ng-model='vm.elderlyModel.nursingLevelId',ng-click='vm.setNursingLevel(nursing_level._id,nursing_level.name)',btn-radio="nursing_level._id",required='') {{nursing_level.name}}
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'nursing_level','required')") {{ "validator.REQUIRED" | translate}}
+                            //- span.text-danger(ng-show="utils.vinput(this.theForm,'nursing_level','required')") {{ "validator.REQUIRED" | translate}}
                          .col-md-10(ng-if="vm.readonly")
                             .btn-group
                                 .btn.btn-primary.cursor-not-allowed(name='nursing_level',ng-repeat='nursing_level in vm.selectBinding.nursing_levels',ng-class="{'active':vm.elderlyModel.nursingLevelId==nursing_level._id}") {{nursing_level.name}}

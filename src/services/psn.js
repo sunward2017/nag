@@ -4826,7 +4826,7 @@ module.exports = {
                                     }
                                 });
                             }
-                            // console.log('nursingPlanItems',nursingPlanItems);
+                            console.log('nursingPlanItems',nursingPlanItems);
                             if (nursingPlanItems.length) {
                                 now = app.moment();
                                 gen_batch_no = yield app.sequenceFactory.getSequenceVal(app.modelVariables.SEQUENCE_DEFS.CODE_OF_NURSING_RECORD);
@@ -4843,7 +4843,7 @@ module.exports = {
                                         tenantId: tenantId
                                     }
                                     workItems = nursingPlanItem.work_items;
-                                    // console.log("workItems",workItems)
+                                    console.log("workItems",workItems)
                                     for (var j = 0, len2 = workItems.length; j < len2; j++) {
                                         workItem = workItems[j];
                                         remind_max = workItem.remind_times || 1;
@@ -4879,7 +4879,7 @@ module.exports = {
                                             nursingRecordsToSave.push(app._.extend({assigned_workers: []}, nursingRecord));
                                         } else if (workItem.repeat_type == DIC.D0103.TIME_IN_DAY) {
                                             exec_date_string = now.format('YYYY-MM-DD');
-                                            if (workItem.repeat_values.length > 0) {
+                                            if (workItem.repeat_values && workItem.repeat_values.length > 0) {
                                                 // 每天某几个时刻执行,考虑到时间间隔比较近,因此将当天的全部生成
                                                 app._.each(workItem.repeat_values, (o) => {
                                                     // console.log(o);
@@ -5209,7 +5209,7 @@ module.exports = {
 
 
                                         // console.log("exec_date_string", exec_date_string);
-                                        if (workItem.repeat_values.length > 0) {
+                                        if (workItem.repeat_values && workItem.repeat_values.length > 0) {
                                             app._.each(workItem.repeat_values, (o) => {
 
                                                 nursingRecord.remind_on = [];

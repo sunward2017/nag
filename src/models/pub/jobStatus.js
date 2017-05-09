@@ -1,9 +1,8 @@
 /**
  * Created by zppro on 17-5-8.
- * 养老机构 护理机器人
+ * 平台管理 作业状态
  */
 var mongoose = require('mongoose');
-var D3009 = require('../../pre-defined/dictionary.json')['D3009'];
 
 module.isloaded = false;
 
@@ -16,7 +15,7 @@ module.exports = function(ctx,name) {
     else {
         module.isloaded = true;
 
-        var robotSchema = new mongoose.Schema({
+        var jobStatusSchema = new mongoose.Schema({
             check_in_time: {type: Date, default: Date.now},
             operated_on: {type: Date, default: Date.now},
             job_id: {type: String, required: true},
@@ -34,18 +33,11 @@ module.exports = function(ctx,name) {
             }
         });
 
-        robotSchema.virtual('robot_status_name').get(function () {
-            if (this.robot_status) {
-                return D3009[this.robot_status].name;
-            }
-            return '';
-        });
-
-        robotSchema.pre('update', function (next) {
+        jobStatusSchema.pre('update', function (next) {
             this.update({}, {$set: {operated_on: new Date()}});
             next();
         });
 
-        return mongoose.model(name, robotSchema, name);
+        return mongoose.model(name, jobStatusSchema, name);
     }
 }

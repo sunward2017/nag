@@ -791,7 +791,7 @@
                             },
                             {
                                 label: '作业规则',
-                                name: 'phone',
+                                name: 'job_rule',
                                 type: 'string',
                                 width: 120,
                                 sortable: true
@@ -811,6 +811,19 @@
                             }
                         ]
                     })
+                }
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.MANAGE_CENTER + 'job-status.details', {
+                url: '/details/:action/:_id',
+                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.MANAGE_CENTER + 'job-status-details.html'),
+                controller: 'JobStatusDetailsController',
+                access_level: AUTH_ACCESS_LEVELS.ADMIN,
+                resolve: {
+                    entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.MANAGE_CENTER + 'job-status.details', {
+                        modelName: 'pub-jobStatus',
+                        blockUI: true
+                    })
+                    //, deps: helper.resolveFor2('ui.select')
                 }
             })
             .state(MODEL_VARIABLES.STATE_PREFIXS.MANAGE_CENTER + 'platform-user-manage', {

@@ -1,0 +1,56 @@
+//
+   Created by zppro on 16-2-23.
+form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="vm.doSubmit()")
+    .panel
+        tabset(justified="true")
+            tab(active="vm.tab1.active")
+                tab-heading
+                    | {{ vm.viewTranslatePath('TAB1') | translate}}
+                    span.text-danger(title="{{'validator.FIELD-INVALID'|translate}}" , ng-show="utils.vtab('contentTab1')")
+                        i.glyphicon.glyphicon-minus-sign
+                div#contentTab1
+                    fieldset: .form-group
+                        <!--作业ID-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-JOB_ID') | translate}}:
+                        .col-md-10(ng-if="!vm.readonly")
+                            input.form-control(type='text', name='job_id',ng-model='vm.model.job_id',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-JOB_ID")|translate}}' ,required='')
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'job_id','required')") {{ "validator.REQUIRED" | translate}}
+                        .col-md-10(ng-if="vm.readonly")
+                            .form-readable {{vm.model.job_id}}
+                    fieldset: .form-group
+                        <!--作业名称-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-JOB_NAME') | translate}}:
+                        .col-md-10(ng-if="!vm.readonly")
+                            input.form-control(type='text', name='job_name',ng-model='vm.model.job_name',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-JOB_NAME")|translate}}' ,required='')
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'job_name','required')") {{ "validator.REQUIRED" | translate}}
+                        .col-md-10(ng-if="vm.readonly")
+                            .form-readable {{vm.model.job_name}}
+                    fieldset: .form-group
+                        <!--作业规则-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-JOB_RULE') | translate}}:
+                        .col-md-10(ng-if="!vm.readonly")
+                            input.form-control(type='text', name='job_rule',ng-model='vm.model.job_rule',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-JOB_RULE")|translate}}' ,required='')
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'job_rule','required')") {{ "validator.REQUIRED" | translate}}
+                        .col-md-10(ng-if="vm.readonly")
+                            .form-readable {{vm.model.job_rule}}
+                    fieldset: .form-group
+                        <!--最后执行-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-LAST_EXEC_ON') | translate}}:
+                        .col-md-10(ng-if="vm.readonly")
+                            .form-readable {{vm.model.last_exec_on|date:'yyyy-MM-dd HH:mm:ss'}}
+                    fieldset: .form-group
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-FLAG-COLLECTION') | translate}}:
+                        .col-md-2
+                            .checkbox.c-checkbox
+                                label
+                                    input#stopFlag(type='checkbox',ng-model='vm.model.stop_flag', ng-disabled="vm.readonly")
+                                    span.fa.fa-check
+                            label(for="stopFlag") {{ vm.viewTranslatePath('TAB1-LABEL-STOP_FLAG') | translate}}
+                    fieldset: .form-group
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-READ-LOG') | translate}}:
+                        col-md-10
+                            button.btn.btn-primary(type="button",ng-click="vm.readlog()") {{ vm.viewTranslatePath('BTN-READ-LOG-TODAY') | translate}}
+    .text-right.mt-lg
+        button.btn.btn-primary(ng-if="vm.readonly",type="button",ng-click="vm.cancel()") {{'button.RETURN'|translate}}
+        //button.btn.btn-warning(type="button",ng-click="vm.cancel()") {{'button.CANCEL'|translate}}
+        //button.btn.btn-success(type="submit") {{'button.SAVE'|translate}}

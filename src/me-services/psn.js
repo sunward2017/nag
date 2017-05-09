@@ -75,7 +75,7 @@ module.exports = {
                                     tenantId: tenantId
                                 },
                                 sort: 'exec_on'
-                            }).populate('assigned_workers', 'name').populate('workItemId', 'repeat_type').populate('elderlyId', 'avatar');
+                            }).populate('assigned_workers', 'name').populate('elderlyId', 'avatar');
                             console.log(rows);
 
                             this.body = app.wrapper.res.rows(rows);
@@ -172,7 +172,8 @@ module.exports = {
 
                             yield nursingRecord.save();
 
-                            this.body = app.wrapper.res.default();
+                            var ret = yield app.psn_nursingRecord_generate_service.generateByNursingRecordId(nursingRecordId);
+                            this.body = ret;
                         } catch (e) {
                             self.logger.error(e.message);
                             this.body = app.wrapper.res.error(e);

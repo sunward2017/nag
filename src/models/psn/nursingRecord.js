@@ -15,15 +15,15 @@ module.exports = function(ctx, name) {
         module.isloaded = true;
 
         var nursingRecordSchema = new mongoose.Schema({
-            type: { type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3017"]) },
             check_in_time: { type: Date, default: Date.now },
             operated_on: { type: Date, default: Date.now },
+            type: { type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3017"]) },
             elderlyId: { type: mongoose.Schema.Types.ObjectId, ref: 'psn_elderly' },
             elderly_name: { type: String },
             roomId: { type: mongoose.Schema.Types.ObjectId, ref: 'psn_room' },
             bed_no: { type: Number, min: 1 },
             gen_batch_no: { type: String, required: true, minlength: 10, maxlength: 10 },
-            workItemId: { type: mongoose.Schema.Types.ObjectId, ref: 'psn_workItem' },
+            workItemId: { type: mongoose.Schema.Types.ObjectId }, //根据type 分别是workitemId和drugUseItemId
             category: { type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3019"]) },
             name: { type: String, required: true, maxlength: 100 },
             description: { type: String, maxLength: 400 },
@@ -74,7 +74,6 @@ module.exports = function(ctx, name) {
               return ctx.moment(o);  
             });
         });
-
 
         nursingRecordSchema.pre('update', function(next) {
             this.update({}, { $set: { operated_on: new Date() } });

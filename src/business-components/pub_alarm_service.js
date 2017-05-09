@@ -77,7 +77,6 @@ module.exports = {
             } catch (e) {
                 console.log(e);
                 self.logger.error(e.message);
-                self.isExecuting = false;
             }
         }).catch(self.ctx.coOnError);
     },
@@ -108,7 +107,6 @@ module.exports = {
             } catch (e) {
                 console.log(e);
                 self.logger.error(e.message);
-                self.isExecuting = false;
             }
         }).catch(self.ctx.coOnError);
     },

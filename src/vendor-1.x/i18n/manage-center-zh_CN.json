@@ -6,10 +6,10 @@
     },
     "tenant-account-manage": {
       "list": {
-        "TITLE": "管理中心-租户-帐号-列表"
+        "TITLE": "管理中心-租户-账号-列表"
       },
       "details": {
-        "TITLE": "管理中心-租户-帐号-详情",
+        "TITLE": "管理中心-租户-账号-详情",
         "TAB1": "基本信息",
         "TAB2": "缴费历史",
         "TAB1-LABEL-NAME": "租户名称",
@@ -85,10 +85,10 @@
     },
     "agent-account-manage": {
       "list": {
-        "TITLE": "管理中心-代理商-帐号-列表"
+        "TITLE": "管理中心-代理商-账号-列表"
       },
       "details": {
-        "TITLE": "管理中心-代理商-帐号-详情",
+        "TITLE": "管理中心-代理商-账号-详情",
         "TAB1": "基本信息",
         "TAB2": "缴费历史",
         "TAB1-LABEL-NAME": "代理商名称",

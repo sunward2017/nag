@@ -253,12 +253,12 @@
     },
     "manage-center": {
       "TENANT-MANAGE": "租户管理",
-      "TENANT-ACCOUNT-MANAGE": "帐号管理",
+      "TENANT-ACCOUNT-MANAGE": "账号管理",
       "TENANT-USER-MANAGE": "用户管理",
       "TENANT-ORDER-MANAGE": "订单管理",
       "------------": "",
       "AGENT-MANAGE": "代理商管理",
-      "AGENT-ACCOUNT-MANAGE": "帐号管理",
+      "AGENT-ACCOUNT-MANAGE": "账号管理",
       "AGENT-USER-MANAGE": "用户管理",
       "AGENT-ORDER-MANAGE": "订单管理",
       "------------": "",
@@ -342,8 +342,8 @@
       "TIP-REPASSWORD": "再次输入密码",
       "TERM-AGREE-A": "我已阅读并同意",
       "TERM-AGREE-B": "条款",
-      "CREATE-ACCOUNT": "创建帐号",
-      "EXIST-ACCOUNT": "已存在帐号"
+      "CREATE-ACCOUNT": "创建账号",
+      "EXIST-ACCOUNT": "已存在账号"
     },
     "recover": {
       "TITLE": "找回密码",

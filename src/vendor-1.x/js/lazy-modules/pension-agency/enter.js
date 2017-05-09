@@ -257,6 +257,8 @@
                 // }
                 vm.selectBinding.nursing_levels = results[14];
                 console.log(results[14]);
+
+                addElderlyFamilyMember();
             });
 
 

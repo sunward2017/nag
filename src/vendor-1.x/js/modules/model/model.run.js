@@ -27,6 +27,7 @@
         modelNode.factory('psn-exit');
         modelNode.factory('psn-reception');
         modelNode.factory('psn-leave');
+        modelNode.factory('psn-assessment');
         modelNode.factory('psn-nursingPlan');
         modelNode.factory('psn-nursingSchedule');
         modelNode.factory('psn-nursingScheduleTemplate');
@@ -65,6 +66,7 @@
         modelNode.factory('pub-appServerSideUpdateHistory');
         modelNode.factory('pub-appClientSideUpdateHistory');
         modelNode.factory('pub-deviceAccess');
+        modelNode.factory('pub-jobStatus');
         modelNode.factory('pub-robot');
         modelNode.factory('pub-bedMonitor');
 

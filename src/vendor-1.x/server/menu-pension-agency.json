@@ -34,6 +34,24 @@
     ]
   },
   {
+    "_id": "menu.pension-agency.ASSESSMENT",
+    "name": "评估管理",
+    "sref": "#",
+    "icon": "icon-folder",
+    "children": [
+      {
+        "_id": "menu.pension-agency.ASSESSMENT-ENTER",
+        "name": "入院评估",
+        "sref": "app.pension-agency.assessment-enter.list"
+      },
+      {
+        "_id": "menu.pension-agency.ASSESSMENT-REGULAR",
+        "name": "定期评估",
+        "sref": "app.pension-agency.assessment-regular.list"
+      }
+    ]
+  },
+  {
     "_id": "menu.pension-agency.NURSING-MANAGE",
     "name": "护理管理",
     "sref": "#",

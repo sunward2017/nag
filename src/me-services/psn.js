@@ -38,6 +38,7 @@ module.exports = {
                             robot = yield app.modelFactory().model_one(app.models['pub_robot'], {
                                 where: {
                                     status: 1,
+                                    stop_flag: false,
                                     code: robot_code
                                 }
                             });
@@ -67,14 +68,14 @@ module.exports = {
                             var today = app.moment(app.moment().format('YYYY-MM-DD') + " 00:00:00");
 
                             var rows = yield app.modelFactory().model_query(app.models['psn_nursingRecord'], {
-                                select: 'exec_on executed_flag name description duration assigned_worker confirmed_flag confirmed_on workItemId voice_content remind_on elderlyId elderly_name type category',
+                                select: 'exec_on executed_flag name description duration assigned_workers confirmed_flag confirmed_on workItemId voice_content remind_on elderlyId elderly_name type category',
                                 where: {
                                     exec_on: { '$gte': today.toDate(), '$lt': today.add(1, 'days').toDate() },
                                     roomId: { $in: roomIds },
                                     tenantId: tenantId
                                 },
                                 sort: 'exec_on'
-                            }).populate('assigned_worker', 'name').populate('workItemId', 'repeat_type').populate('elderlyId', 'avatar');
+                            }).populate('assigned_workers', 'name').populate('workItemId', 'repeat_type').populate('elderlyId', 'avatar');
                             console.log(rows);
 
                             this.body = app.wrapper.res.rows(rows);

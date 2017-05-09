@@ -8,6 +8,11 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                         i.glyphicon.glyphicon-minus-sign
                 div#contentTab1
                     fieldset: .form-group
+                            label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-TENANT_NAME') | translate}}:
+                            .col-md-10
+                                input.form-control(type='text', name='tenant_name',ng-model='vm.tenant_name' ,required='' )
+                                span.text-danger(ng-show="utils.vinput(this.theForm,'tenant_name','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset: .form-group
                         label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-BED_MONITOR_TIMEOUT') | translate}}:
                         .col-md-10
                             input.form-control(type='number', name='psn_bed_monitor_timeout',ng-model='vm.other_configs.psn_bed_monitor_timeout',placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-BED_MONITOR_TIMEOUT")|translate}}' ,required='',ui-validate="'$value>=1'" )

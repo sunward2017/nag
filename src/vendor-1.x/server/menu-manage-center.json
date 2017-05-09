@@ -52,6 +52,11 @@
     "icon": "icon-folder",
     "children": [
       {
+        "_id": "menu.manage-center.JOB-STATUS",
+        "name": "作业状态",
+        "sref": "app.manage-center.job-status.list"
+      },
+      {
         "_id": "menu.manage-center.PLATFORM-USER-MANAGE",
         "name": "用户管理",
         "sref": "app.manage-center.platform-user-manage.list"

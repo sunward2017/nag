@@ -4,6 +4,9 @@
  */
 var mongoose = require('mongoose');
 
+var D3017 = require('../../pre-defined/dictionary.json')['D3017'];
+var D3019 = require('../../pre-defined/dictionary.json')['D3019'];
+
 module.isloaded = false;
 
 
@@ -15,15 +18,15 @@ module.exports = function(ctx, name) {
         module.isloaded = true;
 
         var nursingRecordHistorySchema = new mongoose.Schema({
-            type: { type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3017"]) },
             check_in_time: { type: Date, default: Date.now },
             operated_on: { type: Date, default: Date.now },
-            elderlyId: { type: mongoose.Schema.Types.ObjectId, ref: 'psn_elderly' },
+            type: { type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3017"]) },
+            elderlyId: { type: mongoose.Schema.Types.ObjectId, ref: 'psn_elderly' }, //因为历史表数据巨大,尽量不用populate
             elderly_name: { type: String },
             roomId: { type: mongoose.Schema.Types.ObjectId, ref: 'psn_room' },
             bed_no: { type: Number, min: 1 },
             gen_batch_no: { type: String, required: true, minlength: 10, maxlength: 10 },
-            workItemId: { type: mongoose.Schema.Types.ObjectId, ref: 'psn_workItem' },
+            workItemId: { type: mongoose.Schema.Types.ObjectId, ref: 'psn_workItem' }, //因为历史表数据巨大,尽量不用populate
             category: { type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3019"]) },
             name: { type: String, required: true, maxlength: 100 },
             description: { type: String, maxLength: 400 },
@@ -36,7 +39,7 @@ module.exports = function(ctx, name) {
             confirmed_on: { type: Date }, // 护工确认时间
             remind_on: [{ type: Date, required: true }], //提醒时间
             voice_content: { type: String, maxlength: 400 },
-            archived_on: { type: Date, required: true }, // 归档时间
+            archived_on: { type: Date, default: Date.now }, // 归档时间
             tenantId: { type: mongoose.Schema.Types.ObjectId }
         }, {
             toObject: {
@@ -47,16 +50,18 @@ module.exports = function(ctx, name) {
             }
         });
 
-        nursingRecordHistorySchema.virtual('expire_on').get(function(){
-            if(this.exec_on && this.duration){
-                return ctx.moment(this.exec_on).add(this.duration, 'm').toDate();
+        nursingRecordHistorySchema.virtual('type_name').get(function(){
+            if (this.type) {
+                return D3017[this.type].name;
             }
-            return null;
+            return '';
         });
 
-        nursingRecordHistorySchema.pre('update', function(next) {
-            this.update({}, { $set: { operated_on: new Date() } });
-            next();
+        nursingRecordHistorySchema.virtual('category_name').get(function(){
+            if (this.category) {
+                return D3019[this.category].name;
+            }
+            return '';
         });
 
         return mongoose.model(name, nursingRecordHistorySchema, name);

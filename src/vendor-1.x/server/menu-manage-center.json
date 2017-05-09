@@ -7,7 +7,7 @@
     "children": [
       {
         "_id": "menu.manage-center.TENANT-ACCOUNT-MANAGE",
-        "name": "帐号管理",
+        "name": "账号管理",
         "sref": "app.manage-center.tenant-account-manage.list"
       },
       {
@@ -30,7 +30,7 @@
     "children": [
       {
         "_id": "menu.manage-center.AGENT-ACCOUNT-MANAGE",
-        "name": "帐号管理",
+        "name": "账号管理",
         "sref": "app.manage-center.agent-account-manage.list"
       },
       {

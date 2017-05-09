@@ -41,28 +41,44 @@
             vm.generateNursingRecord = generateNursingRecord;
             vm.customizedWorkItem = customizedWorkItem;
             vm.workItemByElderly = workItemByElderly;
-            vm.allWorkItemChecked= allWorkItemChecked;
+            vm.allWorkItemChecked = allWorkItemChecked;
             vm.refreshWorkItem = refreshWorkItem;
-
+            vm.$nursingLevels = {};
             vm.tab1 = { cid: 'contentTab1' };
             vm.$editings = {};
             vm.$selectAll = {};
 
             vmh.parallel([
                 vmh.clientData.getJson('nursingPlanAxis'),
-                vmh.shareService.tmp('T3001/psn-nursingLevel', 'name short_name', null),
+                vmh.shareService.tmp('T3001/psn-nursingLevel', 'name short_name nursing_assessment_grade', null),
                 vmh.shareService.tmp('T3001/psn-workItem', 'name elderlyId sourceId nursingLevelId', null),
                 vmh.shareService.tmp('T3001/psn-drugUseItem', 'drugId name elderlyId', null),
+                vmh.shareService.d('D3015'),
 
             ]).then(function (results) {
                 vm.xAxisData = results[0];
                 // console.log('nursingPlanAxis:', vm.xAxisData);
 
-                vm.selectBinding.nursingLevels = _.map(results[1], function (row) {
-                    return { id: row._id, name: row.name, short_name: row.short_name }
+                var nursingLevels = _.map(results[1], function (row) {
+                    return { id: row._id, name: row.name, short_name: row.short_name, nursing_assessment_grade: row.nursing_assessment_grade }
                 });
+                // console.log(nursingLevels)
+                var nursingAssessmentGrades = _.map(results[4], function (row) {
+                    return { grade: row.value };
+                })
+                var nursingLevelsByElderly = {};
+                for (var n = 0, g = nursingAssessmentGrades.length; n < g; n++) {
+                    var nursing_assessment_grade = nursingAssessmentGrades[n].grade;
+
+                    nursingLevelsByElderly[nursing_assessment_grade] = _.filter(nursingLevels, function (o) {
+                        return o.nursing_assessment_grade === nursing_assessment_grade;
+                    })
+                }
+                // console.log("filterNursingLevels", nursingLevelsByElderly)
+                vm.$nursingLevels = nursingLevelsByElderly;
+
                 var nursingLevelMap = {};
-                _.reduce(vm.selectBinding.nursingLevels, function (o, nursingLevel) {
+                _.reduce(nursingLevels, function (o, nursingLevel) {
                     o[nursingLevel.id] = nursingLevel.short_name;
                     return o;
                 }, nursingLevelMap);
@@ -72,8 +88,8 @@
                     return { id: row._id, name: row.name, sourceId: row.sourceId, elderlyId: row.elderlyId, nursingLevelId: row.nursingLevelId }
                 });
                 var workItemMap = {};
-                for (var i = 0, len = vm.selectBinding.nursingLevels.length; i < len; i++) {
-                    var nursingLevelId = vm.selectBinding.nursingLevels[i].id;
+                for (var i = 0, len = nursingLevels.length; i < len; i++) {
+                    var nursingLevelId = nursingLevels[i].id;
                     workItemMap[nursingLevelId] = _.filter(workItems, function (o) {
                         return o.nursingLevelId === nursingLevelId;
                     });
@@ -110,10 +126,10 @@
 
 
         function fetchNursingPlan() {
-            vmh.psnService.nursingPlansByRoom(vm.tenantId, ['name', 'sex', 'nursingLevelId'], ['elderlyId', 'work_items', 'remark']).then(function (data) {
+            vmh.psnService.nursingPlansByRoom(vm.tenantId, ['name', 'sex', 'nursingLevelId', 'nursing_assessment_grade'], ['elderlyId', 'work_items', 'remark']).then(function (data) {
                 vm.aggrData = data;
                 // tarnckedKey room + bed ;
-                console.log("data",data)
+                // console.log("data", data)
                 for (var trackedKey in vm.aggrData) {
                     vm.$editings[trackedKey] = {};
                     vm.$selectAll[trackedKey] = {};
@@ -130,7 +146,7 @@
                             var work_items = vm.aggrData[trackedKey]['nursing_plan']['work_items'];
                             if (work_items.length > 0) {
                                 for (var i = 0, len = work_items.length; i < len; i++) {
-                                    if (work_items[i].type == 'A0001') {   
+                                    if (work_items[i].type == 'A0001') {
                                         vm.work_items['A0001'][workItemkey][work_items[i].workItemId] = true;
                                     }
                                 }
@@ -222,9 +238,9 @@
             vm.$editings[trackedKey]['drugUseItems'] = !vm.$editings[trackedKey]['drugUseItems'];
         }
 
-        function allWorkItemChecked(trackedKey){
+        function allWorkItemChecked(trackedKey) {
             vm.$selectAll[trackedKey]['workItems'] = !vm.$selectAll[trackedKey]['workItems'];
-            
+
         }
 
         function workItemChecked(trackedKey, workItemId) {
@@ -280,7 +296,7 @@
         }
 
         function workItemByElderly(workItems, elderlyId) {
-              if (workItems && workItems.length > 0) {
+            if (workItems && workItems.length > 0) {
                 var allWorkItems = _.filter(workItems, function (option) {
                     if (!option.sourceId || option.elderlyId == elderlyId)
                         return option;
@@ -295,37 +311,37 @@
                 var elderlyWorkItems = [], repeat = [];
 
                 for (var m = 0, h = customizedWorkItems.length; m < h; m++) {
-                   for(var i=0;i<allWorkItems.length;i++){
-                       if(allWorkItems[i].id==customizedWorkItems[m].sourceId){
-                           allWorkItems.splice(i,1);
-                       }
-                   }
+                    for (var i = 0; i < allWorkItems.length; i++) {
+                        if (allWorkItems[i].id == customizedWorkItems[m].sourceId) {
+                            allWorkItems.splice(i, 1);
+                        }
+                    }
                 }
-              
+
                 // console.log("elderlyWorkItems", allWorkItems);
                 return allWorkItems;
             }
         }
 
-        function refreshWorkItem(){
-             vmh.parallel([     
-                vmh.shareService.tmp('T3001/psn-workItem', 'name elderlyId sourceId nursingLevelId', null,true),
+        function refreshWorkItem() {
+            vmh.parallel([
+                vmh.shareService.tmp('T3001/psn-workItem', 'name elderlyId sourceId nursingLevelId', null, true),
             ]).then(function (results) {
-               var workItems = _.map(results[0], function (row) {
+                var workItems = _.map(results[0], function (row) {
                     return { id: row._id, name: row.name, sourceId: row.sourceId, elderlyId: row.elderlyId, nursingLevelId: row.nursingLevelId }
                 });
                 var workItemMap = {};
-                for (var i = 0, len = vm.selectBinding.nursingLevels.length; i < len; i++) {
-                    var nursingLevelId = vm.selectBinding.nursingLevels[i].id;
+                for (var i = 0, len = nursingLevels.length; i < len; i++) {
+                    var nursingLevelId = nursingLevels[i].id;
                     workItemMap[nursingLevelId] = _.filter(workItems, function (o) {
                         return o.nursingLevelId === nursingLevelId;
                     });
                 }
-                vm.workItemMap = workItemMap; 
+                vm.workItemMap = workItemMap;
             })
         }
-        function customizedWorkItem(workItemId, elderlyId,trackedKey) {
-            if(!vm.$editings[trackedKey]['workItems']){
+        function customizedWorkItem(workItemId, elderlyId, trackedKey) {
+            if (!vm.$editings[trackedKey]['workItems']) {
                 return
             }
             // console.log("elderlyId",elderlyId);
@@ -338,7 +354,7 @@
                     moduleTranslatePathRoot: vm.moduleTranslatePath(),
                     workItemId: workItemId,
                     elderlyId: elderlyId,
-                    refreshWorkItem:refreshWorkItem
+                    refreshWorkItem: refreshWorkItem
                 }
             })
         }

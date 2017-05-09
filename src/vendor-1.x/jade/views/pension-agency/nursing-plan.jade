@@ -26,7 +26,7 @@
                                         i.glyphicon.glyphicon-pencil
                                 div(ng-if="vm.$editings[row.trackedKey]['nursingLevelId']")
                                     .btn-group
-                                        .dropdown(s-dropdown,is-button,ng-model="vm.editing$NursingLevel[vm.aggrData[row.trackedKey]['elderly']['id']]",s-dropdown-data="vm.selectBinding.nursingLevels" s-dropdown-option="{valueKey:'id', textKey:'short_name'}")
+                                        .dropdown(s-dropdown,is-button,ng-model="vm.editing$NursingLevel[vm.aggrData[row.trackedKey]['elderly']['id']]",s-dropdown-data="vm.$nursingLevels[vm.aggrData[row.trackedKey]['elderly']['nursing_assessment_grade']]" s-dropdown-option="{valueKey:'id', textKey:'short_name'}")
                                     .split
                                     .btn-group
                                         a.btn.btn-primary.btn-sm(title="{{'button.SAVE'|translate}}",ng-click="vm.saveElderlyNursingLevel(row.trackedKey, vm.editing$NursingLevel[vm.aggrData[row.trackedKey]['elderly']['id']])")

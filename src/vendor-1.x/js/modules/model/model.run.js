@@ -66,6 +66,7 @@
         modelNode.factory('pub-appServerSideUpdateHistory');
         modelNode.factory('pub-appClientSideUpdateHistory');
         modelNode.factory('pub-deviceAccess');
+        modelNode.factory('pub-jobStatus');
         modelNode.factory('pub-robot');
         modelNode.factory('pub-bedMonitor');
 

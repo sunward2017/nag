@@ -93,6 +93,7 @@
                 {name:'subsystem.manage-center.tenant-account-manage.js',files:['app/js/lazy-modules/manage-center/tenant-account-manage.js']},
                 {name:'subsystem.manage-center.tenant-order-manage.js',files:['app/js/lazy-modules/manage-center/tenant-order-manage.js']},
                 {name:'subsystem.manage-center.tenant-user-manage.js',files:['app/js/lazy-modules/manage-center/tenant-user-manage.js']},
+                {name:'subsystem.manage-center.job-status.js',files:['app/js/lazy-modules/manage-center/job-status.js']},
                 {name:'subsystem.manage-center.func.js',files:['app/js/lazy-modules/manage-center/func.js']},
                 {name:'subsystem.manage-center.order-receipt-confirmation.js',files:['app/js/lazy-modules/manage-center/order-receipt-confirmation.js']},
                 {name:'subsystem.manage-center.order-refund-confirmation.js',files:['app/js/lazy-modules/manage-center/order-refund-confirmation.js']},

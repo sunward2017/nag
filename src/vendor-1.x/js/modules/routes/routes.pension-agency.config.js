@@ -1931,7 +1931,7 @@
                 resolve: {
                     entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'work-item.list', {
                         modelName: 'psn-workItem',
-                        searchForm: { "status": 1},
+                        searchForm: { "status": 1,customize_flag:false},
                         serverPaging: true,
                         columns: [{
                             label: '护理等级',

@@ -110,6 +110,8 @@
                         return o.elderlyId === elderlyId;
                     });
                 }
+
+                console.log("workItemMap",workItemMap)
                 vm.workItemMap = workItemMap;
                 vm.drugUseItemMap = drugUseItemMap;
             });
@@ -337,9 +339,14 @@
 
         function refreshWorkItem() {
             vmh.parallel([
+                vmh.shareService.tmp('T3001/psn-nursingLevel', 'name short_name nursing_assessment_grade', null),
                 vmh.shareService.tmp('T3001/psn-workItem', 'name elderlyId sourceId nursingLevelId', null, true),
             ]).then(function (results) {
-                var workItems = _.map(results[0], function (row) {
+                
+                var nursingLevels = _.map(results[0], function (row) {
+                    return { id: row._id, name: row.name, short_name: row.short_name, nursing_assessment_grade: row.nursing_assessment_grade }
+                });
+                var workItems = _.map(results[1], function (row) {
                     return { id: row._id, name: row.name, sourceId: row.sourceId, elderlyId: row.elderlyId, nursingLevelId: row.nursingLevelId }
                 });
                 var workItemMap = {};
@@ -349,6 +356,7 @@
                         return o.nursingLevelId === nursingLevelId;
                     });
                 }
+                 console.log("workItemMap",workItemMap)
                 vm.workItemMap = workItemMap;
             })
         }

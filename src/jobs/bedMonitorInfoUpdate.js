@@ -17,6 +17,9 @@
              return co(function*() {
                  ctx.jobManger.createJob(job_id, job_name, job_rule, ()=> {
                      console.log(ctx.moment().format('HH:mm:ss') + ' ' + job_id + '(' + job_name + ') => executing.');
+                     if (ctx.onJobExecute && ctx._.isFunction(ctx.onJobExecute)) {
+                         ctx.onJobExecute.call(null, job_id);
+                     }
                      ctx.bed_monitor_provider.updatebedMonitorInfo();
                      // console.log(ctx.moment().format('HH:mm:ss') + ' ' + job_id + '(' + job_name + ') => executed.');
                  }, {printLog: printLog});
@@ -30,7 +33,7 @@
              }).catch(ctx.coOnError);
          }
          else {
-             console.log(job_id + '(' + job_name + ') => skip register.', Promise);
+             console.log(job_id + '(' + job_name + ') => skip register.');
              return Promise.resolve({
                  success: false,
                  job_id: job_id,

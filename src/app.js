@@ -160,6 +160,17 @@ app.coOnError = function (err) {
     console.error(err.stack);
 };
 
+app.onJobExecute = function (job_id) {
+    return co(function*() {
+        var jobStatus = yield app.modelFactory().model_one(app.models['pub_jobStatus'], {where: {job_id: job_id}});
+        if (jobStatus) {
+            console.log('onJobExecute--------------------refresh last_exec_on')
+            jobStatus.last_exec_on = moment();
+            yield jobStatus.save();
+        }
+    });
+};
+
 //moment
 app.moment = moment;
 
@@ -363,11 +374,9 @@ co(function*() {
                         job_id: jobRegInfo.job_id,
                         job_name: jobRegInfo.job_name,
                         job_rule: jobRegInfo.job_rule,
-                        stop_flag: stop_flag,
-                        last_exec_on: moment()
+                        stop_flag: stop_flag
                     });
                 } else {
-                    jobStatus.last_exec_on = moment();
                     jobStatus.stop_flag = stop_flag;
                     yield jobStatus.save();
                 }

@@ -240,7 +240,19 @@
 
         function allWorkItemChecked(trackedKey) {
             vm.$selectAll[trackedKey]['workItems'] = !vm.$selectAll[trackedKey]['workItems'];
-
+            // console.log(trackedKey);
+            var workItems = vm.workItemByElderly(vm.workItemMap[vm.aggrData[trackedKey]['elderly']['nursingLevelId']], vm.aggrData[trackedKey]['elderly']['id'])
+            // console.log(vm.$selectAll[trackedKey]['workItems']);
+            // console.log(workItems);
+            if (workItems && workItems.length > 0) {
+                for (var s = 0, len = workItems.length; s < len; s++) {
+                    vm.work_items['A0001'][trackedKey + '$' + vm.aggrData[trackedKey]['elderly']['nursingLevelId']][workItems[s].id] = vm.$selectAll[trackedKey]['workItems'];
+                    var elderlyId = vm.aggrData[trackedKey]['elderly'].id;
+                    var workItemKey = trackedKey + '$' + vm.aggrData[trackedKey]['elderly']['nursingLevelId'];
+                    var work_item_check_info = { id: workItems[s].id, type: "A0001", checked: vm.$selectAll[trackedKey]['workItems'] };
+                    vmh.psnService.nursingPlanSaveNursingItem(vm.tenantId, elderlyId, work_item_check_info);
+                }
+            }
         }
 
         function workItemChecked(trackedKey, workItemId) {

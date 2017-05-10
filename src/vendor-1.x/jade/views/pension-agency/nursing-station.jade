@@ -23,13 +23,13 @@ form.search-form
 .nursing-station
     .col-md-12.monitor-objects(block-ui="nursing-station")
         .elderly(ng-repeat="elderly in vm.elderlys")
+            span.nursing-level {{elderly.nursingLevelId.short_name}}
             .avatar(ng-click="vm.openElderlyDialog(elderly)")
                 .avatar-block
                     .user-block-status
                         img.img-thumbnail.img-circle(ng-src="{{ elderly.avatar ? elderly.avatar + '?imageView2/1/w/62/h/81' : vm.defaultElderlyAvatar}}", alt="姓名")
             div.text-center
                 .room-info {{elderly.room_value.roomId.name + '-' + elderly.room_value.bed_no}}
-                span.nursing-level ({{elderly.nursingLevelId.short_name}})
             div(ng-class='vm.elderlyStatusMonitor[elderly.id].status' ng-click="vm.openAlarmDialogByMonitorObject(elderly.id)")
                 .name.text-center {{ elderly.name }}
                     span.age ({{utils.age(elderly.birthday)}})

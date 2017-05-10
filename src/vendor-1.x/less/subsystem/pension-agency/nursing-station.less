@@ -60,6 +60,8 @@
       border: solid 1px #dde6e9;
       margin: 4px 4px;
       display: inline-block;
+      position: relative;
+
       .avatar {
         position: relative;
         cursor: pointer;
@@ -81,9 +83,14 @@
         font-weight: bold;
       }
       .nursing-level {
-        display: inline-block;
-        font-size: 12px;
-        font-weight: normal;
+        position: absolute;
+        right:0;
+        top: 0;
+        background-color: #5D9CEC;
+        color:white;
+        padding: 0 4px;
+        z-index: 9999;
+        font-size: 11px;
       }
     }
   }

@@ -40,10 +40,14 @@
             vm.init({ removeDialog: ngDialog });
 
             vm.doSubmit = doSubmit;
-            vm.queryElderly = queryElderly;
+            vm.queryElderlyPromise = queryElderly();
+            vm.fetchElderlyColumnsPromise = [{label: '入院登记号',name: 'enter_code',width: 100}, {label: '姓名',name: 'name',width: 100}];
             vm.selectElerly = selectElerly;
-            vm.queryDrug = queryDrug;
-            vm.selectDrug = selectDrug;
+            vm.queryDrugPromise = queryDrug();
+            vm.fetchDrugColumnsPromise = [{label: '药品编码',name: 'drug_no',width: 100}, {label: '药品全称',name: 'full_name',width: 100}]
+            vm.selectElerlyForBackFiller = selectElerlyForBackFiller;
+            vm.selectDrugForBackFiller = selectDrugForBackFiller;
+            // vm.selectDrug = selectDrug;
             vm.initVoiceTemplate = initVoiceTemplate;
             vm.tab1 = { cid: 'contentTab1' };
 
@@ -65,7 +69,7 @@
                 }
                 if(vm.model.elderlyId){
                     vm.selectedElderly = {_id: vm.model.elderlyId, name: vm.model.elderly_name};
-                    vm.selectedDrug = {_id:vm.model.drugId,full_name:vm.model.name};
+                    vm.selectedDrug = {_id:vm.model.drugId,drug_full_name:vm.model.name};
                 }
             });
         }
@@ -73,9 +77,9 @@
         function queryElderly(keyword) {
             return vmh.fetch(vmh.psnService.queryElderly(vm.tenantId, keyword, {
                 live_in_flag: true,
-                // sbegin_exit_flow: {'$in':[false,undefined]}
-            }, 'name'));
-        }
+                // begin_exit_flow: {'$in':[false,undefined]}
+            }, 'name enter_code'));
+        } 
 
         function selectElerly(o) {
             if (o) {
@@ -86,14 +90,24 @@
         }
 
         function queryDrug(keyword) {
-            return vmh.fetch(vmh.psnService.queryDrug(vm.tenantId, keyword, {}, 'drug_no full_name'));
+            console.log("elderlyId",vm.model.elderlyId);
+            return vmh.fetch(vmh.psnService.queryDrug(vm.tenantId, keyword, {
+            }, 'drug_no full_name'));
         }
 
-        function selectDrug(o) {
-            if (o) {
-                vm.model.drugId = o.originalObject._id;
-                vm.model.drug_no = o.originalObject.drug_no;
-                vm.model.name = o.originalObject.full_name;
+        function selectDrugForBackFiller(row) {
+            if (row) {
+                vm.model.drugId = row.id;
+                vm.model.drug_no =row.drug_no;
+                vm.model.name = row.drug_full_name;
+            }
+        }
+
+        function selectElerlyForBackFiller(row) {
+            if(row){
+                vm.model.enter_code = row.enter_code;
+                vm.model.elderlyId = row.id;
+                vm.model.elderly_name = row.name;
             }
         }
 

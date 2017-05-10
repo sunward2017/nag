@@ -374,6 +374,7 @@
             if (!vm.$editings[trackedKey]['workItems']) {
                 return
             }
+            vm.work_items['A0001'][trackedKey + '$' + vm.aggrData[trackedKey]['elderly']['nursingLevelId']][workItemId] = false;
             // console.log("elderlyId",elderlyId);
             ngDialog.open({
                 template: 'work-item-custom.html',

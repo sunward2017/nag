@@ -8,17 +8,22 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                         i.glyphicon.glyphicon-minus-sign
                 div#contentTab1
                     fieldset: .form-group
-                        <!--探望老人-->
+                        <!--老人-->
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-ELDERLY-NAME') | translate}}:
-                        .col-md-10
-                            div#elderly(angucomplete-alt,input-name="elderly",minlength="1",field-required="true",text-searching='{{"label.TEXT-SEARCHING"|translate}}',text-no-results='{{"label.TEXT-NO-RESULTS"|translate}}',placeholder="",pause="400",selected-object="vm.selectElerly",remote-api-handler="vm.queryElderly",title-field="name",initial-value="vm.selectedElderly",input-class="form-control form-control-small")
+                        .col-md-10(ng-if="!vm.readonly && vm._action_!='edit' ")
+                            .backfiller(backfiller,ng-model="vm.selectedElderly", input-name="elderly", fetch-rows="vm.queryElderlyPromise", fetch-columns="vm.fetchElderlyColumnsPromise", picker-title="挑选老人" on-select="vm.selectElerlyForBackFiller(row)")
                             span.text-danger(ng-show="utils.vinput(this.theForm,'elderly','autocomplete-required')") {{ "validator.REQUIRED" | translate}}
+                        .col-md-10(ng-if="vm.readonly || vm._action_=='edit'")
+                            .form-readable {{vm.model.elderly_name}}  
                     fieldset: .form-group
                         <!--药品目录-->
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-DRUG-NAME') | translate}}:
+                        //- .col-md-10
+                        //-     div#drug(angucomplete-alt,input-name="drug_no",minlength="1",field-required="true",text-searching='{{"label.TEXT-SEARCHING"|translate}}',text-no-results='{{"label.TEXT-NO-RESULTS"|translate}}',placeholder="",pause="400",selected-object="vm.selectDrug",remote-api-handler="vm.queryDrug",title-field="full_name",initial-value="vm.selectedDrug",input-class="form-control form-control-small")
+                        //-     span.text-danger(ng-show="utils.vinput(this.theForm,'drug_no','autocomplete-required')") {{ "validator.REQUIRED" | translate}}
                         .col-md-10
-                            div#drug(angucomplete-alt,input-name="drug_no",minlength="1",field-required="true",text-searching='{{"label.TEXT-SEARCHING"|translate}}',text-no-results='{{"label.TEXT-NO-RESULTS"|translate}}',placeholder="",pause="400",selected-object="vm.selectDrug",remote-api-handler="vm.queryDrug",title-field="full_name",initial-value="vm.selectedDrug",input-class="form-control form-control-small")
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'drug_no','autocomplete-required')") {{ "validator.REQUIRED" | translate}}
+                            .backfiller(backfiller,ng-model="vm.selectedDrug", input-name="drug", fetch-rows="vm.queryDrugPromise", fetch-columns="vm.fetchDrugColumnsPromise", picker-title="挑选药品", on-select="vm.selectDrugForBackFiller(row)")
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'drug','autocomplete-required')") {{ "validator.REQUIRED" | translate}}
                     fieldset: .form-group
                         <!--服用方法-->
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-DESCRIPTION') | translate}}:

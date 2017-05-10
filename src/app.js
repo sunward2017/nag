@@ -365,10 +365,12 @@ co(function*() {
         console.log('create job use ' + o + '...');
         jobDef.register(app).then(function (jobRegInfo) {
             //更新到作业状态监控
-            console.log('更新到作业状态监控...', jobRegInfo);
             co(function*() {
                 var jobStatus = yield app.modelFactory().model_one(app.models['pub_jobStatus'], {where: {job_id: jobRegInfo.job_id}});
                 var stop_flag = !jobRegInfo.success;
+                if(!stop_flag) {
+                    console.log('更新到作业状态监控...', jobRegInfo);
+                }
                 if (!jobStatus) {
                     yield app.modelFactory().model_create(app.models['pub_jobStatus'], {
                         job_id: jobRegInfo.job_id,

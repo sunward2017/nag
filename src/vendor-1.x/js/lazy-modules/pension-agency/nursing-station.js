@@ -320,6 +320,7 @@
         var vmh = $scope.ngDialogData.vmh;
 
         $scope.utils = vmh.utils.v;
+        $scope.moment = vmh.utils.m;
 
         init();
 

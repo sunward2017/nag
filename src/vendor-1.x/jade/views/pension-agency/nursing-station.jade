@@ -23,13 +23,13 @@ form.search-form
 .nursing-station
     .col-md-12.monitor-objects(block-ui="nursing-station")
         .elderly(ng-repeat="elderly in vm.elderlys")
+            span.nursing-level {{elderly.nursingLevelId.short_name}}
             .avatar(ng-click="vm.openElderlyDialog(elderly)")
                 .avatar-block
                     .user-block-status
                         img.img-thumbnail.img-circle(ng-src="{{ elderly.avatar ? elderly.avatar + '?imageView2/1/w/62/h/81' : vm.defaultElderlyAvatar}}", alt="姓名")
             div.text-center
                 .room-info {{elderly.room_value.roomId.name + '-' + elderly.room_value.bed_no}}
-                span.nursing-level ({{elderly.nursingLevelId.short_name}})
             div(ng-class='vm.elderlyStatusMonitor[elderly.id].status' ng-click="vm.openAlarmDialogByMonitorObject(elderly.id)")
                 .name.text-center {{ elderly.name }}
                     span.age ({{utils.age(elderly.birthday)}})
@@ -73,9 +73,9 @@ script(type="text/ng-template", id="nursing-station-elderly.html")
                         tr
                             th.text-center(width="80")
                                 | {{ vm.moduleTranslatePath('DLG-ELDERLY-TH-EXEC_ON') | translate}}
-                            th.text-center(width="245")
+                            th.text-center(width="365")
                                 | {{ vm.moduleTranslatePath('DLG-ELDERLY-TH-NAME') | translate}}
-                            th.text-center(width="280")
+                            th.text-center(width="384")
                                 | {{ vm.moduleTranslatePath('DLG-ELDERLY-TH-ASSIGNED_WORKER') | translate}}
                             th.text-center(width="100")
                                 | {{ vm.moduleTranslatePath('DLG-ELDERLY-TH-CONFIRM_FLAG') | translate}}
@@ -84,9 +84,13 @@ script(type="text/ng-template", id="nursing-station-elderly.html")
                         tr(ng-repeat="row in vm.nursingRecords")
                             td.text-center(ng-if="row.workItemId.repeat_type != 'A0001' " width="80") {{::row.exec_on|date: 'HH:mm'}}
                             td.text-center(ng-if="row.workItemId.repeat_type == 'A0001' " width="80") {{::row.workItemId.repeat_type_name}}
-                            td.text-left(width="245") {{::row.name}}
-                            td.text-center(width="280") {{::row.assigned_workers | safeArrayMember:'name' }}
-                            td.text-center(width="100") {{::row.confirmed_flag|boolFilter}}
+                            td.text-left(width="365") {{::row.name }}
+                                span.drug-use-item-icon(ng-if=" row.type == 'A0003' ") {{::row.type_name}}
+                            td.text-center(width="384") {{::row.assigned_workers | safeArrayMember:'name' }}
+                            td.text-center(width="100")
+                                span.glyphicon.glyphicon-ok(ng-if="row.confirmed_flag")
+                                span.glyphicon.glyphicon-remove(ng-if="!row.confirmed_flag && moment().isAfter(row.exec_on)")
+                                span.glyphicon.glyphicon-time(ng-if="!row.confirmed_flag && moment().isBefore(row.exec_on)")
                             td
 script(type="text/ng-template", id="nursing-station-alarm.html")
     .ngdialog-title

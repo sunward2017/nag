@@ -51,7 +51,7 @@
                                     label
                                         input(id="{{row.trackedKey + '$' +workItem.id}}",type='checkbox', ng-disabled="!vm.$editings[row.trackedKey]['workItems']", ng-model="vm.work_items['A0001'][row.trackedKey + '$' + vm.aggrData[row.trackedKey]['elderly']['nursingLevelId']][workItem.id]" ng-change="vm.workItemChecked(row.trackedKey, workItem.id)")
                                         span.fa.fa-check
-                                label(for="{{row.trackedKey + '$' +workItem.id}}" ng-dblclick="vm.customizedWorkItem(workItem.id,vm.aggrData[row.trackedKey]['elderly']['id'],row.trackedKey)") {{ workItem.name }}
+                                label(ng-dblclick="vm.customizedWorkItem(workItem.id,vm.aggrData[row.trackedKey]['elderly']['id'],row.trackedKey)") {{ workItem.name }}
                         <!--用药-->        
                         td
                             .btn-group(ng-if="vm.aggrData[row.trackedKey]['elderly']['id']")
@@ -70,7 +70,7 @@
                                     label
                                         input(id="{{row.trackedKey + '$' +drugUseItem.id}}",type='checkbox', ng-disabled="!vm.$editings[row.trackedKey]['drugUseItems']", ng-model="vm.work_items['A0003'][row.trackedKey + '$' + vm.aggrData[row.trackedKey]['elderly']['id']][drugUseItem.id]" ng-change="vm.drugUseItemChecked(row.trackedKey,drugUseItem.id)")
                                         span.fa.fa-check 
-                                label(for="{{row.trackedKey + '$' +drugUseItem.id}}") {{ drugUseItem.name }}
+                                label {{ drugUseItem.name }}
                         td.text-center 
                             .btn-group(ng-if="vm.aggrData[row.trackedKey]['elderly']['nursingLevelId']")
                                 a.btn.btn-warning.btn-sm(ng-click="vm.generateNursingRecord(row.trackedKey)")

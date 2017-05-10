@@ -25,10 +25,12 @@
                                 label
                                     input(type='checkbox' data="trBubble" ng-model="row.checked" )
                                     span.fa.fa-check(data="trBubble")
-                        td.text-left {{::row.name}}
-                        td.text-left {{::row.enter_code}}
+                        td.text-left
+                            | {{::row.name}}
+                            a.btn.btn-primary.btn-xs.pull-right(title="{{ vm.viewTranslatePath('TITLE-ARCHIVE') | translate}}",ng-click="vm.readElderlyArchive(row)") {{ vm.viewTranslatePath('LABEL-ARCHIVE') | translate}}
                         td {{::row.sex|formatter:'sex':vm.columns}}
                         td {{::row.birthday|calcAge}}
+                        td.text-left {{::row.enter_code}}
                         td {{::row.board_summary}}
                         td {{::row.room_summary}}
                         td {{::row.nursing_info}}

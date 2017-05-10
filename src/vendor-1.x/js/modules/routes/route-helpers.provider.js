@@ -264,7 +264,8 @@
                     subSystemToTrans: subSystemToTrans,
                     utils: {
                         g: GridUtils,
-                        v: ViewUtils
+                        v: ViewUtils,
+                        m: moment
                     },
                     alertWarning: alertWarning,
                     alertSuccess: alertSuccess,

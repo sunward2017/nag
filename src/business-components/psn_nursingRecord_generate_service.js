@@ -24,6 +24,26 @@ module.exports = {
 
         return this;
     },
+    generateByTenantsOfPension: function () {
+        var self = this;
+        return co(function*() {
+            var tenants = yield  self.ctx.modelFactory().model_query(self.ctx.models['pub_tenant'], {
+                select: '_id',
+                where: {
+                    status: 1,
+                    type: {'$in': [DIC.D1002.MINI_PENSION_ORG, DIC.D1002.MIDDLE_SIZE_PENSION_ORG, DIC.D1002.LARGE_SCALE_ORG]},
+                    active_flag: true,
+                    certificate_flag: true,
+                    validate_util: {'$gte': self.ctx.moment()}
+                }
+            });
+            for (var i = 0, len = tenants.length; i < len; i++) {
+                console.log('tenantId:', tenants[i]);
+                yield self.generateByTenantId(tenants[i]._id);
+            }
+            return true;
+        }).catch(self.ctx.coOnError);
+    },
     generateByTenantId: function (tenantId, elderlyId) {
         var self = this;
         return self._generate(null, elderlyId, tenantId);
@@ -65,8 +85,10 @@ module.exports = {
                         return self.ctx.wrapper.res.error({message: '无法找到护理计划!'});
                     }
 
-                    workOrDrugUseItem = self.ctx._.find(nursingPlanItem.workItems, (o)=> {
-                        return o.workItemId.toString() == nursingRecord.workItemId.toString();
+                    var workItemIdOfCurrentNursingRecord = nursingRecord.workItemId.toString();
+                    var workItemsInNursingPlanItem = nursingPlanItem.toObject().work_items;
+                    workOrDrugUseItem = self.ctx._.find(workItemsInNursingPlanItem, (o)=> {
+                        return o.workItemId == workItemIdOfCurrentNursingRecord;
                     });
                     if (!workOrDrugUseItem) {
                         return self.ctx.wrapper.res.error({message: '所属项目已经不在护理计划中!'});
@@ -74,7 +96,7 @@ module.exports = {
 
                     //房间床位检查
                     elderly = yield self.ctx.modelFactory().model_read(self.ctx.models['psn_elderly'], elderlyId);
-                    elderlyRoomValue = elderlyMapRoom[nursingPlanItem.elderlyId];
+                    elderlyRoomValue = elderly.room_value;
                     gen_batch_no = yield self.ctx.sequenceFactory.getSequenceVal(self.ctx.modelVariables.SEQUENCE_DEFS.CODE_OF_NURSING_RECORD);
                     nursingRecordToSave = {
                         elderlyId: nursingRecord.elderlyId,
@@ -303,7 +325,7 @@ module.exports = {
                                 tenantId: tenantId
                             }
                             workItems = nursingPlanItem.work_items;
-                            console.log("workItems", workItems)
+                            // console.log("workItems", workItems)
                             for (var j = 0, len2 = workItems.length; j < len2; j++) {
                                 workOrDrugUseItem = workItems[j];
                                 remind_max = workOrDrugUseItem.remind_times || 1;
@@ -492,7 +514,7 @@ module.exports = {
                 }
             } catch (e) {
                 self.logger.error(e.message);
-                return app.wrapper.res.error(e);
+                return self.ctx.wrapper.res.error(e);
             }
         }).catch(self.ctx.coOnError);
     }

@@ -4,6 +4,8 @@
  */
 var mongoose = require('mongoose');
 
+var D3017 = require('../../pre-defined/dictionary.json')['D3017'];
+
 module.isloaded = false;
 
 
@@ -73,6 +75,13 @@ module.exports = function(ctx, name) {
             return ctx._.map(this.remind_on, function(o){
               return ctx.moment(o);  
             });
+        });
+
+        nursingRecordSchema.virtual('type_name').get(function(){
+            if (this.type) {
+                return D3017[this.type].name;
+            }
+            return '';
         });
 
         nursingRecordSchema.pre('update', function(next) {

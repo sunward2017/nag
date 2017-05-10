@@ -7,7 +7,7 @@
 
  var job_id = 'nursingRecordInfoUpdate';
  var job_name =  '护理记录数据更新';
- var job_rule = '1 0 * * *';//每天 几点:几分
+ var job_rule = '15 0 * * *';//每天 几点:几分
  var printLog = true;
 
  module.exports = {
@@ -21,10 +21,14 @@
                          ctx.onJobExecute.call(null, job_id);
                      }
 
-                     //归档昨天的护理记录
-                     ctx.app_archive_service.archivePSN$NursingRecord();
-
-                     //生成新一天的护理记录
+                     console.log('归档昨天的护理记录')
+                     ctx.app_archive_service.archivePSN$NursingRecord().then(()=>{
+                         console.log('生成新一天的护理记录')
+                         return co(function*() {
+                             console.log('----------------------')
+                             return yield ctx.psn_nursingRecord_generate_service.generateByTenantsOfPension()
+                         });
+                     }).catch(ctx.coOnError);
                      // console.log(ctx.moment().format('HH:mm:ss') + ' ' + job_id + '(' + job_name + ') => executed.');
                  }, {printLog: printLog});
 

@@ -119,7 +119,11 @@ module.exports = {
                             if (!nursingRecord) {
                                 this.body = app.wrapper.res.error({ message: '无效的服务项目记录' });
                                 return;
+                            } else if(nursingRecord.executed_flag) {
+                                this.body = app.wrapper.res.error({message: '服务项目记录已执行'});
+                                return;
                             }
+
 
                             nursingRecord.executed_flag = true;
                             yield nursingRecord.save();
@@ -164,6 +168,9 @@ module.exports = {
                             nursingRecord = yield app.modelFactory().model_read(app.models['psn_nursingRecord'], nursingRecordId);
                             if (!nursingRecord) {
                                 this.body = app.wrapper.res.error({ message: '无效的服务项目记录' });
+                                return;
+                            } else if(nursingRecord.confirmed_flag) {
+                                this.body = app.wrapper.res.error({ message: '服务项目记录已签到' });
                                 return;
                             }
 

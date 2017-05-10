@@ -28,9 +28,13 @@
         function init() {
             vm.init({removeDialog: ngDialog});
 
+            vm.readElderlyArchive = readElderlyArchive;
             vm.query();
         }
 
+        function readElderlyArchive (row) {
+            
+        }
     }
 
     InDetailsController.$inject = ['$scope','ngDialog','PENSION_AGENCY_DEFAULT_CHARGE_STANDARD', 'PENSION_AGENCY_CHARGE_ITEM', 'vmh', 'entityVM'];

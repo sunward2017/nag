@@ -166,13 +166,7 @@
                             label: '老人',
                             name: 'name',
                             type: 'string',
-                            width: 60,
-                            sortable: true
-                        }, {
-                            label: '入院登记号',
-                            name: 'enter_code',
-                            type: 'string',
-                            width: 120,
+                            width: 80,
                             sortable: true
                         }, {
                             label: '性别',
@@ -184,7 +178,13 @@
                             label: '年龄',
                             name: 'birthday',
                             type: 'date',
-                            width: 60,
+                            width: 40,
+                            sortable: true
+                        },  {
+                            label: '入院登记号',
+                            name: 'enter_code',
+                            type: 'string',
+                            width: 80,
                             sortable: true
                         }, {
                             label: '饮食套餐',

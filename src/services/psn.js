@@ -4646,6 +4646,146 @@ module.exports = {
                     };
                 }
             }, {
+                method:'nursingPlanSaveAll',
+                verb:'post',
+                url:this.service_url_prefix + "/nursingPlanSaveAll",
+                handler:function(app,options){
+                    return function* (next) {
+                        var type, workItemIds,checked,tenant,elderly,workItems;
+                        try{
+                            var tenantId = this.request.body.tenantId;
+                            tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], tenantId);
+                            if (!tenant || tenant.status == 0) {
+                                this.body = app.wrapper.res.error({ message: '无法找到养老机构!' });
+                                yield next;
+                                return;
+                            }
+
+                            var elderlyId = this.request.body.elderlyId;
+                            elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], elderlyId);
+                            if (!elderly || elderly.status == 0) {
+                                this.body = app.wrapper.res.error({ message: '无法找到老人!' });
+                                yield next;
+                                return;
+                            }
+                            type = this.request.body.type;
+                            workItemIds = this.request.body.workItemIds;
+                            checked = this.request.body.checked;
+
+                            var elderlyNursingPlan = yield app.modelFactory().model_one(app.models['psn_nursingPlan'], {
+                                select: 'work_items',
+                                where: {
+                                    status: 1,
+                                    elderlyId: elderlyId,
+                                    tenantId: tenantId
+                                }
+                            });
+                            var workItemsByElderly = [];
+                            if (!elderlyNursingPlan) {
+                                if(checked == true&&type == DIC.D3017.NURSING_ITEM){
+                                   for (var i=0,len = workItemIds.length;i<len;i++){
+                                        var workItemId = workItemIds[i]; 
+                                        var workItem = yield app.modelFactory().model_read(app.models['psn_workItem'],workItemId);
+                                            if (!workItem || workItem.status == 0) {
+                                                this.body = app.wrapper.res.error({ message: '无法找到工作项目!' });
+                                                yield next;
+                                                return;
+                                            }else{
+                                            var workItemObj = workItem.toObject();
+                                                workItemObj.type = type;
+                                                workItemObj.workItemId = workItemId;
+                                                workItemsByElderly.push(workItemObj);
+                                            }
+                                   }
+                                }else if(checked == true&&type == DIC.D3017.DRUG_USE_ITEM){
+                                       for (var i=0,len = workItemIds.length;i<len;i++){
+                                            var workItemId = workItemIds[i];
+                                            var workItem = yield app.modelFactory().model_read(app.models['psn_drugUseItem'],workItemId);
+                                            if (!workItem || workItem.status == 0) {
+                                                this.body = app.wrapper.res.error({ message: '无法找到用药项目!' });
+                                                yield next;
+                                                return;
+                                            }else{
+                                               var  workItemObj = workItem.toObject();
+                                                    workItemObj.type = type;
+                                                    workItemObj.workItemId = workItemId;
+                                                    workItemsByElderly.push(workItemObj);
+                                            }
+                                       }
+                                }
+                                // console.log("workItemByElderly",workItemsByElderly);
+                                yield app.modelFactory().model_create(app.models['psn_nursingPlan'], {
+                                        elderlyId: elderlyId,
+                                        elderly_name: elderly.name,
+                                        work_items:workItemsByElderly,
+                                        tenantId: tenantId
+                                     });
+
+                            }else{
+                                    workItems = elderlyNursingPlan.work_items;
+                                    // console.log("******",workItems);
+                                    if(type == DIC.D3017.NURSING_ITEM ){
+                                        var baseWorkItems = workItems.filter(function(o){
+                                            return o.type == DIC.D3017.DRUG_USE_ITEM
+                                        })
+                                        // console.log("baseWorkItemsOfDrugUseItem",baseWorkItems);  
+                                        if(checked == true){
+                                            for (var i=0,len = workItemIds.length;i<len;i++){
+                                                 var workItemId = workItemIds[i]; 
+                                                 var workItem = yield app.modelFactory().model_read(app.models['psn_workItem'],workItemId);
+                                                    if (!workItem || workItem.status == 0) {
+                                                        this.body = app.wrapper.res.error({ message: '无法找到工作项目!' });
+                                                        yield next;
+                                                        return;
+                                                    }else{
+                                                      var   workItemObj = workItem.toObject();
+                                                            workItemObj.type = type;
+                                                            workItemObj.workItemId = workItemId;
+                                                            baseWorkItems.push(workItemObj);
+                                                    }
+                                            }
+                                           
+                                        }
+                                         workItemsByElderly = baseWorkItems;
+                                        //  console.log("workItemsofnursingItem",workItemsByElderly) 
+                                    }else if(type == DIC.D3017.DRUG_USE_ITEM){
+                                        var baseWorkItems = workItems.filter(function(o){
+                                            return o.type == DIC.D3017.NURSING_ITEM
+                                        })
+                                        // console.log("baseWorkItemsOfNursingItem",baseWorkItems);  
+                                        if(checked==true){
+                                            for (var i=0,len = workItemIds.length;i<len;i++){
+                                                 var workItemId = workItemIds[i]; 
+                                                 var workItem = yield app.modelFactory().model_read(app.models['psn_drugUseItem'],workItemId);
+                                                    if (!workItem || workItem.status == 0) {
+                                                        this.body = app.wrapper.res.error({ message: '无法找到用药项目!' });
+                                                        yield next;
+                                                        return;
+                                                    }else{
+                                                      var  workItemObj = workItem.toObject();
+                                                           workItemObj.type = type;
+                                                           workItemObj.workItemId = workItemId;
+                                                           baseWorkItems.push(workItemObj);
+                                                    }
+                                            }
+                                        }
+                                        workItemsByElderly = baseWorkItems;
+                                        // console.log("workItemsofdrug",workItemsByElderly) 
+                                    }
+                                     elderlyNursingPlan.work_items = workItemsByElderly;
+                                    //  console.log("workItemsByElderly",workItemsByElderly) 
+                                     yield elderlyNursingPlan.save();
+                            }
+                            this.body = app.wrapper.res.default(); 
+                        }catch(e){
+                            console.log(e);
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);   
+                        }
+                        yield next;
+                    };
+                }
+            },{
                 method: 'nursingPlanSaveRemark',
                 verb: 'post',
                 url: this.service_url_prefix + "/nursingPlanSaveRemark", //为老人保存一条护理项目

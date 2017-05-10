@@ -31,23 +31,24 @@ module.exports = {
             try {
 
                 var today = self.ctx.moment(self.ctx.moment().format('YYYY-MM-DD') + " 00:00:00");
-                
+
                 var rows = yield self.ctx.modelFactory().model_query(self.ctx.models['psn_nursingRecord'], {
                     where: {
-                        exec_on: { '$lte': today.toDate()}
+                        exec_on: {'$lte': today.toDate()}
                     }
                 });
-                
-                console.log('archivePSN$NursingRecord:', rows);
- 
-                yield self.ctx.modelFactory().model_bulkInsert(self.ctx.models['psn_nursingRecordHistory'], {
-                    rows: rows
-                });
 
-                yield self.ctx.modelFactory().model_remove(self.ctx.models['psn_nursingRecord'], {
-                    exec_on: { '$lte': today.toDate()}
-                });
-                
+                // console.log('archivePSN$NursingRecord:', rows);
+
+                if (rows.length > 0) {
+                    yield self.ctx.modelFactory().model_bulkInsert(self.ctx.models['psn_nursingRecordHistory'], {
+                        rows: rows
+                    });
+
+                    yield self.ctx.modelFactory().model_remove(self.ctx.models['psn_nursingRecord'], {
+                        exec_on: {'$lte': today.toDate()}
+                    });
+                }
                 return true;
             } catch (e) {
                 console.log(e);

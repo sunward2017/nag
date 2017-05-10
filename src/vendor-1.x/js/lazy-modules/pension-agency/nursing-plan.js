@@ -42,6 +42,7 @@
             vm.customizedWorkItem = customizedWorkItem;
             vm.workItemByElderly = workItemByElderly;
             vm.allWorkItemChecked = allWorkItemChecked;
+            vm.alldrugUseItemChecked = alldrugUseItemChecked;
             vm.refreshWorkItem = refreshWorkItem;
             vm.$nursingLevels = {};
             vm.tab1 = { cid: 'contentTab1' };
@@ -111,7 +112,7 @@
                     });
                 }
 
-                console.log("workItemMap",workItemMap)
+                console.log("workItemMap", workItemMap)
                 vm.workItemMap = workItemMap;
                 vm.drugUseItemMap = drugUseItemMap;
             });
@@ -242,21 +243,32 @@
 
         function allWorkItemChecked(trackedKey) {
             vm.$selectAll[trackedKey]['workItems'] = !vm.$selectAll[trackedKey]['workItems'];
-            // console.log(trackedKey);
             var workItems = vm.workItemByElderly(vm.workItemMap[vm.aggrData[trackedKey]['elderly']['nursingLevelId']], vm.aggrData[trackedKey]['elderly']['id'])
-            // console.log(vm.$selectAll[trackedKey]['workItems']);
-            // console.log(workItems);
+            // console.log(vm.$selectAll[trackedKey]['workItems']);      
             if (workItems && workItems.length > 0) {
                 for (var s = 0, len = workItems.length; s < len; s++) {
                     vm.work_items['A0001'][trackedKey + '$' + vm.aggrData[trackedKey]['elderly']['nursingLevelId']][workItems[s].id] = vm.$selectAll[trackedKey]['workItems'];
                     var elderlyId = vm.aggrData[trackedKey]['elderly'].id;
                     var workItemKey = trackedKey + '$' + vm.aggrData[trackedKey]['elderly']['nursingLevelId'];
                     var work_item_check_info = { id: workItems[s].id, type: "A0001", checked: vm.$selectAll[trackedKey]['workItems'] };
-                    vmh.psnService.nursingPlanSaveNursingItem(vm.tenantId, elderlyId, work_item_check_info);
+                    vmh.blocking(vmh.psnService.nursingPlanSaveNursingItem(vm.tenantId, elderlyId, work_item_check_info));
                 }
             }
         }
+        function alldrugUseItemChecked(trackedKey) {
+            vm.$selectAll[trackedKey]['drugUseItems'] = !vm.$selectAll[trackedKey]['drugUseItems'];
+            var drugUseItems = vm.drugUseItemMap[vm.aggrData[trackedKey]['elderly']['id']];
+            for (var j = 0, len = drugUseItems.length; j < len; j++) {
+                vm.work_items['A0003'][trackedKey + '$' + vm.aggrData[trackedKey]['elderly']['id']][drugUseItems[j].id] = vm.$selectAll[trackedKey]['drugUseItems'];
+                var elderlyId = vm.aggrData[trackedKey]['elderly'].id;
+                var drugUseItemkey = trackedKey + '$' + vm.aggrData[trackedKey]['elderly']['id'];
+                var drug_use_item_check_info = { id: drugUseItems[j].id, type: 'A0003', checked: vm.$selectAll[trackedKey]['drugUseItems'] };
+                vmh.blocking(
+                    vmh.psnService.nursingPlanSaveNursingItem(vm.tenantId, elderlyId, drug_use_item_check_info)
+                );
+            }
 
+        }
         function workItemChecked(trackedKey, workItemId) {
             var elderlyId = vm.aggrData[trackedKey]['elderly'].id;
             var workItemKey = trackedKey + '$' + vm.aggrData[trackedKey]['elderly']['nursingLevelId'];
@@ -342,7 +354,7 @@
                 vmh.shareService.tmp('T3001/psn-nursingLevel', 'name short_name nursing_assessment_grade', null),
                 vmh.shareService.tmp('T3001/psn-workItem', 'name elderlyId sourceId nursingLevelId', null, true),
             ]).then(function (results) {
-                
+
                 var nursingLevels = _.map(results[0], function (row) {
                     return { id: row._id, name: row.name, short_name: row.short_name, nursing_assessment_grade: row.nursing_assessment_grade }
                 });
@@ -356,7 +368,7 @@
                         return o.nursingLevelId === nursingLevelId;
                     });
                 }
-                 console.log("workItemMap",workItemMap)
+                console.log("workItemMap", workItemMap)
                 vm.workItemMap = workItemMap;
             })
         }

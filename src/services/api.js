@@ -29,7 +29,7 @@ module.exports = {
                     return function *(next) {
                         try {
                             var rows = yield app.modelFactory().model_query(app.models['pub_bedMonitor'], {
-                                select: 'code -_id',
+                                select: 'mac -_id',
                                 where: {
                                     status: 1
                                 }

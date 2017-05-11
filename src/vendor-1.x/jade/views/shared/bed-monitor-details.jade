@@ -20,6 +20,12 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                             input.form-control(type='text', name='name',ng-model='vm.model.name',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-NAME")|translate}}' ,required='')
                             span.text-danger(ng-show="utils.vinput(this.theForm,'name','required')") {{ "validator.REQUIRED" | translate}}
                     fieldset: .form-group
+                        <!--MAC-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-MAC') | translate}}:
+                        .col-md-10
+                            input.form-control(type='text', name='mac',ng-model='vm.model.mac',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-MAC")|translate}}' ,required='')
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'mac','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset: .form-group
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-FLAG-COLLECTION') | translate}}:
                         .col-md-2
                             .checkbox.c-checkbox

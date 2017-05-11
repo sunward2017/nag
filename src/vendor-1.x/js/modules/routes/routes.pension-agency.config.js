@@ -2125,6 +2125,12 @@
                             width: 120,
                             sortable: true
                         }, {
+                            label: 'mac',
+                            name: 'mac',
+                            type: 'string',
+                            width: 120,
+                            sortable: true
+                        }, {
                             label: '设备状态',
                             name: 'device_status_name',
                             type: 'string',

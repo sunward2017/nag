@@ -843,6 +843,7 @@ module.exports = {
                     select: 'name tenantId device_status',
                     where: {
                         status: 1,
+                        stop_flag: false,
                         tenantId: {
                             '$in': tenantIds
                         }
@@ -961,23 +962,14 @@ module.exports = {
                     }
 
                     key = bedMonitor.name;
-
                     if (isOffLine) {
-                        if (bedMonitor.device_status != DIC.D3009.OffLine) {
-                            // console.log('睡眠带状态变化 在线 -> 离线');
-                            // self.logger.info('睡眠带状态变化 在线 -> 离线');
-                            self.ctx.clog.log(self.logger, '睡眠带状态变化 在线 -> 离线');
-                            self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR.OFF_LINE, { bedMonitorName: bedMonitor.name });
-                            self.ctx.cache.del(key);
-                        }
-
+                        self.ctx.clog.log(self.logger, '发送睡眠带设备离线消息');
+                        self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR.OFF_LINE, { bedMonitorName: bedMonitor.name });
+                        self.ctx.cache.del(key);
                     } else {
-                        if (bedMonitor.device_status != DIC.D3009.OnLine) {
-                            // console.log('睡眠带状态变化 离线 -> 在线');
-                            // self.logger.info('睡眠带状态变化 离线 -> 在线');
-                            self.ctx.clog.log(self.logger, '睡眠带状态变化 离线 -> 在线');
-                            self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR.ON_LINE, { bedMonitorName: bedMonitor.name });
-                        }
+                        self.ctx.clog.log(self.logger, '发送睡眠带设备在线消息');
+                        self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR.ON_LINE, {bedMonitorName: bedMonitor.name});
+
                         oldBedStatus = self.ctx.cache.get(key);
                         bedStatus = {
                             tenantId: bedMonitor.tenantId,
@@ -1029,12 +1021,15 @@ module.exports = {
                                     if (bedStatus.isBed == true) {
                                         // console.log('b在床 -> 在床 不做任何事情');
                                         // self.logger.info('b在床 -> 在床 不做任何事情');
-                                        self.ctx.clog.log(self.logger, 'b在床 -> 在床 不做任何事情');
+                                        self.ctx.clog.log(self.logger, 'b在床 -> 在床 发送在床消息');
+                                        self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR.COME, { bedMonitorName: bedMonitor.name });
                                     } else {
                                         // 离床 -> 离床 不做任何事情
                                         // console.log('b离床 -> 离床 处于离床计时,不做任何事情');
                                         // self.logger.info('b离床 -> 离床 处于离床计时,不做任何事情');
-                                        self.ctx.clog.log(self.logger, 'b离床 -> 离床 处于离床计时,不做任何事情');
+                                        self.ctx.clog.log(self.logger, 'b离床 -> 离床 处于离床计时,发送离床消息');
+
+                                        self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR.LEAVE, { bedMonitorName: bedMonitor.name });
                                     }
                                 } else {
                                     if (bedStatus.isBed == true) {
@@ -1061,7 +1056,7 @@ module.exports = {
                                                     self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR.ALARM_LEAVE_TIMEOUT, {
                                                         bedMonitorName: k,
                                                         reason: DIC.D3016.LEAVE_BED_TIMEOUT,
-                                                        alarmId: v.alarmId
+                                                        alarmId: alarmId
                                                     });
                                                     v.alarmId = alarmId;
                                                     self.ctx.cache.put(k, v);

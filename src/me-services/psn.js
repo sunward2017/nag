@@ -47,7 +47,7 @@ module.exports = {
                                 return;
                             }
 
-                            // 通过机器人->房间->护理等级
+                            // 通过机器人->房间->照护等级
                             tenantId = robot.tenantId;
 
                             rooms = yield app.modelFactory().model_query(app.models['psn_room'], {
@@ -113,7 +113,7 @@ module.exports = {
                                 return;
                             }
 
-                            // 通过机器人->房间->护理等级
+                            // 通过机器人->房间->照护等级
                             tenantId = robot.tenantId;
                             nursingRecord = yield app.modelFactory().model_read(app.models['psn_nursingRecord'], nursingRecordId);
                             if (!nursingRecord) {
@@ -163,7 +163,7 @@ module.exports = {
                                 return;
                             }
 
-                            // 通过机器人->房间->护理等级
+                            // 通过机器人->房间->照护等级
                             tenantId = robot.tenantId;
                             nursingRecord = yield app.modelFactory().model_read(app.models['psn_nursingRecord'], nursingRecordId);
                             if (!nursingRecord) {

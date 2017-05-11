@@ -1,6 +1,6 @@
 /**
  * Created by zppro on 17-4-27.
- * 养老机构 护理组实体
+ * 养老机构 照护组实体
  */
 var mongoose = require('mongoose');
 
@@ -25,7 +25,7 @@ module.exports = function(ctx,name) {
                 name: {type: String, required: true, maxlength: 30}, //冗余
                 leader_flag: { type: Boolean, default: false } // 需要组长标识,确保同一组内仅有一个
             }],
-            stop_flag: {type: Boolean, default: false},//停用标志 护理组是否可用
+            stop_flag: {type: Boolean, default: false},//停用标志 照护组是否可用
             stoped_on: {type: Date},
             tenantId: {type: mongoose.Schema.Types.ObjectId}
         }, {

@@ -188,7 +188,7 @@
                     if(results[10].children.length>0) {
                         vm.selectedStandard.children.push(results[10]);
                     }
-                    //增加护理费
+                    //增加照护费
                     if(results[15].children.length>0){
                         vm.selectedStandard.children.push(results[15]);
                     }
@@ -212,7 +212,7 @@
                         vm.selectBinding.board_infos = board_charge_item.children;
                     }
 
-                    //护理信息
+                    //照护信息
                     var nursing_charge_item = _.findWhere(vm.selectedStandard.children, {_id: PENSION_AGENCY_CHARGE_ITEM.NURSING + '-' + vm.elderlyModel.charge_standard});
                     if (nursing_charge_item) {
                         vm.selectBinding.nursing_infos = nursing_charge_item.children;

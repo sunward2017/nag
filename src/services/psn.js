@@ -837,7 +837,7 @@ module.exports = {
             }, {
                 method: 'changeElderlyNursingLevel',
                 verb: 'post',
-                url: this.service_url_prefix + "/changeElderlyNursingLevel", //直接修改老人护理级别
+                url: this.service_url_prefix + "/changeElderlyNursingLevel", //直接修改老人照护级别
                 handler: function (app, options) {
                     return function* (next) {
                         var tenant, elderly, nursingLevel, nursingPlan;
@@ -859,14 +859,14 @@ module.exports = {
                             var nursingLevelId = this.request.body.nursingLevelId;
                             nursingLevel = yield app.modelFactory().model_read(app.models['psn_nursingLevel'], nursingLevelId);
                             if (!nursingLevel || nursingLevel.status == 0) {
-                                this.body = app.wrapper.res.error({ message: '无法找到护理级别!' });
+                                this.body = app.wrapper.res.error({ message: '无法找到照护级别!' });
                                 yield next;
                                 return;
                             }
 
                             // console.log('nursingLevelId:', nursingLevelId);
                             if (nursingLevelId === (elderly.nursingLevelId || '').toString()) {
-                                this.body = app.wrapper.res.error({ message: '护理级别没有变化!' });
+                                this.body = app.wrapper.res.error({ message: '照护级别没有变化!' });
                                 yield next;
                                 return;
                             }
@@ -891,7 +891,7 @@ module.exports = {
                                 tenantId: elderly.tenantId
                             });
 
-                            // 如果更换护理等级,将清空对应的所有工作项目
+                            // 如果更换照护等级,将清空对应的所有工作项目
                             var elderlyNursingPlan = yield app.modelFactory().model_one(app.models['psn_nursingPlan'], {
                                 select: 'work_items',
                                 where: {
@@ -3908,11 +3908,11 @@ module.exports = {
                     };
                 }
             },
-            /**********************护理排班*****************************/
+            /**********************照护排班*****************************/
             {
                 method: 'nursingScheduleWeekly',
                 verb: 'post',
-                url: this.service_url_prefix + "/nursingScheduleWeekly", //按周查找护理排班
+                url: this.service_url_prefix + "/nursingScheduleWeekly", //按周查找照护排班
                 handler: function (app, options) {
                     return function* (next) {
                         var tenant, xAxisValueStart, xAxisValueEnd;
@@ -4210,7 +4210,7 @@ module.exports = {
                             var nursingScheduleTemplateId = this.request.body.nursingScheduleTemplateId;
                             nursingScheduleTemplate = yield app.modelFactory().model_read(app.models['psn_nursingScheduleTemplate'], nursingScheduleTemplateId);
                             if (!nursingScheduleTemplate || nursingScheduleTemplate.status == 0) {
-                                this.body = app.wrapper.res.error({ message: '无法找到护理模版!' });
+                                this.body = app.wrapper.res.error({ message: '无法找到照护模版!' });
                                 yield next;
                                 return;
                             }
@@ -4392,7 +4392,7 @@ module.exports = {
             }, {
                 method: 'nursingScheduleByElderlyDaily',
                 verb: 'post',
-                url: this.service_url_prefix + "/nursingScheduleByElderlyDaily", //按老人和天查找护理排班
+                url: this.service_url_prefix + "/nursingScheduleByElderlyDaily", //按老人和天查找照护排班
                 handler: function (app, options) {
                     return function* (next) {
                         var tenant, elderly, dateString, xAxisValueStart;
@@ -4444,11 +4444,11 @@ module.exports = {
                     };
                 }
             },
-            /**********************护理计划*****************************/
+            /**********************照护计划*****************************/
             {
                 method: 'nursingPlansByRoom',
                 verb: 'post',
-                url: this.service_url_prefix + "/nursingPlansByRoom", //按房间查找入住老人的护理计划
+                url: this.service_url_prefix + "/nursingPlansByRoom", //按房间查找入住老人的照护计划
                 handler: function (app, options) {
                     return function* (next) {
                         var tenant, elderly, nursingPlan;
@@ -4552,7 +4552,7 @@ module.exports = {
             }, {
                 method: 'nursingPlanSaveNursingItem',
                 verb: 'post',
-                url: this.service_url_prefix + "/nursingPlanSaveNursingItem", //为老人保存一条护理类目
+                url: this.service_url_prefix + "/nursingPlanSaveNursingItem", //为老人保存一条照护类目
                 handler: function (app, options) {
                     return function* (next) {
                         var tenant, elderly, workItem, nursingPlan, toProcessWorkItem
@@ -4788,7 +4788,7 @@ module.exports = {
             },{
                 method: 'nursingPlanSaveRemark',
                 verb: 'post',
-                url: this.service_url_prefix + "/nursingPlanSaveRemark", //为老人保存一条护理项目
+                url: this.service_url_prefix + "/nursingPlanSaveRemark", //为老人保存一条照护项目
                 handler: function (app, options) {
                     return function* (next) {
                         var tenant, elderly, nursingPlan;
@@ -4898,11 +4898,11 @@ module.exports = {
                     };
                 }
             },
-            /**********************护理计划执行(护理记录)*****************************/
+            /**********************照护计划执行(照护记录)*****************************/
             {
                 method: 'nursingRecordGenerate',
                 verb: 'post',
-                url: this.service_url_prefix + "/nursingRecordGenerate", //按照护理计划一轮护理记录
+                url: this.service_url_prefix + "/nursingRecordGenerate", //按照照护计划一轮照护记录
                 handler: function (app, options) {
 
                     return function*(next) {
@@ -4920,7 +4920,7 @@ module.exports = {
             },{
                 method: 'nursingRecordsByElderlyToday',
                 verb: 'post',
-                url: this.service_url_prefix + "/nursingRecordsByElderlyToday", //老人的今日的护理记录
+                url: this.service_url_prefix + "/nursingRecordsByElderlyToday", //老人的今日的照护记录
                 handler: function (app, options) {
                     return function* (next) {
                         var tenant, elderly, nursingPlan;

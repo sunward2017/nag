@@ -492,7 +492,7 @@ module.exports = {
             {
                 method: 'fetch-T3011',
                 verb: 'post',
-                url: this.service_url_prefix + "/T3011", // 护理小组可选的护工
+                url: this.service_url_prefix + "/T3011", // 照护小组可选的护工
                 handler: function (app, options) {
                     return function * (next) {
                         try {
@@ -553,7 +553,7 @@ module.exports = {
             {
                 method: 'fetch-T3013',
                 verb: 'post',
-                url: this.service_url_prefix + "/T3013", // 护理小组+护工树
+                url: this.service_url_prefix + "/T3013", // 照护小组+护工树
                 handler: function (app, options) {
                     return function * (next) {
                         try {

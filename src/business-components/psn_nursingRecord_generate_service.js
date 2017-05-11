@@ -65,10 +65,10 @@ module.exports = {
             try {
 
                 if (nursingRecordId && !tenantId) {
-                    // 根据当前的护理记录生成下一周期的记录
+                    // 根据当前的照护记录生成下一周期的记录
                     nursingRecord = yield self.ctx.modelFactory().model_read(self.ctx.models['psn_nursingRecord'], nursingRecordId);
                     if (!nursingRecord) {
-                        return self.ctx.wrapper.res.error({message: '无法找到护理记录!'});
+                        return self.ctx.wrapper.res.error({message: '无法找到照护记录!'});
                     }
 
                     elderlyId = nursingRecord.elderlyId;
@@ -82,7 +82,7 @@ module.exports = {
                         }
                     });
                     if (!nursingPlanItem) {
-                        return self.ctx.wrapper.res.error({message: '无法找到护理计划!'});
+                        return self.ctx.wrapper.res.error({message: '无法找到照护计划!'});
                     }
 
                     var workItemIdOfCurrentNursingRecord = nursingRecord.workItemId.toString();
@@ -91,7 +91,7 @@ module.exports = {
                         return o.workItemId == workItemIdOfCurrentNursingRecord;
                     });
                     if (!workOrDrugUseItem) {
-                        return self.ctx.wrapper.res.error({message: '所属项目已经不在护理计划中!'});
+                        return self.ctx.wrapper.res.error({message: '所属项目已经不在照护计划中!'});
                     }
 
                     //房间床位检查
@@ -224,7 +224,7 @@ module.exports = {
                     }
 
                     if(!nursingRecordToSave.exec_on) {
-                        warningMsg = '当前记录所属的护理计划已更改(执行时间)';
+                        warningMsg = '当前记录所属的照护计划已更改(执行时间)';
                     } else {
                         findNuringWorkerCount = 0;
                         // 查找老人对应的护工 (老人->房间+日期->排班->护工)
@@ -249,14 +249,14 @@ module.exports = {
                         }
 
                         if (findNuringWorkerCount == 0) {
-                            warningMsg = '无法找到护理记录执行时间对应的护工,可能还没有排班';
+                            warningMsg = '无法找到照护记录执行时间对应的护工,可能还没有排班';
                         }
 
                         yield self.ctx.modelFactory().model_create(self.ctx.models['psn_nursingRecord'], nursingRecordToSave);
                     }
                     return self.ctx.wrapper.res.default(warningMsg);
                 } else if (!nursingRecordId && tenantId) {
-                    // 生成当前机构今天的护理记录
+                    // 生成当前机构今天的照护记录
                     tenant = yield self.ctx.modelFactory().model_read(self.ctx.models['pub_tenant'], tenantId);
                     if (!tenant || tenant.status == 0) {
                         return self.ctx.wrapper.res.error({message: '无法找到养老机构!'});
@@ -488,12 +488,12 @@ module.exports = {
                             }
                         }
                         if (findNuringWorkerCount == 0) {
-                            warningMsg = '无法找到护理记录执行时间对应的护工,可能还没有排班';
+                            warningMsg = '无法找到照护记录执行时间对应的护工,可能还没有排班';
                         } else if (findNuringWorkerCount < len) {
-                            warningMsg = '部分护理记录无法找到执行时间对应的护工,可能那些时间段还没有排班';
+                            warningMsg = '部分照护记录无法找到执行时间对应的护工,可能那些时间段还没有排班';
                         }
 
-                        // 最终需要先删除当前时间之后的所有记录,并插入重新计算以后的护理记录
+                        // 最终需要先删除当前时间之后的所有记录,并插入重新计算以后的照护记录
                         if (nursingRecordsToSave.length > 0) {
                             allEdlerlyIds = self.ctx._.allKeys(elderlyMapRoom);
                             yield self.ctx.modelFactory().model_bulkInsert(self.ctx.models['psn_nursingRecord'], {

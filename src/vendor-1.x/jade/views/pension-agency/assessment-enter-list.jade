@@ -25,6 +25,7 @@
                                 label
                                     input(type='checkbox' data="trBubble" ng-model="row.checked" )
                                     span.fa.fa-check(data="trBubble")
+                        td.text-left {{::row.code}}
                         td.text-left {{::row.elderly_name}}
                         td.text-left {{::row.time|date:'yyyy-MM-dd HH:mm'}}
                         td.text-left {{::row.current_disease_evaluation.level|formatter:'current_disease_evaluation.level':vm.columns}}

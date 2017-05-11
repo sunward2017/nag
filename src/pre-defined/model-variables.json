@@ -10,7 +10,8 @@
     "LEAVE_TO_TENANT": "psn_leave$tenant",
     "CODE_OF_NURSING_RECORD": "psn_nursingRecord$code",
     "BOOKING_TO_TENANT": "booking$tenant",
-    "SCENICSPOT": "scenerySpot$code"
+    "SCENICSPOT": "scenerySpot$code",
+    "ASSESSMENT":"psn_assessment$code"
   },
   "KEYS":{
     "SHIPPING_FEE": "shipping_fee"

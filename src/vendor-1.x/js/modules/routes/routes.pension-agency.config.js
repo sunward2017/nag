@@ -527,6 +527,12 @@
                         searchForm: { "status": 1,"type":'A0001'},
                         serverPaging: true,
                         columns: [{
+                            label: '评估号',
+                            name: 'code',
+                            type: 'string',
+                            width: 60,
+                            sortable: true
+                        },{
                             label: '老人',
                             name: 'elderlyId',
                             type: 'string',
@@ -576,7 +582,7 @@
                 resolve: {
                     entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'assessment-enter.details', {
                         modelName: 'psn-assessment',
-                        model: {},
+                        model: {code: MODEL_VARIABLES.PRE_DEFINED.SERVER_GEN},
                         blockUI: true
                     }),
                     deps: helper.resolveFor2('angucomplete-alt')
@@ -638,7 +644,7 @@
                 resolve: {
                     entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'assessment-regular.details', {
                         modelName: 'psn-assessment',
-                        model: {},
+                        model: {code: MODEL_VARIABLES.PRE_DEFINED.SERVER_GEN},
                         blockUI: true
                     }),
                     deps: helper.resolveFor2('angucomplete-alt')

@@ -1,3 +1,4 @@
+
 .col-xs-12.text-center
     .row
         form.form-search
@@ -19,32 +20,21 @@
                             | {{column.label}}
                             i.glyphicon(ng-if="column.name === vm.sort.column && vm.sort.direction",ng-class="vm.sort.direction|orderClass")
                 tbody
-                    tr(ng-class="{true: 'begin_exit_flow'}[row.begin_exit_flow]", ng-repeat="row in vm.rows|filter:vm.filter|orderBy:vm.sort.column:vm.sort.direction===-1|paging:vm" , ng-click="vm.selectRow($event,row)",ng-dblclick="vm.dblclickRow(row.id)")
+                    tr(ng-repeat="row in vm.rows|filter:vm.filter|orderBy:vm.sort.column:vm.sort.direction===-1|paging:vm" , ng-click="vm.selectRow($event,row)",ng-dblclick="vm.dblclickRow(row.id)")
                         td
                             .checkbox.c-checkbox
                                 label
                                     input(type='checkbox' data="trBubble" ng-model="row.checked" )
                                     span.fa.fa-check(data="trBubble")
-                        td.text-left
-                            | {{::row.name}}
-                            a.btn.btn-primary.btn-xs.pull-right(title="{{ vm.viewTranslatePath('TITLE-ARCHIVE') | translate}}",ng-click="vm.readElderlyArchive(row)") {{ vm.viewTranslatePath('LABEL-ARCHIVE') | translate}}
-                        td {{::row.sex|formatter:'sex':vm.columns}}
-                        td {{::row.birthday|calcAge}}
-                        td.text-left {{::row.enter_code}}
-                        td {{::row.board_summary}}
-                        td {{::row.room_summary}}
-                        td {{::row.nursing_info}}
-                        td {{::row.begin_exit_flow|formatter:'begin_exit_flow':vm.columns}}
+                        td {{::row.stop_flag|boolFilter}}
+                        td {{::row.job_id}}
+                        td {{::row.job_name}}
+                        td {{::row.job_rule}}
+                        td.text-center {{::row.last_exec_on|date:'yyyy-MM-dd HH:mm:ss'}}
                         td
                             .btn-group
                                 a.btn.btn-primary.btn-xs(title="{{'button.READ'|translate}}",ng-click="vm.read(row._id)")
-                                    i.glyphicon.glyphicon-search
-                            .btn-group(ng-if="!row.begin_exit_flow")
-                                a.btn.btn-primary.btn-xs(title="{{'button.EDIT'|translate}}",ng-click="vm.edit(row._id)")
-                                    i.glyphicon.glyphicon-pencil
-                            .btn-group
-                                a.btn.btn-primary.btn-xs(title="{{'button.CONFIG'|translate}}",ng-click="$state.go(vm.transTo.inConfig,{_id:row._id})")
-                                    i.glyphicon.glyphicon-cog
+                                    i.glyphicon.glyphicon-list-alt
                     tr(ng-if="vm.paged.length==0")
                         td(colspan="{{utils.noResultsColspan(vm)}}") {{ 'grid.NO-RESULTS' | translate}}
             .panel-footer

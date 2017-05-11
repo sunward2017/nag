@@ -26,7 +26,7 @@
                                         i.glyphicon.glyphicon-pencil
                                 div(ng-if="vm.$editings[row.trackedKey]['nursingLevelId']")
                                     .btn-group
-                                        .dropdown(s-dropdown,is-button,ng-model="vm.editing$NursingLevel[vm.aggrData[row.trackedKey]['elderly']['id']]",s-dropdown-data="vm.selectBinding.nursingLevels" s-dropdown-option="{valueKey:'id', textKey:'short_name'}")
+                                        .dropdown(s-dropdown,is-button,ng-model="vm.editing$NursingLevel[vm.aggrData[row.trackedKey]['elderly']['id']]",s-dropdown-data="vm.$nursingLevels[vm.aggrData[row.trackedKey]['elderly']['nursing_assessment_grade']]" s-dropdown-option="{valueKey:'id', textKey:'short_name'}")
                                     .split
                                     .btn-group
                                         a.btn.btn-primary.btn-sm(title="{{'button.SAVE'|translate}}",ng-click="vm.saveElderlyNursingLevel(row.trackedKey, vm.editing$NursingLevel[vm.aggrData[row.trackedKey]['elderly']['id']])")
@@ -38,26 +38,39 @@
                                 a.btn.btn-primary.btn-sm(ng-click="vm.switchReadonlyWorkItems(row.trackedKey)" ng-class="{'btn-primary': !vm.$editings[row.trackedKey]['workItems'], 'btn-warning': vm.$editings[row.trackedKey]['workItems']}")
                                     i.glyphicon.glyphicon-pencil
                                     span.ml-sm {{ vm.$editings[row.trackedKey]['workItems'] ? vm.moduleTranslatePath('BTN-DO-READONLY-WORK-ITEMS') : vm.moduleTranslatePath('BTN-CANCEL-READONLY-WORK-ITEMS') | translate}}
+                            <!--work_item_all--->
+                            .btn-group(ng-if="vm.aggrData[row.trackedKey]['elderly']['nursingLevelId']") 
+                                .checkbox.c-checkbox
+                                    label
+                                        input(id="{{row.trackedKey + '$all'}}",type='checkbox',ng-disabled="!vm.$editings[row.trackedKey]['workItems']", ng-checked="vm.$selectAll[row.trackedKey]['workItems']" ng-click="vm.allWorkItemChecked(row.trackedKey)")
+                                        span.fa.fa-check
+                                label(for="{{row.trackedKey + '$all'}}",) {{vm.moduleTranslatePath('ALL-SELECTED') | translate}}
                             .split
                             .btn-group.work-item(ng-if="vm.aggrData[row.trackedKey]['elderly']['id'] && vm.aggrData[row.trackedKey]['elderly']['nursingLevelId']", ng-repeat="workItem in vm.workItemByElderly(vm.workItemMap[vm.aggrData[row.trackedKey]['elderly']['nursingLevelId']],vm.aggrData[row.trackedKey]['elderly']['id']) ")
                                 .checkbox.c-checkbox
                                     label
                                         input(id="{{row.trackedKey + '$' +workItem.id}}",type='checkbox', ng-disabled="!vm.$editings[row.trackedKey]['workItems']", ng-model="vm.work_items['A0001'][row.trackedKey + '$' + vm.aggrData[row.trackedKey]['elderly']['nursingLevelId']][workItem.id]" ng-change="vm.workItemChecked(row.trackedKey, workItem.id)")
                                         span.fa.fa-check
-                                label(for="{{row.trackedKey + '$' +workItem.id}}" ng-dblclick="vm.customizedWorkItem(workItem.id,vm.aggrData[row.trackedKey]['elderly']['id'])") {{ workItem.name }}
+                                label(ng-dblclick="vm.customizedWorkItem(workItem.id,vm.aggrData[row.trackedKey]['elderly']['id'],row.trackedKey,workItem.Id)") {{ workItem.name }}
                         <!--用药-->        
                         td
                             .btn-group(ng-if="vm.aggrData[row.trackedKey]['elderly']['id']")
                                 a.btn.btn-primary.btn-sm(ng-click="vm.switchReadonlyDrugUseItems(row.trackedKey)" ng-class="{'btn-primary': !vm.$editings[row.trackedKey]['drugUseItems'], 'btn-warning': vm.$editings[row.trackedKey]['drugUseItems']}")
                                     i.glyphicon.glyphicon-pencil
                                     span.ml-sm {{ vm.$editings[row.trackedKey]['drugUseItems'] ? vm.moduleTranslatePath('BTN-DO-READONLY-WORK-ITEMS') : vm.moduleTranslatePath('BTN-CANCEL-READONLY-WORK-ITEMS') | translate}}
+                            .btn-group(ng-if="vm.aggrData[row.trackedKey]['elderly']['id']") 
+                                .checkbox.c-checkbox
+                                    label
+                                        input(id="{{row.trackedKey + '$alldrug'}}",type='checkbox',ng-disabled="!vm.$editings[row.trackedKey]['drugUseItems']", ng-checked="vm.$selectAll[row.trackedKey]['drugUseItems']" ng-click="vm.alldrugUseItemChecked(row.trackedKey)")
+                                        span.fa.fa-check
+                                label(for="{{row.trackedKey + '$alldrug'}}",) {{vm.moduleTranslatePath('ALL-SELECTED') | translate}}
                             .split
                             .btn-group.work-item(ng-if="vm.aggrData[row.trackedKey]['elderly']['id']", ng-repeat="drugUseItem in vm.drugUseItemMap[vm.aggrData[row.trackedKey]['elderly']['id']]")
                                 .checkbox.c-checkbox
                                     label
                                         input(id="{{row.trackedKey + '$' +drugUseItem.id}}",type='checkbox', ng-disabled="!vm.$editings[row.trackedKey]['drugUseItems']", ng-model="vm.work_items['A0003'][row.trackedKey + '$' + vm.aggrData[row.trackedKey]['elderly']['id']][drugUseItem.id]" ng-change="vm.drugUseItemChecked(row.trackedKey,drugUseItem.id)")
                                         span.fa.fa-check 
-                                label(for="{{row.trackedKey + '$' +drugUseItem.id}}") {{ drugUseItem.name }}
+                                label {{ drugUseItem.name }}
                         td.text-center 
                             .btn-group(ng-if="vm.aggrData[row.trackedKey]['elderly']['nursingLevelId']")
                                 a.btn.btn-warning.btn-sm(ng-click="vm.generateNursingRecord(row.trackedKey)")

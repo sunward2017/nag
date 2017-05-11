@@ -1,63 +1,62 @@
 /**
- * district Created by zppro on 17-3-23.
- * Target:养老机构 照护级别
+ * Created by zppro on 17-5-8.
  */
 
 (function() {
     'use strict';
-    
+
     angular
-        .module('subsystem.pension-agency')
-        .controller('NursingLevelGridController', NursingLevelGridController)
-        .controller('NursingLevelDetailsController', NursingLevelDetailsController)
+        .module('subsystem.manage-center')
+        .controller('JobStatusGridController', JobStatusGridController)
+        .controller('JobStatusDetailsController', JobStatusDetailsController)
     ;
 
+    JobStatusGridController.$inject = ['$scope', 'ngDialog', 'vmh', 'entryVM'];
 
-    NursingLevelGridController.$inject = ['$scope', 'ngDialog', 'vmh', 'entryVM'];
-
-    function NursingLevelGridController($scope, ngDialog, vmh, vm) {
-
+    function JobStatusGridController($scope, ngDialog, vmh, vm) {
         $scope.vm = vm;
         $scope.utils = vmh.utils.g;
-
+         
         init();
+
 
         function init() {
             vm.init({removeDialog: ngDialog});
+
             vm.query();
         }
     }
 
-    NursingLevelDetailsController.$inject = ['$scope', 'ngDialog', 'vmh', 'entityVM'];
+    JobStatusDetailsController.$inject = ['$scope','ngDialog', 'vmh','entityVM'];
 
-    function NursingLevelDetailsController($scope, ngDialog, vmh, vm) {
+    function JobStatusDetailsController($scope, ngDialog, vmh, vm) {
 
         var vm = $scope.vm = vm;
         $scope.utils = vmh.utils.v;
 
-
         init();
 
         function init() {
-
             vm.init({removeDialog: ngDialog});
 
-
+            vm.readlog = readlog;
             vm.doSubmit = doSubmit;
             vm.tab1 = {cid: 'contentTab1'};
 
-            vmh.shareService.d('D3015').then(function (nursingAssessmentGrades) {
-                vm.selectBinding.nursingAssessmentGrades = nursingAssessmentGrades;
-            });
 
             vm.load();
 
         }
 
+        function readlog() {
+            
+        }
 
         function doSubmit() {
 
             if ($scope.theForm.$valid) {
+                //console.log(vm.model);
+                vm.model.ver_order = genVerOrder(vm.model.ver);
                 vm.save();
             }
             else {
@@ -66,8 +65,6 @@
                 }
             }
         }
-
-
     }
 
 })();

@@ -7,7 +7,7 @@
     "children": [
       {
         "_id": "menu.manage-center.TENANT-ACCOUNT-MANAGE",
-        "name": "帐号管理",
+        "name": "账号管理",
         "sref": "app.manage-center.tenant-account-manage.list"
       },
       {
@@ -30,7 +30,7 @@
     "children": [
       {
         "_id": "menu.manage-center.AGENT-ACCOUNT-MANAGE",
-        "name": "帐号管理",
+        "name": "账号管理",
         "sref": "app.manage-center.agent-account-manage.list"
       },
       {
@@ -51,6 +51,11 @@
     "sref": "#",
     "icon": "icon-folder",
     "children": [
+      {
+        "_id": "menu.manage-center.JOB-STATUS",
+        "name": "作业状态",
+        "sref": "app.manage-center.job-status.list"
+      },
       {
         "_id": "menu.manage-center.PLATFORM-USER-MANAGE",
         "name": "用户管理",

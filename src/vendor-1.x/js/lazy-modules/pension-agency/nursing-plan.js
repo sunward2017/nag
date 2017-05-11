@@ -41,25 +41,45 @@
             vm.generateNursingRecord = generateNursingRecord;
             vm.customizedWorkItem = customizedWorkItem;
             vm.workItemByElderly = workItemByElderly;
-
+            vm.allWorkItemChecked = allWorkItemChecked;
+            vm.alldrugUseItemChecked = alldrugUseItemChecked;
+            vm.refreshWorkItem = refreshWorkItem;
+            vm.$nursingLevels = {};
             vm.tab1 = { cid: 'contentTab1' };
             vm.$editings = {};
+            vm.$selectAll = {};
 
             vmh.parallel([
                 vmh.clientData.getJson('nursingPlanAxis'),
-                vmh.shareService.tmp('T3001/psn-nursingLevel', 'name short_name', null),
+                vmh.shareService.tmp('T3001/psn-nursingLevel', 'name short_name nursing_assessment_grade', null),
                 vmh.shareService.tmp('T3001/psn-workItem', 'name elderlyId sourceId nursingLevelId', null),
                 vmh.shareService.tmp('T3001/psn-drugUseItem', 'drugId name elderlyId', null),
+                vmh.shareService.d('D3015'),
 
             ]).then(function (results) {
                 vm.xAxisData = results[0];
                 // console.log('nursingPlanAxis:', vm.xAxisData);
 
-                vm.selectBinding.nursingLevels = _.map(results[1], function (row) {
-                    return { id: row._id, name: row.name, short_name: row.short_name }
+                var nursingLevels = _.map(results[1], function (row) {
+                    return { id: row._id, name: row.name, short_name: row.short_name, nursing_assessment_grade: row.nursing_assessment_grade }
                 });
+                // console.log(nursingLevels)
+                var nursingAssessmentGrades = _.map(results[4], function (row) {
+                    return { grade: row.value };
+                })
+                var nursingLevelsByElderly = {};
+                for (var n = 0, g = nursingAssessmentGrades.length; n < g; n++) {
+                    var nursing_assessment_grade = nursingAssessmentGrades[n].grade;
+
+                    nursingLevelsByElderly[nursing_assessment_grade] = _.filter(nursingLevels, function (o) {
+                        return o.nursing_assessment_grade === nursing_assessment_grade;
+                    })
+                }
+                // console.log("filterNursingLevels", nursingLevelsByElderly)
+                vm.$nursingLevels = nursingLevelsByElderly;
+
                 var nursingLevelMap = {};
-                _.reduce(vm.selectBinding.nursingLevels, function (o, nursingLevel) {
+                _.reduce(nursingLevels, function (o, nursingLevel) {
                     o[nursingLevel.id] = nursingLevel.short_name;
                     return o;
                 }, nursingLevelMap);
@@ -69,8 +89,8 @@
                     return { id: row._id, name: row.name, sourceId: row.sourceId, elderlyId: row.elderlyId, nursingLevelId: row.nursingLevelId }
                 });
                 var workItemMap = {};
-                for (var i = 0, len = vm.selectBinding.nursingLevels.length; i < len; i++) {
-                    var nursingLevelId = vm.selectBinding.nursingLevels[i].id;
+                for (var i = 0, len = nursingLevels.length; i < len; i++) {
+                    var nursingLevelId = nursingLevels[i].id;
                     workItemMap[nursingLevelId] = _.filter(workItems, function (o) {
                         return o.nursingLevelId === nursingLevelId;
                     });
@@ -91,6 +111,8 @@
                         return o.elderlyId === elderlyId;
                     });
                 }
+
+                // console.log("workItemMap", workItemMap)
                 vm.workItemMap = workItemMap;
                 vm.drugUseItemMap = drugUseItemMap;
             });
@@ -107,11 +129,13 @@
 
 
         function fetchNursingPlan() {
-            vmh.psnService.nursingPlansByRoom(vm.tenantId, ['name', 'sex', 'nursingLevelId'], ['elderlyId', 'work_items', 'remark']).then(function (data) {
+            vmh.psnService.nursingPlansByRoom(vm.tenantId, ['name', 'sex', 'nursingLevelId', 'nursing_assessment_grade'], ['elderlyId', 'work_items', 'remark']).then(function (data) {
                 vm.aggrData = data;
                 // tarnckedKey room + bed ;
+                // console.log("data", data)
                 for (var trackedKey in vm.aggrData) {
                     vm.$editings[trackedKey] = {};
+                    vm.$selectAll[trackedKey] = {};
                     var nursingLevelId = vm.aggrData[trackedKey]['elderly']['nursingLevelId'];
 
                     if (nursingLevelId) {
@@ -184,7 +208,7 @@
             var elderlyId = vm.aggrData[trackedKey]['elderly'].id;
             vmh.psnService.changeElderlyNursingLevel(vm.tenantId, elderlyId, nursingLevelId, vm.operated_by, vm.operated_by_name).then(function (data) {
 
-                // 更改老人护理等级意味着需要原等级下的所有工作项目
+                // 更改照护级别意味着需要原等级下的所有工作项目
                 if (data.oldNursingLevelId && data.nursingLevelId != data.oldNursingLevelId) {
                     // console.log('更改前:', vm.work_items)
                     var key = trackedKey + '$' + data.oldNursingLevelId;
@@ -215,6 +239,32 @@
 
         function switchReadonlyDrugUseItems(trackedKey) {
             vm.$editings[trackedKey]['drugUseItems'] = !vm.$editings[trackedKey]['drugUseItems'];
+        }
+
+        function allWorkItemChecked(trackedKey) {
+            vm.$selectAll[trackedKey]['workItems'] = !vm.$selectAll[trackedKey]['workItems'];
+            var workItems = vm.workItemByElderly(vm.workItemMap[vm.aggrData[trackedKey]['elderly']['nursingLevelId']], vm.aggrData[trackedKey]['elderly']['id']);
+            var elderlyId = vm.aggrData[trackedKey]['elderly'].id;
+            var workItemIds=[];
+               
+            if (workItems && workItems.length > 0) {
+                for (var s = 0, len = workItems.length; s < len; s++) {
+                    vm.work_items['A0001'][trackedKey + '$' + vm.aggrData[trackedKey]['elderly']['nursingLevelId']][workItems[s].id] = vm.$selectAll[trackedKey]['workItems'];
+                    workItemIds.push(workItems[s].id);
+                }
+                vmh.psnService.nursingPlanSaveAll(vm.tenantId,elderlyId,"A0001",workItemIds,vm.$selectAll[trackedKey]['workItems']);
+            }
+        }
+        function alldrugUseItemChecked(trackedKey) {
+            vm.$selectAll[trackedKey]['drugUseItems'] = !vm.$selectAll[trackedKey]['drugUseItems'];
+            var drugUseItems = vm.drugUseItemMap[vm.aggrData[trackedKey]['elderly']['id']];
+             var elderlyId = vm.aggrData[trackedKey]['elderly'].id;
+            var workItemIds = [];
+            for (var j = 0, len = drugUseItems.length; j < len; j++) {
+                vm.work_items['A0003'][trackedKey + '$' + vm.aggrData[trackedKey]['elderly']['id']][drugUseItems[j].id] = vm.$selectAll[trackedKey]['drugUseItems'];
+                workItemIds.push(drugUseItems[j].id);
+            }
+            vmh.psnService.nursingPlanSaveAll(vm.tenantId,elderlyId,"A0003",workItemIds,vm.$selectAll[trackedKey]['drugUseItems']);
         }
 
         function workItemChecked(trackedKey, workItemId) {
@@ -270,29 +320,61 @@
         }
 
         function workItemByElderly(workItems, elderlyId) {
-            // console.log(workItems);
-            // console.log(elderlyId);
-            var allWorkItems = _.filter(workItems, function (option) {
-                if ((!option.sourceId) || option.elderlyId == elderlyId)
-                    return option;
-            })
-            var customizedWorkItems = _.filter(allWorkItems, function (p) {
-                if (p.elderlyId = elderlyId);
-                return p;
-            })
-            console.log(customizedWorkItems);
-            for (var s = 0, l = customizedWorkItems.length; s < l; s++) {
-                workItemByElderly = _.filter(allWorkItems, function (item) {
-                    if (customizedWorkItems[s].sourceId !== item.id) {
-                        return item;
-                    };
+            if (workItems && workItems.length > 0) {
+                var allWorkItems = _.filter(workItems, function (option) {
+                    if (!option.sourceId || option.elderlyId == elderlyId)
+                        return option;
                 })
-            }
+                // console.log("allworkItems", allWorkItems);
+                var customizedWorkItems = _.filter(workItems, function (p) {
+                    if (p.elderlyId == elderlyId) {
+                        return p;
+                    }
+                })
+                // console.log("cus", customizedWorkItems);
+                var elderlyWorkItems = [], repeat = [];
 
-            return workItemByElderly;
+                for (var m = 0, h = customizedWorkItems.length; m < h; m++) {
+                    for (var i = 0; i < allWorkItems.length; i++) {
+                        if (allWorkItems[i].id == customizedWorkItems[m].sourceId) {
+                            allWorkItems.splice(i, 1);
+                        }
+                    }
+                }
+
+                // console.log("elderlyWorkItems", allWorkItems);
+                return allWorkItems;
+            }
         }
 
-        function customizedWorkItem(workItemId, elderlyId) {
+        function refreshWorkItem() {
+            vmh.parallel([
+                vmh.shareService.tmp('T3001/psn-nursingLevel', 'name short_name nursing_assessment_grade', null),
+                vmh.shareService.tmp('T3001/psn-workItem', 'name elderlyId sourceId nursingLevelId', null, true),
+            ]).then(function (results) {
+
+                var nursingLevels = _.map(results[0], function (row) {
+                    return { id: row._id, name: row.name, short_name: row.short_name, nursing_assessment_grade: row.nursing_assessment_grade }
+                });
+                var workItems = _.map(results[1], function (row) {
+                    return { id: row._id, name: row.name, sourceId: row.sourceId, elderlyId: row.elderlyId, nursingLevelId: row.nursingLevelId }
+                });
+                var workItemMap = {};
+                for (var i = 0, len = nursingLevels.length; i < len; i++) {
+                    var nursingLevelId = nursingLevels[i].id;
+                    workItemMap[nursingLevelId] = _.filter(workItems, function (o) {
+                        return o.nursingLevelId === nursingLevelId;
+                    });
+                }
+                console.log("workItemMap", workItemMap)
+                vm.workItemMap = workItemMap;
+            })
+        }
+        function customizedWorkItem(workItemId, elderlyId, trackedKey) {
+            if (!vm.$editings[trackedKey]['workItems']) {
+                return
+            }
+            vm.work_items['A0001'][trackedKey + '$' + vm.aggrData[trackedKey]['elderly']['nursingLevelId']][workItemId] = false;
             // console.log("elderlyId",elderlyId);
             ngDialog.open({
                 template: 'work-item-custom.html',
@@ -303,6 +385,7 @@
                     moduleTranslatePathRoot: vm.moduleTranslatePath(),
                     workItemId: workItemId,
                     elderlyId: elderlyId,
+                    refreshWorkItem: refreshWorkItem
                 }
             })
         }
@@ -315,6 +398,8 @@
         var vm = $scope.vm = {};
         var vmh = $scope.ngDialogData.vmh;
         var workItemId = $scope.ngDialogData.workItemId;
+        var refreshWorkItem = $scope.ngDialogData.refreshWorkItem;
+
         vm.doSubmit = doSubmit;
         vm.cancel = cancel;
         vm.selectBinding = {};
@@ -363,14 +448,14 @@
             if (vm.model.customize_flag == false) {
                 vm.model.sourceId = workItemId;
             }
-            if (vm.model.repeat_values) {
+            if (vm.model.repeat_values && typeof (vm.model.repeat_values) === "string") {
                 vm.model.repeat_values = vm.model.repeat_values.split(",");
             }
 
             if (vm.model.voice_template) {
                 var reg = /\${[^}]+}/g;
                 var arr = vm.model.voice_template.match(reg);
-                console.log('arr', arr);
+                // console.log('arr', arr);
                 var isVerify = false;
                 for (var i = 0, len = arr.length; i < len; i++) {
 
@@ -382,12 +467,14 @@
                     }
                 }
                 if (isVerify) {
-                    vmh.alertWarning(vm.viewTranslatePath('VOICE_TEPLATE_ERROR'), true);
+                    vmh.alertWarning("语音模板设置有误", false);
                     return;
                 }
             }
             vmh.psnService.customizedWorkItem(workItemId, vm.model).then(function () {
                 ngDialog.close("#work-item-custom.html");
+                vmh.alertSuccess('自定义模板设置成功', false);
+                refreshWorkItem();
             });
         }
         function cancel() {

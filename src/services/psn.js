@@ -5,7 +5,7 @@
 var DIC = require('../pre-defined/dictionary-constants.json');
 
 module.exports = {
-    init: function(option) {
+    init: function (option) {
         var self = this;
         this.file = __filename;
         this.filename = this.file.substr(this.file.lastIndexOf('/') + 1);
@@ -29,7 +29,7 @@ module.exports = {
                 verb: 'post',
                 url: this.service_url_prefix + "/q/elderly",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         try {
                             var tenantId = this.request.body.tenantId;
                             var keyword = this.request.body.keyword;
@@ -59,7 +59,7 @@ module.exports = {
                 verb: 'get',
                 url: this.service_url_prefix + "/elderlyInfo/:_id/:select", //:select需要提取的字段域用逗号分割 e.g. name,type
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         try {
                             var elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], this.params._id);
                             var ret = app._.pick(elderly.toObject(), this.params.select.split(','));
@@ -76,7 +76,7 @@ module.exports = {
                 verb: 'post',
                 url: this.service_url_prefix + "/changeElderlyRoomBed",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         var steps;
                         var tenant, elderly, room;
                         var oldRoomStatus, newRoomStatus, updateRoomStatus, old_roomOccupancyChangeHistory, new_roomOccupancyChangeHistory;
@@ -91,31 +91,31 @@ module.exports = {
 
                             tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], tenantId);
                             if (!tenant || tenant.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到养老机构!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到养老机构!' });
                                 yield next;
                                 return;
                             }
                             elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], elderlyId);
                             if (!elderly || elderly.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到老人!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到老人!' });
                                 yield next;
                                 return;
                             }
                             room = yield app.modelFactory().model_read(app.models['psn_room'], roomId);
                             if (!room || room.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到搬入房间资料!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到搬入房间资料!' });
                                 yield next;
                                 return;
                             }
 
                             var district = yield app.modelFactory().model_read(app.models['psn_district'], room.districtId);
                             if (!district || district.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到搬入房间所在区域资料!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到搬入房间所在区域资料!' });
                                 yield next;
                                 return;
                             }
                             if (bed_no > room.capacity) {
-                                this.body = app.wrapper.res.error({message: '无效的床位号，该房间最多支持' + room.capacity + '床位!'});
+                                this.body = app.wrapper.res.error({ message: '无效的床位号，该房间最多支持' + room.capacity + '床位!' });
                                 yield next;
                                 return;
                             }
@@ -125,7 +125,7 @@ module.exports = {
                             raw_elderly_room_summary = elderly_json.room_summary;
 
                             if (raw_elderly_room_value.roomId == roomId && raw_elderly_room_value.bed_no == bed_no) {
-                                this.body = app.wrapper.res.error({message: '房间床位没有变化!'});
+                                this.body = app.wrapper.res.error({ message: '房间床位没有变化!' });
                                 yield next;
                                 return;
                             }
@@ -140,14 +140,14 @@ module.exports = {
                                 }
                             });
                             if (oldRoomStatuses.length == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到老人搬离房间床位信息!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到老人搬离房间床位信息!' });
                                 yield next;
                                 return;
                             } else {
                                 oldRoomStatus = oldRoomStatuses[0];
                             }
                             if (!oldRoomStatus.occupied) {
-                                this.body = app.wrapper.res.error({message: '无法找到老人搬离房间床位信息!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到老人搬离房间床位信息!' });
                                 yield next;
                                 return;
                             }
@@ -158,7 +158,7 @@ module.exports = {
                                 if (occupy.bed_no == raw_elderly_room_value.bed_no && elderlyId == occupy.elderlyId) {
                                     foundOccupy = true;
                                     if (occupy.bed_status == 'A0002') {
-                                        this.body = app.wrapper.res.error({message: '该老人旧床位仅仅被预占用，请使用修改预占用床位功能!'});
+                                        this.body = app.wrapper.res.error({ message: '该老人旧床位仅仅被预占用，请使用修改预占用床位功能!' });
                                         yield next;
                                         return;
                                     }
@@ -174,7 +174,7 @@ module.exports = {
                             }
 
                             if (!foundOccupy) {
-                                this.body = app.wrapper.res.error({message: '无法找到老人原来的房间床位信息!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到老人原来的房间床位信息!' });
                                 yield next;
 
                                 return;
@@ -196,7 +196,7 @@ module.exports = {
                             if (newRoomStatuses.length == 0) {
                                 newRoomStatus = {
                                     roomId: roomId,
-                                    occupied: [{bed_no: bed_no, bed_status: 'A0003', elderlyId: elderlyId}],
+                                    occupied: [{ bed_no: bed_no, bed_status: 'A0003', elderlyId: elderlyId }],
                                     tenantId: tenantId
                                 };
                             } else {
@@ -224,7 +224,7 @@ module.exports = {
                                     //判断要入住的床位是否有其他老人，如有其他老人已经预占则返回
                                     if (bedInfo1.elderlyId) {
                                         //改成
-                                        this.body = app.wrapper.res.error({message: '该床位已经被占用，请刷新床位信息!'});
+                                        this.body = app.wrapper.res.error({ message: '该床位已经被占用，请刷新床位信息!' });
                                         yield next;
                                         return;
                                     }
@@ -244,7 +244,7 @@ module.exports = {
                                     bed_no: raw_elderly_room_value.bed_no,
                                     elderlyId: elderlyId,
                                     in_flag: true
-                                }, sort: {check_in_time: -1}
+                                }, sort: { check_in_time: -1 }
                             });
                             console.log(roomOccupancyChangeHistories);
                             if (roomOccupancyChangeHistories && roomOccupancyChangeHistories.length > 0) {
@@ -253,7 +253,7 @@ module.exports = {
                                 old_roomOccupancyChangeHistory.in_flag = false;
                                 old_roomOccupancyChangeHistory.check_out_time = app.moment();
                             } else {
-                                this.body = app.wrapper.res.error({message: '无法找到旧的房间占用历史!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到旧的房间占用历史!' });
                                 yield next;
                                 return;
                             }
@@ -342,7 +342,7 @@ module.exports = {
                 verb: 'post',
                 url: this.service_url_prefix + "/changeElderlyChargeItem",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         var steps;
                         var tenant, elderly, charge_item;
                         var journal_account_item_A0003, journal_account_item_B0001, tenantJournalAccount_B0006, tenantJournalAccount_A0001;
@@ -360,27 +360,27 @@ module.exports = {
                             var arr_old_charge_item_id = old_charge_item_id.split('.');
                             var arr_new_charge_item_id = new_charge_item.item_id.split('.');
                             if (arr_old_charge_item_id.slice(0, arr_old_charge_item_id.length - 1).join('.') != arr_new_charge_item_id.slice(0, arr_new_charge_item_id.length - 1).join('.')) {
-                                this.body = app.wrapper.res.error({message: '更改的收费项目不是统一个收费类别下!'});
+                                this.body = app.wrapper.res.error({ message: '更改的收费项目不是统一个收费类别下!' });
                                 yield next;
                                 return;
                             }
 
                             tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], tenantId);
                             if (!tenant || tenant.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到养老机构!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到养老机构!' });
                                 yield next;
                                 return;
                             }
                             elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], elderlyId);
                             if (!elderly || elderly.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到老人资料!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到老人资料!' });
                                 yield next;
                                 return;
                             }
 
-                            charge_item = app._.findWhere(elderly.charge_items, {item_id: old_charge_item_id});
+                            charge_item = app._.findWhere(elderly.charge_items, { item_id: old_charge_item_id });
                             if (!charge_item) {
-                                this.body = app.wrapper.res.error({message: '该老人数据中无法找到收费项目!'});
+                                this.body = app.wrapper.res.error({ message: '该老人数据中无法找到收费项目!' });
                                 yield next;
                                 return;
                             }
@@ -395,7 +395,7 @@ module.exports = {
                             //计算预付月收费日
                             var firstPrepayDate = elderly.charging_on_of_monthly_prepay;
                             if (!firstPrepayDate) {
-                                var arr_journal_account_B0001 = app._.where(elderly_json.journal_account, {revenue_and_expenditure_type: 'B0001'});
+                                var arr_journal_account_B0001 = app._.where(elderly_json.journal_account, { revenue_and_expenditure_type: 'B0001' });
                                 var latest_journal_account_B0001 = app._.max(arr_journal_account_B0001, function (item) {
                                     return item.check_in_time;
                                 });
@@ -571,7 +571,7 @@ module.exports = {
                 verb: 'post',
                 url: this.service_url_prefix + "/changeElderlyChargeItemForOtherAndCustomized",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         var steps;
                         var tenant, elderly;
                         var journal_account_item_A0003, journal_account_item_B0001, tenantJournalAccount_B0006, tenantJournalAccount_A0001;
@@ -587,13 +587,13 @@ module.exports = {
 
                             tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], tenantId);
                             if (!tenant || tenant.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到养老机构!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到养老机构!' });
                                 yield next;
                                 return;
                             }
                             elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], elderlyId);
                             if (!elderly || elderly.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到老人资料!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到老人资料!' });
                                 yield next;
                                 return;
                             }
@@ -624,19 +624,19 @@ module.exports = {
                             var elderlyChargeItemIds = app._.pluck(charge_itemsForOtherAndCustomized, 'item_id');
                             //先找出增加的项目和不变的项目并老人收费项目变动历史
 
-                            var tenantSelectedStandard = app._.find(tenant_json.charge_standards, function(o){
-                                    return o.subsystem == app.modelVariables['PENSION-AGENCY'].SUB_SYSTEM && o.charge_standard == elderly_json.charge_standard;
-                                }) || {};
+                            var tenantSelectedStandard = app._.find(tenant_json.charge_standards, function (o) {
+                                return o.subsystem == app.modelVariables['PENSION-AGENCY'].SUB_SYSTEM && o.charge_standard == elderly_json.charge_standard;
+                            }) || {};
 
                             for (var i = 0; i < selectedOtherAndCustomized.length; i++) {
-                                var chargeItemOfTenant = app._.findWhere(tenantSelectedStandard.charge_items, {item_id: selectedOtherAndCustomized[i]});
+                                var chargeItemOfTenant = app._.findWhere(tenantSelectedStandard.charge_items, { item_id: selectedOtherAndCustomized[i] });
 
                                 if (app._.contains(elderlyChargeItemIds, selectedOtherAndCustomized[i])) {
                                     //检查个人账户和租户账户中收费项目的定价是否一致
                                     //如果不一至则需要将租户里的定价更新到老人中
-                                    var chargeItemOfElderly = app._.findWhere(charge_itemsForOtherAndCustomized, {item_id: selectedOtherAndCustomized[i]});
+                                    var chargeItemOfElderly = app._.findWhere(charge_itemsForOtherAndCustomized, { item_id: selectedOtherAndCustomized[i] });
 
-                                    var chargeItemHistoryOfElderly = app._.findWhere(elderly_json.charge_item_change_history, {new_item_id: selectedOtherAndCustomized[i]});
+                                    var chargeItemHistoryOfElderly = app._.findWhere(elderly_json.charge_item_change_history, { new_item_id: selectedOtherAndCustomized[i] });
 
                                     if (chargeItemOfTenant.period_price != chargeItemOfElderly.period_price) {
                                         for (var i = 0; i < charge_itemsForOtherAndCustomized.length; i++) {
@@ -715,7 +715,7 @@ module.exports = {
                             //计算退还预付月租
                             var firstPrepayDate = elderly.charging_on_of_monthly_prepay;
                             if (!firstPrepayDate) {
-                                var arr_journal_account_B0001 = app._.where(elderly_json.journal_account, {revenue_and_expenditure_type: 'B0001'});
+                                var arr_journal_account_B0001 = app._.where(elderly_json.journal_account, { revenue_and_expenditure_type: 'B0001' });
                                 var latest_journal_account_B0001 = app._.max(arr_journal_account_B0001, function (item) {
                                     return item.check_in_time;
                                 });
@@ -837,36 +837,36 @@ module.exports = {
             }, {
                 method: 'changeElderlyNursingLevel',
                 verb: 'post',
-                url: this.service_url_prefix + "/changeElderlyNursingLevel", //直接修改老人护理级别
+                url: this.service_url_prefix + "/changeElderlyNursingLevel", //直接修改老人照护级别
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         var tenant, elderly, nursingLevel, nursingPlan;
                         try {
                             var tenantId = this.request.body.tenantId;
                             tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], tenantId);
                             if (!tenant || tenant.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到养老机构!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到养老机构!' });
                                 yield next;
                                 return;
                             }
                             var elderlyId = this.request.body.elderlyId;
                             elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], elderlyId);
                             if (!elderly || elderly.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到老人!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到老人!' });
                                 yield next;
                                 return;
                             }
                             var nursingLevelId = this.request.body.nursingLevelId;
                             nursingLevel = yield app.modelFactory().model_read(app.models['psn_nursingLevel'], nursingLevelId);
                             if (!nursingLevel || nursingLevel.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到护理级别!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到照护级别!' });
                                 yield next;
                                 return;
                             }
 
                             // console.log('nursingLevelId:', nursingLevelId);
                             if (nursingLevelId === (elderly.nursingLevelId || '').toString()) {
-                                this.body = app.wrapper.res.error({message: '护理级别没有变化!'});
+                                this.body = app.wrapper.res.error({ message: '照护级别没有变化!' });
                                 yield next;
                                 return;
                             }
@@ -891,7 +891,7 @@ module.exports = {
                                 tenantId: elderly.tenantId
                             });
 
-                            // 如果更换护理等级,将清空对应的所有工作项目
+                            // 如果更换照护等级,将清空对应的所有工作项目
                             var elderlyNursingPlan = yield app.modelFactory().model_one(app.models['psn_nursingPlan'], {
                                 select: 'work_items',
                                 where: {
@@ -932,7 +932,7 @@ module.exports = {
                 verb: 'post',
                 url: this.service_url_prefix + "/bookingRecharge/:_id",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         var steps;
                         var recharge, elderly, tenant;
                         var raw_recharge_operated_by, raw_recharge_operated_by_name;
@@ -942,39 +942,39 @@ module.exports = {
                             var operated_by = this.request.body.operated_by;
                             var operated_by_name = this.request.body.operated_by_name;
                             if (!operated_by) {
-                                this.body = app.wrapper.res.error({message: '缺少操作人数据!'});
+                                this.body = app.wrapper.res.error({ message: '缺少操作人数据!' });
                                 yield next;
                                 return;
                             }
 
                             recharge = yield app.modelFactory().model_read(app.models['psn_recharge'], this.params._id);
                             if (!recharge || recharge.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到充值记录!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到充值记录!' });
                                 yield next;
                                 return;
                             }
                             if (recharge.voucher_no) {
-                                this.body = app.wrapper.res.error({message: '充值记录已经入账无需重新记账!'});
+                                this.body = app.wrapper.res.error({ message: '充值记录已经入账无需重新记账!' });
                                 yield next;
                                 return;
                             }
 
                             elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], recharge.elderlyId);
                             if (!elderly || elderly.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到老人资料!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到老人资料!' });
                                 yield next;
                                 return;
                             }
 
                             if (!elderly.live_in_flag || elderly.begin_exit_flow) {
-                                this.body = app.wrapper.res.error({message: '当前老人不在院或正在办理出院手续，无法记账!'});
+                                this.body = app.wrapper.res.error({ message: '当前老人不在院或正在办理出院手续，无法记账!' });
                                 yield next;
                                 return;
                             }
 
                             tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], recharge.tenantId);
                             if (!tenant || tenant.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到养老机构!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到养老机构!' });
                                 yield next;
                                 return;
                             }
@@ -1052,7 +1052,7 @@ module.exports = {
                 verb: 'get',
                 url: this.service_url_prefix + "/checkCanChangeBookingOrUnbookingRecharge/:_id",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         var steps;
                         var recharge, elderly, tenant;
 
@@ -1060,24 +1060,24 @@ module.exports = {
 
                             recharge = yield app.modelFactory().model_read(app.models['psn_recharge'], this.params._id);
                             if (!recharge || recharge.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到充值记录!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到充值记录!' });
                                 yield next;
                                 return;
                             }
                             if (!recharge.voucher_no) {
-                                this.body = app.wrapper.res.ret({itCan: false});
+                                this.body = app.wrapper.res.ret({ itCan: false });
                                 yield next;
                                 return;
                             }
 
                             elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], recharge.elderlyId);
                             if (!elderly || elderly.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到老人!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到老人!' });
                                 yield next;
                                 return;
                             }
                             if (!elderly.live_in_flag || elderly.begin_exit_flow) {
-                                this.body = app.wrapper.res.error({itCan: false, message: '当前老人不在院或正在办理出院手续，无法记账!'});
+                                this.body = app.wrapper.res.error({ itCan: false, message: '当前老人不在院或正在办理出院手续，无法记账!' });
                                 yield next;
                                 return;
                             }
@@ -1091,7 +1091,7 @@ module.exports = {
                                 carry_over_flag: false
                             });
 
-                            this.body = app.wrapper.res.ret({itCan: bookingJournalAccountItem != null});
+                            this.body = app.wrapper.res.ret({ itCan: bookingJournalAccountItem != null });
                         } catch (e) {
                             self.logger.error(e.message);
                             this.body = app.wrapper.res.error(e);
@@ -1105,7 +1105,7 @@ module.exports = {
                 verb: 'post',
                 url: this.service_url_prefix + "/disableRechargeAndUnbooking/:_id",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         var steps;
                         var recharge, elderly, tenant;
                         var raw_recharge_status, raw_recharge_operated_by, raw_recharge_operated_by_name;
@@ -1114,39 +1114,39 @@ module.exports = {
                             var operated_by = this.request.body.operated_by;
                             var operated_by_name = this.request.body.operated_by_name;
                             if (!operated_by) {
-                                this.body = app.wrapper.res.error({message: '缺少操作人数据!'});
+                                this.body = app.wrapper.res.error({ message: '缺少操作人数据!' });
                                 yield next;
                                 return;
                             }
 
                             recharge = yield app.modelFactory().model_read(app.models['psn_recharge'], this.params._id);
                             if (!recharge || recharge.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到充值记录!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到充值记录!' });
                                 yield next;
                                 return;
                             }
                             if (!recharge.voucher_no) {
-                                this.body = app.wrapper.res.error({message: '充值记录还未记账，无需撤销!'});
+                                this.body = app.wrapper.res.error({ message: '充值记录还未记账，无需撤销!' });
                                 yield next;
                                 return;
                             }
 
                             elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], recharge.elderlyId);
                             if (!elderly || elderly.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到老人!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到老人!' });
                                 yield next;
                                 return;
                             }
 
                             if (!elderly.live_in_flag || elderly.begin_exit_flow) {
-                                this.body = app.wrapper.res.error({message: '当前老人不在院或正在办理出院手续，无法记账!'});
+                                this.body = app.wrapper.res.error({ message: '当前老人不在院或正在办理出院手续，无法记账!' });
                                 yield next;
                                 return;
                             }
 
                             tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], recharge.tenantId);
                             if (!tenant || tenant.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到养老机构!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到养老机构!' });
                                 yield next;
                                 return;
                             }
@@ -1180,13 +1180,13 @@ module.exports = {
                             }
 
                             if (isBookingJournalAccountItemCarryOver) {
-                                this.body = app.wrapper.res.error({message: '充值记录记账凭证已经结算，无需撤销!'});
+                                this.body = app.wrapper.res.error({ message: '充值记录记账凭证已经结算，无需撤销!' });
                                 yield next;
                                 return;
                             }
 
 
-                            elderly.journal_account = app._.reject(elderly_json.journal_account, {voucher_no: recharge_json.voucher_no});
+                            elderly.journal_account = app._.reject(elderly_json.journal_account, { voucher_no: recharge_json.voucher_no });
 
                             //更新老人分类账
                             elderly.subsidiary_ledger.self -= unbookingAmount;
@@ -1228,7 +1228,7 @@ module.exports = {
                 verb: 'post',
                 url: this.service_url_prefix + "/changeRechargeBookingAmount/:_id",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         var steps;
                         var recharge, elderly, tenant;
                         var raw_recharge_operated_by, raw_recharge_operated_by_name;
@@ -1238,39 +1238,39 @@ module.exports = {
                             var operated_by = this.request.body.operated_by;
                             var operated_by_name = this.request.body.operated_by_name;
                             if (!operated_by) {
-                                this.body = app.wrapper.res.error({message: '缺少操作人数据!'});
+                                this.body = app.wrapper.res.error({ message: '缺少操作人数据!' });
                                 yield next;
                                 return;
                             }
 
                             recharge = yield app.modelFactory().model_read(app.models['psn_recharge'], this.params._id);
                             if (!recharge || recharge.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到充值记录!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到充值记录!' });
                                 yield next;
                                 return;
                             }
                             if (!recharge.voucher_no) {
-                                this.body = app.wrapper.res.error({message: '充值记录还未记账，无需撤销!'});
+                                this.body = app.wrapper.res.error({ message: '充值记录还未记账，无需撤销!' });
                                 yield next;
                                 return;
                             }
 
                             elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], recharge.elderlyId);
                             if (!elderly || elderly.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到老人!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到老人!' });
                                 yield next;
                                 return;
                             }
 
                             if (!elderly.live_in_flag || elderly.begin_exit_flow) {
-                                this.body = app.wrapper.res.error({message: '当前老人不在院或正在办理出院手续，无法记账!'});
+                                this.body = app.wrapper.res.error({ message: '当前老人不在院或正在办理出院手续，无法记账!' });
                                 yield next;
                                 return;
                             }
 
                             tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], recharge.tenantId);
                             if (!tenant || tenant.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到养老机构!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到养老机构!' });
                                 yield next;
                                 return;
                             }
@@ -1301,7 +1301,7 @@ module.exports = {
                             }
 
                             if (isBookingJournalAccountItemCarryOver) {
-                                this.body = app.wrapper.res.error({message: '充值记录记账凭证已经结算，无需撤销!'});
+                                this.body = app.wrapper.res.error({ message: '充值记录记账凭证已经结算，无需撤销!' });
                                 yield next;
                                 return;
                             }
@@ -1348,7 +1348,7 @@ module.exports = {
                 verb: 'post',
                 url: this.service_url_prefix + "/checkCanBookingRedToElderlyRecharge",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         var recharge_to_red, tenantJournalAccount_to_red, elderly, tenant;
                         try {
                             var tenantId = this.request.body.tenantId;
@@ -1356,7 +1356,7 @@ module.exports = {
 
                             tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], tenantId);
                             if (!tenant || tenant.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到租户资料!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到租户资料!' });
                                 yield next;
                                 return;
                             }
@@ -1385,7 +1385,7 @@ module.exports = {
 
                             if (can_not_find_recharge_to_red && can_not_find_tenantJournalAccount_to_red) {
 
-                                this.body = app.wrapper.res.error({message: '无法找到需要冲红的流水记录!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到需要冲红的流水记录!' });
                                 yield next;
                                 return;
                             }
@@ -1393,13 +1393,13 @@ module.exports = {
                             if (!can_not_find_recharge_to_red) {
                                 elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], recharge_to_red.elderlyId);
                                 if (!elderly || elderly.status == 0) {
-                                    this.body = app.wrapper.res.error({message: '无法找到老人!'});
+                                    this.body = app.wrapper.res.error({ message: '无法找到老人!' });
                                     yield next;
                                     return;
                                 }
 
                                 if (!elderly.live_in_flag || elderly.begin_exit_flow) {
-                                    this.body = app.wrapper.res.error({message: '当前老人不在院或正在办理出院手续，无法冲红!'});
+                                    this.body = app.wrapper.res.error({ message: '当前老人不在院或正在办理出院手续，无法冲红!' });
                                     yield next;
                                     return;
                                 }
@@ -1407,7 +1407,7 @@ module.exports = {
                                 var journal_account = elderly.journal_account;
                                 for (var i = 0; i < journal_account.length; i++) {
                                     if (journal_account[i].voucher_no == voucher_no_to_red && !journal_account[i].carry_over_flag) {
-                                        this.body = app.wrapper.res.error({message: '当前充值流水没有结转，无法冲红，可以修改或删除!'});
+                                        this.body = app.wrapper.res.error({ message: '当前充值流水没有结转，无法冲红，可以修改或删除!' });
                                         yield next;
                                         return;
                                     }
@@ -1416,7 +1416,7 @@ module.exports = {
 
                             if (!can_not_find_tenantJournalAccount_to_red) {
                                 if (!tenantJournalAccount_to_red.carry_over_flag) {
-                                    this.body = app.wrapper.res.error({message: '当前流水没有结转，无法冲红，可以修改或删除!'});
+                                    this.body = app.wrapper.res.error({ message: '当前流水没有结转，无法冲红，可以修改或删除!' });
                                     yield next;
                                     return;
                                 }
@@ -1440,7 +1440,7 @@ module.exports = {
                 verb: 'post',
                 url: this.service_url_prefix + "/bookingRedToElderlyRecharge",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         var steps;
                         var recharge_to_red, tenantJournalAccount_to_red, red, elderly, tenant;
                         var raw_red_operated_by, raw_red_operated_by_name;
@@ -1458,14 +1458,14 @@ module.exports = {
                             var voucher_no, remark;
 
                             if (!operated_by) {
-                                this.body = app.wrapper.res.error({message: '缺少操作人数据!'});
+                                this.body = app.wrapper.res.error({ message: '缺少操作人数据!' });
                                 yield next;
                                 return;
                             }
 
                             tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], tenantId);
                             if (!tenant || tenant.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到养老机构!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到养老机构!' });
                                 yield next;
                                 return;
                             }
@@ -1481,20 +1481,20 @@ module.exports = {
                                     }
                                 });
                                 if (!recharge_to_red || recharge_to_red.status == 0) {
-                                    this.body = app.wrapper.res.error({message: '无法找到需要冲红的流水记录!'});
+                                    this.body = app.wrapper.res.error({ message: '无法找到需要冲红的流水记录!' });
                                     yield next;
                                     return;
                                 }
 
                                 elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], recharge_to_red.elderlyId);
                                 if (!elderly || elderly.status == 0) {
-                                    this.body = app.wrapper.res.error({message: '无法找到老人!'});
+                                    this.body = app.wrapper.res.error({ message: '无法找到老人!' });
                                     yield next;
                                     return;
                                 }
 
                                 if (!elderly.live_in_flag || elderly.begin_exit_flow) {
-                                    this.body = app.wrapper.res.error({message: '当前老人不在院或正在办理出院手续，无法记账!'});
+                                    this.body = app.wrapper.res.error({ message: '当前老人不在院或正在办理出院手续，无法记账!' });
                                     yield next;
                                     return;
                                 }
@@ -1502,7 +1502,7 @@ module.exports = {
                                 var journal_account = elderly.journal_account;
                                 for (var i = 0; i < journal_account.length; i++) {
                                     if (journal_account[i].voucher_no == voucher_no_to_red && !journal_account[i].carry_over_flag) {
-                                        this.body = app.wrapper.res.error({message: '当前充值流水没有结转，无法冲红，可以修改或删除!'});
+                                        this.body = app.wrapper.res.error({ message: '当前充值流水没有结转，无法冲红，可以修改或删除!' });
                                         yield next;
                                         return;
                                     }
@@ -1542,13 +1542,13 @@ module.exports = {
                                     }
                                 });
                                 if (!tenantJournalAccount_to_red || tenantJournalAccount_to_red.status == 0) {
-                                    this.body = app.wrapper.res.error({message: '无法找到需要冲红的流水记录!'});
+                                    this.body = app.wrapper.res.error({ message: '无法找到需要冲红的流水记录!' });
                                     yield next;
                                     return;
                                 }
 
                                 if (!tenantJournalAccount_to_red.carry_over_flag) {
-                                    this.body = app.wrapper.res.error({message: '当前流水没有结转，无法冲红，可以修改或删除!'});
+                                    this.body = app.wrapper.res.error({ message: '当前流水没有结转，无法冲红，可以修改或删除!' });
                                     yield next;
                                     return;
                                 }
@@ -1556,18 +1556,18 @@ module.exports = {
                                 if (tenantJournalAccount_to_red.source_type == app.modelVariables.SOURCE_TYPES.ELDERLY) {
                                     elderly = yield app.modelFactory().model_read(app.models['pub_elderly'], tenantJournalAccount_to_red.source_id);
                                     if (!elderly || elderly.status == 0) {
-                                        this.body = app.wrapper.res.error({message: '无法找到老人!'});
+                                        this.body = app.wrapper.res.error({ message: '无法找到老人!' });
                                         yield next;
                                         return;
                                     }
                                     // source_key ='$journal_account.voucher_no';
                                     if (!elderly.live_in_flag || elderly.begin_exit_flow) {
-                                        this.body = app.wrapper.res.error({message: '当前老人不在院或正在办理出院手续，无法冲红!'});
+                                        this.body = app.wrapper.res.error({ message: '当前老人不在院或正在办理出院手续，无法冲红!' });
                                         yield next;
                                         return;
                                     }
                                 } else {
-                                    this.body = app.wrapper.res.error({message: '当前流水没有记录来源，无法冲红!'});
+                                    this.body = app.wrapper.res.error({ message: '当前流水没有记录来源，无法冲红!' });
                                     yield next;
                                     return;
                                 }
@@ -1680,7 +1680,7 @@ module.exports = {
                 verb: 'get',
                 url: this.service_url_prefix + "/checkCanChangeBookingOrUnbookingRedToElderlyRecharge/:_id",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         var steps;
                         var red, recharge_to_red, tenantJournalAccount_to_red, elderly, tenant;
 
@@ -1689,7 +1689,7 @@ module.exports = {
 
                             red = yield app.modelFactory().model_read(app.models['pub_red'], this.params._id);
                             if (!red || red.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到冲红记录!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到冲红记录!' });
                                 yield next;
                                 return;
                             }
@@ -1724,7 +1724,7 @@ module.exports = {
                                 //冲红的是充值记录，则通过其找到目标老人
                                 elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], elderlyId);
                                 if (!elderly || elderly.status == 0) {
-                                    this.body = app.wrapper.res.error({message: '无法找到老人!'});
+                                    this.body = app.wrapper.res.error({ message: '无法找到老人!' });
                                     yield next;
                                     return;
                                 }
@@ -1749,7 +1749,7 @@ module.exports = {
                                 itCan = bookingJournalAccountItem != null;
                             }
 
-                            this.body = app.wrapper.res.ret({itCan: itCan});
+                            this.body = app.wrapper.res.ret({ itCan: itCan });
                         } catch (e) {
                             self.logger.error(e.message);
                             this.body = app.wrapper.res.error(e);
@@ -1763,7 +1763,7 @@ module.exports = {
                 verb: 'post',
                 url: this.service_url_prefix + "/disableRedAndUnbookingToElderlyRecharge/:_id",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         var steps;
                         var red, recharge_to_red, tenantJournalAccount_to_red, elderly, tenant;
                         var raw_red_status, raw_red_operated_by, raw_red_operated_by_name, raw_elderly_subsidiary_ledger, raw_elderly_journal_account, raw_tenantJournalAccountStatus, raw_tenant_subsidiary_ledger;
@@ -1771,7 +1771,7 @@ module.exports = {
                             var operated_by = this.request.body.operated_by;
                             var operated_by_name = this.request.body.operated_by_name;
                             if (!operated_by) {
-                                this.body = app.wrapper.res.error({message: '缺少操作人数据!'});
+                                this.body = app.wrapper.res.error({ message: '缺少操作人数据!' });
                                 yield next;
                                 return;
                             }
@@ -1779,14 +1779,14 @@ module.exports = {
 
                             red = yield app.modelFactory().model_read(app.models['pub_red'], this.params._id);
                             if (!red || red.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到充红记录!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到充红记录!' });
                                 yield next;
                                 return;
                             }
 
                             tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], red.tenantId);
                             if (!tenant || tenant.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到租户资料!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到租户资料!' });
                                 yield next;
                                 return;
                             }
@@ -1814,11 +1814,11 @@ module.exports = {
                                 });
 
                                 if (!tenantJournalAccount_to_red) {
-                                    this.body = app.wrapper.res.error({message: '无法找到需要撤销的流水记录!'});
+                                    this.body = app.wrapper.res.error({ message: '无法找到需要撤销的流水记录!' });
                                     yield next;
                                     return;
                                 } else if (tenantJournalAccount_to_red.carry_over_flag) {
-                                    this.body = app.wrapper.res.error({message: '当前流水记录已经结转!'});
+                                    this.body = app.wrapper.res.error({ message: '当前流水记录已经结转!' });
                                     yield next;
                                     return;
                                 }
@@ -1829,12 +1829,12 @@ module.exports = {
                                 if (tenantJournalAccount_to_red.source_type == app.modelVariables.SOURCE_TYPES.ELDERLY) {
                                     elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], tenantJournalAccount_to_red.source_id);
                                     if (!elderly || elderly.status == 0) {
-                                        this.body = app.wrapper.res.error({message: '无法找到老人!'});
+                                        this.body = app.wrapper.res.error({ message: '无法找到老人!' });
                                         yield next;
                                         return;
                                     }
                                     if (!elderly.live_in_flag || elderly.begin_exit_flow) {
-                                        this.body = app.wrapper.res.error({message: '当前老人不在院或正在办理出院手续，无法撤销冲红!'});
+                                        this.body = app.wrapper.res.error({ message: '当前老人不在院或正在办理出院手续，无法撤销冲红!' });
                                         yield next;
                                         return;
                                     }
@@ -1852,13 +1852,13 @@ module.exports = {
                                     }
 
                                     if (index == -1) {
-                                        this.body = app.wrapper.res.error({message: '无法找到需要撤销的老人流水记录!'});
+                                        this.body = app.wrapper.res.error({ message: '无法找到需要撤销的老人流水记录!' });
                                         yield next;
                                         return;
                                     }
 
                                     if (elderly.journal_account[index].carry_over_flag) {
-                                        this.body = app.wrapper.res.error({message: '当前流水记录已经结转!'});
+                                        this.body = app.wrapper.res.error({ message: '当前流水记录已经结转!' });
                                         yield next;
                                         return;
                                     }
@@ -1875,7 +1875,7 @@ module.exports = {
                                     yield elderly.save();
                                     steps = 'A';
                                 } else {
-                                    this.body = app.wrapper.res.error({message: '当前流水没有记录来源，无法撤销冲红!'});
+                                    this.body = app.wrapper.res.error({ message: '当前流水没有记录来源，无法撤销冲红!' });
                                     yield next;
                                     return;
                                 }
@@ -1898,13 +1898,13 @@ module.exports = {
 
                                 elderly = yield app.modelFactory().model_read(app.models['pub_elderly'], recharge_to_red.elderlyId);
                                 if (!elderly || elderly.status == 0) {
-                                    this.body = app.wrapper.res.error({message: '无法找到老人资料!'});
+                                    this.body = app.wrapper.res.error({ message: '无法找到老人资料!' });
                                     yield next;
                                     return;
                                 }
 
                                 if (!elderly.live_in_flag || elderly.begin_exit_flow) {
-                                    this.body = app.wrapper.res.error({message: '当前老人不在院或正在办理出院手续，无法记账!'});
+                                    this.body = app.wrapper.res.error({ message: '当前老人不在院或正在办理出院手续，无法记账!' });
                                     yield next;
                                     return;
                                 }
@@ -1924,13 +1924,13 @@ module.exports = {
                                 }
 
                                 if (index == -1) {
-                                    this.body = app.wrapper.res.error({message: '无法找到需要撤销的老人流水记录!'});
+                                    this.body = app.wrapper.res.error({ message: '无法找到需要撤销的老人流水记录!' });
                                     yield next;
                                     return;
                                 }
 
                                 if (elderly.journal_account[index].carry_over_flag) {
-                                    this.body = app.wrapper.res.error({message: '当前流水记录已经结转!'});
+                                    this.body = app.wrapper.res.error({ message: '当前流水记录已经结转!' });
                                     yield next;
                                     return;
                                 }
@@ -1995,7 +1995,7 @@ module.exports = {
                 verb: 'post',
                 url: this.service_url_prefix + "/changeRedBookingAmountToElderlyRecharge/:_id",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         var steps;
                         var red, recharge_to_red, tenantJournalAccount_to_red, elderly, tenant;
                         var raw_red_operated_by, raw_red_operated_by_name, raw_elderly_subsidiary_ledger, raw_elderly_journal_account, raw_tenantJournalAccountAmount, raw_tenant_subsidiary_ledger;
@@ -2003,21 +2003,21 @@ module.exports = {
                             var operated_by = this.request.body.operated_by;
                             var operated_by_name = this.request.body.operated_by_name;
                             if (!operated_by) {
-                                this.body = app.wrapper.res.error({message: '缺少操作人数据!'});
+                                this.body = app.wrapper.res.error({ message: '缺少操作人数据!' });
                                 yield next;
                                 return;
                             }
 
                             red = yield app.modelFactory().model_read(app.models['pub_red'], this.params._id);
                             if (!red || red.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到充红记录!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到充红记录!' });
                                 yield next;
                                 return;
                             }
 
                             tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], red.tenantId);
                             if (!tenant || tenant.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到租户资料!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到租户资料!' });
                                 yield next;
                                 return;
                             }
@@ -2047,11 +2047,11 @@ module.exports = {
                                 });
 
                                 if (!tenantJournalAccount_to_red) {
-                                    this.body = app.wrapper.res.error({message: '无法找到需要修改的流水记录!'});
+                                    this.body = app.wrapper.res.error({ message: '无法找到需要修改的流水记录!' });
                                     yield next;
                                     return;
                                 } else if (tenantJournalAccount_to_red.carry_over_flag) {
-                                    this.body = app.wrapper.res.error({message: '当前流水记录已经结转!'});
+                                    this.body = app.wrapper.res.error({ message: '当前流水记录已经结转!' });
                                     yield next;
                                     return;
                                 }
@@ -2062,12 +2062,12 @@ module.exports = {
                                 if (tenantJournalAccount_to_red.source_type == app.modelVariables.SOURCE_TYPES.ELDERLY) {
                                     elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], tenantJournalAccount_to_red.source_id);
                                     if (!elderly || elderly.status == 0) {
-                                        this.body = app.wrapper.res.error({message: '无法找到老人!'});
+                                        this.body = app.wrapper.res.error({ message: '无法找到老人!' });
                                         yield next;
                                         return;
                                     }
                                     if (!elderly.live_in_flag || elderly.begin_exit_flow) {
-                                        this.body = app.wrapper.res.error({message: '当前老人不在院或正在办理出院手续，无法修改冲红!'});
+                                        this.body = app.wrapper.res.error({ message: '当前老人不在院或正在办理出院手续，无法修改冲红!' });
                                         yield next;
                                         return;
                                     }
@@ -2089,13 +2089,13 @@ module.exports = {
                                     console.log(newBookingAmount);
 
                                     if (index == -1) {
-                                        this.body = app.wrapper.res.error({message: '无法找到需要撤销的老人流水记录!'});
+                                        this.body = app.wrapper.res.error({ message: '无法找到需要撤销的老人流水记录!' });
                                         yield next;
                                         return;
                                     }
 
                                     if (elderly.journal_account[index].carry_over_flag) {
-                                        this.body = app.wrapper.res.error({message: '当前流水记录已经结转!'});
+                                        this.body = app.wrapper.res.error({ message: '当前流水记录已经结转!' });
                                         yield next;
                                         return;
                                     }
@@ -2111,7 +2111,7 @@ module.exports = {
                                     yield elderly.save();
                                     steps = 'A';
                                 } else {
-                                    this.body = app.wrapper.res.error({message: '当前流水没有记录来源，无法修改冲红!'});
+                                    this.body = app.wrapper.res.error({ message: '当前流水没有记录来源，无法修改冲红!' });
                                     yield next;
                                     return;
                                 }
@@ -2135,13 +2135,13 @@ module.exports = {
 
                                 elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], recharge_to_red.elderlyId);
                                 if (!elderly || elderly.status == 0) {
-                                    this.body = app.wrapper.res.error({message: '无法找到老人!'});
+                                    this.body = app.wrapper.res.error({ message: '无法找到老人!' });
                                     yield next;
                                     return;
                                 }
 
                                 if (!elderly.live_in_flag || elderly.begin_exit_flow) {
-                                    this.body = app.wrapper.res.error({message: '当前老人不在院或正在办理出院手续，无法记账!'});
+                                    this.body = app.wrapper.res.error({ message: '当前老人不在院或正在办理出院手续，无法记账!' });
                                     yield next;
                                     return;
                                 }
@@ -2165,13 +2165,13 @@ module.exports = {
                                 console.log(newBookingAmount);
 
                                 if (index == -1) {
-                                    this.body = app.wrapper.res.error({message: '无法找到需要修改的老人流水记录!'});
+                                    this.body = app.wrapper.res.error({ message: '无法找到需要修改的老人流水记录!' });
                                     yield next;
                                     return;
                                 }
 
                                 if (elderly.journal_account[index].carry_over_flag) {
-                                    this.body = app.wrapper.res.error({message: '当前流水记录已经结转!'});
+                                    this.body = app.wrapper.res.error({ message: '当前流水记录已经结转!' });
                                     yield next;
                                     return;
                                 }
@@ -2236,10 +2236,10 @@ module.exports = {
                 verb: 'get',
                 url: this.service_url_prefix + "/roomStatusInfo/:tenantId",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         try {
 
-                            var roomStatuses = yield app.modelFactory().model_query(app.models['psn_roomStatus'], {where: {tenantId: this.params.tenantId}})
+                            var roomStatuses = yield app.modelFactory().model_query(app.models['psn_roomStatus'], { where: { tenantId: this.params.tenantId } })
                                 .populate({
                                     path: 'occupied.elderlyId',
                                     select: '-_id name'
@@ -2257,7 +2257,7 @@ module.exports = {
                 verb: 'post',
                 url: this.service_url_prefix + "/updateRoomStatusInfo",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         var steps;
                         var tenant, elderly, room;
                         var remove_created_roomStatus_id, raw_bed_status_for_cancel_occupy_roomStatus, raw_elderly_for_cancel_occupy_roomStatus;
@@ -2271,24 +2271,24 @@ module.exports = {
 
                             tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], tenantId);
                             if (!tenant || tenant.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到养老机构!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到养老机构!' });
                                 yield next;
                                 return;
                             }
                             elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], elderlyId);
                             if (!elderly || elderly.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到老人!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到老人!' });
                                 yield next;
                                 return;
                             }
                             room = yield app.modelFactory().model_read(app.models['psn_room'], roomId);
                             if (!room || room.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到房间!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到房间!' });
                                 yield next;
                                 return;
                             }
                             if (Number(bed_no) > room.capacity) {
-                                this.body = app.wrapper.res.error({message: '无效的床位号，该房间最多支持' + room.capacity + '床位!'});
+                                this.body = app.wrapper.res.error({ message: '无效的床位号，该房间最多支持' + room.capacity + '床位!' });
                                 yield next;
                                 return;
                             }
@@ -2297,7 +2297,7 @@ module.exports = {
                             //检查入住老人有没有其他的预占用或在用记录
                             var toUpdateRoomStatus = [];
                             var toCreateRoomStatus;
-                            var roomStatuses = yield app.modelFactory().model_query(app.models['psn_roomStatus'], {where: {tenantId: tenantId}});
+                            var roomStatuses = yield app.modelFactory().model_query(app.models['psn_roomStatus'], { where: { tenantId: tenantId } });
                             for (var i = 0; i < roomStatuses.length; i++) {
                                 if (roomStatuses[i].occupied) {
                                     for (var j = 0; j < roomStatuses[i].occupied.length; j++) {
@@ -2305,7 +2305,7 @@ module.exports = {
                                         var occupy = roomStatuses[i].occupied[j];
                                         if (elderlyId == occupy.elderlyId) {
                                             if (occupy.bed_status == 'A0003') {
-                                                this.body = app.wrapper.res.error({message: '该老人已经入住到其他床位，请使用换床功能!!'});
+                                                this.body = app.wrapper.res.error({ message: '该老人已经入住到其他床位，请使用换床功能!!' });
                                                 yield next;
                                                 return;
                                             }
@@ -2339,7 +2339,7 @@ module.exports = {
                                 console.log('create:' + roomId);
                                 toCreateRoomStatus = {
                                     roomId: roomId,
-                                    occupied: [{bed_no: bed_no, bed_status: 'A0002', elderlyId: elderlyId}],
+                                    occupied: [{ bed_no: bed_no, bed_status: 'A0002', elderlyId: elderlyId }],
                                     tenantId: tenantId
                                 };
                             } else {
@@ -2360,7 +2360,7 @@ module.exports = {
                                     //判断要入住的床位是否有其他老人，如有其他老人已经预占则返回
                                     if (bedInfo1.elderlyId && bedInfo1.elderlyId != elderlyId) {
                                         //改成
-                                        this.body = app.wrapper.res.error({message: '该床位已经被占用，请刷新床位信息!'});
+                                        this.body = app.wrapper.res.error({ message: '该床位已经被占用，请刷新床位信息!' });
                                         yield next;
                                         return;
                                     }
@@ -2414,7 +2414,7 @@ module.exports = {
                 verb: 'post',
                 url: this.service_url_prefix + "/robotRemoveRoomConfig",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         var steps;
                         var tenant, robot, rooms, room, robots;
                         try {
@@ -2424,21 +2424,21 @@ module.exports = {
 
                             tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], tenantId);
                             if (!tenant || tenant.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到养老机构!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到养老机构!' });
                                 yield next;
                                 return;
                             }
 
                             robot = yield app.modelFactory().model_read(app.models['pub_robot'], robotId);
                             if (!robot || robot.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到机器人!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到机器人!' });
                                 yield next;
                                 return;
                             }
 
                             rooms = yield app.modelFactory().model_query(app.models['psn_room'], {
                                 where: {
-                                    robots: {$elemMatch: {$eq: robotId}},
+                                    robots: { $elemMatch: { $eq: robotId } },
                                     tenantId: tenantId
                                 }
                             });
@@ -2481,7 +2481,7 @@ module.exports = {
                 verb: 'post',
                 url: this.service_url_prefix + "/bedMonitorRemoveRoomConfig",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         var steps;
                         var tenant, bedMonitor, rooms, room, bedMonitors;
                         try {
@@ -2491,14 +2491,14 @@ module.exports = {
 
                             tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], tenantId);
                             if (!tenant || tenant.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到养老机构!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到养老机构!' });
                                 yield next;
                                 return;
                             }
 
                             bedMonitor = yield app.modelFactory().model_read(app.models['pub_bedMonitor'], bedMonitorId);
                             if (!bedMonitor || bedMonitor.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到睡眠带!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到睡眠带!' });
                                 yield next;
                                 return;
                             }
@@ -2549,7 +2549,7 @@ module.exports = {
                 verb: 'post',
                 url: this.service_url_prefix + "/completeEnter/:_id",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         var steps;
                         var enter, tenant, elderly, roomStatus, roomOccupancyChangeHistory, recharge,
                             journal_account_item_A0001, journal_account_item_B0001,
@@ -2563,7 +2563,7 @@ module.exports = {
                             var operated_by = this.request.body.operated_by;
                             var operated_by_name = this.request.body.operated_by_name;
                             if (!operated_by) {
-                                this.body = app.wrapper.res.error({message: '缺少操作人数据!'});
+                                this.body = app.wrapper.res.error({ message: '缺少操作人数据!' });
                                 yield next;
                                 return;
                             }
@@ -2572,7 +2572,7 @@ module.exports = {
                             enter = yield app.modelFactory().model_read(app.models['psn_enter'], this.params._id);
 
                             if (!enter || enter.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到入院记录!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到入院记录!' });
                                 yield next;
                                 return;
                             }
@@ -2587,7 +2587,7 @@ module.exports = {
                             //2、获取租户信息
                             tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], enter.tenantId);
                             if (!tenant || tenant.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到养老机构资料!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到养老机构资料!' });
                                 yield next;
                                 return;
                             }
@@ -2595,7 +2595,7 @@ module.exports = {
                             //3、正式入院后从入院单中复制
                             elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], enter.elderlyId);
                             if (!elderly || elderly.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到老人!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到老人!' });
                                 yield next;
                                 return;
                             }
@@ -2622,11 +2622,11 @@ module.exports = {
                             //4、更新房间床位信息
                             var roomId = elderly.room_value.roomId;
                             var bed_no = elderly.room_value.bed_no;
-                            roomStatus = yield app.modelFactory().model_one(app.models['psn_roomStatus'], {where: {roomId: roomId}});
+                            roomStatus = yield app.modelFactory().model_one(app.models['psn_roomStatus'], { where: { roomId: roomId } });
                             if (!roomStatus) {
                                 roomStatus = {
                                     roomId: roomId,
-                                    occupied: [{bed_no: bed_no, bed_status: 'A0003', elderlyId: enter.elderlyId}],
+                                    occupied: [{ bed_no: bed_no, bed_status: 'A0003', elderlyId: enter.elderlyId }],
                                     tenantId: enter.tenantId
                                 };
                             } else {
@@ -2743,7 +2743,7 @@ module.exports = {
                             steps += "A";
                             recharge = yield app.modelFactory().model_create(app.models['psn_recharge'], recharge);
 
-                            this.body = app.wrapper.res.ret({current_register_step: enter.current_register_step});
+                            this.body = app.wrapper.res.ret({ current_register_step: enter.current_register_step });
                         } catch (e) {
                             self.logger.error(e.message);
                             this.body = app.wrapper.res.error(e);
@@ -2801,7 +2801,7 @@ module.exports = {
                 verb: 'post',
                 url: this.service_url_prefix + "/disableEnterRelatedAction/:_id",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         var steps;
                         var enter, tenant, elderly;
                         var toUpdateRoomStatus = [];
@@ -2811,7 +2811,7 @@ module.exports = {
                             //1、订单状态改为[入院成功]
                             enter = yield app.modelFactory().model_read(app.models['psn_enter'], this.params._id);
                             if (!enter || enter.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到入院记录!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到入院记录!' });
                                 yield next;
                                 return;
                             }
@@ -2819,7 +2819,7 @@ module.exports = {
                             //2、获取租户信息
                             tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], enter.tenantId);
                             if (!tenant || tenant.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到养老机构!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到养老机构!' });
                                 yield next;
                                 return;
                             }
@@ -2827,18 +2827,18 @@ module.exports = {
                             //3、判断老人是否在院
                             elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], enter.elderlyId);
                             if (!elderly || elderly.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到老人资料!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到老人资料!' });
                                 yield next;
                                 return;
                             }
                             if (elderly.live_in_flag) {
-                                this.body = app.wrapper.res.error({message: '老人已经在院，必须办理出院手续!'});
+                                this.body = app.wrapper.res.error({ message: '老人已经在院，必须办理出院手续!' });
                                 yield next;
                                 return;
                             }
 
                             //解除预占用
-                            var roomStatuses = yield app.modelFactory().model_query(app.models['psn_roomStatus'], {where: {tenantId: enter.tenantId}});
+                            var roomStatuses = yield app.modelFactory().model_query(app.models['psn_roomStatus'], { where: { tenantId: enter.tenantId } });
                             for (var i = 0; i < roomStatuses.length; i++) {
                                 if (roomStatuses[i].occupied) {
                                     var old_roomStatus_occupied = app.clone(roomStatuses[i].toObject().occupied);
@@ -2883,7 +2883,7 @@ module.exports = {
                 verb: 'get',
                 url: this.service_url_prefix + "/checkBeforeAddEnter/:tenantId/:id_no",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         var steps;
                         var enter, tenant, elderly;
                         var toUpdateRoomStatus = [];
@@ -2897,7 +2897,7 @@ module.exports = {
                             //1、获取租户信息
                             tenant = yield app.modelFactory().model_read(app.models["pub_tenant"], tenantId);
                             if (!tenant || tenant.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到养老机构资料!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到养老机构资料!' });
                                 yield next;
                                 return;
                             }
@@ -2914,7 +2914,7 @@ module.exports = {
 
                                 if (elderly.live_in_flag) {
                                     console.log('老人已经在院，无法办理入院手续!');
-                                    this.body = app.wrapper.res.error({message: '老人已经在院，无法办理入院手续!'});
+                                    this.body = app.wrapper.res.error({ message: '老人已经在院，无法办理入院手续!' });
                                     yield next;
                                     return;
                                 }
@@ -2925,20 +2925,20 @@ module.exports = {
                                 var enters = yield app.modelFactory().model_query(app.models['psn_enter'], {
                                     where: {
                                         elderlyId: elderly._id,
-                                        current_register_step: {"$in": ['A0001', 'A0003', 'A0005']},
+                                        current_register_step: { "$in": ['A0001', 'A0003', 'A0005'] },
                                         tenantId: tenantId,
                                         status: 1
                                     }
                                 });
 
                                 if (enters && enters.length > 0) {
-                                    this.body = app.wrapper.res.error({message: '系统检测到该老人已经存在其他入院记录，无法办理入院手续!'});
+                                    this.body = app.wrapper.res.error({ message: '系统检测到该老人已经存在其他入院记录，无法办理入院手续!' });
                                     yield next;
                                     return;
                                 }
                             }
 
-                            this.body = app.wrapper.res.ret({elderly: elderly});
+                            this.body = app.wrapper.res.ret({ elderly: elderly });
                         } catch (e) {
                             self.logger.error(e.message);
                             this.body = app.wrapper.res.error(e);
@@ -2952,17 +2952,17 @@ module.exports = {
                 verb: 'post',
                 url: this.service_url_prefix + "/nursingLevelsByAssessmentGrade",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         try {
                             var nursing_assessment_grade = this.request.body.nursing_assessment_grade;
                             var tenantId = this.request.body.tenantId;
                             if (!nursing_assessment_grade) {
-                                this.body = app.wrapper.res.error({message: '缺少评估等级!'});
+                                this.body = app.wrapper.res.error({ message: '缺少评估等级!' });
                                 yield next;
                                 return;
                             }
                             if (!tenantId) {
-                                this.body = app.wrapper.res.error({message: '缺少养老机构!'});
+                                this.body = app.wrapper.res.error({ message: '缺少养老机构!' });
                                 yield next;
                                 return;
                             }
@@ -2985,11 +2985,11 @@ module.exports = {
                 verb: 'post',
                 url: this.service_url_prefix + "/nursingLevels",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         try {
                             var tenantId = this.request.body.tenantId;
                             if (!tenantId) {
-                                this.body = app.wrapper.res.error({message: '缺少养老机构!'});
+                                this.body = app.wrapper.res.error({ message: '缺少养老机构!' });
                                 yield next;
                                 return;
                             }
@@ -3013,7 +3013,7 @@ module.exports = {
                 verb: 'post',
                 url: this.service_url_prefix + "/submitApplicationToExit/:_id",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         var steps;
                         var elderly, newExit;
                         var raw_elderly_begin_exit_flow;
@@ -3023,7 +3023,7 @@ module.exports = {
                             var operated_by_name = this.request.body.operated_by_name;
 
                             if (!operated_by) {
-                                this.body = app.wrapper.res.error({message: '缺少操作人数据!'});
+                                this.body = app.wrapper.res.error({ message: '缺少操作人数据!' });
                                 yield next;
                                 return;
                             }
@@ -3031,24 +3031,24 @@ module.exports = {
                             //1、判断老人是否在院
                             elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], this.params._id);
                             if (!elderly || elderly.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到老人!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到老人!' });
                                 yield next;
                                 return;
                             }
                             if (!elderly.live_in_flag) {
-                                this.body = app.wrapper.res.error({message: '老人已经出院!'});
+                                this.body = app.wrapper.res.error({ message: '老人已经出院!' });
                                 yield next;
                                 return;
                             }
 
                             if (elderly.begin_exit_flow || (yield app.modelFactory().model_totals(app.models['psn_exit'], {
-                                    where: {
-                                        tenantId: elderly.tenantId,
-                                        elderlyId: elderly._id,
-                                        enter_code: elderly.enter_code
-                                    }
-                                })).length > 0) {
-                                this.body = app.wrapper.res.error({message: '老人出院申请已经提交，请按照出院流程办理出院手续!'});
+                                where: {
+                                    tenantId: elderly.tenantId,
+                                    elderlyId: elderly._id,
+                                    enter_code: elderly.enter_code
+                                }
+                            })).length > 0) {
+                                this.body = app.wrapper.res.error({ message: '老人出院申请已经提交，请按照出院流程办理出院手续!' });
                                 yield next;
                                 return;
                             }
@@ -3081,7 +3081,7 @@ module.exports = {
                             steps = "A";
                             newExit = yield app.modelFactory().model_create(app.models['psn_exit'], newExit);
 
-                            this.body = app.wrapper.res.ret({begin_exit_flow: elderly.begin_exit_flow});
+                            this.body = app.wrapper.res.ret({ begin_exit_flow: elderly.begin_exit_flow });
                         } catch (e) {
                             self.logger.error(e.message);
                             this.body = app.wrapper.res.error(e);
@@ -3107,17 +3107,17 @@ module.exports = {
                 verb: 'post',
                 url: this.service_url_prefix + "/submitToAuditItemReturn/:_id",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         var exit;
                         try {
                             exit = yield app.modelFactory().model_read(app.models['psn_exit'], this.params._id);
                             if (!exit || exit.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到老人出院申请!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到老人出院申请!' });
                                 yield next;
                                 return;
                             }
                             if (exit.current_step != 'A0001') {
-                                this.body = app.wrapper.res.error({message: '出院流程步骤错误，当前状态下不能提交!'});
+                                this.body = app.wrapper.res.error({ message: '出院流程步骤错误，当前状态下不能提交!' });
                                 yield next;
                                 return;
                             }
@@ -3141,25 +3141,25 @@ module.exports = {
                 verb: 'post',
                 url: this.service_url_prefix + "/submitToAuditSettlement/:_id",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         var exit;
                         try {
                             var operated_by = this.request.body.operated_by;
                             var operated_by_name = this.request.body.operated_by_name;
                             if (!operated_by) {
-                                this.body = app.wrapper.res.error({message: '缺少操作人数据!'});
+                                this.body = app.wrapper.res.error({ message: '缺少操作人数据!' });
                                 yield next;
                                 return;
                             }
 
                             exit = yield app.modelFactory().model_read(app.models['psn_exit'], this.params._id);
                             if (!exit || exit.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到老人出院申请!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到老人出院申请!' });
                                 yield next;
                                 return;
                             }
                             if (exit.current_step != 'A0003') {
-                                this.body = app.wrapper.res.error({message: '出院流程步骤错误，当前状态下不能提交!'});
+                                this.body = app.wrapper.res.error({ message: '出院流程步骤错误，当前状态下不能提交!' });
                                 yield next;
                                 return;
                             }
@@ -3189,25 +3189,25 @@ module.exports = {
                 verb: 'post',
                 url: this.service_url_prefix + "/submitToConfirmExit/:_id",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         var exit;
                         try {
                             var operated_by = this.request.body.operated_by;
                             var operated_by_name = this.request.body.operated_by_name;
                             if (!operated_by) {
-                                this.body = app.wrapper.res.error({message: '缺少操作人数据!'});
+                                this.body = app.wrapper.res.error({ message: '缺少操作人数据!' });
                                 yield next;
                                 return;
                             }
 
                             exit = yield app.modelFactory().model_read(app.models['psn_exit'], this.params._id);
                             if (!exit || exit.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到老人出院申请!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到老人出院申请!' });
                                 yield next;
                                 return;
                             }
                             if (exit.current_step != 'A0005') {
-                                this.body = app.wrapper.res.error({message: '出院流程步骤错误，当前状态下不能提交!'});
+                                this.body = app.wrapper.res.error({ message: '出院流程步骤错误，当前状态下不能提交!' });
                                 yield next;
                                 return;
                             }
@@ -3237,31 +3237,31 @@ module.exports = {
                 verb: 'get',
                 url: this.service_url_prefix + "/advancePaymentItemsWhenExitSettlement/:_id",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         try {
                             var exit = yield app.modelFactory().model_read(app.models['psn_exit'], this.params._id);
                             if (!exit || exit.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到老人出院申请!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到老人出院申请!' });
                                 yield next;
                                 return;
                             }
 
                             var elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], exit.elderlyId);
                             if (!elderly || elderly.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到老人!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到老人!' });
                                 yield next;
                                 return;
                             }
 
                             if (!elderly.begin_exit_flow) {
-                                this.body = app.wrapper.res.error({message: '当前老人没有办理出院流程，无法获取结算信息!'});
+                                this.body = app.wrapper.res.error({ message: '当前老人没有办理出院流程，无法获取结算信息!' });
                                 yield next;
                                 return;
                             }
 
                             var advancePaymentItems = [];
 
-                            var balance_brought_forward_payment_item = {digest: '上期结转', amount: elderly.general_ledger};
+                            var balance_brought_forward_payment_item = { digest: '上期结转', amount: elderly.general_ledger };
                             advancePaymentItems.push(balance_brought_forward_payment_item);
                             var arr_journal_account = elderly.journal_account;
                             for (var i = 0; i < arr_journal_account.length; i++) {
@@ -3287,24 +3287,24 @@ module.exports = {
                 verb: 'get',
                 url: this.service_url_prefix + "/chargeItemsRecordedWhenExitSettlement/:_id",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         try {
                             var exit = yield app.modelFactory().model_read(app.models['psn_exit'], this.params._id);
                             if (!exit || exit.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到老人出院申请!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到老人出院申请!' });
                                 yield next;
                                 return;
                             }
 
                             var elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], exit.elderlyId);
                             if (!elderly || elderly.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到老人资料!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到老人资料!' });
                                 yield next;
                                 return;
                             }
 
                             if (!elderly.begin_exit_flow) {
-                                this.body = app.wrapper.res.error({message: '当前老人没有办理出院流程，无法获取结算信息!'});
+                                this.body = app.wrapper.res.error({ message: '当前老人没有办理出院流程，无法获取结算信息!' });
                                 yield next;
                                 return;
                             }
@@ -3336,24 +3336,24 @@ module.exports = {
                 verb: 'get',
                 url: this.service_url_prefix + "/chargeItemsUnRecordedWhenExitSettlement/:_id",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         try {
                             var exit = yield app.modelFactory().model_read(app.models['psn_exit'], this.params._id);
                             if (!exit || exit.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到老人出院申请!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到老人出院申请!' });
                                 yield next;
                                 return;
                             }
 
                             var elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], exit.elderlyId);
                             if (!elderly || elderly.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到老人资料!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到老人资料!' });
                                 yield next;
                                 return;
                             }
 
                             if (!elderly.begin_exit_flow) {
-                                this.body = app.wrapper.res.error({message: '当前老人没有办理出院流程，无法获取结算信息!'});
+                                this.body = app.wrapper.res.error({ message: '当前老人没有办理出院流程，无法获取结算信息!' });
                                 yield next;
                                 return;
                             }
@@ -3366,7 +3366,7 @@ module.exports = {
                             //改用elderly.charging_on_of_monthly_prepay
                             var firstPrepayDate = elderly.charging_on_of_monthly_prepay;
                             if (!firstPrepayDate) {
-                                var arr_journal_account_B0001 = app._.where(elderly_json.journal_account, {revenue_and_expenditure_type: 'B0001'});
+                                var arr_journal_account_B0001 = app._.where(elderly_json.journal_account, { revenue_and_expenditure_type: 'B0001' });
                                 var latest_journal_account_B0001 = app._.max(arr_journal_account_B0001, function (item) {
                                     return item.check_in_time;
                                 });
@@ -3404,7 +3404,7 @@ module.exports = {
                 verb: 'post',
                 url: this.service_url_prefix + "/exitSettlement/:_id",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         var steps;
                         var exit, elderly, tenant;
                         var raw_elderly_general_ledger, raw_elderly_subsidiary_ledger, raw_elderly_journal_account;
@@ -3417,39 +3417,39 @@ module.exports = {
                             var operated_by = this.request.body.operated_by;
                             var operated_by_name = this.request.body.operated_by_name;
                             if (!operated_by) {
-                                this.body = app.wrapper.res.error({message: '缺少操作人数据!'});
+                                this.body = app.wrapper.res.error({ message: '缺少操作人数据!' });
                                 yield next;
                                 return;
                             }
 
                             exit = yield app.modelFactory().model_read(app.models['psn_exit'], this.params._id);
                             if (!exit || exit.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到老人出院申请!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到老人出院申请!' });
                                 yield next;
                                 return;
                             }
                             if (exit.current_step != 'A0005') {
-                                this.body = app.wrapper.res.error({message: '出院流程步骤错误，当前状态下不能提交!'});
+                                this.body = app.wrapper.res.error({ message: '出院流程步骤错误，当前状态下不能提交!' });
                                 yield next;
                                 return;
                             }
 
                             elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], exit.elderlyId);
                             if (!elderly || elderly.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到老人资料!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到老人资料!' });
                                 yield next;
                                 return;
                             }
 
                             if (!elderly.begin_exit_flow) {
-                                this.body = app.wrapper.res.error({message: '当前老人没有办理出院流程，无法结算!'});
+                                this.body = app.wrapper.res.error({ message: '当前老人没有办理出院流程，无法结算!' });
                                 yield next;
                                 return;
                             }
 
                             tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], exit.tenantId);
                             if (!tenant || tenant.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到养老机构资料!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到养老机构资料!' });
                                 yield next;
                                 return;
                             }
@@ -3495,7 +3495,7 @@ module.exports = {
                             var unrecorded_charge_total = 0;
                             var firstPrepayDate = elderly.charging_on_of_monthly_prepay;
                             if (!firstPrepayDate) {
-                                var arr_journal_account_B0001 = app._.where(elderly_json.journal_account, {revenue_and_expenditure_type: 'B0001'});
+                                var arr_journal_account_B0001 = app._.where(elderly_json.journal_account, { revenue_and_expenditure_type: 'B0001' });
                                 var latest_journal_account_B0001 = app._.max(arr_journal_account_B0001, function (item) {
                                     return item.check_in_time;
                                 });
@@ -3647,7 +3647,7 @@ module.exports = {
                 verb: 'post',
                 url: this.service_url_prefix + "/completeExit/:_id",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         var steps;
                         var exit, tenant, elderly, roomStatus, now_roomOccupancyChangeHistory, new_roomOccupancyChangeHistory;
                         var raw_exit_current_step, raw_exit_exit_on, raw_exit_elderly_snapshot,
@@ -3657,20 +3657,20 @@ module.exports = {
                         try {
                             exit = yield app.modelFactory().model_read(app.models["psn_exit"], this.params._id);
                             if (!exit || exit.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到出院记录!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到出院记录!' });
                                 yield next;
                                 return;
                             }
 
                             elderly = yield app.modelFactory().model_read(app.models["psn_elderly"], exit.elderlyId);
                             if (!elderly || elderly.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到老人资料!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到老人资料!' });
                                 yield next;
                                 return;
                             }
 
                             if (!elderly.live_in_flag) {
-                                this.body = app.wrapper.res.error({message: '该老人已出院!'});
+                                this.body = app.wrapper.res.error({ message: '该老人已出院!' });
                                 yield next;
                                 return;
                             }
@@ -3685,7 +3685,7 @@ module.exports = {
                             });
 
                             if (roomStatus == null) {
-                                this.body = app.wrapper.res.error({message: '无法找到当前老人在用的床位状态资料!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到当前老人在用的床位状态资料!' });
                                 yield next;
                                 return;
                             }
@@ -3698,13 +3698,13 @@ module.exports = {
                                     elderlyId: elderly._id,
                                     in_flag: true
                                 },
-                                sort: {check_in_time: -1}
+                                sort: { check_in_time: -1 }
                             });
 
                             if (roomOccupancyChangeHistories && roomOccupancyChangeHistories.length > 0) {
                                 now_roomOccupancyChangeHistory = roomOccupancyChangeHistories[0];
                             } else {
-                                this.body = app.wrapper.res.error({message: '无法找到旧的房间占用历史!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到旧的房间占用历史!' });
                                 yield next;
                                 return;
                             }
@@ -3766,7 +3766,7 @@ module.exports = {
 
                             yield elderly.save();
 
-                            this.body = app.wrapper.res.ret({current_step: exit.current_step, exit_on: exit.exit_on});
+                            this.body = app.wrapper.res.ret({ current_step: exit.current_step, exit_on: exit.exit_on });
 
                         } catch (e) {
                             self.logger.error(e.message);
@@ -3805,19 +3805,19 @@ module.exports = {
                 verb: 'post',
                 url: this.service_url_prefix + "/receptionVisiterSyncElderlyFamilyMembers/:_id",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         var reception, elderly;
                         try {
                             reception = yield app.modelFactory().model_read(app.models['psn_reception'], this.params._id);
                             if (!reception || reception.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到接待记录!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到接待记录!' });
                                 yield next;
                                 return;
                             }
 
                             elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], reception.elderlyId);
                             if (!elderly || elderly.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到老人!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到老人!' });
                                 yield next;
                                 return;
                             }
@@ -3858,19 +3858,19 @@ module.exports = {
                 verb: 'post',
                 url: this.service_url_prefix + "/leaveAccompanierSyncElderlyFamilyMembers/:_id",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         var leave, elderly;
                         try {
                             leave = yield app.modelFactory().model_read(app.models['psn_leave'], this.params._id);
                             if (!leave || leave.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到外出记录!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到外出记录!' });
                                 yield next;
                                 return;
                             }
 
                             elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], leave.elderlyId);
                             if (!elderly || elderly.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到老人!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到老人!' });
                                 yield next;
                                 return;
                             }
@@ -3908,20 +3908,20 @@ module.exports = {
                     };
                 }
             },
-            /**********************护理排班*****************************/
+            /**********************照护排班*****************************/
             {
                 method: 'nursingScheduleWeekly',
                 verb: 'post',
-                url: this.service_url_prefix + "/nursingScheduleWeekly", //按周查找护理排班
+                url: this.service_url_prefix + "/nursingScheduleWeekly", //按周查找照护排班
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         var tenant, xAxisValueStart, xAxisValueEnd;
                         try {
                             //this.request.body
                             var tenantId = this.request.body.tenantId;
                             tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], tenantId);
                             if (!tenant || tenant.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到养老机构!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到养老机构!' });
                                 yield next;
                                 return;
                             }
@@ -3949,7 +3949,7 @@ module.exports = {
                             var yAxisData = app._.map(app._.uniq(app._.map(rows, (o) => {
                                 return o.y_axis.toString();
                             })), (o) => {
-                                return {_id: o};
+                                return { _id: o };
                             });
                             // console.log(yAxisData);
                             // console.log(rows);
@@ -3970,14 +3970,14 @@ module.exports = {
                 verb: 'post',
                 url: this.service_url_prefix + "/nursingScheduleSave",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         var tenant;
                         try {
                             //this.request.body
                             var tenantId = this.request.body.tenantId;
                             tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], tenantId);
                             if (!tenant || tenant.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到养老机构!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到养老机构!' });
                                 yield next;
                                 return;
                             }
@@ -4004,7 +4004,7 @@ module.exports = {
 
                             var removeWhere = {
                                 tenantId: tenantId,
-                                y_axis: {$in: yAxisRange},
+                                y_axis: { $in: yAxisRange },
                                 $or: xAxisRange
                             };
 
@@ -4044,6 +4044,7 @@ module.exports = {
                                     });
                                     console.log('assigned_workers:', assigned_workers);
 
+ 
                                     exec_start = app.moment(groupKey_x_axis);
                                     exec_end = app.moment(exec_start).add(1, 'days');
 
@@ -4069,6 +4070,7 @@ module.exports = {
                                         nursingRecordIds = app._.map(nursingRecordsMatched, (o) => {
                                             return o._id;
                                         });
+
 
                                         console.log('bulkUpdate nursingRecordIds:', nursingRecordIds);
 
@@ -4097,14 +4099,14 @@ module.exports = {
                 verb: 'post',
                 url: this.service_url_prefix + "/nursingScheduleRemove",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         var tenant;
                         try {
                             //this.request.body
                             var tenantId = this.request.body.tenantId;
                             tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], tenantId);
                             if (!tenant || tenant.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到养老机构!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到养老机构!' });
                                 yield next;
                                 return;
                             }
@@ -4131,7 +4133,7 @@ module.exports = {
 
                             var removeWhere = {
                                 tenantId: tenantId,
-                                y_axis: {$in: yAxisRange},
+                                y_axis: { $in: yAxisRange },
                                 $or: xAxisRange
                             };
 
@@ -4166,7 +4168,7 @@ module.exports = {
                                 nursingRecordsMatched = yield app.modelFactory().model_query(app.models['psn_nursingRecord'], {
                                     select: '_id',
                                     where: {
-                                        exec_on: {'$gte': exec_start, '$lt': exec_end},
+                                        exec_on: { '$gte': exec_start, '$lt': exec_end },
                                         roomId: toRemoveRow.y_axis,
                                         tenantId: tenantId
                                     }
@@ -4201,14 +4203,14 @@ module.exports = {
                 verb: 'post',
                 url: this.service_url_prefix + "/nursingScheduleTemplateImport",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         var nursingScheduleTemplate;
                         try {
                             //this.request.body
                             var nursingScheduleTemplateId = this.request.body.nursingScheduleTemplateId;
                             nursingScheduleTemplate = yield app.modelFactory().model_read(app.models['psn_nursingScheduleTemplate'], nursingScheduleTemplateId);
                             if (!nursingScheduleTemplate || nursingScheduleTemplate.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到护理模版!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到照护模版!' });
                                 yield next;
                                 return;
                             }
@@ -4225,7 +4227,7 @@ module.exports = {
                                 xAxisValue = app.moment(o);
                                 xAxisDate = xAxisValue.toDate();
                                 xAxisDayDateMap[xAxisValue.day()] = xAxisDate;
-                                return {'x_axis': {'$gte': xAxisDate, '$lt': xAxisValue.add(1, 'days').toDate()}}
+                                return { 'x_axis': { '$gte': xAxisDate, '$lt': xAxisValue.add(1, 'days').toDate() } }
                             });
 
                             var templateItems = nursingScheduleTemplate.content;
@@ -4235,7 +4237,7 @@ module.exports = {
 
                             var removeWhere = {
                                 tenantId: nursingScheduleTemplate.tenantId,
-                                y_axis: {$in: yAxisRange},
+                                y_axis: { $in: yAxisRange },
                                 $or: xAxisRange
                             };
 
@@ -4307,6 +4309,7 @@ module.exports = {
                                             return o._id;
                                         });
 
+ 
                                         console.log('bulkUpdate nursingRecordIds:', nursingRecordIds);
 
                                         batchConditions = {"_id": {"$in": nursingRecordIds}};
@@ -4334,14 +4337,14 @@ module.exports = {
                 verb: 'post',
                 url: this.service_url_prefix + "/nursingScheduleSaveAsTemplateWeekly",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         var tenant;
                         try {
                             //this.request.body
                             var tenantId = this.request.body.tenantId;
                             tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], tenantId);
                             if (!tenant || tenant.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到养老机构!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到养老机构!' });
                                 yield next;
                                 return;
                             }
@@ -4389,16 +4392,16 @@ module.exports = {
             }, {
                 method: 'nursingScheduleByElderlyDaily',
                 verb: 'post',
-                url: this.service_url_prefix + "/nursingScheduleByElderlyDaily", //按老人和天查找护理排班
+                url: this.service_url_prefix + "/nursingScheduleByElderlyDaily", //按老人和天查找照护排班
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         var tenant, elderly, dateString, xAxisValueStart;
                         try {
                             //this.request.body
                             var tenantId = this.request.body.tenantId;
                             tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], tenantId);
                             if (!tenant || tenant.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到养老机构!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到养老机构!' });
                                 yield next;
                                 return;
                             }
@@ -4406,7 +4409,7 @@ module.exports = {
                             var elderlyId = this.request.body.elderlyId;
                             elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], elderlyId);
                             if (!elderly || elderly.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到老人!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到老人!' });
                                 yield next;
                                 return;
                             }
@@ -4441,19 +4444,19 @@ module.exports = {
                     };
                 }
             },
-            /**********************护理计划*****************************/
+            /**********************照护计划*****************************/
             {
                 method: 'nursingPlansByRoom',
                 verb: 'post',
-                url: this.service_url_prefix + "/nursingPlansByRoom", //按房间查找入住老人的护理计划
+                url: this.service_url_prefix + "/nursingPlansByRoom", //按房间查找入住老人的照护计划
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         var tenant, elderly, nursingPlan;
                         try {
                             var tenantId = this.request.body.tenantId;
                             tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], tenantId);
                             if (!tenant || tenant.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到养老机构!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到养老机构!' });
                                 yield next;
                                 return;
                             }
@@ -4522,42 +4525,42 @@ module.exports = {
                         yield next;
                     };
                 }
-            },{
+            }, {
                 method: 'workItemQuery',
                 verb: 'post',
                 url: this.service_url_prefix + "/q/workItem",
-                handler: function(app, options) {
-                    return function*(next) {
+                handler: function (app, options) {
+                    return function* (next) {
                         try {
                             var workItemId = this.request.body.workItemId;
                             // console.log("workItemId",workItemId)
-                            var rows = yield app.modelFactory().model_read(app.models['psn_workItem'],workItemId);
-                            if(!rows){
+                            var rows = yield app.modelFactory().model_read(app.models['psn_workItem'], workItemId);
+                            if (!rows) {
                                 this.body = app.wrapper.res.error({ message: '无法找到工作项目!' });
                                 yield next;
-                                return; 
+                                return;
                             }
                             this.body = app.wrapper.res.rows(rows);
                         } catch (e) {
-                            console.log(e);       
+                            console.log(e);
                             self.logger.error(e.message);
                             this.body = app.wrapper.res.error(e);
                         }
                         yield next;
                     };
                 }
-            },{
+            }, {
                 method: 'nursingPlanSaveNursingItem',
                 verb: 'post',
-                url: this.service_url_prefix + "/nursingPlanSaveNursingItem", //为老人保存一条护理类目
+                url: this.service_url_prefix + "/nursingPlanSaveNursingItem", //为老人保存一条照护类目
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         var tenant, elderly, workItem, nursingPlan, toProcessWorkItem
                         try {
                             var tenantId = this.request.body.tenantId;
                             tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], tenantId);
                             if (!tenant || tenant.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到养老机构!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到养老机构!' });
                                 yield next;
                                 return;
                             }
@@ -4565,7 +4568,7 @@ module.exports = {
                             var elderlyId = this.request.body.elderlyId;
                             elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], elderlyId);
                             if (!elderly || elderly.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到老人!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到老人!' });
                                 yield next;
                                 return;
                             }
@@ -4576,7 +4579,7 @@ module.exports = {
                             if (type == DIC.D3017.NURSING_ITEM) {
                                 workItem = yield app.modelFactory().model_read(app.models['psn_workItem'], toProcessWorkItemId);
                                 if (!workItem || workItem.status == 0) {
-                                    this.body = app.wrapper.res.error({message: '无法找到工作项目!'});
+                                    this.body = app.wrapper.res.error({ message: '无法找到工作项目!' });
                                     yield next;
                                     return;
                                 }
@@ -4584,7 +4587,7 @@ module.exports = {
                             } else if (type == DIC.D3017.DRUG_USE_ITEM) {
                                 workItem = yield app.modelFactory().model_read(app.models['psn_drugUseItem'], toProcessWorkItemId);
                                 if (!workItem || workItem.status == 0) {
-                                    this.body = app.wrapper.res.error({message: '无法找到用药管理项目!'});
+                                    this.body = app.wrapper.res.error({ message: '无法找到用药管理项目!' });
                                     yield next;
                                     return;
                                 }
@@ -4643,17 +4646,17 @@ module.exports = {
                     };
                 }
             }, {
-                method: 'nursingPlanSaveRemark',
-                verb: 'post',
-                url: this.service_url_prefix + "/nursingPlanSaveRemark", //为老人保存一条护理项目
-                handler: function (app, options) {
-                    return function*(next) {
-                        var tenant, elderly, nursingPlan;
-                        try {
+                method:'nursingPlanSaveAll',
+                verb:'post',
+                url:this.service_url_prefix + "/nursingPlanSaveAll",
+                handler:function(app,options){
+                    return function* (next) {
+                        var type, workItemIds,checked,tenant,elderly,workItems;
+                        try{
                             var tenantId = this.request.body.tenantId;
                             tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], tenantId);
                             if (!tenant || tenant.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到养老机构!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到养老机构!' });
                                 yield next;
                                 return;
                             }
@@ -4661,7 +4664,147 @@ module.exports = {
                             var elderlyId = this.request.body.elderlyId;
                             elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], elderlyId);
                             if (!elderly || elderly.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到老人!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到老人!' });
+                                yield next;
+                                return;
+                            }
+                            type = this.request.body.type;
+                            workItemIds = this.request.body.workItemIds;
+                            checked = this.request.body.checked;
+
+                            var elderlyNursingPlan = yield app.modelFactory().model_one(app.models['psn_nursingPlan'], {
+                                select: 'work_items',
+                                where: {
+                                    status: 1,
+                                    elderlyId: elderlyId,
+                                    tenantId: tenantId
+                                }
+                            });
+                            var workItemsByElderly = [];
+                            if (!elderlyNursingPlan) {
+                                if(checked == true&&type == DIC.D3017.NURSING_ITEM){
+                                   for (var i=0,len = workItemIds.length;i<len;i++){
+                                        var workItemId = workItemIds[i]; 
+                                        var workItem = yield app.modelFactory().model_read(app.models['psn_workItem'],workItemId);
+                                            if (!workItem || workItem.status == 0) {
+                                                this.body = app.wrapper.res.error({ message: '无法找到工作项目!' });
+                                                yield next;
+                                                return;
+                                            }else{
+                                            var workItemObj = workItem.toObject();
+                                                workItemObj.type = type;
+                                                workItemObj.workItemId = workItemId;
+                                                workItemsByElderly.push(workItemObj);
+                                            }
+                                   }
+                                }else if(checked == true&&type == DIC.D3017.DRUG_USE_ITEM){
+                                       for (var i=0,len = workItemIds.length;i<len;i++){
+                                            var workItemId = workItemIds[i];
+                                            var workItem = yield app.modelFactory().model_read(app.models['psn_drugUseItem'],workItemId);
+                                            if (!workItem || workItem.status == 0) {
+                                                this.body = app.wrapper.res.error({ message: '无法找到用药项目!' });
+                                                yield next;
+                                                return;
+                                            }else{
+                                               var  workItemObj = workItem.toObject();
+                                                    workItemObj.type = type;
+                                                    workItemObj.workItemId = workItemId;
+                                                    workItemsByElderly.push(workItemObj);
+                                            }
+                                       }
+                                }
+                                // console.log("workItemByElderly",workItemsByElderly);
+                                yield app.modelFactory().model_create(app.models['psn_nursingPlan'], {
+                                        elderlyId: elderlyId,
+                                        elderly_name: elderly.name,
+                                        work_items:workItemsByElderly,
+                                        tenantId: tenantId
+                                     });
+
+                            }else{
+                                    workItems = elderlyNursingPlan.work_items;
+                                    // console.log("******",workItems);
+                                    if(type == DIC.D3017.NURSING_ITEM ){
+                                        var baseWorkItems = workItems.filter(function(o){
+                                            return o.type == DIC.D3017.DRUG_USE_ITEM
+                                        })
+                                        // console.log("baseWorkItemsOfDrugUseItem",baseWorkItems);  
+                                        if(checked == true){
+                                            for (var i=0,len = workItemIds.length;i<len;i++){
+                                                 var workItemId = workItemIds[i]; 
+                                                 var workItem = yield app.modelFactory().model_read(app.models['psn_workItem'],workItemId);
+                                                    if (!workItem || workItem.status == 0) {
+                                                        this.body = app.wrapper.res.error({ message: '无法找到工作项目!' });
+                                                        yield next;
+                                                        return;
+                                                    }else{
+                                                      var   workItemObj = workItem.toObject();
+                                                            workItemObj.type = type;
+                                                            workItemObj.workItemId = workItemId;
+                                                            baseWorkItems.push(workItemObj);
+                                                    }
+                                            }
+                                           
+                                        }
+                                         workItemsByElderly = baseWorkItems;
+                                        //  console.log("workItemsofnursingItem",workItemsByElderly) 
+                                    }else if(type == DIC.D3017.DRUG_USE_ITEM){
+                                        var baseWorkItems = workItems.filter(function(o){
+                                            return o.type == DIC.D3017.NURSING_ITEM
+                                        })
+                                        // console.log("baseWorkItemsOfNursingItem",baseWorkItems);  
+                                        if(checked==true){
+                                            for (var i=0,len = workItemIds.length;i<len;i++){
+                                                 var workItemId = workItemIds[i]; 
+                                                 var workItem = yield app.modelFactory().model_read(app.models['psn_drugUseItem'],workItemId);
+                                                    if (!workItem || workItem.status == 0) {
+                                                        this.body = app.wrapper.res.error({ message: '无法找到用药项目!' });
+                                                        yield next;
+                                                        return;
+                                                    }else{
+                                                      var  workItemObj = workItem.toObject();
+                                                           workItemObj.type = type;
+                                                           workItemObj.workItemId = workItemId;
+                                                           baseWorkItems.push(workItemObj);
+                                                    }
+                                            }
+                                        }
+                                        workItemsByElderly = baseWorkItems;
+                                        // console.log("workItemsofdrug",workItemsByElderly) 
+                                    }
+                                     elderlyNursingPlan.work_items = workItemsByElderly;
+                                    //  console.log("workItemsByElderly",workItemsByElderly) 
+                                     yield elderlyNursingPlan.save();
+                            }
+                            this.body = app.wrapper.res.default(); 
+                        }catch(e){
+                            console.log(e);
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);   
+                        }
+                        yield next;
+                    };
+                }
+            },{
+                method: 'nursingPlanSaveRemark',
+                verb: 'post',
+                url: this.service_url_prefix + "/nursingPlanSaveRemark", //为老人保存一条照护项目
+                handler: function (app, options) {
+                    return function* (next) {
+                        var tenant, elderly, nursingPlan;
+                        try {
+                            var tenantId = this.request.body.tenantId;
+                            tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], tenantId);
+                            if (!tenant || tenant.status == 0) {
+                                this.body = app.wrapper.res.error({ message: '无法找到养老机构!' });
+                                yield next;
+                                return;
+                            }
+
+                            var elderlyId = this.request.body.elderlyId;
+                            elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], elderlyId);
+                            if (!elderly || elderly.status == 0) {
+                                this.body = app.wrapper.res.error({ message: '无法找到老人!' });
                                 yield next;
                                 return;
                             }
@@ -4708,21 +4851,23 @@ module.exports = {
                 handler: function (app, options) {
                     return function* (next) {
                         try {
-                            var workItemId = this.request.body.workItemId,newWorkItemId;
+                            var workItemId = this.request.body.workItemId, newWorkItemId;
                             // console.log("<<<workItemId", workItemId);
                             var customizedWorkItem = this.request.body.customizedWorkItem;
                             // console.log(">>>>>customizeWorkItem", customizedWorkItem);
                             var workItem = yield app.modelFactory().model_read(app.models['psn_workItem'], workItemId);
                             // console.log('<<<<workItem', workItem);
-                            if (!workItem.customize_flag) {
+                            if (workItem.customize_flag ==false) {
                                 delete customizedWorkItem._id;
                                 customizedWorkItem.customize_flag = true;
-                                customizedWorkItem.name+="+";
-                                yield app.modelFactory().model_create(app.models['psn_workItem'], customizedWorkItem);
+                                customizedWorkItem.sourceId = workItemId;
+                                customizedWorkItem.name += "+";
+                                newWorkItem = yield app.modelFactory().model_create(app.models['psn_workItem'], customizedWorkItem);
                             } else {
-                                workItem = app._.extend(workItem, customizedWorkItem);
-                                yield workItem.save();
+                                yield app.modelFactory().model_delete(app.models['psn_workItem'], workItemId);
+                                newWorkItem = yield app.modelFactory().model_create(app.models['psn_workItem'], customizedWorkItem);
                             }
+                            // console.log("newWorkItem", newWorkItem);
                             var elderlyId = this.request.body.customizedWorkItem.elderlyId;
                             var tenantId = this.request.body.customizedWorkItem.tenantId;
                             var elderlyNursingPlan = yield app.modelFactory().model_one(app.models['psn_nursingPlan'], {
@@ -4737,14 +4882,14 @@ module.exports = {
                             if (elderlyNursingPlan && elderlyNursingPlan.work_items) {
 
                                 elderlyNursingPlan.work_items = elderlyNursingPlan.work_items.filter(function (item) {
-                                    return item.workItemId !== workItemId;
+                                    return item.workItemId != workItemId;
                                 });
                                 // console.log("elderlyNursingPlan",elderlyNursingPlan);
                                 yield elderlyNursingPlan.save();
                             }
 
-                            this.body = app.wrapper.res.default();
-                        }catch(e){
+                            this.body = app.wrapper.res.rows(newWorkItem);
+                        } catch (e) {
                             console.log(e);
                             self.logger.error(e.message);
                             this.body = app.wrapper.res.error(e);
@@ -4753,280 +4898,17 @@ module.exports = {
                     };
                 }
             },
-            /**********************护理计划执行(护理记录)*****************************/
+            /**********************照护计划执行(照护记录)*****************************/
             {
                 method: 'nursingRecordGenerate',
                 verb: 'post',
-                url: this.service_url_prefix + "/nursingRecordGenerate", //按照护理计划一轮护理记录
+                url: this.service_url_prefix + "/nursingRecordGenerate", //按照照护计划一轮照护记录
                 handler: function (app, options) {
+
                     return function*(next) {
-                        var tenant, elderly, elderlyRoomValue, roomId, nursingPlanItems, nursingPlanItem, workItems, workItem,
-                            nursingRecord, now, gen_batch_no, nursingWorkerScheduleItems, exec_date, exec_on, exec_date_string, remind_on;
-                        var elderlyMapRoom = {},
-                            nursingRecordsToSave = [],
-                            nursingRecordToSave, work_item_repeat_values, allEdlerlyIds, allElderly, nursingRecordExist,
-                            remind_max, remind_step, remind_start, exec_start, exec_end, warningMsg;
                         try {
-                            var tenantId = this.request.body.tenantId;
-                            tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], tenantId);
-                            if (!tenant || tenant.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到养老机构!'});
-                                yield next;
-                                return;
-                            }
-
-                            var elderlyId = this.request.body.elderlyId;
-                            if (elderlyId) {
-                                // 为单个老人
-                                elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], elderlyId);
-                                if (!elderly || elderly.status == 0) {
-                                    this.body = app.wrapper.res.error({message: '无法找到老人!'});
-                                    yield next;
-                                    return;
-                                }
-
-                                if (!elderly.live_in_flag) {
-                                    this.body = app.wrapper.res.error({message: '老人已出院或离世!'});
-                                    yield next;
-                                    return;
-                                }
-
-                                nursingPlanItems = yield app.modelFactory().model_query(app.models['psn_nursingPlan'], {
-                                    select: 'elderlyId elderly_name work_items',
-                                    where: {
-                                        status: 1,
-                                        elderlyId: elderlyId,
-                                        tenantId: tenantId
-                                    }
-                                });
-
-                                // 查询房间号
-                                elderlyMapRoom[elderlyId] = elderly.room_value;
-
-                            } else {
-                                allElderly = yield app.modelFactory().model_query(app.models['psn_elderly'], {
-                                    select: 'room_value',
-                                    where: {
-                                        status: 1,
-                                        live_in_flag: true,
-                                        tenantId: tenantId
-                                    }
-                                });
-
-                                app._.each(allElderly, (o) => {
-                                    elderlyMapRoom[o._id.toString()] = o.room_value;
-                                });
-
-                                // 为所有老人
-                                nursingPlanItems = yield app.modelFactory().model_query(app.models['psn_nursingPlan'], {
-                                    select: 'elderlyId elderly_name work_items',
-                                    where: {
-                                        status: 1,
-                                        tenantId: tenantId
-                                    }
-                                });
-                            }
-                            // console.log('nursingPlanItems',nursingPlanItems);
-                            if (nursingPlanItems.length) {
-                                now = app.moment();
-                                gen_batch_no = yield app.sequenceFactory.getSequenceVal(app.modelVariables.SEQUENCE_DEFS.CODE_OF_NURSING_RECORD);
-                                // console.log('gen_batch_no:',gen_batch_no);
-                                for (var i = 0, len = nursingPlanItems.length; i < len; i++) {
-                                    nursingPlanItem = nursingPlanItems[i];
-                                    elderlyRoomValue = elderlyMapRoom[nursingPlanItem.elderlyId];
-                                    nursingRecord = {
-                                        elderlyId: nursingPlanItem.elderlyId,
-                                        elderly_name: nursingPlanItem.elderly_name,
-                                        roomId: elderlyRoomValue.roomId,
-                                        bed_no: elderlyRoomValue.bed_no,
-                                        gen_batch_no: gen_batch_no,
-                                        tenantId: tenantId
-                                    }
-                                    workItems = nursingPlanItem.work_items;
-                                    // console.log("workItems",workItems)
-                                    for (var j = 0, len2 = workItems.length; j < len2; j++) {
-                                        workItem = workItems[j];
-                                        remind_max = workItem.remind_times || 1;
-                                        remind_step = workItem.duration / remind_max;
-                                        // console.log('remind_max: ', remind_max);
-                                        // console.log('remind_step: ', remind_step);
-
-                                        nursingRecord.workItemId = workItem._id
-                                        nursingRecord.name = workItem.name;
-                                        nursingRecord.description = workItem.description;
-                                        nursingRecord.remark = workItem.remark;
-                                        nursingRecord.duration = workItem.duration;
-                                        nursingRecord.remind_on = [];
-                                        nursingRecord.type = workItem.type;
-                                        nursingRecord.category = workItem.work_item_category;
-
-                                        var str = workItem.voice_template || '';
-                                        if(str) {
-                                            str = str.replace(/\${老人姓名}/g, nursingPlanItem.elderly_name || '')
-                                                .replace(/\${项目名称}/g, workItem.name || '')
-                                                .replace(/\${药品名称}/g, workItem.name || '')
-                                                .replace(/\${工作描述}/g, workItem.description || '')
-                                                .replace(/\${服用方法}/g, workItem.description || '');
-                                        }
-
-                                        // console.log('voice_content', str);
-
-                                        nursingRecord.voice_content = str;
-
-                                        if (workItem.repeat_type == DIC.D0103.AS_NEEDED) {
-                                            //按需工作不需要提醒
-                                            nursingRecord.exec_on = app.moment(app.moment().format('YYYY-MM-DD') + " 23:59:59");
-                                            nursingRecordsToSave.push(app._.extend({assigned_workers: []}, nursingRecord));
-                                        } else if (workItem.repeat_type == DIC.D0103.TIME_IN_DAY) {
-                                            exec_date_string = now.format('YYYY-MM-DD');
-                                            if (workItem.repeat_values.length > 0) {
-                                                // 每天某几个时刻执行,考虑到时间间隔比较近,因此将当天的全部生成
-                                                app._.each(workItem.repeat_values, (o) => {
-                                                    // console.log(o);
-                                                    nursingRecord.remind_on = [];
-                                                    exec_on = app.moment(exec_date_string + ' ' + o + workItem.repeat_start);
-                                                    if (exec_on.isAfter(now)) {
-                                                        // 当天没有过期的时刻
-                                                        nursingRecord.exec_on = exec_on;
-                                                        if (workItem.remind_flag) {
-                                                            remind_start = app.moment(exec_on);
-
-                                                            for (var remind_count = 0; remind_count < remind_max; remind_count++) {
-
-                                                                nursingRecord.remind_on.push(app.moment(remind_start.add(remind_step * remind_count, 'minutes')));
-                                                            }
-                                                        }
-                                                        nursingRecordsToSave.push(app._.extend({assigned_workers: []}, nursingRecord));
-                                                    }
-                                                });
-                                            } else {
-                                                // 每天某个时刻执行
-                                                exec_on = app.moment(exec_date_string + ' ' + workItem.repeat_start)
-                                                if (exec_on.isBefore(now)) {
-                                                    // 当天已经过期,生成明天
-                                                    exec_on = app.moment(now).add(1, 'days').format('YYYY-MM-DD') + ' ' + workItem.repeat_start;
-                                                }
-                                                // console.log('exec_on:', exec_on.format('YYYY-DD-MM HH:mm'));
-                                                nursingRecord.exec_on = exec_on;
-                                                if (workItem.remind_flag) {
-                                                    remind_start = app.moment(exec_on);
-                                                    for (var remind_count = 0; remind_count < remind_max; remind_count++) {
-                                                        // console.log('remind_start:', remind_start.format('YYYY-DD-MM HH:mm'));
-                                                        // console.log('remind_count:', remind_count);
-                                                        // console.log('remind_step:', remind_step);
-                                                        nursingRecord.remind_on.push(app.moment(app.moment(remind_start).add(remind_step * remind_count, 'minutes')));
-                                                    }
-                                                }
-                                                nursingRecordsToSave.push(app._.extend({assigned_workers: []}, nursingRecord));
-                                            }
-                                        } else if (workItem.repeat_type == DIC.D0103.DAY_IN_WEEK) {
-                                            if (workItem.repeat_values) {
-                                                work_item_repeat_values = workItem.repeat_values;
-                                                for (var weekDay = now.day(), weekMax = weekDay + 8; weekDay < weekMax; weekDay++) {
-                                                    if (app._.find(work_item_repeat_values, (o) => {
-                                                            return weekDay % 7 === o % 7;
-                                                        })) {
-                                                        // day 相等以后,判断是否时是生成当天,如果是则比较时刻,时刻过期的话需要生成下一个执行点
-                                                        // console.log('weekDay',weekDay);
-                                                        exec_date = app.moment(now).day(weekDay);
-                                                        // console.log("exec_date",app.moment(exec_date.format('YYYY-MM-DD') + ' ' + workItem.repeat_start).toDate());
-                                                        // console.log("now",now.toDate());
-                                                        // console.log("exec_date is after now:",app.moment(exec_date.format('YYYY-MM-DD') + ' ' + workItem.repeat_start).isAfter(now));
-                                                        if (app.moment(exec_date.format('YYYY-MM-DD') + ' ' + workItem.repeat_start).isAfter(now)) {
-                                                            exec_on = app.moment(exec_date.format('YYYY-MM-DD') + ' ' + workItem.repeat_start)
-                                                            nursingRecord.exec_on = exec_on;
-                                                            if (workItem.remind_flag) {
-                                                                remind_start = app.moment(exec_on);
-                                                                for (var remind_count = 0; remind_count < remind_max; remind_count++) {
-
-                                                                    nursingRecord.remind_on.push(app.moment(app.moment(remind_start).add(remind_step * remind_count, 'minutes')));
-                                                                }
-                                                            }
-                                                            nursingRecordsToSave.push(app._.extend({assigned_workers: []}, nursingRecord));
-                                                            break;
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        } else if (workItem.repeat_type == DIC.D0103.DATE_IN_MONTH) {
-                                            if (workItem.repeat_values) {
-                                                work_item_repeat_values = workItem.repeat_values;
-                                                for (var i = 0; i < 32; i++) {
-                                                    if (app._.find(work_item_repeat_values, (o) => {
-                                                            return app.moment(now).add(i, 'days').date() === o;
-                                                        })) {
-                                                        // date 相等以后,判断是否时是生成当天,如果是则比较时刻,时刻过期的话需要生成下一个执行点
-                                                        exec_date = app.moment(now).add(i, 'days');
-                                                        if (app.moment(exec_date.format('YYYY-MM-DD') + ' ' + workItem.repeat_start).isAfter(now)) {
-                                                            exec_on = app.moment(exec_date.format('YYYY-MM-DD') + ' ' + workItem.repeat_start)
-                                                            nursingRecord.exec_on = exec_on;
-                                                            if (workItem.remind_flag) {
-                                                                remind_start = app.moment(exec_on);
-                                                                for (var remind_count = 0; remind_count < remind_max; remind_count++) {
-                                                                    nursingRecord.remind_on.push(app.moment(app.moment(remind_start).add(remind_step * remind_count, 'minutes')));
-                                                                }
-                                                            }
-                                                            nursingRecordsToSave.push(app._.extend({assigned_workers: []}, nursingRecord));
-                                                            break;
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-
-                                // console.log('nursingRecordsToSave:', nursingRecordsToSave);
-                                for (var i = 0, findNuringWorkerCount = 0, len = nursingRecordsToSave.length; i < len; i++) {
-                                    nursingRecordToSave = nursingRecordsToSave[i];
-                                    elderlyRoomValue = elderlyMapRoom[nursingRecordToSave.elderlyId];
-                                    // 查找老人对应的护工 (老人->房间+日期->排班->护工)
-                                    exec_start = app.moment(nursingRecordToSave.exec_on.format('YYYY-MM-DD'));
-                                    exec_end = app.moment(exec_start).add(1, 'days');
-                                    // console.log('exec_start:', exec_start.format('YYYY-MM-DD HH:mm'));
-                                    // console.log('exec_end:', exec_end.format('YYYY-MM-DD HH:mm'));
-                                    // console.log('elderlyRoomValue:', elderlyRoomValue);
-                                    // console.log('nursingRecordToSave.NAME:', nursingRecordToSave.name,elderlyRoomValue.roomId, exec_start.format('YYYY-MM-DD HH:mm:ss'), exec_end.format('YYYY-MM-DD HH:mm:ss'));
-                                    nursingWorkerScheduleItems = yield app.modelFactory().model_query(app.models['psn_nursingSchedule'], {
-                                        select: 'aggr_value',
-                                        where: {
-                                            status: 1,
-                                            x_axis: {'$gte': exec_start, '$lt': exec_end},
-                                            y_axis: elderlyRoomValue.roomId,
-                                            tenantId: tenantId
-                                        }
-                                    });
-                                    if (nursingWorkerScheduleItems.length > 0) {
-                                        for (var j = 0, workerLen = nursingWorkerScheduleItems.length; j < workerLen; j++) {
-
-                                            nursingRecordToSave.assigned_workers.push(nursingWorkerScheduleItems[j].aggr_value);
-                                            findNuringWorkerCount++;
-                                        }
-                                        // console.log('nursingRecordToSave.assigned_workers:', nursingRecordToSave.assigned_workers);
-                                    }
-                                }
-                                if (findNuringWorkerCount == 0) {
-                                    warningMsg = '无法找到护理记录执行时间对应的护工,可能还没有排班';
-                                } else if (findNuringWorkerCount < len) {
-                                    warningMsg = '部分护理记录无法找到执行时间对应的护工,可能那些时间段还没有排班';
-                                }
-
-                                // 最终需要先删除当前时间之后的所有记录,并插入重新计算以后的护理记录
-                                if (nursingRecordsToSave.length > 0) {
-                                    allEdlerlyIds = app._.allKeys(elderlyMapRoom);
-                                    yield app.modelFactory().model_bulkInsert(app.models['psn_nursingRecord'], {
-                                        removeWhere: {
-                                            tenantId: tenantId,
-                                            elderlyId: {'$in': allEdlerlyIds},
-                                            exec_on: {'$gt': now},
-
-                                        },
-                                        rows: nursingRecordsToSave
-                                    });
-                                }
-                            }
-                            // console.log("warningMsg",warningMsg);
-                            this.body = app.wrapper.res.default(warningMsg);
+                            var ret = yield app.psn_nursingRecord_generate_service.generateByTenantId(this.request.body.tenantId, this.request.body.elderlyId);
+                            this.body = ret;
                         } catch (e) {
                             console.log(e);
                             self.logger.error(e.message);
@@ -5035,323 +4917,18 @@ module.exports = {
                         yield next;
                     };
                 }
-            }, {
-                method: "nursingRecordNextGenerate",
-                verb: 'post',
-                url: this.service_url_prefix + "/nursingRecordNextGenerate",
-                handler: function (app, options) {
-                    return function*(next) {
-                        try {
-                            var nursingRecordId = this.request.body.nursingRecordId;
-                            var currentNursingRecord = yield app.modelFactory().model_one(app.models['psn_nursingRecord'], {where: {_id: nursingRecordId}});
-                            // console.log('currentNursingRecord',currentNursingRecord);
-                            currentNursingRecord.executed_flag = true;
-                            currentNursingRecord.save();
-                            var elderlyId = currentNursingRecord.elderlyId;
-                            var workItemId = currentNursingRecord.workItemId;
-
-
-                            var tenant, elderly, elderlyRoomValue, roomId, nursingPlanItems, nursingPlanItem, workItems, workItem,
-                                nursingRecord, now, gen_batch_no, nursingWorkerScheduleItems, exec_date, exec_on, exec_date_string, remind_on;
-                            var elderlyMapRoom = {},
-                                nursingRecordsToSave = [],
-                                nursingRecordToSave, work_item_repeat_values, allEdlerlyIds, allElderly, nursingRecordExist,
-                                remind_max, remind_step, remind_start, exec_start, exec_end, warningMsg;
-
-                            var tenantId = currentNursingRecord.tenantId;
-
-                            var cur_exec_on = app.moment(currentNursingRecord.exec_on).format('YYYY-MM-DD')
-                            exec_date_string = app.moment(cur_exec_on).add(1, "days").format('YYYY-MM-DD');
-                            now = app.moment(cur_exec_on).add(1, "days");
-
-                            tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], tenantId);
-                            if (!tenant || tenant.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到养老机构!'});
-                                yield next;
-                                return;
-                            }
-
-
-                            if (elderlyId) {
-                                // 为单个老人
-                                elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], elderlyId);
-                                if (!elderly || elderly.status == 0) {
-                                    this.body = app.wrapper.res.error({message: '无法找到老人!'});
-                                    yield next;
-                                    return;
-                                }
-
-                                if (!elderly.live_in_flag) {
-                                    this.body = app.wrapper.res.error({message: '老人已出院或离世!'});
-                                    yield next;
-                                    return;
-                                }
-
-                                nursingPlanItems = yield app.modelFactory().model_query(app.models['psn_nursingPlan'], {
-                                    select: 'elderlyId elderly_name work_items',
-                                    where: {
-                                        status: 1,
-                                        elderlyId: elderlyId,
-                                        tenantId: tenantId
-                                    }
-                                });
-
-                                // 查询房间号
-                                elderlyMapRoom[elderlyId] = elderly.room_value;
-
-                            } else {
-                                allElderly = yield app.modelFactory().model_query(app.models['psn_elderly'], {
-                                    select: 'room_value',
-                                    where: {
-                                        status: 1,
-                                        live_in_flag: true,
-                                        tenantId: tenantId
-                                    }
-                                });
-
-                                app._.each(allElderly, (o) => {
-                                    elderlyMapRoom[o._id.toString()] = o.room_value;
-                                });
-
-                                // 为所有老人
-                                nursingPlanItems = yield app.modelFactory().model_query(app.models['psn_nursingPlan'], {
-                                    select: 'elderlyId elderly_name work_items',
-                                    where: {
-                                        status: 1,
-                                        tenantId: tenantId
-                                    }
-                                });
-                            }
-
-                            if (nursingPlanItems) {
-
-                                var flag = false; // work_item is exist flag;
-                                for (var i = 0, len = nursingPlanItems.length; i < len; i++) {
-                                    workItems = nursingPlanItems[i].work_items;
-                                    for (var j = 0, len2 = workItems.length; j < len2; j++) {
-                                        if (workItems[j].workItemId.toString() == workItemId) {
-                                            flag = true;
-                                            workItem = workItems[j];
-                                            break;
-                                        }
-                                    }
-                                    if (flag = true) {
-                                        nursingPlanItem = nursingPlanItems[i];
-                                        break;
-                                    }
-                                }
-                                // console.log("workItem", workItem);
-                                gen_batch_no = yield app.sequenceFactory.getSequenceVal(app.modelVariables.SEQUENCE_DEFS.CODE_OF_NURSING_RECORD);
-                                elderlyRoomValue = elderlyMapRoom[nursingPlanItem.elderlyId];
-                                remind_max = workItem.remind_times || 1;
-
-                                remind_step = workItem.duration / remind_max;
-
-                                nursingRecord = {
-                                    elderlyId: nursingPlanItem.elderlyId,
-                                    elderly_name: nursingPlanItem.elderly_name,
-                                    roomId: elderlyRoomValue.roomId,
-                                    bed_no: elderlyRoomValue.bed_no,
-                                    gen_batch_no: gen_batch_no,
-                                    tenantId: tenantId,
-                                    workItemId: workItem._id,
-                                    name: workItem.name,
-                                    description: workItem.description,
-                                    remark: workItem.remark,
-                                    duration: workItem.duration,
-                                    type: workItem.type,
-                                    category: workItem.work_item_category
-                                };
-
-
-                                var str = workItem.voice_template || '';
-                                if(str) {
-                                    str = str.replace(/\${老人姓名}/g, nursingPlanItem.elderly_name || '')
-                                        .replace(/\${项目名称}/g, workItem.name || '')
-                                        .replace(/\${药品名称}/g, workItem.name || '')
-                                        .replace(/\${工作描述}/g, workItem.description || '')
-                                        .replace(/\${服用方法}/g, workItem.description || '');
-                                }
-
-
-                                nursingRecord.voice_content = str;
-                                nursingRecord.remind_on = [];
-
-                                if (workItem.repeat_type == DIC.D0103.AS_NEEDED) {
-                                    //按需工作不需要提醒
-                                    nursingRecord.exec_on = app.moment(app.moment().format('YYYY-MM-DD') + " 23:59:59");
-                                    nursingRecordsToSave.push(app._.extend({assigned_workers: []}, nursingRecord));
-                                } else if (workItem.repeat_type == DIC.D0103.TIME_IN_DAY) {
-                                    //Whether the current record is the last one
-                                    var currentAllRecords = yield app.modelFactory().model_query(app.models['psn_nursingRecord'], {
-                                        where: {
-                                            elderlyId: elderlyId,
-                                            workItemId: workItemId
-                                        }
-                                    });
-                                    // console.log("currentAllRecords", currentAllRecords);
-                                    if (app._.find(currentAllRecords, (c) => {
-                                            return app.moment(c.exec_on).isAfter(app.moment(currentNursingRecord.exec_on))
-                                        })) {
-                                        this.body = app.wrapper.res.default();
-                                        yield next;
-                                        return
-
-                                    } else {
-                                        yield app.modelFactory().model_bulkDelete(app.models['psn_nursingRecord'], {
-                                            where: {
-                                                tenantId: tenantId,
-                                                elderlyId: {'$in': allEdlerlyIds},
-                                                workItemId: workItemId,
-                                                executed_flag: false,
-                                            }
-                                        })
-
-
-                                        // console.log("exec_date_string", exec_date_string);
-                                        if (workItem.repeat_values.length > 0) {
-                                            app._.each(workItem.repeat_values, (o) => {
-
-                                                nursingRecord.remind_on = [];
-                                                exec_on = app.moment(exec_date_string + ' ' + o + workItem.repeat_start);
-                                                // console.log("exec_on", exec_on);
-                                                nursingRecord.exec_on = exec_on;
-                                                if (workItem.remind_flag) {
-                                                    remind_start = app.moment(exec_on);
-
-                                                    for (var remind_count = 0; remind_count < remind_max; remind_count++) {
-                                                        nursingRecord.remind_on.push(app.moment(app.moment(remind_start).add(remind_step * remind_count, 'minutes')));
-                                                    }
-                                                }
-                                                nursingRecordsToSave.push(app._.extend({assigned_workers: []}, nursingRecord));
-
-                                            });
-                                        } else {
-                                            exec_on = app.moment(exec_date_string + ' ' + workItem.repeat_start)
-                                            if (exec_on.isBefore(now)) {
-                                                exec_on = app.moment(now).add(1, 'days').format('YYYY-MM-DD') + ' ' + workItem.repeat_start;
-                                            }
-                                            nursingRecord.exec_on = exec_on;
-                                            if (workItem.remind_flag) {
-                                                remind_start = app.moment(exec_on);
-                                                for (var remind_count = 0; remind_count < remind_max; remind_count++) {
-                                                    nursingRecord.remind_on.push(app.moment(app.moment(remind_start).add(remind_step * remind_count, 'minutes')));
-                                                }
-                                            }
-                                            nursingRecordsToSave.push(app._.extend({assigned_workers: []}, nursingRecord));
-                                        }
-                                    }
-
-                                } else if (workItem.repeat_type == DIC.D0103.DAY_IN_WEEK) {
-                                    if (workItem.repeat_values) {
-                                        work_item_repeat_values = workItem.repeat_values;
-                                        for (var weekDay = now.day(), weekMax = weekDay + 8; weekDay < weekMax; weekDay++) {
-                                            if (app._.find(work_item_repeat_values, (o) => {
-                                                    return weekDay % 7 === o % 7;
-                                                })) {
-                                                exec_date = app.moment(now).day(weekDay);
-
-                                                if (app.moment(exec_date.format('YYYY-MM-DD') + ' ' + workItem.repeat_start).isAfter(now)) {
-                                                    exec_on = app.moment(exec_date.format('YYYY-MM-DD') + ' ' + workItem.repeat_start)
-                                                    nursingRecord.exec_on = exec_on;
-                                                    if (workItem.remind_flag) {
-                                                        remind_start = app.moment(exec_on);
-                                                        for (var remind_count = 0; remind_count < remind_max; remind_count++) {
-
-                                                            nursingRecord.remind_on.push(app.moment(app.moment(remind_start).add(remind_step * remind_count, 'minutes')));
-                                                        }
-                                                    }
-                                                    nursingRecordsToSave.push(app._.extend({assigned_workers: []}, nursingRecord));
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                    }
-                                } else if (workItem.repeat_type == DIC.D0103.DATE_IN_MONTH) {
-                                    if (workItem.repeat_values) {
-                                        work_item_repeat_values = workItem.repeat_values;
-                                        for (var i = 0; i < 32; i++) {
-                                            if (app._.find(work_item_repeat_values, (o) => {
-                                                    return app.moment(now).add(i, 'days').date() === o;
-                                                })) {
-                                                // date 相等以后,判断是否时是生成当天,如果是则比较时刻,时刻过期的话需要生成下一个执行点
-                                                exec_date = app.moment(now).add(i, 'days');
-                                                // console.log("exec_date_M",exec_date)
-                                                if (app.moment(exec_date.format('YYYY-MM-DD') + ' ' + workItem.repeat_start).isAfter(now)) {
-                                                    exec_on = app.moment(exec_date.format('YYYY-MM-DD') + ' ' + workItem.repeat_start)
-                                                    nursingRecord.exec_on = exec_on;
-                                                    if (workItem.remind_flag) {
-                                                        remind_start = app.moment(exec_on);
-                                                        for (var remind_count = 0; remind_count < remind_max; remind_count++) {
-                                                            nursingRecord.remind_on.push(app.moment(app.moment(remind_start).add(remind_step * remind_count, 'minutes')));
-                                                        }
-                                                    }
-                                                    nursingRecordsToSave.push(app._.extend({assigned_workers: []}, nursingRecord));
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-
-                            }
-
-                            for (var i = 0, findNuringWorkerCount = 0, len = nursingRecordsToSave.length; i < len; i++) {
-                                nursingRecordToSave = nursingRecordsToSave[i];
-                                elderlyRoomValue = elderlyMapRoom[nursingRecordToSave.elderlyId];
-                                exec_start = app.moment(nursingRecordToSave.exec_on.format('YYYY-MM-DD'));
-                                exec_end = app.moment(exec_start).add(1, 'days');
-                                nursingWorkerScheduleItems = yield app.modelFactory().model_query(app.models['psn_nursingSchedule'], {
-                                    select: 'aggr_value',
-                                    where: {
-                                        status: 1,
-                                        x_axis: {'$gte': exec_start, '$lt': exec_end},
-                                        y_axis: elderlyRoomValue.roomId,
-                                        tenantId: tenantId
-                                    }
-                                });
-                                if (nursingWorkerScheduleItems.length > 0) {
-                                    for (var j = 0, workerLen = nursingWorkerScheduleItems.length; j < workerLen; j++) {
-                                        nursingRecordToSave.assigned_workers.push(nursingWorkerScheduleItems[j].aggr_value);
-                                        findNuringWorkerCount++;
-                                    }
-                                }
-                            }
-                            if (findNuringWorkerCount == 0) {
-                                warningMsg = '无法找到护理记录执行时间对应的护工,可能还没有排班';
-                            } else if (findNuringWorkerCount < len) {
-                                warningMsg = '部分护理记录无法找到执行时间对应的护工,可能那些时间段还没有排班';
-                            }
-
-                            // 最终需要先删除当前时间之后的所有记录,并插入重新计算以后的护理记录
-                            if (nursingRecordsToSave.length > 0) {
-                                allEdlerlyIds = app._.allKeys(elderlyMapRoom);
-                                yield app.modelFactory().model_bulkInsert(app.models['psn_nursingRecord'], {
-                                    rows: nursingRecordsToSave
-                                });
-                            }
-
-                            this.body = app.wrapper.res.default(warningMsg);
-
-                        } catch (e) {
-                            self.logger.error(e.message);
-                            this.body = app.wrapper.res.error(e);
-                        }
-                        yield next;
-                    };
-                }
-            }, {
+            },{
                 method: 'nursingRecordsByElderlyToday',
                 verb: 'post',
-                url: this.service_url_prefix + "/nursingRecordsByElderlyToday", //老人的今日的护理记录
+                url: this.service_url_prefix + "/nursingRecordsByElderlyToday", //老人的今日的照护记录
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         var tenant, elderly, nursingPlan;
                         try {
                             var tenantId = this.request.body.tenantId;
                             tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], tenantId);
                             if (!tenant || tenant.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到养老机构!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到养老机构!' });
                                 yield next;
                                 return;
                             }
@@ -5359,17 +4936,17 @@ module.exports = {
                             var elderlyId = this.request.body.elderlyId;
                             elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], elderlyId);
                             if (!elderly || elderly.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到老人!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到老人!' });
                                 yield next;
                                 return;
                             }
 
                             var today = app.moment(app.moment().format('YYYY-MM-DD') + " 00:00:00");
                             var rows = yield app.modelFactory().model_query(app.models['psn_nursingRecord'], {
-                                select: 'exec_on executed_flag name description duration assigned_workers confirmed_flag confirmed_on workItemId',
+                                select: 'exec_on executed_flag name type description duration assigned_workers confirmed_flag confirmed_on workItemId',
                                 where: {
                                     elderlyId: elderlyId,
-                                    exec_on: {$gte: today.toDate(), $lte: today.add(1, 'days').toDate()},
+                                    exec_on: { $gte: today.toDate(), $lte: today.add(1, 'days').toDate() },
                                     tenantId: tenantId
                                 },
                                 sort: 'exec_on'
@@ -5391,13 +4968,13 @@ module.exports = {
                 verb: 'post',
                 url: this.service_url_prefix + "/elderlysByDistrictFloors", //按片区楼层查找入住老人
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         var tenant, districtFloors, pairOfDistrictFloor, roomObjects, roomIds, elderlyObjects, elderlyIds;
                         try {
                             var tenantId = this.request.body.tenantId;
                             tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], tenantId);
                             if (!tenant || tenant.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到养老机构!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到养老机构!' });
                                 yield next;
                                 return;
                             }
@@ -5405,7 +4982,7 @@ module.exports = {
                             // console.log('districtFloors:', this.request.body.districtFloors);
                             var districtFloors = app._.map(this.request.body.districtFloors, (o) => {
                                 pairOfDistrictFloor = o.split('$');
-                                return {'$and': [{districtId: pairOfDistrictFloor[0]}, {floor: pairOfDistrictFloor[1]}]};
+                                return { '$and': [{ districtId: pairOfDistrictFloor[0] }, { floor: pairOfDistrictFloor[1] }] };
                             });
 
                             // console.log('districtFloors:', districtFloors);
@@ -5425,9 +5002,9 @@ module.exports = {
                             elderlyObjects = yield app.modelFactory().model_query(app.models['psn_roomOccupancyChangeHistory'], {
                                 select: 'elderlyId',
                                 where: {
-                                    roomId: {'$in': roomIds},
+                                    roomId: { '$in': roomIds },
                                     in_flag: true,
-                                    check_out_time: {$exists: false},
+                                    check_out_time: { $exists: false },
                                     tenantId: tenantId
                                 }
                             });
@@ -5443,7 +5020,7 @@ module.exports = {
                                 where: {
                                     status: 1,
                                     live_in_flag: true,
-                                    _id: {'$in': elderlyIds},
+                                    _id: { '$in': elderlyIds },
                                     tenantId: tenantId
                                 }
 
@@ -5466,14 +5043,14 @@ module.exports = {
                 verb: 'post',
                 url: this.service_url_prefix + "/nursingStationCloseBedMonitorAlarm", //关闭离床报警,此处永远为插入记录,因为采用报警数据后置插入模型
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         var alarm; //, tenant, elderly, bedMonitor;
                         try {
 
                             var alarmId = this.request.body.alarmId;
                             alarm = yield app.modelFactory().model_read(app.models['pub_alarm'], alarmId);
                             if (!alarm || alarm.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到警报信息!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到警报信息!' });
                                 yield next;
                                 return;
                             }
@@ -5537,7 +5114,7 @@ module.exports = {
                 verb: 'post',
                 url: this.service_url_prefix + "/q/drug",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         try {
                             var tenantId = this.request.body.tenantId;
                             var keyword = this.request.body.keyword;
@@ -5568,7 +5145,7 @@ module.exports = {
                 verb: 'post',
                 url: this.service_url_prefix + "/inStock",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         var tenant, elderly, drug;
                         try {
                             var tenantId = this.request.body.tenantId;
@@ -5625,7 +5202,7 @@ module.exports = {
                 verb: 'get',
                 url: this.service_url_prefix + "/inStockAbolish/:_id", //:select需要提取的字段域用逗号分割 e.g. name,type
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         try {
                             var inStock = yield app.modelFactory().model_read(app.models['psn_drugInOutStock'], this.params._id);
                             var inStockJson = inStock.toObject();
@@ -5640,12 +5217,12 @@ module.exports = {
                             });
                             // console.log(drugStock);
                             if (!drugStock) {
-                                this.body = app.wrapper.res.error({message: '当前无库存，无法取消记录'});
+                                this.body = app.wrapper.res.error({ message: '当前无库存，无法取消记录' });
                                 yield next;
                                 return;
                             } else {
                                 if (drugStock.current_quantity < inStockJson.in_out_quantity) {
-                                    this.body = app.wrapper.res.error({message: '库存不足，无法取消记录!'});
+                                    this.body = app.wrapper.res.error({ message: '库存不足，无法取消记录!' });
                                     yield next;
                                     return;
                                 } else {
@@ -5668,13 +5245,13 @@ module.exports = {
                 verb: 'post',
                 url: this.service_url_prefix + "/outStock",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         var tenant, elderly, drug;
                         try {
                             var tenantId = this.request.body.tenantId;
                             tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], tenantId);
                             if (!tenant || tenant.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到养老机构!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到养老机构!' });
                                 yield next;
                                 return;
                             }
@@ -5682,7 +5259,7 @@ module.exports = {
                             var elderlyId = this.request.body.elderlyId;
                             elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], elderlyId);
                             if (!elderly || elderly.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到老人!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到老人!' });
                                 yield next;
                                 return;
                             }
@@ -5690,7 +5267,7 @@ module.exports = {
                             var drugId = this.request.body.drugId;
                             drug = yield app.modelFactory().model_read(app.models['psn_drugDirectory'], drugId);
                             if (!drug || drug.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到药品!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到药品!' });
                                 yield next;
                                 return;
                             }
@@ -5721,12 +5298,12 @@ module.exports = {
                             });
 
                             if (!drugStock) {
-                                this.body = app.wrapper.res.error({message: '当前无库存，无法出库!'});
+                                this.body = app.wrapper.res.error({ message: '当前无库存，无法出库!' });
                                 yield next;
                                 return;
                             } else {
                                 if (drugStock.current_quantity < in_out_quantity) {
-                                    this.body = app.wrapper.res.error({message: '出库数量大于当前库存，无法出库!'});
+                                    this.body = app.wrapper.res.error({ message: '出库数量大于当前库存，无法出库!' });
                                     yield next;
                                     return;
                                 } else {
@@ -5762,13 +5339,13 @@ module.exports = {
                 verb: 'post',
                 url: this.service_url_prefix + "/drugOutStockInvalid",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         try {
                             var drugInOutStockId = this.request.body.drugInOutStockId;
                             console.log(drugInOutStockId);
                             var drugInOutStock = yield app.modelFactory().model_read(app.models['psn_drugInOutStock'], drugInOutStockId);
                             if (!drugInOutStock || drugInOutStock.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到出入库记录!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到出入库记录!' });
                                 yield next;
                                 return;
                             } else {
@@ -5802,7 +5379,7 @@ module.exports = {
                 verb: 'post',
                 url: this.service_url_prefix + "/drugStockEditLogInsert",
                 handler: function (app, options) {
-                    return function*(next) {
+                    return function* (next) {
                         try {
                             var drugStockId = this.request.body.drugStockId;
                             var revised_quantity = this.request.body.revised_quantity;
@@ -5811,13 +5388,13 @@ module.exports = {
                             var operated_by_name = this.request.body.operated_by_name;
                             var tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], tenantId);
                             if (!tenant || tenant.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到养老机构!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到养老机构!' });
                                 yield next;
                                 return;
                             }
                             var drugStock = yield app.modelFactory().model_read(app.models['psn_drugStock'], drugStockId);
                             if (!drugStock || drugStock.status == 0) {
-                                this.body = app.wrapper.res.error({message: '无法找到库存记录!'});
+                                this.body = app.wrapper.res.error({ message: '无法找到库存记录!' });
                                 yield next;
                                 return;
                             } else {

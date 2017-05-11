@@ -42,7 +42,7 @@
         "HEAD-LABEL-ENTER_ON": "入院日期",
         "TAB1": "老人信息",
         "TAB2": "食宿信息",
-        "TAB3": "护理与服务",
+        "TAB3": "照护信息",
         "TAB4": "费用信息",
         "TAB1-LABEL-ELDERLY-NAME": "老人姓名",
         "TAB1-PLACEHOLDER-ELDERLY-NAME": "张三",
@@ -70,7 +70,7 @@
         "TAB2-ROOM-INFO": "房间床位",
         "TAB3-NURSING-INFO": "护理信息",
         "TAB3-NURSING-ASSESSMENT-GRADE": "评估等级",
-        "TAB3-NURSING-LEVEL": "护理等级",
+        "TAB3-NURSING-LEVEL": "照护级别",
         "TAB3-CUSTOM-SERVICE-INFO": "特色服务",
         "TAB4-CHARGE-ITEM": "收费项目",
         "TAB4-CHARGE-PERIOD-PRICE-SUM": "费用小计",
@@ -84,7 +84,9 @@
     },
     "in": {
       "list": {
-        "TITLE": "养老机构-老人管理-在院-列表"
+        "TITLE": "养老机构-老人管理-在院-列表",
+        "LABEL-ARCHIVE":"全档案",
+        "TITLE-ARCHIVE":"综合了老人在机构内部多个维度的数据"
       },
       "details": {
         "TITLE": "养老机构-老人管理-在院-详情",
@@ -305,7 +307,7 @@
         "TAB1-LABEL-STAIRS":"上下楼梯",
         "TAB1-LABEL-BATH":"洗澡",
         "TAB1-LABEL-ASSESSMENT-GRADE":"评估等级",
-        "TAB1-LABEL-NURSING-LEVEL":"护理等级"
+        "TAB1-LABEL-NURSING-LEVEL":"照护级别"
       }
     },
     "assessment-regular":{
@@ -328,7 +330,7 @@
         "TAB1-LABEL-STAIRS":"上下楼梯",
         "TAB1-LABEL-BATH":"洗澡",
         "TAB1-LABEL-ASSESSMENT-GRADE":"评估等级",
-        "TAB1-LABEL-NURSING-LEVEL":"护理等级"
+        "TAB1-LABEL-NURSING-LEVEL":"照护级别"
       }
     },
     "nursing-station": {
@@ -344,24 +346,26 @@
       "DLG-ELDERLY-LABEL-NURSING_ASSESSMENT_GRADE": "评估级别",
       "DLG-ELDERLY-LABEL-ROOM_INFO": "房间床位",
       "DLG-ELDERLY-LABEL-NURING_WORKER": "护工",
-      "DLG-ELDERLY-LABEL-NURSING_LEVEL": "护理等级",
+      "DLG-ELDERLY-LABEL-NURSING_LEVEL": "照护级别",
       "DLG-ELDERLY-LABEL-FAMILY_MEMBERS": "家庭成员",
       "DLG-ELDERLY-BTN-AVATAR": "上传近照",
-      "DLG-ELDERLY-HEAD-NURSING_RECORDS_TODAY": "今日护理记录",
+      "DLG-ELDERLY-HEAD-NURSING_RECORDS_TODAY": "今日照护与用药",
       "DLG-ELDERLY-TH-EXEC_ON": "时间",
       "DLG-ELDERLY-TH-NAME": "项目",
       "DLG-ELDERLY-TH-ASSIGNED_WORKER": "护工",
-      "DLG-ELDERLY-TH-CONFIRM_FLAG": "完成情况"
+      "DLG-ELDERLY-TH-CONFIRM_FLAG": "完成情况",
+      "DLG-ELDERLY-HEAD-LIFE_INTEGRATION": "生命体征",
+      "DLG-ELDERLY-HEAD-HARDWARE_ROBOT": "照护机器人"
     },
     "nursing-plan": {
-      "TITLE": "养老机构-护理管理-护理计划-编排",
-      "BTN-SET-NURSING-LEVEL": "设置护理等级",
+      "TITLE": "养老机构-照护管理-照护计划-编排",
+      "BTN-SET-NURSING-LEVEL": "设置照护级别",
       "BTN-CANCEL-READONLY-WORK-ITEMS": "进入编辑模式",
       "BTN-DO-READONLY-WORK-ITEMS": "返回只读模式",
       "BTN-ADD-CUSTOMIZED-WORK-ITEMS": "添加自定义项目",
-      "BTN-GEN-NURSING-CONTENT": "生成护理内容",
+      "BTN-GEN-NURSING-CONTENT": "生成照护内容",
       "BTN-SET-NURSING-PLAN-REMARK": "填写备注",
-      "DIALOG-GENERATE-NURSING-RECORD": "生成的数据将覆盖之前还未执行的护理内容,您确定要生成吗？",
+      "DIALOG-GENERATE-NURSING-RECORD": "生成的数据将覆盖之前还未执行的照护内容,您确定要生成吗？",
       "DLG-WORK-ITEM-TITLE":"工作项目自定义",
       "TAB1-LABEL-REPEAT_TYPE": "重复类型",
       "TAB1-LABEL-REPEAT_VALUES": "重复值域",
@@ -379,11 +383,11 @@
       "TAB1-LABEL-FEE": "费用(￥)",
       "TAB1-PLACEHOLDER-FEE": "100..",
       "TAB1-PLACEHOLDER-REMIND_TIMES": "3..",
-      "VOICE_TEPLATE_ERROR":"语音模板有错误"
+      "ALL-SELECTED":"选中所有"
     },
     "nursing-schedule": {
-      "TITLE": "养老机构-护理管理-护理排班-编排",
-      "DIALOG-SAVE-AS-TEMPLATE-TITLE": "保存为护理计划模版",
+      "TITLE": "养老机构-照护管理-照护排班-编排",
+      "DIALOG-SAVE-AS-TEMPLATE-TITLE": "保存为照护计划模版",
       "LABEL-YAXIS_LABEL": "房间",
       "PLACEHOLDER-PICK_NURSING_SCHEDULE_TEMPLATE": "选择一个模版导入..",
       "PLACEHOLDER-PICK_NURSING_WORKER": "挑选护工..",
@@ -405,10 +409,10 @@
     },
     "nursing-schedule-template": {
       "list": {
-        "TITLE": "养老机构-护理管理-护理排班模版-列表"
+        "TITLE": "养老机构-照护管理-照护排班模版-列表"
       },
       "details": {
-        "TITLE": "养老机构-护理管理-护理排班模版-详情",
+        "TITLE": "养老机构-照护管理-照护排班模版-详情",
         "TAB1": "基本信息",
         "TAB1-LABEL-NAME": "模版名称",
         "TAB1-PLACEHOLDER-NAME": "1#楼周排班..",
@@ -428,12 +432,12 @@
     },
     "nursing-group": {
       "list": {
-        "TITLE": "养老机构-护理管理-护理组-列表"
+        "TITLE": "养老机构-照护管理-照护组-列表"
       },
       "details": {
-        "TITLE": "养老机构-护理管理-护理组-详情",
+        "TITLE": "养老机构-照护管理-照护组-详情",
         "TAB1": "基本信息",
-        "TAB1-LABEL-NAME": "护理组名称",
+        "TAB1-LABEL-NAME": "照护组名称",
         "TAB1-PLACEHOLDER-NAME": "张XX小组..",
         "TAB1-LABEL-MEMBERS": "组成员",
         "TAB1-LABEL-MEMBERS_SELECTED": "选中的组成员",
@@ -595,7 +599,7 @@
         "TITLE": "养老机构-药品管理-药品出库-详情",
         "TAB1": "出库信息",
         "TAB1-LABEL-ELDERLY-NAME": "老人",
-        "TAB1-LABEL-DRUG-NO": "药品编码",
+        "TAB1-LABEL-DRUG-NAME": "药品名称", 
         "TAB1-LABEL-TYPE": "药品去处",
         "TAB1-LABEL-QUANTITY": "出库数量",
         "TAB1-LABEL-UNIT": "包装规格",
@@ -645,8 +649,8 @@
       "details": {
         "TITLE": "养老机构-基础设置-工作项目-详情",
         "TAB1": "基本信息",
-        "TAB1-LABEL-NURSING_LEVEL": "护理等级",
-        "TAB1-PLACEHOLDER-NURSING_LEVEL": "请选择一个护理等级..",
+        "TAB1-LABEL-NURSING_LEVEL": "照护级别",
+        "TAB1-PLACEHOLDER-NURSING_LEVEL": "请选择一个照护级别..",
         "TAB1-LABEL-NAME": "项目名称",
         "TAB1-PLACEHOLDER-NAME": "喂早餐..",
         "TAB1-LABEL-DESCRIPTION": "工作描述",
@@ -774,13 +778,13 @@
     },
     "nursing-level": {
       "list": {
-        "TITLE": "养老机构-基础设置-护理级别-列表"
+        "TITLE": "养老机构-基础设置-照护级别-列表"
       },
       "details": {
-        "TITLE": "养老机构-基础设置-护理级别-详情",
+        "TITLE": "养老机构-基础设置-照护级别-详情",
         "TAB1": "基本信息",
-        "TAB1-LABEL-NURSING_ASSESSMENT_GRADE": "护理评估等级",
-        "TAB1-PLACEHOLDER-NURSING_ASSESSMENT_GRADE": "选择一个护理评估等级..",
+        "TAB1-LABEL-NURSING_ASSESSMENT_GRADE": "老人评估等级",
+        "TAB1-PLACEHOLDER-NURSING_ASSESSMENT_GRADE": "选择一个老人评估等级..",
         "TAB1-LABEL-NAME": "全称",
         "TAB1-PLACEHOLDER-NAME": "特级护理(一)..",
         "TAB1-LABEL-SHORT_NAME": "简称",

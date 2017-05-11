@@ -25,7 +25,7 @@ module.exports = function(ctx,name) {
             elderly_name: {type: String},
             drugId:{type: mongoose.Schema.Types.ObjectId,required: true,ref:'psn_drugDirectory'},//关联药品
             drug_no:{type: String,},// 药品编码
-            name:{type: String},
+            drug_full_name:{type: String},
             description:{type: String},
             duration: {type: Number, default: 0}, // 完成时长 单为分
             repeat_type: {type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D0103"])},

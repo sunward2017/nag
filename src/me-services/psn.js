@@ -47,7 +47,7 @@ module.exports = {
                                 return;
                             }
 
-                            // 通过机器人->房间->护理等级
+                            // 通过机器人->房间->照护等级
                             tenantId = robot.tenantId;
 
                             rooms = yield app.modelFactory().model_query(app.models['psn_room'], {
@@ -75,7 +75,7 @@ module.exports = {
                                     tenantId: tenantId
                                 },
                                 sort: 'exec_on'
-                            }).populate('assigned_workers', 'name').populate('workItemId', 'repeat_type').populate('elderlyId', 'avatar');
+                            }).populate('assigned_workers', 'name').populate('elderlyId', 'avatar');
                             console.log(rows);
 
                             this.body = app.wrapper.res.rows(rows);
@@ -113,13 +113,17 @@ module.exports = {
                                 return;
                             }
 
-                            // 通过机器人->房间->护理等级
+                            // 通过机器人->房间->照护等级
                             tenantId = robot.tenantId;
                             nursingRecord = yield app.modelFactory().model_read(app.models['psn_nursingRecord'], nursingRecordId);
                             if (!nursingRecord) {
                                 this.body = app.wrapper.res.error({ message: '无效的服务项目记录' });
                                 return;
+                            } else if(nursingRecord.executed_flag) {
+                                this.body = app.wrapper.res.error({message: '服务项目记录已执行'});
+                                return;
                             }
+
 
                             nursingRecord.executed_flag = true;
                             yield nursingRecord.save();
@@ -159,11 +163,14 @@ module.exports = {
                                 return;
                             }
 
-                            // 通过机器人->房间->护理等级
+                            // 通过机器人->房间->照护等级
                             tenantId = robot.tenantId;
                             nursingRecord = yield app.modelFactory().model_read(app.models['psn_nursingRecord'], nursingRecordId);
                             if (!nursingRecord) {
                                 this.body = app.wrapper.res.error({ message: '无效的服务项目记录' });
+                                return;
+                            } else if(nursingRecord.confirmed_flag) {
+                                this.body = app.wrapper.res.error({ message: '服务项目记录已签到' });
                                 return;
                             }
 
@@ -172,7 +179,8 @@ module.exports = {
 
                             yield nursingRecord.save();
 
-                            this.body = app.wrapper.res.default();
+                            var ret = yield app.psn_nursingRecord_generate_service.generateByNursingRecordId(nursingRecordId);
+                            this.body = ret;
                         } catch (e) {
                             self.logger.error(e.message);
                             this.body = app.wrapper.res.error(e);

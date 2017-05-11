@@ -166,13 +166,7 @@
                             label: '老人',
                             name: 'name',
                             type: 'string',
-                            width: 60,
-                            sortable: true
-                        }, {
-                            label: '入院登记号',
-                            name: 'enter_code',
-                            type: 'string',
-                            width: 120,
+                            width: 80,
                             sortable: true
                         }, {
                             label: '性别',
@@ -184,7 +178,13 @@
                             label: '年龄',
                             name: 'birthday',
                             type: 'date',
-                            width: 60,
+                            width: 40,
+                            sortable: true
+                        },  {
+                            label: '入院登记号',
+                            name: 'enter_code',
+                            type: 'string',
+                            width: 80,
                             sortable: true
                         }, {
                             label: '饮食套餐',
@@ -197,7 +197,7 @@
                             type: 'string',
                             width: 120
                         }, {
-                            label: '护理信息',
+                            label: '照护信息',
                             name: 'nursing_info',
                             type: 'string',
                             width: 120
@@ -559,7 +559,7 @@
                             sortable: true,
                             formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D3015/object'),
                         },{
-                            label: '护理等级',
+                            label: '照护级别',
                             name: 'current_nursing_level_name',
                             type: 'string',
                             width: 60,
@@ -717,7 +717,7 @@
             })
             .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'nursing-schedule-template', {
                 url: '/nursing-schedule-template',
-                title: '护理排班模版',
+                title: '照护排班模版',
                 abstract: true,
                 views: {
                     "module-header": {
@@ -791,7 +791,7 @@
             })
             .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'nursing-group', {
                 url: '/nursing-group',
-                title: '护理组管理',
+                title: '照护组管理',
                 abstract: true,
                 views: {
                     "module-header": {
@@ -818,7 +818,7 @@
                         searchForm: { "status": 1 },
                         serverPaging: true,
                         columns: [{
-                            label: '护理组名称',
+                            label: '照护组名称',
                             name: 'name',
                             type: 'string',
                             width: 120,
@@ -1362,7 +1362,7 @@
                             formatter: { type: 'populate', options: { path: 'nursingLevelId', select: '-_id name' } }
                         }, {
                             label: '药品全称',
-                            name: 'name',
+                            name: 'drug_full_name',
                             type: 'string',
                             width: 100,
                             sortable: true
@@ -1690,7 +1690,7 @@
                             label: '是否有效',
                             name: 'valid_flag',
                             type: 'bool',
-                            width: 80,
+                            width: 60,
                             sortable: false
                         }, {
                             label: '操作',
@@ -1760,7 +1760,7 @@
                             label: '药品名称',
                             name: 'drug_full_name',
                             type: 'string',
-                            width: 60,
+                            width: 80,
                             sortable: true
                         }, {
                             label: '药品编码',
@@ -1779,7 +1779,7 @@
                             label: '出库数量',
                             name: 'in_out_quantity',
                             type: 'number',
-                            width: 80,
+                            width: 60,
                             sortable: true,
                         }, {
                             label: '包装单位',
@@ -1792,7 +1792,7 @@
                             label: '是否有效',
                             name: 'valid_flag',
                             type: 'bool',
-                            width: 80,
+                            width: 40,
                             sortable: false
                         },
 
@@ -1924,7 +1924,7 @@
                         searchForm: { "status": 1,customize_flag:false},
                         serverPaging: true,
                         columns: [{
-                            label: '护理等级',
+                            label: '照护级别',
                             name: 'nursing_level_name',
                             type: 'string',
                             width: 80,
@@ -2356,7 +2356,7 @@
             })
             .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'nursing-level', {
                 url: '/nursing-level',
-                title: '护理级别',
+                title: '照护级别',
                 abstract: true,
                 views: {
                     "module-header": {

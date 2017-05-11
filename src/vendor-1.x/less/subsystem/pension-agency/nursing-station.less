@@ -60,6 +60,8 @@
       border: solid 1px #dde6e9;
       margin: 4px 4px;
       display: inline-block;
+      position: relative;
+
       .avatar {
         position: relative;
         cursor: pointer;
@@ -81,21 +83,42 @@
         font-weight: bold;
       }
       .nursing-level {
-        display: inline-block;
-        font-size: 12px;
-        font-weight: normal;
+        position: absolute;
+        right:0;
+        top: 0;
+        background-color: #5D9CEC;
+        color:white;
+        padding: 0 4px;
+        z-index: 997;
+        font-size: 11px;
+      }
+      .online-offline{
+        position: absolute;
+        left:0;
+        top: 0;
+        z-index: 997;
+
+        .online{
+          background-color: #27C24C;
+          color: white;
+          cursor: default;
+          padding: 4px;
+          border-radius: 100%;
+        }
+        .offline{
+          background-color: #7c7d7d;
+          color: white;
+          cursor: default;
+          padding: 4px;
+          border-radius: 100%;
+        }
       }
     }
   }
 
 
-  .online{
+  .normal{
     background-color: #27C24C;
-    color: white;
-    cursor: default;
-  }
-  .offline{
-    background-color: #7c7d7d;
     color: white;
     cursor: default;
   }
@@ -174,9 +197,11 @@
 }
 
 .ngdialog.ngdialog-theme-default.ngdialog-nursing-station-elderly{
+  padding-top: 40px !important;
+  padding-bottom: 40px !important;
   .ngdialog-content {
-    width: 800px;
-    height: 600px;
+    width: 1024px;
+    height: 800px;
     background-color: white;
     .ngdialog-title{
       width:100%;
@@ -243,9 +268,9 @@
       }
       .elderly-more-info {
         clear: both;
-        margin-top: 5px;
-        .panel-heading-normal{
-          padding:4px;
+        margin-top: 10px;
+        .tab-content-block{
+          height:450px;
         }
         thead {
           display: block;
@@ -253,9 +278,16 @@
         }
         tbody{
           display: block;
-          max-height:280px;
+          max-height:420px;
           overflow-y: auto;    /* Trigger vertical scroll    */
           overflow-x: hidden;  /* Hide the horizontal scroll */
+          .drug-use-item-icon{
+            font-size:10px;
+            color:white;
+            padding:2px 8px;
+            border-radius: 2px;
+            background-color: @brand-danger;
+          }
         }
       }
     }

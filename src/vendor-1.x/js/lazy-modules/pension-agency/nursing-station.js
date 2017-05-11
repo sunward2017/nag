@@ -89,7 +89,7 @@
                 var bedMonitorStatus = vm.elderlyStatusMonitor[elderlyId];
                 if (bedMonitorStatus) {
                     vmh.timeout(function(){
-                        bedMonitorStatus.status = 'online';
+                        bedMonitorStatus.status = 'normal';
                         console.log('bedMonitorStatus:', bedMonitorStatus);
                     });
                 }
@@ -320,6 +320,7 @@
         var vmh = $scope.ngDialogData.vmh;
 
         $scope.utils = vmh.utils.v;
+        $scope.moment = vmh.utils.m;
 
         init();
 
@@ -336,6 +337,9 @@
 
             vm.onAvatarUploaded = onAvatarUploaded;
             // vm.tab1 = {cid: 'contentTab1', active: true};
+            vm.tab1 = {cid: 'content-nursing_records_today', active: true};
+            vm.tab2 = {cid: 'content-life_integration'};
+            vm.tab3 = {cid: 'content-hardware_robot'};
 
             vmh.parallel([
                 vmh.shareService.d2('D1012'),

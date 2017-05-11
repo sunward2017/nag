@@ -42,12 +42,12 @@
             vm.doSubmit = doSubmit;
             vm.queryElderlyPromise = queryElderly();
             vm.fetchElderlyColumnsPromise = [{label: '入院登记号',name: 'enter_code',width: 100}, {label: '姓名',name: 'name',width: 100}];
-            // vm.selectElerly = selectElerly;
+            
             vm.queryDrugPromise = queryDrug();
-            vm.fetchDrugColumnsPromise = [{label: '药品编码',name: 'drug_no',width: 100}, {label: '药品全称',name: 'full_name',width: 100}]
+            vm.fetchDrugColumnsPromise = [{label: '药品编码',name: 'drug_no',width: 100}, {label: '药品全称',name: 'full_name',width: 100}];
             vm.selectElerlyForBackFiller = selectElerlyForBackFiller;
             vm.selectDrugForBackFiller = selectDrugForBackFiller;
-            // vm.selectDrug = selectDrug;
+             
             vm.initVoiceTemplate = initVoiceTemplate;
             vm.tab1 = { cid: 'contentTab1' };
 
@@ -82,8 +82,7 @@
         } 
 
         function queryDrug(keyword) {
-            return vmh.fetch(vmh.psnService.queryDrug(vm.tenantId, keyword, {
-            }, 'drug_no full_name'));
+            return vmh.fetch(vmh.psnService.queryDrug(vm.tenantId, keyword, {}, 'drug_no full_name'));
         }
 
         function selectDrugForBackFiller(row) {

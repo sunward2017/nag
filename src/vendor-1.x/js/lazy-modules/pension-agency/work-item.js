@@ -82,7 +82,7 @@
         }
 
         function doSubmit() {
-            vm.model.repeat_values = vm.repeat_values ? vm.repeat_values.split(",") : "";
+            vm.model.repeat_values = (vm.repeat_values && vm.repeat_values.length > 0) ? vm.repeat_values.split(",") : [];
 
             if (vm.model.voice_template) {
                 var reg = /\${[^}]+}/g;

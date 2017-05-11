@@ -89,7 +89,7 @@
                 var bedMonitorStatus = vm.elderlyStatusMonitor[elderlyId];
                 if (bedMonitorStatus) {
                     vmh.timeout(function(){
-                        bedMonitorStatus.status = 'online';
+                        bedMonitorStatus.status = 'normal';
                         console.log('bedMonitorStatus:', bedMonitorStatus);
                     });
                 }

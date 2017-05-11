@@ -50,7 +50,7 @@ app.conf = {
     },
     auth: {
         toPaths:['/services'],
-        ignorePaths: ['/services/share/login', '/services/robot/sendTestMail', '/services/open']
+        ignorePaths: ['/services/share/login', '/services/robot/sendTestMail', '/services/open', '/services/api']
     },
     authApp: {
         toPaths: ['/me-services/api', '/me-services/trv', '/me-services/qiniu/open/uploadToken'],

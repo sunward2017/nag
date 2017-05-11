@@ -197,7 +197,7 @@
                             type: 'string',
                             width: 120
                         }, {
-                            label: '护理信息',
+                            label: '照护信息',
                             name: 'nursing_info',
                             type: 'string',
                             width: 120
@@ -553,7 +553,7 @@
                             sortable: true,
                             formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D3015/object'),
                         },{
-                            label: '护理等级',
+                            label: '照护级别',
                             name: 'current_nursing_level_name',
                             type: 'string',
                             width: 60,
@@ -631,7 +631,7 @@
                             sortable: true,
                             formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D3015/object'),
                         },{
-                            label: '护理等级',
+                            label: '照护级别',
                             name: 'current_nursing_level_name',
                             type: 'string',
                             width: 60,
@@ -727,7 +727,7 @@
             })
             .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'nursing-schedule-template', {
                 url: '/nursing-schedule-template',
-                title: '护理排班模版',
+                title: '照护排班模版',
                 abstract: true,
                 views: {
                     "module-header": {
@@ -801,7 +801,7 @@
             })
             .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'nursing-group', {
                 url: '/nursing-group',
-                title: '护理组管理',
+                title: '照护组管理',
                 abstract: true,
                 views: {
                     "module-header": {
@@ -828,7 +828,7 @@
                         searchForm: { "status": 1 },
                         serverPaging: true,
                         columns: [{
-                            label: '护理组名称',
+                            label: '照护组名称',
                             name: 'name',
                             type: 'string',
                             width: 120,
@@ -1934,7 +1934,7 @@
                         searchForm: { "status": 1,customize_flag:false},
                         serverPaging: true,
                         columns: [{
-                            label: '护理等级',
+                            label: '照护级别',
                             name: 'nursing_level_name',
                             type: 'string',
                             width: 80,
@@ -2366,7 +2366,7 @@
             })
             .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'nursing-level', {
                 url: '/nursing-level',
-                title: '护理级别',
+                title: '照护级别',
                 abstract: true,
                 views: {
                     "module-header": {

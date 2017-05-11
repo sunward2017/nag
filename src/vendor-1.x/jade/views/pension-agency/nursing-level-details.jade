@@ -8,7 +8,7 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                         i.glyphicon.glyphicon-minus-sign
                 div#contentTab1
                     fieldset: .form-group
-                        <!--护理评估等级-->
+                        <!--老人评估等级-->
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-NURSING_ASSESSMENT_GRADE') | translate}}:
                         .col-md-10
                             ui-select(name="nursing_assessment_grade",ng-model='vm.model.nursing_assessment_grade', theme='bootstrap',required='')

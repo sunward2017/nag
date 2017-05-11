@@ -237,7 +237,7 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                         i.glyphicon.glyphicon-minus-sign
                 div#contentTab3
                     //- fieldset: .form-group
-                        //- <!--护理信息-->
+                        //- <!--照护信息-->
                         //- label.col-md-2.control-label {{ vm.viewTranslatePath('TAB3-NURSING-INFO') | translate}}:
                         //- .col-md-10(ng-if="!vm.readonly")
                         //-     .btn-group
@@ -257,7 +257,7 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                             .btn-group
                                 .btn.btn-primary.cursor-not-allowed(name='nursing_assessment_grade',ng-repeat='nursing_assessment_grade in vm.selectBinding.nursing_assessment_grades',ng-class="{'active':vm.elderlyModel.nursing_assessment_grade==nursing_assessment_grade.value}") {{nursing_assessment_grade.name}}
                     fieldset: .form-group
-                        <!--护理等级-->
+                        <!--照护级别-->
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB3-NURSING-LEVEL') | translate}}:
                         .col-md-10(ng-if="!vm.readonly")
                             .btn-group

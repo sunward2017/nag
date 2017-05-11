@@ -1,6 +1,6 @@
 /**
  * Created by zppro on 17-3-17.
- * 养老机构 护理计划
+ * 养老机构 照护计划
  */
 var mongoose = require('mongoose');
 

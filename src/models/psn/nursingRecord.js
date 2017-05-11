@@ -1,6 +1,6 @@
 /**
  * Created by zppro on 17-3-27.
- * 养老机构 护理记录
+ * 养老机构 照护记录
  */
 var mongoose = require('mongoose');
 

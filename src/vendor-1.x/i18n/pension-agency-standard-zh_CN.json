@@ -597,7 +597,7 @@
         "TITLE": "养老机构-药品管理-药品出库-详情",
         "TAB1": "出库信息",
         "TAB1-LABEL-ELDERLY-NAME": "老人",
-        "TAB1-LABEL-DRUG-NO": "药品编码",
+        "TAB1-LABEL-DRUG-NAME": "药品名称", 
         "TAB1-LABEL-TYPE": "药品去处",
         "TAB1-LABEL-QUANTITY": "出库数量",
         "TAB1-LABEL-UNIT": "包装规格",

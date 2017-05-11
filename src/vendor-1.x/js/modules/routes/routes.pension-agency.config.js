@@ -1372,7 +1372,7 @@
                             formatter: { type: 'populate', options: { path: 'nursingLevelId', select: '-_id name' } }
                         }, {
                             label: '药品全称',
-                            name: 'name',
+                            name: 'drug_full_name',
                             type: 'string',
                             width: 100,
                             sortable: true
@@ -1700,7 +1700,7 @@
                             label: '是否有效',
                             name: 'valid_flag',
                             type: 'bool',
-                            width: 80,
+                            width: 60,
                             sortable: false
                         }, {
                             label: '操作',
@@ -1770,7 +1770,7 @@
                             label: '药品名称',
                             name: 'drug_full_name',
                             type: 'string',
-                            width: 60,
+                            width: 80,
                             sortable: true
                         }, {
                             label: '药品编码',
@@ -1789,7 +1789,7 @@
                             label: '出库数量',
                             name: 'in_out_quantity',
                             type: 'number',
-                            width: 80,
+                            width: 60,
                             sortable: true,
                         }, {
                             label: '包装单位',
@@ -1802,7 +1802,7 @@
                             label: '是否有效',
                             name: 'valid_flag',
                             type: 'bool',
-                            width: 80,
+                            width: 40,
                             sortable: false
                         },
 

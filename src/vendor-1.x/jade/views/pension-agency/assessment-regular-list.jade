@@ -25,11 +25,15 @@
                                 label
                                     input(type='checkbox' data="trBubble" ng-model="row.checked" )
                                     span.fa.fa-check(data="trBubble")
-                        td.text-left {{::row.elderly_name}}
-                        td.text-left {{::row.current_disease_evaluation.level|formatter:'current_disease_evaluation.level':vm.columns}}
-                        td.text-left {{::row.current_adl.score}}
-                        td.text-left {{::row.current_nursing_assessment_grade|formatter:'current_nursing_assessment_grade':vm.columns}}
-                        td.text-left {{::row.current_nursing_level_name}}
+                        td.text-left {{::row.name}}
+                        td.text-left {{::row.last_assessment_time|date:'yyyy-MM-dd HH:mm'}}
+                        td
+                            .btn-group
+                                a.btn.btn-primary.btn-xs(title="{{'button.READ'|translate}}",ng-click="vm.readLastAssessment(row._id,row.name,row.lastAssessmentId)")
+                                    i.glyphicon.glyphicon-search
+                            .btn-group
+                                a.btn.btn-primary.btn-xs(title="{{'button.BEGIN-ASSESSMENT'|translate}}",ng-click="vm.addRegularAssessment(row._id,row.name)")
+                                    i.glyphicon.glyphicon-pencil
                     tr(ng-if="vm.paged.length==0")
                         td(colspan="{{utils.noResultsColspan(vm)}}") {{ 'grid.NO-RESULTS' | translate}}
             .panel-footer
@@ -37,9 +41,7 @@
                     .col-md-4.text-left
                         .btn-toolbar
                             .btn-group
-                                a.btn.btn-primary.btn-sm(title="{{'button.ADD'|translate}}",ng-click="vm.add()")
+                                a.btn.btn-primary.btn-sm(title="{{'button.ADD'|translate}}",ng-click="vm.addNew()")
                                     i.glyphicon.glyphicon-plus
-                                a.btn.btn-primary.btn-sm(title="{{'button.REMOVE'|translate}}",ng-click="vm.disable()")
-                                    i.glyphicon.glyphicon-minus
                     .col-md-8
                         pagination.pagination-sm.pull-right(total-items="vm.page.totals",ng-model="vm.page.no",max-size="5",items-per-page="vm.page.size",boundary-links="true" ,ng-change="vm.paging()")

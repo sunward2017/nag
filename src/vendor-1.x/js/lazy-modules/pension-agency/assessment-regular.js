@@ -12,6 +12,10 @@
         .controller('AssessmentRegularDetailsGridController',AssessmentRegularDetailsGridController)
     ;
 
+    var globalElderlyId;
+    var globalElderlyName;
+    var globalLastAssessmentId;
+
     AssessmentRegularGridController.$inject = ['$scope', 'ngDialog', 'vmh', 'entryVM'];
 
     function  AssessmentRegularGridController($scope, ngDialog, vmh, vm) {
@@ -24,6 +28,29 @@
         function init() {
             vm.init({removeDialog: ngDialog});
             vm.query();
+            vm.addRegularAssessment = addRegularAssessment;
+            vm.readLastAssessment = readLastAssessment;
+            vm.addNew = addNew;
+        }
+
+        function addRegularAssessment(elderlyId,elderly_name){
+            vm.add();
+            globalElderlyId = elderlyId;
+            globalElderlyName = elderly_name;
+        }
+
+        function readLastAssessment(elderlyId,elderly_name,lastAssessmentId){
+            globalLastAssessmentId = lastAssessmentId;
+            globalElderlyId = elderlyId;
+            globalElderlyName = elderly_name;
+            console.log('globalLastAssessmentId:'+lastAssessmentId);
+            vm.read(elderlyId);
+        }
+
+        function addNew(){
+            globalElderlyId = '';
+            globalElderlyName = '';
+            vm.add();
         }
     }
 
@@ -35,6 +62,10 @@
         $scope.utils = vmh.utils.v;
         vm.disease_evaluation_json = {};
         vm.adl_json = {};
+        var elderlyService = vm.modelNode.services['psn-elderly'];
+        vm.elderlyModel = {};
+        var assessmentService = vm.modelNode.services['psn-assessment'];
+        vm.assessmentModel = {};
 
         init();
 
@@ -143,7 +174,33 @@
                             return res;
                         });       
 
-            vm.load();
+            vm.load().then(function(){
+                if(vm.model.elderlyId){
+                    vm.selectedElderly = {_id: vm.model.elderlyId, name: vm.model.elderly_name};
+                }else{
+                    if(globalElderlyId && globalElderlyName) vm.selectedElderly = {_id: globalElderlyId, name: globalElderlyName};
+                }
+                if(vm._action_ == 'read' ){
+                    console.log(globalLastAssessmentId);
+                    vmh.fetch(assessmentService.query({_id: globalLastAssessmentId})).then(function(results){
+                        var assessment = results[0];
+                        vm.base_on = assessment.current_disease_evaluation.base_on;
+                        vm.adl_shit = assessment.current_adl.base_on[0].standard;
+                        vm.adl_pee = assessment.current_adl.base_on[1].standard;
+                        vm.adl_decorator = assessment.current_adl.base_on[2].standard;
+                        vm.adl_wc = assessment.current_adl.base_on[3].standard;
+                        vm.adl_eat = assessment.current_adl.base_on[4].standard;
+                        vm.adl_transfer = assessment.current_adl.base_on[5].standard;
+                        vm.adl_activity = assessment.current_adl.base_on[6].standard;
+                        vm.adl_dress = assessment.current_adl.base_on[7].standard;
+                        vm.adl_stairs = assessment.current_adl.base_on[8].standard;
+                        vm.adl_bath = assessment.current_adl.base_on[9].standard;
+                        vm.model.current_nursing_assessment_grade_name = assessment.current_nursing_assessment_grade_name;
+                        vm.model.nursingLevelId = assessment.nursingLevelId;
+                    });
+                    
+                }
+            });
 
         }
 
@@ -325,7 +382,7 @@
                 var selectAssessmentGrade = _.find(vm.assessment_grades,function(item){
                     return item.value == vm.model.current_nursing_assessment_grade;
                 });
-                vm.assessment_grade_name = selectAssessmentGrade.name;
+                vm.model.current_nursing_assessment_grade_name = selectAssessmentGrade.name;
                 vmh.psnService.nursingLevelsByAssessmentGrade(vm.tenantId,vm.model.current_nursing_assessment_grade).then(function(rows){
                 console.log(rows);
                 vm.selectBinding.nursing_levels = rows;
@@ -340,7 +397,14 @@
 
         function doSubmit() {
             if ($scope.theForm.$valid) {
-                vm.save();
+                vm.save(true).then(function(ret){
+                    vm.elderlyModel.nursing_assessment_grade = vm.model.current_nursing_assessment_grade;
+                    vm.elderlyModel.nursingLevelId = vm.model.nursingLevelId;
+                    vm.elderlyModel.last_assessment_time = ret.time;
+                    vm.elderlyModel.lastAssessmentId = ret.id;
+                    vmh.fetch(elderlyService.update(vm.model.elderlyId, vm.elderlyModel));
+                    vm.returnBack();
+                });
             }
             else {
                 if ($scope.utils.vtab(vm.tab1.cid)) {

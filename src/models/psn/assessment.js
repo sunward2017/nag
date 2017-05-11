@@ -34,8 +34,11 @@ module.exports = function(ctx,name) {
                 }]
             },//日常生活活动能力
             current_nursing_assessment_grade: {type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3015"])},//评估等级，对应国标的三个等级
+            current_nursing_assessment_grade_name:{type:String},
             nursingLevelId: {type: mongoose.Schema.Types.ObjectId, ref: 'psn_nursingLevel'},//评估等级
             current_nursing_level_name:{type:String},
+            time:{type: Date, default: Date.now},//评估时间
+            reason:{type:String},//评估原因
             tenantId: {type: mongoose.Schema.Types.ObjectId}
         }, {
             toObject: {
@@ -44,13 +47,6 @@ module.exports = function(ctx,name) {
             , toJSON: {
                 virtuals: true
             }
-        });
-
-        assessmentSchema.virtual('nursing_assessment_grade_name').get(function () {
-            if (this.nursing_assessment_grade) {
-                return D3015[this.nursing_assessment_grade].name;
-            }
-            return '';
         });
 
         assessmentSchema.pre('update', function (next) {

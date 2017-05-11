@@ -74,7 +74,7 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                     fieldset: .form-group
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-ASSESSMENT-GRADE') | translate}}:
                         .col-md-10
-                            input.form-control(ng-disabled="true", type='text', name='assessment_grade',ng-model='vm.assessment_grade_name',placeholder='' ,required='')
+                            input.form-control(ng-disabled="true", type='text', name='assessment_grade',ng-model='vm.model.current_nursing_assessment_grade_name',placeholder='' ,required='')
                             span.text-danger(ng-show="utils.vinput(this.theForm,'assessment_grade','required')") {{ "validator.REQUIRED" | translate}}
                     fieldset: .form-group
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-NURSING-LEVEL') | translate}}:

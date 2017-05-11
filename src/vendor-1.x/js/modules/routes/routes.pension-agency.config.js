@@ -533,6 +533,12 @@
                             width: 60,
                             sortable: true
                         },{
+                            label: '评估时间',
+                            name: 'time',
+                            type: 'date',
+                            width: 60,
+                            sortable: true
+                        },{
                             label: '病情级别',
                             name: 'current_disease_evaluation.level',
                             type: 'string',
@@ -601,41 +607,25 @@
                 controller: 'AssessmentRegularGridController',
                 resolve: {
                     entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'assessment-regular.list', {
-                        modelName: 'psn-assessment',
-                        searchForm: { "status": 1,"type":'A0003'},
+                        modelName: 'psn-elderly',
+                        searchForm: { "status": 1},
                         serverPaging: true,
                         columns: [{
                             label: '老人',
-                            name: 'elderlyId',
+                            name: 'name',
                             type: 'string',
                             width: 60,
                             sortable: true
                         },{
-                            label: '病情级别',
-                            name: 'current_disease_evaluation.level',
-                            type: 'string',
-                            width: 60,
-                            sortable: true,
-                            formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D3021/object'),
+                            label: '上次评估时间',
+                            name: 'last_assessment_time',
+                            sortable: false,
+                            width: 60
                         },{
-                            label: '活动能力总分',
-                            name: 'current_adl.score',
-                            type: 'string',
-                            width: 60,
-                            sortable: true
-                        },{
-                            label: '评估等级',
-                            name: 'current_nursing_assessment_grade',
-                            type: 'string',
-                            width: 60,
-                            sortable: true,
-                            formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D3015/object'),
-                        },{
-                            label: '护理等级',
-                            name: 'current_nursing_level_name',
-                            type: 'string',
-                            width: 60,
-                            sortable: true
+                            label: '',
+                            name: 'actions',
+                            sortable: false,
+                            width: 30
                         }]
                     })
                 }

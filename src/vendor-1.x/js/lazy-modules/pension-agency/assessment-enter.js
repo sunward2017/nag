@@ -35,6 +35,8 @@
         $scope.utils = vmh.utils.v;
         vm.disease_evaluation_json = {};
         vm.adl_json = {};
+        var elderlyService = vm.modelNode.services['psn-elderly'];
+        vm.elderlyModel = {};
 
         init();
 
@@ -167,7 +169,6 @@
 
         function beginAssessment(){
             if (true) {
-
                 //病情
                 var a0001_flag = false;
                 var a0003_flag = false;
@@ -325,10 +326,11 @@
                 var selectAssessmentGrade = _.find(vm.assessment_grades,function(item){
                     return item.value == vm.model.current_nursing_assessment_grade;
                 });
-                vm.assessment_grade_name = selectAssessmentGrade.name;
+                vm.model.current_nursing_assessment_grade_name = selectAssessmentGrade.name;
                 vmh.psnService.nursingLevelsByAssessmentGrade(vm.tenantId,vm.model.current_nursing_assessment_grade).then(function(rows){
                 console.log(rows);
                 vm.selectBinding.nursing_levels = rows;
+
             });
             }
             else {
@@ -340,7 +342,14 @@
 
         function doSubmit() {
             if ($scope.theForm.$valid) {
-                vm.save();
+                vm.save(true).then(function(ret){
+                    vm.elderlyModel.nursing_assessment_grade = vm.model.current_nursing_assessment_grade;
+                    vm.elderlyModel.nursingLevelId = vm.model.nursingLevelId;
+                    vm.elderlyModel.last_assessment_time = ret.time;
+                    vm.elderlyModel.lastAssessmentId = ret.id;
+                    vmh.fetch(elderlyService.update(vm.model.elderlyId, vm.elderlyModel));
+                    vm.returnBack();
+                });
             }
             else {
                 if ($scope.utils.vtab(vm.tab1.cid)) {

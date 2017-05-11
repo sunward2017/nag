@@ -337,6 +337,9 @@
 
             vm.onAvatarUploaded = onAvatarUploaded;
             // vm.tab1 = {cid: 'contentTab1', active: true};
+            vm.tab1 = {cid: 'content-nursing_records_today', active: true};
+            vm.tab2 = {cid: 'content-life_integration'};
+            vm.tab3 = {cid: 'content-hardware_robot'};
 
             vmh.parallel([
                 vmh.shareService.d2('D1012'),

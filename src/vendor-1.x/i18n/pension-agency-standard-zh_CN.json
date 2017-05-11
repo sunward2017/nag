@@ -349,11 +349,13 @@
       "DLG-ELDERLY-LABEL-NURSING_LEVEL": "照护级别",
       "DLG-ELDERLY-LABEL-FAMILY_MEMBERS": "家庭成员",
       "DLG-ELDERLY-BTN-AVATAR": "上传近照",
-      "DLG-ELDERLY-HEAD-NURSING_RECORDS_TODAY": "今日护理与用药",
+      "DLG-ELDERLY-HEAD-NURSING_RECORDS_TODAY": "今日照护与用药",
       "DLG-ELDERLY-TH-EXEC_ON": "时间",
       "DLG-ELDERLY-TH-NAME": "项目",
       "DLG-ELDERLY-TH-ASSIGNED_WORKER": "护工",
-      "DLG-ELDERLY-TH-CONFIRM_FLAG": "完成情况"
+      "DLG-ELDERLY-TH-CONFIRM_FLAG": "完成情况",
+      "DLG-ELDERLY-HEAD-LIFE_INTEGRATION": "生命体征",
+      "DLG-ELDERLY-HEAD-HARDWARE_ROBOT": "照护机器人"
     },
     "nursing-plan": {
       "TITLE": "养老机构-照护管理-照护计划-编排",

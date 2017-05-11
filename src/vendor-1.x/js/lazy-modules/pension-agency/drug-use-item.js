@@ -42,7 +42,7 @@
             vm.doSubmit = doSubmit;
             vm.queryElderlyPromise = queryElderly();
             vm.fetchElderlyColumnsPromise = [{label: '入院登记号',name: 'enter_code',width: 100}, {label: '姓名',name: 'name',width: 100}];
-            vm.selectElerly = selectElerly;
+            // vm.selectElerly = selectElerly;
             vm.queryDrugPromise = queryDrug();
             vm.fetchDrugColumnsPromise = [{label: '药品编码',name: 'drug_no',width: 100}, {label: '药品全称',name: 'full_name',width: 100}]
             vm.selectElerlyForBackFiller = selectElerlyForBackFiller;
@@ -69,7 +69,7 @@
                 }
                 if(vm.model.elderlyId){
                     vm.selectedElderly = {_id: vm.model.elderlyId, name: vm.model.elderly_name};
-                    vm.selectedDrug = {_id:vm.model.drugId,drug_full_name:vm.model.name};
+                    vm.selectedDrug = {_id:vm.model.drugId,name:vm.model.drug_full_name};
                 }
             });
         }
@@ -81,16 +81,7 @@
             }, 'name enter_code'));
         } 
 
-        function selectElerly(o) {
-            if (o) {
-                // vm.model.enter_code = o.originalObject.enter_code;
-                vm.model.elderlyId = o.originalObject._id;
-                vm.model.elderly_name = o.originalObject.name;
-            }
-        }
-
         function queryDrug(keyword) {
-            console.log("elderlyId",vm.model.elderlyId);
             return vmh.fetch(vmh.psnService.queryDrug(vm.tenantId, keyword, {
             }, 'drug_no full_name'));
         }
@@ -99,7 +90,7 @@
             if (row) {
                 vm.model.drugId = row.id;
                 vm.model.drug_no =row.drug_no;
-                vm.model.name = row.drug_full_name;
+                vm.model.drug_full_name = row.full_name;
             }
         }
 

@@ -1372,7 +1372,7 @@
                             formatter: { type: 'populate', options: { path: 'nursingLevelId', select: '-_id name' } }
                         }, {
                             label: '药品全称',
-                            name: 'name',
+                            name: 'drug_full_name',
                             type: 'string',
                             width: 100,
                             sortable: true

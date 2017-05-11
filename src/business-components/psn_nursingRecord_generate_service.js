@@ -325,7 +325,7 @@ module.exports = {
                                 tenantId: tenantId
                             }
                             workItems = nursingPlanItem.work_items;
-                            // console.log("workItems", workItems)
+                            console.log("workItems", workItems)
                             for (var j = 0, len2 = workItems.length; j < len2; j++) {
                                 workOrDrugUseItem = workItems[j];
                                 remind_max = workOrDrugUseItem.remind_times || 1;

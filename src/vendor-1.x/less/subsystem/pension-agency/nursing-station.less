@@ -89,20 +89,36 @@
         background-color: #5D9CEC;
         color:white;
         padding: 0 4px;
-        z-index: 9999;
+        z-index: 997;
         font-size: 11px;
+      }
+      .online-offline{
+        position: absolute;
+        left:0;
+        top: 0;
+        z-index: 997;
+
+        .online{
+          background-color: #27C24C;
+          color: white;
+          cursor: default;
+          padding: 4px;
+          border-radius: 100%;
+        }
+        .offline{
+          background-color: #7c7d7d;
+          color: white;
+          cursor: default;
+          padding: 4px;
+          border-radius: 100%;
+        }
       }
     }
   }
 
 
-  .online{
+  .normal{
     background-color: #27C24C;
-    color: white;
-    cursor: default;
-  }
-  .offline{
-    background-color: #7c7d7d;
     color: white;
     cursor: default;
   }
@@ -252,9 +268,9 @@
       }
       .elderly-more-info {
         clear: both;
-        margin-top: 5px;
-        .panel-heading-normal{
-          padding:4px;
+        margin-top: 10px;
+        .tab-content-block{
+          height:450px;
         }
         thead {
           display: block;
@@ -262,7 +278,7 @@
         }
         tbody{
           display: block;
-          max-height:480px;
+          max-height:420px;
           overflow-y: auto;    /* Trigger vertical scroll    */
           overflow-x: hidden;  /* Hide the horizontal scroll */
           .drug-use-item-icon{

@@ -53,7 +53,7 @@
   },
   {
     "_id": "menu.pension-agency.NURSING-MANAGE",
-    "name": "护理管理",
+    "name": "照护管理",
     "sref": "#",
     "icon": "icon-folder",
     "children": [
@@ -69,22 +69,22 @@
       },
       {
         "_id": "menu.pension-agency.NURSING-PLAN",
-        "name": "护理计划",
+        "name": "照护计划",
         "sref": "app.pension-agency.nursing-plan"
       },
       {
         "_id": "menu.pension-agency.NURSING-SCHEDULE",
-        "name": "护理排班",
+        "name": "照护排班",
         "sref": "app.pension-agency.nursing-schedule"
       },
       {
         "_id": "menu.pension-agency.NURSING-SCHEDULE-TEMPLATE",
-        "name": "护理排班模版",
+        "name": "照护排班模版",
         "sref": "app.pension-agency.nursing-schedule-template.list"
       },
       {
         "_id": "menu.pension-agency.NURSING-GROUP",
-        "name": "护理组",
+        "name": "照护组",
         "sref": "app.pension-agency.nursing-group.list"
       }
     ]
@@ -252,7 +252,7 @@
       },
       {
         "_id": "menu.pension-agency.NURSING-LEVEL",
-        "name": "护理等级",
+        "name": "照护级别",
         "sref": "app.pension-agency.nursing-level.list"
       },
       {

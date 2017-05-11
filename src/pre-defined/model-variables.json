@@ -32,7 +32,7 @@
     "CHARGE_ITEM_PREFIX": "ci.pension-agency.",
     "CHARGE_ITEM_NURSING_LEVEL_CATAGORY":{
       "_ID": "NURSING_LEVEL",
-      "NAME": "护理费"
+      "NAME": "照护费"
     },
     "CHARGE_ITEM_CUSTOMIZED_CATAGORY": {
       "_ID": "CUSTOMIZED",

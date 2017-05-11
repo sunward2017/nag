@@ -1,6 +1,6 @@
 /**
  * Created by zppro on 17-3-23.
- * 养老机构 护理级别
+ * 养老机构 照护级别
  */
 var mongoose = require('mongoose');
 var D3015 = require('../../pre-defined/dictionary.json')['D3015'];

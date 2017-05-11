@@ -1,6 +1,6 @@
 /**
  * district Created by zppro on 17-3-23.
- * Target:养老机构 护理级别
+ * Target:养老机构 照护级别
  */
 
 (function() {

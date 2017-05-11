@@ -16,22 +16,22 @@
   },  
   {
     "_id": "nursing_level_name",
-    "name": "护理等级",
+    "name": "照护级别",
     "width": "80"
   },
   {
     "_id": "nursing_workitems_standard",
-    "name": "护理项目(标准)",
+    "name": "照护项目",
     "width": "200"
   },
   {
     "_id": "nursing_workitems_customized",
-    "name": "用药管理",
+    "name": "用药项目",
     "width": "160"
   },
   {
     "_id":"generate_nursing_content",
-     "name": "生成护理",
+     "name": "生成照护记录",
     "width": "80"
   }
    

@@ -208,7 +208,7 @@
             var elderlyId = vm.aggrData[trackedKey]['elderly'].id;
             vmh.psnService.changeElderlyNursingLevel(vm.tenantId, elderlyId, nursingLevelId, vm.operated_by, vm.operated_by_name).then(function (data) {
 
-                // 更改老人护理等级意味着需要原等级下的所有工作项目
+                // 更改照护级别意味着需要原等级下的所有工作项目
                 if (data.oldNursingLevelId && data.nursingLevelId != data.oldNursingLevelId) {
                     // console.log('更改前:', vm.work_items)
                     var key = trackedKey + '$' + data.oldNursingLevelId;

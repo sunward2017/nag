@@ -1,6 +1,6 @@
 /**
  * Created by zppro on 17-3-17.
- * 养老机构 护理排班
+ * 养老机构 照护排班
  */
 var mongoose = require('mongoose');
 

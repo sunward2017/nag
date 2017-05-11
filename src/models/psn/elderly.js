@@ -99,7 +99,7 @@ module.exports = function(ctx,name) {
                 new_item_name: {type: String},
                 new_period_price: {type: Number},
                 new_period: {type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D1015"])}
-            }],//2种情况：1对于吃、住、护理类别，必须old_item和new_item都有数据，表明无论如何会选择类别中的一项收费；2、对于其他和自定义项目可以old_item为空也可以new_item为空分别表示新增收费和删除收费
+            }],//2种情况：1对于吃、住、照护级别，必须old_item和new_item都有数据，表明无论如何会选择类别中的一项收费；2、对于其他和自定义项目可以old_item为空也可以new_item为空分别表示新增收费和删除收费
             py: {type: String}, //拼音码
             bed_monitor_timeout:{type:Number},//睡眠带超时时间
             bed_monitor_timeout_alarm_begin:{type:String,minlength: 5, maxlength: 5},//超时报警起始时间

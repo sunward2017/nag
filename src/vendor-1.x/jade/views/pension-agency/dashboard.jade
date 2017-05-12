@@ -103,3 +103,12 @@
    .col-lg-6
       .panel.widget
          div(ng-if="vm.roomCatagoryOfManTimeMonthly_loaded",id="{{vm.roomCatagoryOfManTimeMonthly_id}}",echarts="vm.roomCatagoryOfManTimeMonthly_id",config="vm.roomCatagoryOfManTimeMonthly_config",echarts-dimension="'2:1.3'",style="width:100%;")
+.row
+   .col-lg-6
+      .panel.panel-primary.widget
+          .panel-heading
+              h3.panel-title 当月及下月生日老人
+          .panel-body     
+              ul.list-inline
+                  li(ng-repeat="elderly in vm.birthdayElderlys")
+                      .btn.btn-info.btn-xs{{ elderly.name+"("+(elderly.sex=="M"?"男":"女" )+")"}}          

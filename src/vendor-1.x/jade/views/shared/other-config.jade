@@ -32,5 +32,10 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                         .col-md-10
                             input.form-control(type='text',name='pub_alarm_D3016_A1000',ng-model='vm.other_configs.pub_alarm_D3016_A1000',placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-ALARM_D3016_A1000")|translate}}')
                             span.text-danger(ng-show="utils.vinput(this.theForm,'pub_alarm_D3016_A1000','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset: .form-group
+                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-ASSESSMENT_REGULAR_PERIOD') | translate}}:
+                        .col-md-10
+                            input.form-control(type='number',name='pub_assessment_regular_period',ng-model='vm.other_configs.pub_assessment_regular_period',placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-ASSESSMENT_REGULAR_PERIOD")|translate}}',ui-validate="'$value>=1'")
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'pub_assessment_regular_period','required')") {{ "validator.REQUIRED" | translate}}
     .text-right.mt-lg
         button.btn.btn-success(type="submit") {{'button.SAVE'|translate}}

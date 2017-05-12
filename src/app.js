@@ -530,6 +530,11 @@ co(function*() {
     // yield app.spu_service.appendSaleInfoByOrderPaySuccess(order);
     // console.log(app.moment(1492705810785).format('YYYY-MM-DD HH:mm:ss'))
 
+    // var xlsx = require('node-xlsx').default;
+    // var worksheets = xlsx.parse(app.conf.dir.root + '/raw-data/drug0921-t.xlsx');
+    // console.dir(worksheets[0].data[0]);
+    // console.dir(worksheets[0].data[1]);
+
 
 }).catch(app.coOnError);
 

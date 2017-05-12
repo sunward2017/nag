@@ -61,7 +61,7 @@
                 console.log('nursing-station socket disconnected');
             });
             channel.off(SOCKET_EVENTS.PSN.BED_MONITOR.S2C.ON_LINE).on(SOCKET_EVENTS.PSN.BED_MONITOR.S2C.ON_LINE, function(data) {
-                console.log('nursing-station socket ON_LINE =>', data);
+                // console.log('nursing-station socket ON_LINE =>', data);
                 // var bedMonitorStatus = vm.monitorStatus[data.bedMonitorName];
                 var elderlyId = vm.bedMonitorMappingElderly[data.bedMonitorName];
                 var bedMonitorStatus = vm.elderlyStatusMonitor[elderlyId];
@@ -73,7 +73,7 @@
                 }
             });
             channel.off(SOCKET_EVENTS.PSN.BED_MONITOR.S2C.OFF_LINE).on(SOCKET_EVENTS.PSN.BED_MONITOR.S2C.OFF_LINE, function(data) {
-                console.log('nursing-station socket OFF_LINE =>', data);
+                // console.log('nursing-station socket OFF_LINE =>', data);
                 var elderlyId = vm.bedMonitorMappingElderly[data.bedMonitorName];
                 var bedMonitorStatus = vm.elderlyStatusMonitor[elderlyId];
                 if (bedMonitorStatus) {
@@ -84,7 +84,7 @@
                 }
             });
             channel.off(SOCKET_EVENTS.PSN.BED_MONITOR.S2C.COME).on(SOCKET_EVENTS.PSN.BED_MONITOR.S2C.COME, function(data) {
-                console.log('nursing-station socket COME =>', data);
+                // console.log('nursing-station socket COME =>', data);
                 var elderlyId = vm.bedMonitorMappingElderly[data.bedMonitorName];
                 var bedMonitorStatus = vm.elderlyStatusMonitor[elderlyId];
                 if (bedMonitorStatus) {
@@ -95,7 +95,7 @@
                 }
             });
             channel.off(SOCKET_EVENTS.PSN.BED_MONITOR.S2C.LEAVE).on(SOCKET_EVENTS.PSN.BED_MONITOR.S2C.LEAVE, function(data) {
-                console.log('nursing-station socket LEAVE =>', data);
+                // console.log('nursing-station socket LEAVE =>', data);
                 var elderlyId = vm.bedMonitorMappingElderly[data.bedMonitorName];
                 var bedMonitorStatus = vm.elderlyStatusMonitor[elderlyId];
                 if (bedMonitorStatus) {
@@ -105,11 +105,22 @@
                     })
                 }
             });
+            channel.off(SOCKET_EVENTS.PSN.BED_MONITOR.S2C.NO_MAN_IN_BED).on(SOCKET_EVENTS.PSN.BED_MONITOR.S2C.NO_MAN_IN_BED, function(data) {
+                // console.log('nursing-station socket NO_MAN_IN_BED =>', data);
+                var elderlyId = vm.bedMonitorMappingElderly[data.bedMonitorName];
+                var bedMonitorStatus = vm.elderlyStatusMonitor[elderlyId];
+                if (bedMonitorStatus) {
+                    vmh.timeout(function(){
+                        bedMonitorStatus.status = 'no-man-in-bed';
+                        console.log('bedMonitorStatus:', bedMonitorStatus);
+                    })
+                }
+            });
             channel.off(SOCKET_EVENTS.PSN.BED_MONITOR.S2C.ALARM_LEAVE_TIMEOUT).on(SOCKET_EVENTS.PSN.BED_MONITOR.S2C.ALARM_LEAVE_TIMEOUT, function(data){
-                console.log('nursing-station socket ALARM_LEAVE_TIMEOUT =>', data);
+                // console.log('nursing-station socket ALARM_LEAVE_TIMEOUT =>', data);
                 var elderlyId = vm.bedMonitorMappingElderly[data.bedMonitorName];
                 console.log('on alarm elderlyId=>', elderlyId);
-                if (_.findIndex(vm.alarmQueue, function(alarmObject){
+                if (data.alarmId && _.findIndex(vm.alarmQueue, function(alarmObject){
                         return alarmObject.elderlyId == elderlyId && alarmObject.reason == data.reason;
                     }) == -1) {
                     var elderly = _.find(vm.elderlys, function (elderly) {
@@ -119,6 +130,7 @@
                     vm.alarmQueue.push(alarm);
                     console.log('vm.alarmQueue:', vm.alarmQueue);
                 }
+
                 var bedMonitorStatus = vm.elderlyStatusMonitor[elderlyId];
                 if (bedMonitorStatus) {
                     vmh.timeout(function(){

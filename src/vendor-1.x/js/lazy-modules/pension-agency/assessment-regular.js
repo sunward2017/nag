@@ -15,6 +15,7 @@
     var globalElderlyId;
     var globalElderlyName;
     var globalLastAssessmentId;
+    var globalIsAddNew;
 
     AssessmentRegularGridController.$inject = ['$scope', 'ngDialog', 'vmh', 'entryVM'];
 
@@ -34,9 +35,11 @@
         }
 
         function addRegularAssessment(elderlyId,elderly_name){
+            globalIsAddNew = false;
             vm.add();
             globalElderlyId = elderlyId;
             globalElderlyName = elderly_name;
+            console.log(elderlyId,elderly_name);
         }
 
         function readLastAssessment(elderlyId,elderly_name,lastAssessmentId){
@@ -48,6 +51,7 @@
         }
 
         function addNew(){
+            globalIsAddNew = true;
             globalElderlyId = '';
             globalElderlyName = '';
             vm.add();
@@ -77,8 +81,12 @@
             vm.doSubmit = doSubmit;
             vm.beginAssessment = beginAssessment;
             vm.setNursingLevel = setNursingLevel;
-            vm.queryElderly = queryElderly;
+            vm.selectElerlyForBackFiller = selectElerlyForBackFiller;
+            vm.queryElderlyPromise = queryElderly();
+            vm.fetchElderlyColumnsPromise = [{ label: '入院登记号', name: 'enter_code', width: 100 }, { label: '姓名', name: 'name', width: 100 }];
+            // vm.queryElderly = queryElderly;
             vm.selectElerly = selectElerly;
+            vm.isAddNew = globalIsAddNew;
             vm.tab1 = {cid: 'contentTab1'};
  
 
@@ -175,13 +183,26 @@
                         });       
 
             vm.load().then(function(){
-                if(vm.model.elderlyId){
-                    vm.selectedElderly = {_id: vm.model.elderlyId, name: vm.model.elderly_name};
+                // if(vm.model.elderlyId){
+                //     vm.selectedElderly = {_id: vm.model.elderlyId, name: vm.model.elderly_name};
+                // }else{
+                //     if(globalElderlyId && globalElderlyName) vm.selectedElderly = {_id: globalElderlyId, name: globalElderlyName};
+                // }
+
+                console.log('isAddNew:'+globalIsAddNew);
+
+                if(globalElderlyId && globalElderlyName){
+                    // vm.selectedElderly = {_id: globalElderlyId, name: globalElderlyName};
+                    vm.isAddNew = false;
                 }else{
-                    if(globalElderlyId && globalElderlyName) vm.selectedElderly = {_id: globalElderlyId, name: globalElderlyName};
+                    vm.isAddNew = true;
                 }
+
                 if(vm._action_ == 'read' ){
                     console.log(globalLastAssessmentId);
+                    console.log('elderly_name:');
+                    console.log(vm.model.elderly_name);
+                    vm.model.elderly_name = globalElderlyName;
                     vmh.fetch(assessmentService.query({_id: globalLastAssessmentId})).then(function(results){
                         var assessment = results[0];
                         vm.base_on = assessment.current_disease_evaluation.base_on;
@@ -198,22 +219,36 @@
                         vm.model.current_nursing_assessment_grade_name = assessment.current_nursing_assessment_grade_name;
                         vm.model.nursingLevelId = assessment.nursingLevelId;
                     });
-                    
+                }else if(vm._action_ == 'add'){
+                    if(globalElderlyId && globalElderlyName) {
+                       vm.model.elderly_name = globalElderlyName;
+                       vm.model.elderlyId = globalElderlyId;
+                    }
                 }
             });
 
         }
 
-        function queryElderly(keyword) {
+         function queryElderly(keyword) {
             return vmh.fetch(vmh.psnService.queryElderly(vm.tenantId, keyword, {
-                  live_in_flag: true
-            }, 'name'));
+                live_in_flag: true,
+                begin_exit_flow: {'$in':[false,undefined]}
+            }, 'name enter_code'));
+        }
+
+        function selectElerlyForBackFiller(row) {
+            if(row){
+                vm.model.enter_code = row.enter_code;
+                vm.model.elderlyId = row.id;
+                vm.model.elderly_name = row.name;
+            }
         }
 
         function selectElerly(o) {
             if(o){
+                vm.model.enter_code = o.originalObject.enter_code;
                 vm.model.elderlyId = o.originalObject._id;
-                vm.model.elderly_name = o.originalObject.name;
+                vm.model.elderly_name = o.title;
             }
         }
 

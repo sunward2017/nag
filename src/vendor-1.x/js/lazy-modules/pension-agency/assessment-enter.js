@@ -48,7 +48,10 @@
             vm.doSubmit = doSubmit;
             vm.beginAssessment = beginAssessment;
             vm.setNursingLevel = setNursingLevel;
-            vm.queryElderly = queryElderly;
+            vm.selectElerlyForBackFiller = selectElerlyForBackFiller;
+            vm.queryElderlyPromise = queryElderly();
+            vm.fetchElderlyColumnsPromise = [{ label: '入院登记号', name: 'enter_code', width: 100 }, { label: '姓名', name: 'name', width: 100 }];
+            // vm.queryElderly = queryElderly;
             vm.selectElerly = selectElerly;
             vm.tab1 = {cid: 'contentTab1'};
  
@@ -149,10 +152,18 @@
 
         }
 
+        function selectElerlyForBackFiller(row) {
+                    if (row) {
+                        vm.model.enter_code = row.enter_code;
+                        vm.model.elderlyId = row.id;
+                        vm.model.elderly_name = row.name;
+                    }
+                }
+
         function queryElderly(keyword) {
             return vmh.fetch(vmh.psnService.queryElderly(vm.tenantId, keyword, {
                   live_in_flag: true
-            }, 'name'));
+            }, 'name enter_code'));
         }
 
         function selectElerly(o) {

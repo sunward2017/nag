@@ -9,9 +9,15 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                 div#contentTab1
                     fieldset: .form-group
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-ELDERLY-NAME') | translate}}:
-                        .col-md-10
-                            div#elderly(angucomplete-alt,input-name="elderly",minlength="1",field-required="true",text-searching='{{"label.TEXT-SEARCHING"|translate}}',text-no-results='{{"label.TEXT-NO-RESULTS"|translate}}',placeholder="",pause="400",selected-object="vm.selectElerly",remote-api-handler="vm.queryElderly",title-field="name",initial-value="vm.selectedElderly",input-class="form-control form-control-small")
+                        .col-md-10(ng-if="vm._action_=='add' && vm.isAddNew")
+                            .backfiller(backfiller,ng-model="vm.selectedElderly", input-name="elderly", fetch-rows="vm.queryElderlyPromise", required='',fetch-columns="vm.fetchElderlyColumnsPromise", picker-title="挑选老人" on-select="vm.selectElerlyForBackFiller(row)")
                             span.text-danger(ng-show="utils.vinput(this.theForm,'elderly','autocomplete-required')") {{ "validator.REQUIRED" | translate}}
+                        .col-md-10(ng-if="vm._action_=='read' || !vm.isAddNew")
+                            .form-readable {{vm.model.elderly_name}}
+                        //- label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-ELDERLY-NAME') | translate}}:
+                        //- .col-md-10
+                        //-     div#elderly(angucomplete-alt,input-name="elderly",minlength="1",field-required="true"t-searching='{{"label.TEXT-SEARCHING"|translate}}',text-no-results='{{"label.TEXT-NO-RESULTS"|translate}}',placeholder="",pause="400",selected-object="vm.selectElerly",remote-api-handler="vm.queryElderly",title-field="name",initial-value="vm.selectedElderly",input-class="form-control form-control-small")
+                        //-     span.text-danger(ng-show="utils.vinput(this.theForm,'elderly','autocomplete-required')") {{ "validator.REQUIRED" | translate}}
                     fieldset: .form-group
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-DISEASE_EVALUATION') | translate}}:
                         .col-md-10

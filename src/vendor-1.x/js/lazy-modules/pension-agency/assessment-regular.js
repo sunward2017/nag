@@ -12,18 +12,66 @@
         .controller('AssessmentRegularDetailsGridController',AssessmentRegularDetailsGridController)
     ;
 
+    var globalElderlyId;
+    var globalElderlyName;
+    var globalLastAssessmentId;
+    var globalIsAddNew;
+
     AssessmentRegularGridController.$inject = ['$scope', 'ngDialog', 'vmh', 'entryVM'];
 
     function  AssessmentRegularGridController($scope, ngDialog, vmh, vm) {
 
         $scope.vm = vm;
         $scope.utils = vmh.utils.g;
+        var tenantService = vm.modelNode.services['pub-tenant'];
+        var today = moment().format('YYYY MM DD');
+        var todayMoment = moment(today,'YYYY MM DD');
+        var assessmentDay;
+        var assessmentExpireDay;
+        var assessmentExpireMoment;
 
         init();
 
         function init() {
             vm.init({removeDialog: ngDialog});
+            vmh.fetch(tenantService.query({_id: vm.tenantId})).then(function(results){
+                vm.assessment_regular_period = results[0].other_config.pub_assessment_regular_period;
+            });
             vm.query();
+            vm.addRegularAssessment = addRegularAssessment;
+            vm.readLastAssessment = readLastAssessment;
+            vm.fiterTime = fiterTime;
+            vm.addNew = addNew;
+        }
+
+        function addRegularAssessment(elderlyId,elderly_name){
+            globalIsAddNew = false;
+            vm.add();
+            globalElderlyId = elderlyId;
+            globalElderlyName = elderly_name;
+            console.log(elderlyId,elderly_name);
+        }
+
+        function readLastAssessment(elderlyId,elderly_name,lastAssessmentId){
+            globalLastAssessmentId = lastAssessmentId;
+            globalElderlyId = elderlyId;
+            globalElderlyName = elderly_name;
+            console.log('globalLastAssessmentId:'+lastAssessmentId);
+            vm.read(elderlyId);
+        }
+
+        function addNew(){
+            globalIsAddNew = true;
+            globalElderlyId = '';
+            globalElderlyName = '';
+            vm.add();
+        }
+
+        function fiterTime(last_assessment_time){
+            assessmentDay = moment(last_assessment_time,'YYYY MM DD');
+            assessmentExpireDay = moment(assessmentDay,'YYYY MM DD').add(vm.assessment_regular_period,'M').format('YYYY MM DD');
+            assessmentExpireMoment = moment(assessmentExpireDay,'YYYY MM DD');
+            return todayMoment.isAfter(assessmentExpireMoment);
         }
     }
 
@@ -35,6 +83,10 @@
         $scope.utils = vmh.utils.v;
         vm.disease_evaluation_json = {};
         vm.adl_json = {};
+        var elderlyService = vm.modelNode.services['psn-elderly'];
+        vm.elderlyModel = {};
+        var assessmentService = vm.modelNode.services['psn-assessment'];
+        vm.assessmentModel = {};
 
         init();
 
@@ -46,8 +98,12 @@
             vm.doSubmit = doSubmit;
             vm.beginAssessment = beginAssessment;
             vm.setNursingLevel = setNursingLevel;
-            vm.queryElderly = queryElderly;
+            vm.selectElerlyForBackFiller = selectElerlyForBackFiller;
+            vm.queryElderlyPromise = queryElderly();
+            vm.fetchElderlyColumnsPromise = [{ label: '入院登记号', name: 'enter_code', width: 100 }, { label: '姓名', name: 'name', width: 100 }];
+            // vm.queryElderly = queryElderly;
             vm.selectElerly = selectElerly;
+            vm.isAddNew = globalIsAddNew;
             vm.tab1 = {cid: 'contentTab1'};
  
 
@@ -143,20 +199,66 @@
                             return res;
                         });       
 
-            vm.load();
+            vm.load().then(function(){
+
+                if(globalElderlyId && globalElderlyName){
+                    // vm.selectedElderly = {_id: globalElderlyId, name: globalElderlyName};
+                    vm.isAddNew = false;
+                }else{
+                    vm.isAddNew = true;
+                }
+
+                if(vm._action_ == 'read' ){
+                    console.log(globalLastAssessmentId);
+                    console.log('elderly_name:');
+                    console.log(vm.model.elderly_name);
+                    vm.model.elderly_name = globalElderlyName;
+                    vmh.fetch(assessmentService.query({_id: globalLastAssessmentId})).then(function(results){
+                        var assessment = results[0];
+                        vm.base_on = assessment.current_disease_evaluation.base_on;
+                        vm.adl_shit = assessment.current_adl.base_on[0].standard;
+                        vm.adl_pee = assessment.current_adl.base_on[1].standard;
+                        vm.adl_decorator = assessment.current_adl.base_on[2].standard;
+                        vm.adl_wc = assessment.current_adl.base_on[3].standard;
+                        vm.adl_eat = assessment.current_adl.base_on[4].standard;
+                        vm.adl_transfer = assessment.current_adl.base_on[5].standard;
+                        vm.adl_activity = assessment.current_adl.base_on[6].standard;
+                        vm.adl_dress = assessment.current_adl.base_on[7].standard;
+                        vm.adl_stairs = assessment.current_adl.base_on[8].standard;
+                        vm.adl_bath = assessment.current_adl.base_on[9].standard;
+                        vm.model.current_nursing_assessment_grade_name = assessment.current_nursing_assessment_grade_name;
+                        vm.model.nursingLevelId = assessment.nursingLevelId;
+                    });
+                }else if(vm._action_ == 'add'){
+                    if(globalElderlyId && globalElderlyName) {
+                       vm.model.elderly_name = globalElderlyName;
+                       vm.model.elderlyId = globalElderlyId;
+                    }
+                }
+            });
 
         }
 
-        function queryElderly(keyword) {
+         function queryElderly(keyword) {
             return vmh.fetch(vmh.psnService.queryElderly(vm.tenantId, keyword, {
-                  live_in_flag: true
-            }, 'name'));
+                live_in_flag: true,
+                begin_exit_flow: {'$in':[false,undefined]}
+            }, 'name enter_code'));
+        }
+
+        function selectElerlyForBackFiller(row) {
+            if(row){
+                vm.model.enter_code = row.enter_code;
+                vm.model.elderlyId = row.id;
+                vm.model.elderly_name = row.name;
+            }
         }
 
         function selectElerly(o) {
             if(o){
+                vm.model.enter_code = o.originalObject.enter_code;
                 vm.model.elderlyId = o.originalObject._id;
-                vm.model.elderly_name = o.originalObject.name;
+                vm.model.elderly_name = o.title;
             }
         }
 
@@ -325,7 +427,7 @@
                 var selectAssessmentGrade = _.find(vm.assessment_grades,function(item){
                     return item.value == vm.model.current_nursing_assessment_grade;
                 });
-                vm.assessment_grade_name = selectAssessmentGrade.name;
+                vm.model.current_nursing_assessment_grade_name = selectAssessmentGrade.name;
                 vmh.psnService.nursingLevelsByAssessmentGrade(vm.tenantId,vm.model.current_nursing_assessment_grade).then(function(rows){
                 console.log(rows);
                 vm.selectBinding.nursing_levels = rows;
@@ -340,7 +442,15 @@
 
         function doSubmit() {
             if ($scope.theForm.$valid) {
-                vm.save();
+                vm.save(true).then(function(ret){
+                    vm.elderlyModel.nursing_assessment_grade = vm.model.current_nursing_assessment_grade;
+                    vm.elderlyModel.nursingLevelId = vm.model.nursingLevelId;
+                    vm.elderlyModel.nursing_level_name = vm.model.current_nursing_level_name;
+                    vm.elderlyModel.last_assessment_time = ret.time;
+                    vm.elderlyModel.lastAssessmentId = ret.id;
+                    vmh.fetch(elderlyService.update(vm.model.elderlyId, vm.elderlyModel));
+                    vm.returnBack();
+                });
             }
             else {
                 if ($scope.utils.vtab(vm.tab1.cid)) {

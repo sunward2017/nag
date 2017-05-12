@@ -18,6 +18,7 @@ module.exports = function(ctx,name) {
             check_in_time: {type: Date, default: Date.now},
             operated_on: {type: Date, default: Date.now},
             status: {type: Number, min: 0, max: 1, default: 1},
+            code: {type: String,required: true, minlength: 6, maxlength: 6},
             elderlyId:{type: mongoose.Schema.Types.ObjectId,required: true,ref:'psn_elderly'},//关联老人
             elderly_name: {type: String, required: true, maxlength: 20},
             type:{type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3020"])},//类别：入院评估、定期评估
@@ -34,8 +35,11 @@ module.exports = function(ctx,name) {
                 }]
             },//日常生活活动能力
             current_nursing_assessment_grade: {type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3015"])},//评估等级，对应国标的三个等级
+            current_nursing_assessment_grade_name:{type:String},
             nursingLevelId: {type: mongoose.Schema.Types.ObjectId, ref: 'psn_nursingLevel'},//评估等级
             current_nursing_level_name:{type:String},
+            time:{type: Date, default: Date.now},//评估时间
+            reason:{type:String},//评估原因
             tenantId: {type: mongoose.Schema.Types.ObjectId}
         }, {
             toObject: {
@@ -46,16 +50,43 @@ module.exports = function(ctx,name) {
             }
         });
 
-        assessmentSchema.virtual('nursing_assessment_grade_name').get(function () {
-            if (this.nursing_assessment_grade) {
-                return D3015[this.nursing_assessment_grade].name;
-            }
-            return '';
-        });
-
         assessmentSchema.pre('update', function (next) {
             this.update({}, {$set: {operated_on: new Date()}});
             next();
+        });
+
+        assessmentSchema.pre('validate', function (next) {
+            if (this.code == ctx.modelVariables.SERVER_GEN) {
+                //考虑到并发几乎不可能发生，所以将订单编号设定为
+                //order.type+[年2月2日2]+6位随机数
+                var self = this;
+                if (this.tenantId) {
+                    console.log(ctx.modelVariables.SEQUENCE_DEFS.ASSESSMENT);
+                    console.log(this.tenantId)
+                    ctx.sequenceFactory.getSequenceVal(ctx.modelVariables.SEQUENCE_DEFS.ASSESSMENT, null, this.tenantId).then(function(ret){
+
+                        self.code = ret;
+                        console.log(self);
+                        next();
+                    });
+                    console.log('aaaa')
+                    //var tenantModel = require('../pub/tenant')(ctx, 'pub_tenant');
+                    //tenantModel.findById(this.tenantId,function(err,tenant){
+                    //
+                    //    tenant.needRefreshToken();
+                    //    self.code = tenant.token + '-' + ctx.moment().format('YYMMDD') + ctx.util.randomN(6);
+                    //
+                    //    next();
+                    //});
+                }
+                else{
+                    next();
+                }
+            }
+            else{
+                next();
+            }
+
         });
 
         return mongoose.model(name, assessmentSchema, name);

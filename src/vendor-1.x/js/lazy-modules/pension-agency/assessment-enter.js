@@ -35,6 +35,8 @@
         $scope.utils = vmh.utils.v;
         vm.disease_evaluation_json = {};
         vm.adl_json = {};
+        var elderlyService = vm.modelNode.services['psn-elderly'];
+        vm.elderlyModel = {};
 
         init();
 
@@ -46,7 +48,10 @@
             vm.doSubmit = doSubmit;
             vm.beginAssessment = beginAssessment;
             vm.setNursingLevel = setNursingLevel;
-            vm.queryElderly = queryElderly;
+            vm.selectElerlyForBackFiller = selectElerlyForBackFiller;
+            vm.queryElderlyPromise = queryElderly();
+            vm.fetchElderlyColumnsPromise = [{ label: '入院登记号', name: 'enter_code', width: 100 }, { label: '姓名', name: 'name', width: 100 }];
+            // vm.queryElderly = queryElderly;
             vm.selectElerly = selectElerly;
             vm.tab1 = {cid: 'contentTab1'};
  
@@ -143,14 +148,36 @@
                             return res;
                         });       
 
-            vm.load();
+            vm.load().then(function(){
+                if(vm._action_ == 'read' || vm._action_ == 'edit'){
+                    vm.base_on = vm.model.current_disease_evaluation.base_on;
+                    vm.adl_shit = vm.model.current_adl.base_on[0].standard;
+                    vm.adl_pee = vm.model.current_adl.base_on[1].standard;
+                    vm.adl_decorator = vm.model.current_adl.base_on[2].standard;
+                    vm.adl_wc = vm.model.current_adl.base_on[3].standard;
+                    vm.adl_eat = vm.model.current_adl.base_on[4].standard;
+                    vm.adl_transfer = vm.model.current_adl.base_on[5].standard;
+                    vm.adl_activity = vm.model.current_adl.base_on[6].standard;
+                    vm.adl_dress = vm.model.current_adl.base_on[7].standard;
+                    vm.adl_stairs = vm.model.current_adl.base_on[8].standard;
+                    vm.adl_bath = vm.model.current_adl.base_on[9].standard;
+                }
+            });
 
         }
+
+        function selectElerlyForBackFiller(row) {
+                    if (row) {
+                        vm.model.enter_code = row.enter_code;
+                        vm.model.elderlyId = row.id;
+                        vm.model.elderly_name = row.name;
+                    }
+                }
 
         function queryElderly(keyword) {
             return vmh.fetch(vmh.psnService.queryElderly(vm.tenantId, keyword, {
                   live_in_flag: true
-            }, 'name'));
+            }, 'name enter_code'));
         }
 
         function selectElerly(o) {
@@ -167,7 +194,6 @@
 
         function beginAssessment(){
             if (true) {
-
                 //病情
                 var a0001_flag = false;
                 var a0003_flag = false;
@@ -325,10 +351,11 @@
                 var selectAssessmentGrade = _.find(vm.assessment_grades,function(item){
                     return item.value == vm.model.current_nursing_assessment_grade;
                 });
-                vm.assessment_grade_name = selectAssessmentGrade.name;
+                vm.model.current_nursing_assessment_grade_name = selectAssessmentGrade.name;
                 vmh.psnService.nursingLevelsByAssessmentGrade(vm.tenantId,vm.model.current_nursing_assessment_grade).then(function(rows){
                 console.log(rows);
                 vm.selectBinding.nursing_levels = rows;
+
             });
             }
             else {
@@ -340,7 +367,15 @@
 
         function doSubmit() {
             if ($scope.theForm.$valid) {
-                vm.save();
+                vm.save(true).then(function(ret){
+                    vm.elderlyModel.nursing_assessment_grade = vm.model.current_nursing_assessment_grade;
+                    vm.elderlyModel.nursingLevelId = vm.model.nursingLevelId;
+                    vm.elderlyModel.nursing_level_name = vm.model.current_nursing_level_name;
+                    vm.elderlyModel.last_assessment_time = ret.time;
+                    vm.elderlyModel.lastAssessmentId = ret.id;
+                    vmh.fetch(elderlyService.update(vm.model.elderlyId, vm.elderlyModel));
+                    vm.returnBack();
+                });
             }
             else {
                 if ($scope.utils.vtab(vm.tab1.cid)) {

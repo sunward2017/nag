@@ -9,13 +9,19 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                 div#contentTab1
                     fieldset: .form-group
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-ELDERLY-NAME') | translate}}:
-                        .col-md-10
-                            div#elderly(angucomplete-alt,input-name="elderly",minlength="1",field-required="true",text-searching='{{"label.TEXT-SEARCHING"|translate}}',text-no-results='{{"label.TEXT-NO-RESULTS"|translate}}',placeholder="",pause="400",selected-object="vm.selectElerly",remote-api-handler="vm.queryElderly",title-field="name",initial-value="vm.selectedElderly",input-class="form-control form-control-small")
+                        .col-md-10(ng-if="vm._action_=='add' && vm.isAddNew")
+                            .backfiller(backfiller,ng-model="vm.selectedElderly", input-name="elderly", fetch-rows="vm.queryElderlyPromise", required='',fetch-columns="vm.fetchElderlyColumnsPromise", picker-title="挑选老人" on-select="vm.selectElerlyForBackFiller(row)")
                             span.text-danger(ng-show="utils.vinput(this.theForm,'elderly','autocomplete-required')") {{ "validator.REQUIRED" | translate}}
+                        .col-md-10(ng-if="vm._action_=='read' || !vm.isAddNew")
+                            .form-readable {{vm.model.elderly_name}}
+                        //- label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-ELDERLY-NAME') | translate}}:
+                        //- .col-md-10
+                        //-     div#elderly(angucomplete-alt,input-name="elderly",minlength="1",field-required="true"t-searching='{{"label.TEXT-SEARCHING"|translate}}',text-no-results='{{"label.TEXT-NO-RESULTS"|translate}}',placeholder="",pause="400",selected-object="vm.selectElerly",remote-api-handler="vm.queryElderly",title-field="name",initial-value="vm.selectedElderly",input-class="form-control form-control-small")
+                        //-     span.text-danger(ng-show="utils.vinput(this.theForm,'elderly','autocomplete-required')") {{ "validator.REQUIRED" | translate}}
                     fieldset: .form-group
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-DISEASE_EVALUATION') | translate}}:
                         .col-md-10
-                            .tree.tree-dropdown(name='disease_evaluation',s-tree,s-tree-data="vm.disease_evaluation",s-tree-height="200", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{mode:'check',layout:'dropdown',readonly:{{vm.readonly}} }",ng-model="vm.base_on",required='',ng-change='vm.genAssessmentGrade()',)
+                            .tree.tree-dropdown(name='disease_evaluation',s-tree,s-tree-data="vm.disease_evaluation",s-tree-height="200", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{mode:'check',layout:'dropdown',readonly:{{vm.readonly}} }",ng-model="vm.base_on",required='')
                             span.text-danger(ng-show="utils.vinput(this.theForm,'disease_evaluation','required')") {{ "validator.REQUIRED" | translate}}
                     fieldset: .form-group
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-SHIT') | translate}}:
@@ -70,11 +76,11 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                     fieldset: .form-group
                         .col-md-2
                         .col-md-10
-                            button.btn.btn-danger(type="button",ng-click="vm.beginAssessment()") {{'button.BEGIN-ASSESSMENT'|translate}}
+                            button.btn.btn-danger(ng-disabled="vm._action_=='read'",type="button",ng-click="vm.beginAssessment()") {{'button.BEGIN-ASSESSMENT'|translate}}
                     fieldset: .form-group
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-ASSESSMENT-GRADE') | translate}}:
                         .col-md-10
-                            input.form-control(ng-disabled="true", type='text', name='assessment_grade',ng-model='vm.assessment_grade_name',placeholder='' ,required='')
+                            input.form-control(ng-disabled="true", type='text', name='assessment_grade',ng-model='vm.model.current_nursing_assessment_grade_name',placeholder='' ,required='')
                             span.text-danger(ng-show="utils.vinput(this.theForm,'assessment_grade','required')") {{ "validator.REQUIRED" | translate}}
                     fieldset: .form-group
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-NURSING-LEVEL') | translate}}:
@@ -90,4 +96,4 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
 
     .text-right.mt-lg
         button.btn.btn-warning(type="button",ng-click="vm.cancel()") {{'button.CANCEL'|translate}}
-        button.btn.btn-success(type="submit") {{'button.SAVE'|translate}}
+        button.btn.btn-success(ng-if="vm._action_!=='read'",type="submit") {{'button.SAVE'|translate}}

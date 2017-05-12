@@ -74,6 +74,7 @@ module.exports = function(ctx,name) {
                 adl_level: {type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3008"])}
             },
             nursingLevelId: {type: mongoose.Schema.Types.ObjectId, ref: 'psn_nursingLevel'},
+            nursing_level_name:{type: String},
             nursing_info:{type: String},//nursing_assessment_grade_name-nursing_level_name
             subsidiary_ledger:{
                 self:{type: Number, default: 0.00},//自费账户
@@ -104,6 +105,8 @@ module.exports = function(ctx,name) {
             bed_monitor_timeout:{type:Number},//睡眠带超时时间
             bed_monitor_timeout_alarm_begin:{type:String,minlength: 5, maxlength: 5},//超时报警起始时间
             bed_monitor_timeout_alarm_end:{type:String,minlength: 5, maxlength: 5},//超时报警结束时间
+            last_assessment_time:{type: Date},//最近一次评估时间
+            lastAssessmentId:{type: mongoose.Schema.Types.ObjectId, required: true, ref: 'psn_assessment'},//最近一次评估
             tenantId: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'pub_tenant'}
         }, {
             toObject: {

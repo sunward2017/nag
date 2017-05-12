@@ -87,7 +87,7 @@
             if (vm.model.voice_template) {
                 var reg = /\${[^}]+}/g;
                 var arr = vm.model.voice_template.match(reg);
-                console.log('arr', arr);
+                
                 var isVerify = false;
                 for (var i = 0, len = arr.length; i < len; i++) {
 

@@ -1,12 +1,17 @@
 
 form.search-form
     .row.nursing-station-head
-        .col-md-2
+        .col-md-8
             a.btn.btn-danger.btn-md(ng-click="vm.toggleAlarmQueue()")
                 i.glyphicon(ng-class='{"glyphicon-folder-open":vm.alarmQueueVisible,"glyphicon-folder-close":!vm.alarmQueueVisible}')
                 span.pl-sm {{ vm.toggleAlarmButton | translate}}
                 span(ng-show="vm.alarmQueue.length > 0") ({{vm.alarmQueue.length}})
-        .col-md-6
+            i.fa.fa-square.img-tip.normal
+            span 在床
+            i.fa.fa-square.img-tip.alarm
+            span 不在床
+            i.fa.fa-square.img-tip.warning
+            span 离床记时中
         label.search-col.col-md-1.text-right 楼层房间
         .col-md-2
             .tree.tree-dropdown(name='floorTree',s-tree, s-tree-data="vm.floorDataPromise",s-tree-height="400", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{mode:'check',layout:'dropdown',selectNodeFormat:'object'}",ng-model="vm.floorData", on-check-change="vm.onFloorChange()")

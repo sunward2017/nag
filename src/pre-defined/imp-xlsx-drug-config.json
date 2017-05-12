@@ -1,0 +1,67 @@
+{
+  "data": {
+    "from": 2,
+    "to": 31042,
+    "colums": [
+      {
+        "src": "品牌",
+        "dest": "vender"
+      },
+      {
+        "src": "参考价",
+        "dest": "reference_price",
+        "type": "number"
+      },
+      {
+        "src": "剂型",
+        "dest": "dosage_form"
+      },
+      {
+        "src": "批准日期",
+        "dest": "audit_on",
+        "type": "date"
+      },
+      {
+        "src": "条形码",
+        "dest": "barcode",
+        "format": true
+      },
+      {
+        "src": "规格",
+        "dest": "specification"
+      },
+      {
+        "src": "治疗症状",
+        "dest": "indications_function"
+      },
+      {
+        "src": "特殊人群用药",
+        "dest": "special_individuals"
+      },
+      {
+        "src": "用法",
+        "dest": "usage"
+      },
+      {
+        "src": "有效期",
+        "dest": "validity"
+      },
+      {
+        "src": "存储",
+        "dest": "store"
+      },
+      {
+        "src": "大类",
+        "dest": "class_one"
+      },
+      {
+        "src": "二类",
+        "dest": "class_two"
+      },
+      {
+        "src": "a批准文号1",
+        "dest": "approval_no"
+      }
+    ]
+  }
+}

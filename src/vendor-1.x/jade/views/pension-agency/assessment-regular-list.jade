@@ -34,7 +34,7 @@
                                 a.btn.btn-primary.btn-xs(title="{{'button.READ'|translate}}",ng-click="vm.readLastAssessment(row._id,row.name,row.lastAssessmentId)")
                                     i.glyphicon.glyphicon-search
                             .btn-group
-                                a.btn.btn-primary.btn-xs(title="{{'button.BEGIN-ASSESSMENT'|translate}}",ng-click="vm.addRegularAssessment(row._id,row.name)")
+                                a.btn.btn-primary.btn-xs(ng-disabled="!vm.fiterTime(row.last_assessment_time)",title="{{'button.BEGIN-ASSESSMENT'|translate}}",ng-click="vm.addRegularAssessment(row._id,row.name)")
                                     i.glyphicon.glyphicon-pencil
                     tr(ng-if="vm.paged.length==0")
                         td(colspan="{{utils.noResultsColspan(vm)}}") {{ 'grid.NO-RESULTS' | translate}}

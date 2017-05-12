@@ -23,14 +23,24 @@
 
         $scope.vm = vm;
         $scope.utils = vmh.utils.g;
+        var tenantService = vm.modelNode.services['pub-tenant'];
+        var today = moment().format('YYYY MM DD');
+        var todayMoment = moment(today,'YYYY MM DD');
+        var assessmentDay;
+        var assessmentExpireDay;
+        var assessmentExpireMoment;
 
         init();
 
         function init() {
             vm.init({removeDialog: ngDialog});
+            vmh.fetch(tenantService.query({_id: vm.tenantId})).then(function(results){
+                vm.assessment_regular_period = results[0].other_config.pub_assessment_regular_period;
+            });
             vm.query();
             vm.addRegularAssessment = addRegularAssessment;
             vm.readLastAssessment = readLastAssessment;
+            vm.fiterTime = fiterTime;
             vm.addNew = addNew;
         }
 
@@ -55,6 +65,13 @@
             globalElderlyId = '';
             globalElderlyName = '';
             vm.add();
+        }
+
+        function fiterTime(last_assessment_time){
+            assessmentDay = moment(last_assessment_time,'YYYY MM DD');
+            assessmentExpireDay = moment(assessmentDay,'YYYY MM DD').add(vm.assessment_regular_period,'M').format('YYYY MM DD');
+            assessmentExpireMoment = moment(assessmentExpireDay,'YYYY MM DD');
+            return todayMoment.isAfter(assessmentExpireMoment);
         }
     }
 
@@ -183,13 +200,6 @@
                         });       
 
             vm.load().then(function(){
-                // if(vm.model.elderlyId){
-                //     vm.selectedElderly = {_id: vm.model.elderlyId, name: vm.model.elderly_name};
-                // }else{
-                //     if(globalElderlyId && globalElderlyName) vm.selectedElderly = {_id: globalElderlyId, name: globalElderlyName};
-                // }
-
-                console.log('isAddNew:'+globalIsAddNew);
 
                 if(globalElderlyId && globalElderlyName){
                     // vm.selectedElderly = {_id: globalElderlyId, name: globalElderlyName};

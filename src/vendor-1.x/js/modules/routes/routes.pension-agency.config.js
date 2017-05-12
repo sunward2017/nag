@@ -545,19 +545,6 @@
                             width: 60,
                             sortable: true
                         },{
-                            label: '病情级别',
-                            name: 'current_disease_evaluation.level',
-                            type: 'string',
-                            width: 60,
-                            sortable: true,
-                            formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D3021/object'),
-                        },{
-                            label: '活动能力总分',
-                            name: 'current_adl.score',
-                            type: 'string',
-                            width: 60,
-                            sortable: true
-                        },{
                             label: '评估等级',
                             name: 'current_nursing_assessment_grade',
                             type: 'string',
@@ -632,6 +619,19 @@
                             label: '上次评估时间',
                             name: 'last_assessment_time',
                             sortable: false,
+                            width: 60,
+                            sortable: true
+                        },{
+                            label: '评估等级',
+                            name: 'nursing_assessment_grade_name',
+                            type: 'string',
+                            width: 60,
+                            sortable: true,
+                            formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D3015/object'),
+                        },{
+                            label: '照护级别',
+                            name: 'nursing_level_name',
+                            type: 'string',
                             width: 60,
                             sortable: true
                         },{

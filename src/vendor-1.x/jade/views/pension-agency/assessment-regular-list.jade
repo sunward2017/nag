@@ -27,6 +27,8 @@
                                     span.fa.fa-check(data="trBubble")
                         td.text-left {{::row.name}}
                         td.text-left {{::row.last_assessment_time|date:'yyyy-MM-dd HH:mm'}}
+                        td.text-left {{::row.nursing_assessment_grade_name}}
+                        td.text-left {{::row.nursing_level_name}}
                         td
                             .btn-group
                                 a.btn.btn-primary.btn-xs(title="{{'button.READ'|translate}}",ng-click="vm.readLastAssessment(row._id,row.name,row.lastAssessmentId)")

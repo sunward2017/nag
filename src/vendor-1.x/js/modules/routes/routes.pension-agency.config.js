@@ -570,6 +570,11 @@
                             type: 'string',
                             width: 60,
                             sortable: true
+                        },{
+                            label: '',
+                            name: 'actions',
+                            sortable: false,
+                            width: 30
                         }]
                     })
                 }
@@ -622,11 +627,13 @@
                             type: 'string',
                             width: 60,
                             sortable: true
+                            
                         },{
                             label: '上次评估时间',
                             name: 'last_assessment_time',
                             sortable: false,
-                            width: 60
+                            width: 60,
+                            sortable: true
                         },{
                             label: '',
                             name: 'actions',

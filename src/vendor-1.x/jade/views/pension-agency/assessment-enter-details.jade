@@ -76,7 +76,7 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                     fieldset: .form-group
                         .col-md-2
                         .col-md-10
-                            button.btn.btn-danger(type="button",ng-click="vm.beginAssessment()") {{'button.BEGIN-ASSESSMENT'|translate}}
+                            button.btn.btn-danger(ng-disabled="vm._action_=='read'",type="button",ng-click="vm.beginAssessment()") {{'button.BEGIN-ASSESSMENT'|translate}}
                     fieldset: .form-group
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-ASSESSMENT-GRADE') | translate}}:
                         .col-md-10
@@ -96,4 +96,4 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
 
     .text-right.mt-lg
         button.btn.btn-warning(type="button",ng-click="vm.cancel()") {{'button.CANCEL'|translate}}
-        button.btn.btn-success(type="submit") {{'button.SAVE'|translate}}
+        button.btn.btn-success(ng-if="vm._action_!=='read'",type="submit") {{'button.SAVE'|translate}}

@@ -148,7 +148,21 @@
                             return res;
                         });       
 
-            vm.load();
+            vm.load().then(function(){
+                if(vm._action_ == 'read' || vm._action_ == 'edit'){
+                    vm.base_on = vm.model.current_disease_evaluation.base_on;
+                    vm.adl_shit = vm.model.current_adl.base_on[0].standard;
+                    vm.adl_pee = vm.model.current_adl.base_on[1].standard;
+                    vm.adl_decorator = vm.model.current_adl.base_on[2].standard;
+                    vm.adl_wc = vm.model.current_adl.base_on[3].standard;
+                    vm.adl_eat = vm.model.current_adl.base_on[4].standard;
+                    vm.adl_transfer = vm.model.current_adl.base_on[5].standard;
+                    vm.adl_activity = vm.model.current_adl.base_on[6].standard;
+                    vm.adl_dress = vm.model.current_adl.base_on[7].standard;
+                    vm.adl_stairs = vm.model.current_adl.base_on[8].standard;
+                    vm.adl_bath = vm.model.current_adl.base_on[9].standard;
+                }
+            });
 
         }
 

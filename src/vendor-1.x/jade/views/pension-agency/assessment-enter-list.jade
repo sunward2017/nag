@@ -32,6 +32,13 @@
                         td.text-left {{::row.current_adl.score}}
                         td.text-left {{::row.current_nursing_assessment_grade|formatter:'current_nursing_assessment_grade':vm.columns}}
                         td.text-left {{::row.current_nursing_level_name}}
+                        td
+                            .btn-group
+                                a.btn.btn-primary.btn-xs(title="{{'button.READ'|translate}}",ng-click="vm.read(row._id)")
+                                    i.glyphicon.glyphicon-search
+                            .btn-group
+                                a.btn.btn-primary.btn-xs(title="{{'button.EDIT'|translate}}",ng-click="vm.edit(row._id)")
+                                    i.glyphicon.glyphicon-pencil
                     tr(ng-if="vm.paged.length==0")
                         td(colspan="{{utils.noResultsColspan(vm)}}") {{ 'grid.NO-RESULTS' | translate}}
             .panel-footer

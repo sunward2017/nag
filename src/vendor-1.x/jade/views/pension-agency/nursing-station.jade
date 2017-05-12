@@ -24,7 +24,7 @@ form.search-form
     .col-md-12.monitor-objects(block-ui="nursing-station")
         .elderly(ng-repeat="elderly in vm.elderlys")
             .online-offline
-                span.fa(ng-class='{"fa-plug online": vm.elderlyStatusMonitor[elderly.id].status && vm.elderlyStatusMonitor[elderly.id].status != "offline", "fa-unlink offline": vm.elderlyStatusMonitor[elderly.id].status == "offline"}')
+                span.fa(ng-class='{"fa-plug online": vm.elderlyStatusMonitor[elderly.id].status && vm.elderlyStatusMonitor[elderly.id].status != "offline", "fa-plug offline": vm.elderlyStatusMonitor[elderly.id].status == "offline"}')
             span.nursing-level {{elderly.nursingLevelId.short_name}}
             .avatar(ng-click="vm.openElderlyDialog(elderly)")
                 .avatar-block

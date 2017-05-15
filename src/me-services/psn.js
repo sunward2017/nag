@@ -336,8 +336,81 @@ module.exports = {
                         yield next;
                     }
                 }
-            }
+            }, {
+                method: 'drug$directory$fetch',
+                verb: 'post',
+                url: this.service_url_prefix + "/drug/directory/fetch",
+                handler: function(app, options) {
+                    return function*(next) {
+                        try {
+                            var tenantId = this.request.body.tenantId;
+                            var keyword = this.request.body.keyword;
+                            var data = this.request.body.data;
 
+                            app._.extend(data.where, {
+                                status: 1,
+                                tenantId: tenantId
+                            });
+
+                            if (keyword) {
+                                data.where.full_name = new RegExp(keyword);
+                            }
+                            var rows;
+                            var psnDrugs = yield app.modelFactory().model_query(app.models['psn_drugDirectory'], data);
+                            if(!psnDrugs||psnDrugs.status==0){
+                                var  pubDrugs = yield app.modelFactory().model_query(app.models['pub_drug'], data);
+                                if(pubDrugs){
+                                      pubDrugs_json = pubDrugs.toOject(); 
+                                      yield app.modelFactory().model_create(app.models['psn_drugDirectory'],{
+                                            barcode: pubDrugs_json.barcode, //条形码 added by zppro 2017.5.12
+                                            drug_no: pubDrugs_json.approval_no,// 药品编码
+                                            full_name: pubDrugs_json.name,
+                                            short_name: pubDrugs_json.short_name,
+                                            alias: pubDrugs_json.alias,
+                                            english_name: pubDrugs_json.english_name,
+                                            indications_function: pubDrugs_json.indications_function,//药品功能主治（适用症）
+                                            otc_flag: pubDrugs_json.otc_flag,
+                                            health_care_flag: pubDrugs_json.medical_insurance_flag ,
+                                            usage: pubDrugs_json.usage,
+                                            price: pubDrugs_json.reference_price,
+                                            specification: pubDrugs.specification,//药品规格
+                                            vender: pubDrugs_json.vender,//厂家 added by zppro 2017.5.12
+                                            dosage_form: pubDrugs_json.dosage_form, //剂型 added by zppro 2017.5.12
+                                            special_individuals: pubDrugs_json.special_individuals, //特殊人群用药 added by zppro 2017.5.12
+                                            drugSourceId: pubDrugs_json.id ,//关联公共的药品库
+                                            tenantId:tenantId //关联机构   
+                                         });
+                                   rows = yield app.modelFactory().model_query(app.models['psn_drugDirectory'], data);            
+                                }
+                            }else{
+                                rows = psnDrugs;
+                            }
+                            this.body = app.wrapper.res.rows(rows); 
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    }
+                } 
+            }, {
+                 method: 'drug$inStock$save',
+                verb: 'post',
+                url: this.service_url_prefix + "/drug/inStock/save",
+                handler: function(app, options) {
+                    return function*(next) {
+                        try {
+                            var data = this.request.body.data;
+                            yield app.modelFactory().model_create(app.models['psn_drugDirectory'],data); 
+                            this.body = app.wrapper.default(); 
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    }
+                }  
+            }
         ];
 
         return this;

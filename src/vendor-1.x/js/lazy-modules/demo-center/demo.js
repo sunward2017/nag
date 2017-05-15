@@ -729,11 +729,10 @@
         }
     }
 
-    BackfillerDemoPickDialogController.$inject = ['$scope', 'RouteHelpers'];
+    BackfillerDemoPickDialogController.$inject = ['$scope', 'vmh'];
 
-    function BackfillerDemoPickDialogController ($scope, helper) {
+    function BackfillerDemoPickDialogController ($scope, vmh) {
         var vm = $scope.vm = {};
-        var vmh = $scope.vmh = helper.buildVMHelper();
 
         init();
 

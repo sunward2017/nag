@@ -10,8 +10,8 @@
         .directive('backfiller', backfiller)
     ;
 
-    backfiller.$inject = ['$q', '$timeout', 'ngDialog'];
-    function backfiller($q, $timeout, ngDialog) {
+    backfiller.$inject = ['$q', '$timeout', 'ngDialog', 'RouteHelpers'];
+    function backfiller($q, $timeout, ngDialog, helper) {
 
 
         var directive = {
@@ -95,6 +95,9 @@
                         translatePath: function (key) {
                             return pickerUrl + '.' + key;
                         }
+                    },
+                    resolve: {
+                        vmh: helper.buildVMHelper()
                     }
                 }).closePromise.then(function (ret) {
                     if(ret.value!='$document' && ret.value!='$closeButton' && ret.value!='$escape' ) {

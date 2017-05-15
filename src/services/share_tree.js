@@ -4,6 +4,7 @@
  */
 
 var statHelper = require('rfcore').factory('statHelper');
+var path = require('path');
 
 module.exports = {
     init: function (option) {
@@ -68,6 +69,28 @@ module.exports = {
                                 rows.push({_id: d.day(), name: d.format(f).replace(/周7/, '周日'), value: d.format(dateFormat)});
                             }
                             console.log(rows);
+                            this.body = app.wrapper.res.rows(rows);
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
+            {
+                method: 'fetch-T0200',//文件目录
+                verb: 'post',
+                url: this.service_url_prefix + "/T0200",
+                handler: function (app, options) {
+                    return function *(next) {
+                        try {
+                            var dir = this.request.body.where.dir || '';
+                            var exts = this.request.body.where.exts; // 必须带.比如 ['.xls','.xlsx']
+                            var target_dir = path.join(app.conf.dir.rawData, dir);
+                            console.log('target_dir:', target_dir);
+                            var rows = yield app.util.readDirectoryStructure(target_dir, exts, {format: 'tree'});
+                            console.log('structure:', rows);
                             this.body = app.wrapper.res.rows(rows);
                         } catch (e) {
                             self.logger.error(e.message);

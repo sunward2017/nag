@@ -34,6 +34,7 @@ app.conf = {
     isProduction: true,
     dir: {
         root: __dirname,
+        rawData: path.join(__dirname, 'raw-data'),
         log: path.join(__dirname, 'logs'),
         service: path.join(__dirname, 'services'),
         meServices: path.join(__dirname, 'me-services'),
@@ -232,7 +233,7 @@ co(function*() {
     mongoose.Promise = global.Promise;
 
     console.log('configure models...');
-    app.modelsDirStructure = yield app.util.readDictionaryStructure(path.resolve('models'), '.js');
+    app.modelsDirStructure = yield app.util.readDirectoryStructure(path.resolve('models'), '.js');
     var ModelFactory = require('./libs/ModelFactory');
     ModelFactory.loadModel.bind(app)(app.modelsDirStructure);
     app.models = ModelFactory.models;

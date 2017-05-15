@@ -2,6 +2,9 @@
  * Created by zppro on 16-8-28.
  * 参考字典D1003-预定义树
  */
+var path = require('path');
+var xlsx = require('node-xlsx').default;
+var importDrugConfig = require('../pre-defined/imp-xlsx-drug-config.json');
 
 module.exports = {
     init: function (option) {
@@ -531,6 +534,43 @@ module.exports = {
                             newUpdateHistory.ver_order = self.genVerOrder(newUpdateHistory.ver);
                             yield app.modelFactory().model_create(app.models['pub_appClientSideUpdateHistory'], newUpdateHistory);
 
+                            this.body = app.wrapper.res.default();
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
+            /******************数据管理*********************************/
+            {
+                method: 'importDrug',//管理中心将复制一条客户端升级记录，并增加一位版本号
+                verb: 'post',
+                url: this.service_url_prefix + "/importDrug",
+                handler: function (app, options) {
+                    return function * (next) {
+                        try {
+                            var file_name = this.request.body.file_name;
+                            console.log(this.request.body);
+                            var file = path.join(app.conf.dir.rawData , file_name);
+                            console.log(file);
+                            var worksheets = xlsx.parse(file);
+                            var sheetConfig;
+                            for(var i=0,len = worksheets.length, worksheet = worksheets[i];i<len;i++) {
+                                //读取导入配置
+                                for(var key in importDrugConfig){
+                                    if(key == worksheet.name) {
+                                        sheetConfig = importDrugConfig[key];
+                                        console.log('importDrugConfig:', key, importDrugConfig[key]);
+                                        for (var rowIndex = sheetConfig.from, rowLen = sheetConfig.to+1; rowIndex < rowLen; rowIndex++) {
+                                            if (worksheet.data[rowIndex].length > 0) {
+                                                console.log('row:', rowIndex, worksheet.data[rowIndex]);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                             this.body = app.wrapper.res.default();
                         } catch (e) {
                             self.logger.error(e.message);

@@ -622,14 +622,14 @@
                             width: 60,
                             sortable: true
                         },{
-                            label: '评估等级',
+                            label: '上次评估等级',
                             name: 'nursing_assessment_grade_name',
                             type: 'string',
                             width: 60,
                             sortable: true,
                             formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D3015/object'),
                         },{
-                            label: '照护级别',
+                            label: '上次照护级别',
                             name: 'nursing_level_name',
                             type: 'string',
                             width: 60,

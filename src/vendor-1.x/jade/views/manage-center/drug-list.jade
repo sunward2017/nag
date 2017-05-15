@@ -1,3 +1,5 @@
+// create zhangsx on 17-3-22 
+ 
 .col-xs-12.text-center
     .row
         form.form-search
@@ -25,17 +27,17 @@
                                 label
                                     input(type='checkbox' data="trBubble" ng-model="row.checked" )
                                     span.fa.fa-check(data="trBubble")
-                        td.text-left {{::row.name}}
-                        td.text-left {{::row.last_assessment_time|date:'yyyy-MM-dd HH:mm'}}
-                        td.text-left {{::row.nursing_assessment_grade_name}}
-                        td.text-left {{::row.nursing_level_name}}
+                        td.text-center {{::row.barcode}}
+                        td.text-center {{::row.name}}
+                        td {{::row.otc_flag|boolFilter}}
+                        td {{::row.medical_insurance_flag|boolFilter}}
+                        td {{::row.reference_price | currency}}
+                        td {{::row.specification}}
                         td
                             .btn-group
-                                a.btn.btn-primary.btn-xs(title="{{'button.READ'|translate}}",ng-click="vm.readLastAssessment(row._id,row.name,row.lastAssessmentId)")
-                                    i.glyphicon.glyphicon-search
-                            .btn-group
-                                a.btn.btn-primary.btn-xs(ng-disabled="!vm.fiterTime(row.last_assessment_time)",title="{{'button.BEGIN-ASSESSMENT'|translate}}",ng-click="vm.addRegularAssessment(row._id,row.name)")
+                                a.btn.btn-primary.btn-xs(title="{{'button.EDIT'|translate}}",ng-click="vm.edit(row._id)")
                                     i.glyphicon.glyphicon-pencil
+
                     tr(ng-if="vm.paged.length==0")
                         td(colspan="{{utils.noResultsColspan(vm)}}") {{ 'grid.NO-RESULTS' | translate}}
             .panel-footer
@@ -43,7 +45,9 @@
                     .col-md-4.text-left
                         .btn-toolbar
                             .btn-group
-                                a.btn.btn-primary.btn-sm(title="{{'button.ADD'|translate}}",ng-click="vm.addNew()")
+                                a.btn.btn-primary.btn-sm(title="{{'button.ADD'|translate}}",ng-click="vm.add()")
                                     i.glyphicon.glyphicon-plus
+                                a.btn.btn-primary.btn-sm(title="{{'button.REMOVE'|translate}}",ng-click="vm.remove()")
+                                    i.glyphicon.glyphicon-minus
                     .col-md-8
                         pagination.pagination-sm.pull-right(total-items="vm.page.totals",ng-model="vm.page.no",max-size="5",items-per-page="vm.page.size",boundary-links="true" ,ng-change="vm.paging()")

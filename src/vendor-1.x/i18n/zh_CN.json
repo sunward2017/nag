@@ -274,6 +274,9 @@
       "APP-CLIENTSIDE-UPDATE": "app更新",
       "DEVICE-ACCESS": "访问设备",
       "------------": "",
+      "DATA-MANAGE": "数据管理",
+      "DRUG": "药品",
+      "------------": "",
       "METADATA-MANAGE": "元数据管理",
       "DICTIONARY-MANAGE": "字典管理",
       "PARAM": "系统参数"

@@ -1400,6 +1400,88 @@
                     })
                 }
             })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.MANAGE_CENTER + 'drug', {
+                url: '/drug',
+                title: '药品',
+                abstract: true,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath(MODEL_VARIABLES.HEAD_TEMPLATES.MANAGE_CENTER),
+                        controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div>'
+                    }
+                },
+                resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.MANAGE_CENTER + 'drug.js')
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.MANAGE_CENTER + 'drug.list', {
+                url: '/list/:action',
+                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.MANAGE_CENTER + 'drug-list.html'),
+                access_level: AUTH_ACCESS_LEVELS.ADMIN,
+                controller: 'DrugGridController',
+                resolve: {
+                    entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.MANAGE_CENTER + 'drug.list', {
+                        modelName: 'pub-drug',
+                        searchForm: { "status": 1 },
+                        serverPaging: true,
+                        columns: [{
+                            label: '条形码',
+                            name: 'barcode',
+                            type: 'string',
+                            width: 100,
+                            sortable: true
+                        }, {
+                            label: '药品名称',
+                            name: 'name',
+                            type: 'string',
+                            width: 100,
+                            sortable: true
+                        }, {
+                            label: '处方药',
+                            name: 'otc_flag',
+                            type: 'bool',
+                            width: 40,
+                            sortable: true
+                        }, {
+                            label: '医保',
+                            name: 'medical_insurance_flag',
+                            type: 'bool',
+                            width: 40,
+                            sortable: true
+                        }, {
+                            label: '参考价',
+                            name: 'reference_price',
+                            type: 'number',
+                            width: 50,
+                            sortable: true
+                        }, {
+                            label: '规格',
+                            name: 'specification',
+                            type: 'string',
+                            width: 120,
+                            sortable: true
+                        }, {
+                            label: '操作',
+                            name: 'actions',
+                            sortable: false,
+                            width: 40
+                        }]
+                    })
+                }
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.MANAGE_CENTER + 'drug.details', {
+                url: '/details/:action/:_id',
+                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.MANAGE_CENTER + 'drug-details.html'),
+                controller: 'DrugDetailsController',
+                access_level: AUTH_ACCESS_LEVELS.ADMIN,
+                resolve: {
+                    entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.MANAGE_CENTER + 'drug.details', {
+                        modelName: 'pub-drug',
+                        blockUI: true
+                    })
+                }
+            })
             .state('app.manage-center.metadata-dictionary-manage', {
                 url: '/metadata-dictionary-manage',
                 title: '字典管理',

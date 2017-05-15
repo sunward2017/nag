@@ -100,5 +100,18 @@
         "sref": "app.manage-center.device-access.list"
       }
     ]
+  },
+  {
+    "_id": "menu.manage-center.DATA-MANAGE",
+    "name": "数据管理",
+    "sref": "#",
+    "icon": "icon-folder",
+    "children": [
+      {
+        "_id": "menu.manage-center.DRUG",
+        "name": "药品",
+        "sref": "app.manage-center.drug.list"
+      }
+    ]
   }
 ]

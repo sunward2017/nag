@@ -1,0 +1,122 @@
+form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="vm.doSubmit()")
+    .panel
+        tabset(justified="true")
+            tab(active="vm.tab1.active")
+                tab-heading
+                    | {{ vm.viewTranslatePath('TAB1') | translate}}
+                    span.text-danger(title="{{'validator.FIELD-INVALID'|translate}}" , ng-show="utils.vtab('contentTab1')")
+                        i.glyphicon.glyphicon-minus-sign
+                div#contentTab1
+                    fieldset: .form-group
+                        <!--条形码-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-BARCODE') | translate}}:
+                        .col-md-10
+                            input.form-control(type='number', name='barcode',ng-model='vm.model.barcode', placeholder='{{ vm.viewTranslatePath("TAB1-PLACEHOLDER-BARCODE") | translate}}' ,required='', minlength="13", maxlength="13")
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'barcode','required')") {{ "validator.REQUIRED" | translate}}
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'barcode','number')") {{ "validator.NUMBER" | translate}}
+                    fieldset: .form-group
+                        <!--名称-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-NAME') | translate}}:
+                        .col-md-10
+                            input.form-control(type='text', name='name',ng-model='vm.model.name',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-NAME")|translate}}' ,required='')
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'name','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset: .form-group
+                        <!--参考价-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-REFERENCE_PRICE') | translate}}:
+                        .col-md-10
+                            input.form-control(type='number', name='reference_price',ng-model='vm.model.reference_price',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-REFERENCE_PRICE")|translate}}'  )
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'reference_price','number')") {{ "validator.NUMBER" | translate}}
+                    fieldset: .form-group
+                        <!--厂家-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-VENDER') | translate}}:
+                        .col-md-10
+                            input.form-control(type='text', name='vender',ng-model='vm.model.vender',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-VENDER")|translate}}' )
+                    fieldset: .form-group
+                        <!--剂型-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-DOSAGE_FORM') | translate}}:
+                        .col-md-10
+                            input.form-control(type='text', name='dosage_form',ng-model='vm.model.dosage_form',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-DOSAGE_FORM")|translate}}' )
+                    fieldset: .form-group
+                        <!--批准日期-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-AUDIT_ON') | translate}}:
+                        .col-md-10
+                            .input-group
+                                input.form-control(type="text",name='audit_on',is-open="vm.openedDP",datepicker-popup="",ng-model="vm.model.audit_on" ,ng-click="vm.openDP($event)")
+                                span.input-group-btn
+                                    button.btn.btn-primary(ng-click="vm.openDP($event)")
+                                        i.glyphicon.glyphicon-calendar
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'audit_on','date')") {{ "validator.DATE" | translate}}
+                    fieldset: .form-group
+                        <!--批准文号-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-APPROVAL_NO') | translate}}:
+                        .col-md-10
+                            input.form-control(type='text', name='approval_no',ng-model='vm.model.approval_no',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-APPROVAL_NO")|translate}}' )
+                    fieldset: .form-group
+                        <!--简称-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-SHORT_NAME') | translate}}:
+                        .col-md-10
+                            input.form-control(type='text', name='short_name',ng-model='vm.model.short_name',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-SHORT_NAME")|translate}}' )
+                    fieldset: .form-group
+                        <!--别名-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-ALIAS') | translate}}:
+                        .col-md-10
+                            input.form-control(type='text', name='alias',ng-model='vm.model.alias',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-ALIAS")|translate}}')
+                    fieldset: .form-group
+                        <!--英文名称-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-ENGLISH_NAME') | translate}}:
+                        .col-md-10
+                            input.form-control(type='text', name='english_name',ng-model='vm.model.english_name',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-ENGLISH_NAME")|translate}}' )
+                    fieldset: .form-group
+                        <!--药品规格-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-SPECIFICATION') | translate}}:
+                        .col-md-10
+                            textarea.form-control(name='specification',ng-model='vm.model.specification' maxlength="400")
+                    fieldset: .form-group
+                        <!--用法-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-USAGE') | translate}}:
+                        .col-md-10
+                            textarea.form-control(name='usage',ng-model='vm.model.usage' maxlength="400")
+                    fieldset: .form-group
+                        <!--药品功能主治-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-INDICTIONS_FUNCTION') | translate}}:
+                        .col-md-10
+                            textarea.form-control(name='indications_function',ng-model='vm.model.indications_function' maxlength="400")
+                    fieldset: .form-group
+                        <!--特殊人群用药-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-SPECIAL_INDIVIDUALS') | translate}}:
+                        .col-md-10
+                            textarea.form-control(name='special_individuals',ng-model='vm.model.special_individuals' maxlength="400")
+                    fieldset: .form-group
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-FLAG-COLLECTION') | translate}}:
+                        .col-md-2
+                            <!--otc标志-->
+                            .checkbox.c-checkbox
+                                label
+                                    input#otcFlag(type='checkbox',ng-model='vm.model.otc_flag')
+                                    span.fa.fa-check
+                            label(for="otcFlag") {{ vm.viewTranslatePath('TAB1-LABEL-OTC_FLAG') | translate}}
+                        .col-md-2
+                            <!--医保-->
+                            .checkbox.c-checkbox
+                                label
+                                    input#medicalInsuranceFlag(type='checkbox',ng-model='vm.model.medical_insurance_flag')
+                                    span.fa.fa-check
+                            label(for="medicalInsuranceFlag") {{ vm.viewTranslatePath('TAB1-LABEL-MEDICAL_INSURANCE_FLAG') | translate}}
+                    fieldset: .form-group
+                        <!--存储-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-STORE') | translate}}:
+                        .col-md-10
+                            input.form-control(type='text', name='store',ng-model='vm.model.store',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-STORE")|translate}}')
+                    fieldset: .form-group
+                        <!--大类-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-CLASS_ONE') | translate}}:
+                        .col-md-10
+                            input.form-control(type='text', name='class_one',ng-model='vm.model.class_one',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-CLASS_ONE")|translate}}' )
+                    fieldset: .form-group
+                        <!--二类-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-CLASS_TWO') | translate}}:
+                        .col-md-10
+                            input.form-control(type='text', name='class_two',ng-model='vm.model.class_two',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-CLASS_TWO")|translate}}')
+    .text-right.mt-lg
+        button.btn.btn-warning(type="button",ng-click="vm.cancel()") {{'button.CANCEL'|translate}}
+        button.btn.btn-success(type="submit") {{'button.SAVE'|translate}}

@@ -8,6 +8,13 @@
     "html": {
       "DLG-FETCH-DATA-GRID-TITLE": "演示数据"
     }
+  },
+  "dlg-drug-import-file-pick":{
+    "html": {
+      "TITLE": "药品导入对话框",
+      "MSG-NO-FILE-SELECTED": "没有选中任何文件",
+      "LOADING-TEXT-IMPORTING-DRUG": "正在导入药品.."
+    }
   }
 }
 

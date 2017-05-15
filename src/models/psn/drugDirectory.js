@@ -31,6 +31,7 @@ module.exports = function(ctx,name) {
             vender:{type: String},//厂家 added by zppro 2017.5.12
             dosage_form:{type: String}, //剂型 added by zppro 2017.5.12
             special_individuals:{type: String}, //特殊人群用药 added by zppro 2017.5.12
+            drugSourceId: {type: mongoose.Schema.Types.ObjectId,ref:'pub_drug'},//关联公共的药品库
             tenantId: {type: mongoose.Schema.Types.ObjectId,required: true,ref:'pub_tenant'}//关联机构
         }, {
             toObject: {

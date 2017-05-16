@@ -1480,22 +1480,10 @@
                             width: 80,
                             sortable: true
                         }, {
-                            label: '全称',
+                            label: '药品全称',
                             name: 'full_name',
                             type: 'string',
                             width: 100,
-                            sortable: true
-                        }, {
-                            label: '简称',
-                            name: 'short_name',
-                            type: 'string',
-                            width: 60,
-                            sortable: true
-                        }, {
-                            label: '别名',
-                            name: 'alias',
-                            type: 'string',
-                            width: 60,
                             sortable: true
                         }, {
                             label: '处方药',

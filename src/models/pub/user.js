@@ -28,7 +28,7 @@ module.exports = function(ctx,name) {
             system_flag: {type: Boolean, default: false},
             stop_flag: {type: Boolean, default: false},//开通标志 租户是否可用
             password_hash: String,
-            tenantId: {type: mongoose.Schema.Types.ObjectId}
+            tenantId: {type: mongoose.Schema.Types.ObjectId, required: true,ref:'pub_tenant'}
         });
 
         userSchema.pre('update', function (next) {

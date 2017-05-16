@@ -108,54 +108,87 @@ module.exports = {
                 }
             }
         }, {
+            method: 'drug$directory$fetch',
+            verb: 'post',
+            url: this.service_url_prefix + "/drug/directory/fetch",
+            handler: function (app, options) {
+                return function* (next) {
+                    try {
+                        var tenantId = this.request.body.tenantId;
+                        var barcode = this.request.body.barcode;
+
+                        // console.log("body", this.request.body);
+
+                        var psnDrug = yield app.modelFactory().model_one(app.models['psn_drugDirectory'], {
+                            where: {
+                                status: 1,
+                                tenantId: tenantId,
+                                barcode: barcode
+                            }
+                        });
+                        // console.log("psnDrug", psnDrug);
+                        if (!psnDrug) {
+                            var pubDrug_json = yield app.modelFactory().model_one(app.models['pub_drug'], { where: { barcode: barcode } });
+                            if (pubDrug_json) {
+                                var rows = {
+                                    local_flag: false,
+                                    barcode: pubDrug_json.barcode, //条形码 added by zppro 2017.5.12
+                                    drug_no: pubDrug_json.approval_no,// 药品编码
+                                    full_name: pubDrug_json.name,
+                                    short_name: pubDrug_json.short_name,
+                                    alias: pubDrug_json.alias,
+                                    english_name: pubDrug_json.english_name,
+                                    indications_function: pubDrug_json.indications_function,//药品功能主治（适用症）
+                                    otc_flag: pubDrug_json.otc_flag,
+                                    health_care_flag: pubDrug_json.medical_insurance_flag,
+                                    usage: pubDrug_json.usage,
+                                    price: pubDrug_json.reference_price,
+                                    specification: pubDrug_json.specification,//药品规格
+                                    vender: pubDrug_json.vender,//厂家 added by zppro 2017.5.12
+                                    dosage_form: pubDrug_json.dosage_form, //剂型 added by zppro 2017.5.12
+                                    special_individuals: pubDrug_json.special_individuals, //特殊人群用药 added by zppro 2017.5.12
+                                    drugSourceId: pubDrug_json.id,//关联公共的药品库
+                                    tenantId: tenantId //关联机构   
+                                };
+                                // console.log("<<<<<<<", rows)
+                                this.body = app.wrapper.res.rows(rows);
+                            } else {
+                                this.body = app.wrapper.res.default();
+                            }
+                        } else {
+                            psnDrug.local_flag = true;
+                            this.body = app.wrapper.res.rows(psnDrug);
+                        }
+
+                    } catch (e) {
+                        self.logger.error(e.message);
+                        this.body = app.wrapper.res.error(e);
+                    }
+                    yield next;
+                }
+            }
+        }, {
             method: 'drug$directory$save',
             verb: 'post',
             url: this.service_url_prefix + "/drug/directory/save",
             handler: function (app, options) {
                 return function* (next) {
                     try {
-                        var tenantId = this.request.body.tenantId;
-                        var barcode = this.request.body.barcode;
-                        var data = {
-                            status: 1,
-                            tenantId: tenantId,
-                            barcode: barcode
+                        console.log("request", this.request.body);
+                        if (!this.request.body.local_flag) {
+                            yield app.modelFactory().model_create(app.models['psn_drugDirectory'], this.request.body);
                         };
-
-                        var psnDrugs = yield app.modelFactory().model_query(app.models['psn_drugDirectory'], { where: data });
-                        if (!psnDrugs || psnDrugs.status == 0) {
-                            var pubDrugs = yield app.modelFactory().model_read(app.models['pub_drug'], barcode);
-                            if (pubDrugs) {
-                                pubDrugs_json = pubDrugs.toOject();
-                                yield app.modelFactory().model_create(app.models['psn_drugDirectory'], {
-                                    barcode: pubDrugs_json.barcode, //条形码 added by zppro 2017.5.12
-                                    drug_no: pubDrugs_json.approval_no,// 药品编码
-                                    full_name: pubDrugs_json.name,
-                                    short_name: pubDrugs_json.short_name,
-                                    alias: pubDrugs_json.alias,
-                                    english_name: pubDrugs_json.english_name,
-                                    indications_function: pubDrugs_json.indications_function,//药品功能主治（适用症）
-                                    otc_flag: pubDrugs_json.otc_flag,
-                                    health_care_flag: pubDrugs_json.medical_insurance_flag,
-                                    usage: pubDrugs_json.usage,
-                                    price: pubDrugs_json.reference_price,
-                                    specification: pubDrugs.specification,//药品规格
-                                    vender: pubDrugs_json.vender,//厂家 added by zppro 2017.5.12
-                                    dosage_form: pubDrugs_json.dosage_form, //剂型 added by zppro 2017.5.12
-                                    special_individuals: pubDrugs_json.special_individuals, //特殊人群用药 added by zppro 2017.5.12
-                                    drugSourceId: pubDrugs_json.id,//关联公共的药品库
-                                    tenantId: tenantId //关联机构   
-                                });
-                            } else {
-                                yield app.modelFactory().model_create(app.models['psn_drugDirectory'], {
-                                    barcode: barcode,
-                                    tenantId: tenantId
-                                })
+                        var img = this.request.body.img;
+                        if (img) {
+                            var barcode = this.request.body.barcode;
+                            var pubDrug = yield app.modelFactory().model_one(app.models['pub_drug'], {
+                                where: { barcode: barcode }
+                            });
+                            if (!pubDrug.img) {
+                                pubDrug.img = img;
+                                pugDrug.save();
                             }
-                        } else {
-                            this.body = app.wrapper.res.error({ message: '该药品已存在' });
-                            yield next;
-                            return;
+
                         }
                         this.body = app.wrapper.res.default();
                     } catch (e) {
@@ -166,27 +199,29 @@ module.exports = {
                 }
             }
         }, {
-            method: 'user$certification$fetch',
+            method: 'user$auth',
             verb: 'post',
-            url: this.service_url_prefix + "/user/certification/fetch",
+            url: this.service_url_prefix + "/user/auth",
             handler: function (app, options) {
                 return function* (next) {
                     try {
-                        var data = this.request.body.data;
-                        console.log(data);
-                        var user = yield app.modelFactory().model_query(app.models['pub_user'], {
-                            select: "code name",
-                            where: data
-                        }).populate("tenantId", "_id name");
+                        // console.log("request", this.request.body);
+                        var user = yield app.modelFactory().model_one(app.models['pub_user'], {
+                            select: "code name tenantId",
+                            where: this.request.body
+                        })
 
-                        console.log("<<<<<user<<<<<", user);
+                        // console.log("<<<<<user<<<<<", user);
 
                         if (!user || user.status == 0) {
                             this.body = app.wrapper.res.error({ message: '认证失败,请重新认证' });
                             yield next;
                             return;
                         } else {
-                            this.body = app.wrapper.res.rows(user);
+                            var tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], user.tenantId);
+                            var rows = { name: user.name, tenantId: tenant.id, tenantName: tenant.name };
+                            // console.log(rows);
+                            this.body = app.wrapper.res.rows(rows);
                         }
 
                     } catch (e) {

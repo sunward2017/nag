@@ -17,6 +17,7 @@ module.exports = function(ctx,name) {
             operated_on: {type: Date, default: Date.now},
             status: {type: Number, min: 0, max: 1, default: 1},
             barcode:{type: String}, //条形码 added by zppro 2017.5.16
+            img:{type: String},//
             drug_no:{type: String},// 药品编码
             full_name:{type: String},
             short_name:{type: String},

@@ -2,10 +2,16 @@
   "data": {
     "from": 1,
     "to": 2,
-    "colums": [
+    "header": true,
+    "columns": [
       {
         "src": "品牌",
         "dest": "vender"
+      },
+      {
+        "src": "药品名称",
+        "dest": "name",
+        "required": true
       },
       {
         "src": "参考价",
@@ -24,7 +30,8 @@
       {
         "src": "条形码",
         "dest": "barcode",
-        "format": true
+        "type": "number",
+        "required": true
       },
       {
         "src": "规格",
@@ -47,7 +54,7 @@
         "dest": "validity"
       },
       {
-        "src": "存储",
+        "src": "储存",
         "dest": "store"
       },
       {

@@ -253,7 +253,8 @@
     },
     "drug": {
       "list": {
-        "TITLE": "管理中心-数据管理-药品-列表"
+        "TITLE": "管理中心-数据管理-药品-列表",
+        "BTN-IMPORT-DRUG-DIALOG": "导入药品..."
       },
       "details": {
         "TITLE": "管理中心-数据管理-药品-详情",

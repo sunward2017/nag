@@ -12,10 +12,9 @@
         .controller('BackfillerDefaultPickDialogController', BackfillerDefaultPickDialogController)
     ;
 
-    BackfillerDefaultPickDialogController.$inject = ['$scope', 'RouteHelpers'];
-    function BackfillerDefaultPickDialogController($scope, helper) {
+    BackfillerDefaultPickDialogController.$inject = ['$scope', 'vmh'];
+    function BackfillerDefaultPickDialogController($scope, vmh) {
         var vm = $scope.vm = {};
-        var vmh = $scope.vmh = helper.buildVMHelper();
 
         init();
 

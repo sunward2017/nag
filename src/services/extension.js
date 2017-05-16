@@ -549,30 +549,98 @@ module.exports = {
                 verb: 'post',
                 url: this.service_url_prefix + "/importDrug",
                 handler: function (app, options) {
-                    return function * (next) {
+                    return function *(next) {
                         try {
                             var file_name = this.request.body.file_name;
-                            console.log(this.request.body);
-                            var file = path.join(app.conf.dir.rawData , file_name);
-                            console.log(file);
+                            // console.log(this.request.body);
+                            var file = path.join(app.conf.dir.rawData, file_name);
+                            // console.log(file);
+                            console.log('begin parse',app.moment().format('YYYY.MM.DD HH:mm:ss'));
                             var worksheets = xlsx.parse(file);
-                            var sheetConfig;
-                            for(var i=0,len = worksheets.length, worksheet = worksheets[i];i<len;i++) {
+                            console.log('end parse',app.moment().format('YYYY.MM.DD HH:mm:ss'));
+                            var saveRows = [], sheetConfig;
+                            for (var i = 0, len = worksheets.length, worksheet = worksheets[i]; i < len; i++) {
                                 //读取导入配置
-                                for(var key in importDrugConfig){
-                                    if(key == worksheet.name) {
+                                for (var key in importDrugConfig) {
+                                    if (key == worksheet.name) {
                                         sheetConfig = importDrugConfig[key];
-                                        console.log('importDrugConfig:', key, importDrugConfig[key]);
-                                        for (var rowIndex = sheetConfig.from, rowLen = sheetConfig.to+1; rowIndex < rowLen; rowIndex++) {
-                                            if (worksheet.data[rowIndex].length > 0) {
-                                                console.log('row:', rowIndex, worksheet.data[rowIndex]);
+                                        // console.log('importDrugConfig:', key, sheetConfig);
+                                        // 解析colIndex
+                                        var columns = sheetConfig.columns, col, colIndex;
+                                        for (var j = 0, jlen = columns.length; j < jlen; j++) {
+                                            col = columns[j];
+                                            if (sheetConfig.header) {
+                                                colIndex = app._.findIndex(worksheet.data[0], (o) => {
+                                                    return o == col.src
+                                                });
+                                            } else {
+                                                colIndex = col.src;
+                                            }
+                                            if (colIndex != -1) {
+                                                col['colIndex'] = colIndex;
                                             }
                                         }
+
+                                        var row, colType, colValue, required, isSkip;
+                                        console.log('begin row each', app.moment().format('YYYY.MM.DD HH:mm:ss'));
+                                        var rowMax = (sheetConfig.to || 0) + 1 > worksheet.data.length ? (sheetConfig.to || 0) + 1 : worksheet.data.length;
+                                        console.log('rowMax:', rowMax)
+                                        for (var rowIndex = sheetConfig.from, rowLen = rowMax; rowIndex < rowLen; rowIndex++) {
+                                            if (worksheet.data[rowIndex].length > 0) {
+                                                row = {};
+                                                isSkip = false;
+                                                for (var k = 0, klen = columns.length; k < klen; k++) {
+                                                    col = columns[k];
+                                                    colType = col.type;
+                                                    required = !!col.required;
+                                                    colValue = worksheet.data[rowIndex][col['colIndex']];
+                                                    // console.log('col:', col, colType,col['colIndex'], worksheet.data[rowIndex][col['colIndex']]);
+                                                    if (colValue) {
+                                                        colValue = colValue.replace(/\r/g, '').replace(/\n/g, '');
+                                                        if (colType == 'number') {
+                                                            row[col.dest] = parseInt(colValue);
+                                                        } else if (colType == 'date') {
+                                                            row[col.dest] = app.moment(colValue);
+                                                        } else {
+                                                            row[col.dest] = colValue;
+                                                        }
+                                                    } else {
+                                                        isSkip = required
+                                                    }
+                                                }
+                                                if (!isSkip) {
+                                                    saveRows.push(row);
+                                                } else {
+                                                    console.log('skip row:', rowIndex, worksheet.data[rowIndex]);
+                                                }
+                                            }
+                                        }
+                                        console.log('end row each',app.moment().format('YYYY.MM.DD HH:mm:ss'));
                                     }
                                 }
                             }
+
+                            console.log('begin save row to db', app.moment().format('YYYY.MM.DD HH:mm:ss'));
+                            var needChunkNumber = 1000;
+                            if (saveRows.length > needChunkNumber) {
+                                var arrChunked = self.chunkArrayRange(saveRows, 100);
+                                for (var s = 0, sLen = arrChunked.length; s < sLen; s++) {
+                                    // console.log('arrChunked:',s,arrChunked[s]);
+                                    yield app.modelFactory().model_bulkInsert(app.models['pub_drug'], {
+                                        rows: arrChunked[s]
+                                    });
+                                }
+                            } else {
+                                // console.log('saveRows:', saveRows)
+                                yield app.modelFactory().model_bulkInsert(app.models['pub_drug'], {
+                                    rows: saveRows
+                                });
+                            }
+                            console.log('end save row to db',app.moment().format('YYYY.MM.DD HH:mm:ss'));
+                            
                             this.body = app.wrapper.res.default();
                         } catch (e) {
+                            console.log(e);
                             self.logger.error(e.message);
                             this.body = app.wrapper.res.error(e);
                         }
@@ -587,6 +655,26 @@ module.exports = {
     genVerOrder: function(ver) {
         var arr = ver.split('.');
         return parseInt(arr[0]) * 10000 + parseInt(arr[1]) * 100 + parseInt(arr[2]);
+    },
+    chunkArrayRange: function (arr, range) {
+        var result = [], start, end;
+        // console.log('total arr length:', arr.length);
+        for (var x = 0; x < arr.length; x = x+range) {
+            start = result.length * range;
+            end = (start + range) < arr.length ? (start + range) : arr.length + 1;
+            // console.log('chunkArrayRange:', start, end);
+            result.push(arr.slice(start, end));
+        }
+        return result;
+    },
+    chunkArraySize: function (arr, size) {
+        var result = [], start, end;
+        for (var x = 0; x < Math.ceil(arr.length / size); x++) {
+            start = x * size;
+            end = start + size;
+            result.push(arr.slice(start, end));
+        }
+        return result;
     }
 }.init();
 //.init(option);

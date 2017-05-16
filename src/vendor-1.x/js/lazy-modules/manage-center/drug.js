@@ -67,6 +67,7 @@
                 }
             }).closePromise.then(function (ret) {
                 if (ret.value != '$document' && ret.value != '$closeButton' && ret.value != '$escape') {
+                    vmh.alertSuccess('notification.IMPORT-SUCCESS', true);
                     vm.query();
                 }
             });
@@ -148,7 +149,14 @@
                     });
                     vm.isImporting = true;
                     
-                    vmh.extensionService.importDrug(vm.dir + vm.toImport);
+                    vmh.extensionService.importDrug(vm.dir + vm.toImport).then(function (ret) {
+                        vm.isImporting = false;
+                        $scope.closeThisDialog();
+                    }, function (err) {
+                        console.log(err);
+                    }).finally(function(){
+                        vm.importDrugBlocker.stop();
+                    })
                 })
                 
 

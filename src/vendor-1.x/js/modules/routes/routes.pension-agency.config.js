@@ -608,6 +608,8 @@
                         modelName: 'psn-elderly',
                         searchForm: { "status": 1},
                         serverPaging: true,
+                        sortColumn: 'last_assessment_time',
+                        sortDirection: 1,
                         columns: [{
                             label: '老人',
                             name: 'name',
@@ -618,7 +620,6 @@
                         },{
                             label: '上次评估时间',
                             name: 'last_assessment_time',
-                            sortable: false,
                             width: 60,
                             sortable: true
                         },{
@@ -634,6 +635,10 @@
                             type: 'string',
                             width: 60,
                             sortable: true
+                        },{
+                            label: '状态',
+                            sortable: false,
+                            width: 30
                         },{
                             label: '',
                             name: 'actions',

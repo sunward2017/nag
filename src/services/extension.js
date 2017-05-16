@@ -623,7 +623,7 @@ module.exports = {
                             console.log('begin save row to db', app.moment().format('YYYY.MM.DD HH:mm:ss'));
                             var needChunkNumber = 1000;
                             if (saveRows.length > needChunkNumber) {
-                                var arrChunked = self.chunkArrayRange(saveRows, 100);
+                                var arrChunked = app.util.chunkArrayRange(saveRows, 100);
                                 for (var s = 0, sLen = arrChunked.length; s < sLen; s++) {
                                     // console.log('arrChunked:',s,arrChunked[s]);
                                     yield app.modelFactory().model_bulkInsert(app.models['pub_drug'], {
@@ -655,26 +655,6 @@ module.exports = {
     genVerOrder: function(ver) {
         var arr = ver.split('.');
         return parseInt(arr[0]) * 10000 + parseInt(arr[1]) * 100 + parseInt(arr[2]);
-    },
-    chunkArrayRange: function (arr, range) {
-        var result = [], start, end;
-        // console.log('total arr length:', arr.length);
-        for (var x = 0; x < arr.length; x = x+range) {
-            start = result.length * range;
-            end = (start + range) < arr.length ? (start + range) : arr.length + 1;
-            // console.log('chunkArrayRange:', start, end);
-            result.push(arr.slice(start, end));
-        }
-        return result;
-    },
-    chunkArraySize: function (arr, size) {
-        var result = [], start, end;
-        for (var x = 0; x < Math.ceil(arr.length / size); x++) {
-            start = x * size;
-            end = start + size;
-            result.push(arr.slice(start, end));
-        }
-        return result;
     }
 }.init();
 //.init(option);

@@ -31,11 +31,15 @@
         }
 
         function openImportDialog() {
+            vm.dialogData = {
+                isImporting: false
+            };
 
             ngDialog.open({
                 template: 'dlg-drug-import-file-pick.html',
                 controller: 'DrugImportDialogController',
                 className: 'ngdialog-theme-default dialog-drug-import',
+                data: vm.dialogData,
                 resolve:{
                     vmh: function () {
                         return vmh;
@@ -46,9 +50,9 @@
                         }
                     }
                 },
-                preCloseCallback: function (isImporting) {
-                    console.log('isImporting:', arguments)
-                    if(isImporting) {
+                preCloseCallback: function () {
+                    console.log('dialog:', vm.dialogData)
+                    if(vm.dialogData.isImporting) {
                         // if (confirm('Are you sure you want to close without saving your changes?')) {
                         //     return true;
                         // }
@@ -147,14 +151,18 @@
                     vm.importDrugBlocker.start({
                         message: translatedText,
                     });
-                    vm.isImporting = true;
-                    
+
+                    $scope.ngDialogData.isImporting = true;
+
                     vmh.extensionService.importDrug(vm.dir + vm.toImport).then(function (ret) {
-                        vm.isImporting = false;
+                        $scope.ngDialogData.isImporting = false;
                         $scope.closeThisDialog();
                     }, function (err) {
                         console.log(err);
                     }).finally(function(){
+                        if($scope.ngDialogData.isImporting){
+                            $scope.ngDialogData.isImporting = false;
+                        }
                         vm.importDrugBlocker.stop();
                     })
                 })

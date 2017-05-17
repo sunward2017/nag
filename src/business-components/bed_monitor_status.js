@@ -1813,5 +1813,19 @@ module.exports = {
                 self.logger.error(emessage);
             }
         }).catch(self.ctx.coOnError);
+    },
+    checkSessionAndGetLatestSmbPerMinuteRecord:function(sessionId,devId){
+        var self = this;
+        return co(function* (){
+            try {
+                var sessionIsExpired = yield self.checkSessionIsExpired(sessionId);
+                if (!sessionIsExpired) {
+                    return yield self.getLatestSmbPerMinuteRecord(sessionId,devId);
+                }
+            } catch (e) {
+                console.log(e);
+                self.logger.error(e.message);
+            }
+        }).catch(self.ctx.coOnError);
     }
 };

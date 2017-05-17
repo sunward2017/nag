@@ -7,6 +7,9 @@
       "COME": "psn$bed_monitor_status$come",
       "NO_MAN_IN_BED": "psn$bed_monitor_status$no_man_in_bed",
       "ALARM_LEAVE_TIMEOUT": "psn$bed_monitor_status$alarm_leave_timeout"
+    },
+    "BED_MONITOR_LISTEN":{
+      "DATA": "psn$bed_monitor_listen$data"
     }
   },
   "MEMBER": {

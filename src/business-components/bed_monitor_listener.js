@@ -60,8 +60,11 @@ module.exports = {
 
             // 为客户端添加“close”事件处理函数
             self.socket.on('close', function() {
-                self.ctx.clog.log(self.logger, 'Connection closed 重连');
-                self.connectTo(listenConfig);
+                setTimeout(()=>{
+                    self.ctx.clog.log(self.logger, 'Connection closed 重连');
+                    self.connectTo(listenConfig);
+                }, 30000);
+
             });
 
             self.socket.on('error', function(err) {

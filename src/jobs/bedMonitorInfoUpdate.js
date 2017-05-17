@@ -20,7 +20,7 @@
                      if (ctx.onJobExecute && ctx._.isFunction(ctx.onJobExecute)) {
                          ctx.onJobExecute.call(null, job_id);
                      }
-                     ctx.bed_monitor_provider.updatebedMonitorInfo();
+                     ctx.bed_monitor_status.updatebedMonitorInfo();
                      // console.log(ctx.moment().format('HH:mm:ss') + ' ' + job_id + '(' + job_name + ') => executed.');
                  }, {printLog: printLog});
 

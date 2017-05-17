@@ -13,9 +13,9 @@
         .controller('NursingStationElderlyDialogController', NursingStationElderlyDialogController)
     ;
 
-    NursingStationController.$inject = ['$scope', 'ngDialog', 'blockUI' ,'SOCKET_EVENTS', 'SocketManager', 'vmh', 'instanceVM'];
+    NursingStationController.$inject = ['$scope', 'ngDialog', 'blockUI' ,'SOCKET_EVENTS', 'SocketManager', '$echarts', 'vmh', 'instanceVM'];
 
-    function NursingStationController($scope, ngDialog, blockUI, SOCKET_EVENTS, SocketManager, vmh, vm) {
+    function NursingStationController($scope, ngDialog, blockUI, SOCKET_EVENTS, SocketManager, $echarts, vmh, vm) {
 
         var vm = $scope.vm = vm;
         $scope.utils = vmh.utils.v;
@@ -33,7 +33,7 @@
             vm.openElderlyDialog = openElderlyDialog;
 
             vm.elderlyStatusMonitor = {};
-            vm.bedMonitorMappingElderly = {};
+            vm.bedMonitorStatusMappingElderly = {};// bedMonitorName做key
             vm.bedMonitorStatusMonitor = {};
             vm.alarmQueue = [];
             vm.defaultElderlyAvatar = 'app/img/user/avatar-in-nursing-station.png';
@@ -48,22 +48,21 @@
                 return nodes;
             });
 
-
-            subscribeBedMonitor();
+            subscribeBedMonitorStatus();
             processAlarmQueue();
         }
-        function subscribeBedMonitor () {
-            var channel = SocketManager.registerChannel(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.$SOCKET_URL);
-            channel.on(SOCKET_EVENTS.SHARED.CONNECT, function() {
-                console.log('nursing-station socket connected');
+        function subscribeBedMonitorStatus () {
+            var channelOfStatus = SocketManager.registerChannel(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.$SOCKET_URL);
+            channelOfStatus.on(SOCKET_EVENTS.SHARED.CONNECT, function() {
+                console.log('nursing-station bed_monitor_status socket connected');
             });
-            channel.on(SOCKET_EVENTS.SHARED.DISCONNECT, function() {
-                console.log('nursing-station socket disconnected');
+            channelOfStatus.on(SOCKET_EVENTS.SHARED.DISCONNECT, function() {
+                console.log('nursing-station bed_monitor_status socket disconnected');
             });
-            channel.off(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.S2C.ON_LINE).on(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.S2C.ON_LINE, function(data) {
+            channelOfStatus.off(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.S2C.ON_LINE).on(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.S2C.ON_LINE, function(data) {
                 // console.log('nursing-station socket ON_LINE =>', data);
                 // var bedMonitorStatus = vm.monitorStatus[data.bedMonitorName];
-                var elderlyId = vm.bedMonitorMappingElderly[data.bedMonitorName];
+                var elderlyId = vm.bedMonitorStatusMappingElderly[data.bedMonitorName];
                 var bedMonitorStatus = vm.elderlyStatusMonitor[elderlyId];
                 if (bedMonitorStatus) {
                     vmh.timeout(function(){
@@ -72,9 +71,9 @@
                     });
                 }
             });
-            channel.off(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.S2C.OFF_LINE).on(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.S2C.OFF_LINE, function(data) {
+            channelOfStatus.off(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.S2C.OFF_LINE).on(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.S2C.OFF_LINE, function(data) {
                 // console.log('nursing-station socket OFF_LINE =>', data);
-                var elderlyId = vm.bedMonitorMappingElderly[data.bedMonitorName];
+                var elderlyId = vm.bedMonitorStatusMappingElderly[data.bedMonitorName];
                 var bedMonitorStatus = vm.elderlyStatusMonitor[elderlyId];
                 if (bedMonitorStatus) {
                     vmh.timeout(function(){
@@ -83,9 +82,9 @@
                     });
                 }
             });
-            channel.off(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.S2C.COME).on(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.S2C.COME, function(data) {
+            channelOfStatus.off(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.S2C.COME).on(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.S2C.COME, function(data) {
                 // console.log('nursing-station socket COME =>', data);
-                var elderlyId = vm.bedMonitorMappingElderly[data.bedMonitorName];
+                var elderlyId = vm.bedMonitorStatusMappingElderly[data.bedMonitorName];
                 var bedMonitorStatus = vm.elderlyStatusMonitor[elderlyId];
                 if (bedMonitorStatus) {
                     vmh.timeout(function(){
@@ -94,9 +93,9 @@
                     });
                 }
             });
-            channel.off(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.S2C.LEAVE).on(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.S2C.LEAVE, function(data) {
+            channelOfStatus.off(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.S2C.LEAVE).on(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.S2C.LEAVE, function(data) {
                 // console.log('nursing-station socket LEAVE =>', data);
-                var elderlyId = vm.bedMonitorMappingElderly[data.bedMonitorName];
+                var elderlyId = vm.bedMonitorStatusMappingElderly[data.bedMonitorName];
                 var bedMonitorStatus = vm.elderlyStatusMonitor[elderlyId];
                 if (bedMonitorStatus) {
                     vmh.timeout(function(){
@@ -105,9 +104,9 @@
                     })
                 }
             });
-            channel.off(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.S2C.NO_MAN_IN_BED).on(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.S2C.NO_MAN_IN_BED, function(data) {
+            channelOfStatus.off(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.S2C.NO_MAN_IN_BED).on(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.S2C.NO_MAN_IN_BED, function(data) {
                 // console.log('nursing-station socket NO_MAN_IN_BED =>', data);
-                var elderlyId = vm.bedMonitorMappingElderly[data.bedMonitorName];
+                var elderlyId = vm.bedMonitorStatusMappingElderly[data.bedMonitorName];
                 var bedMonitorStatus = vm.elderlyStatusMonitor[elderlyId];
                 if (bedMonitorStatus) {
                     vmh.timeout(function(){
@@ -116,9 +115,9 @@
                     })
                 }
             });
-            channel.off(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.S2C.ALARM_LEAVE_TIMEOUT).on(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.S2C.ALARM_LEAVE_TIMEOUT, function(data){
+            channelOfStatus.off(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.S2C.ALARM_LEAVE_TIMEOUT).on(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.S2C.ALARM_LEAVE_TIMEOUT, function(data){
                 // console.log('nursing-station socket ALARM_LEAVE_TIMEOUT =>', data);
-                var elderlyId = vm.bedMonitorMappingElderly[data.bedMonitorName];
+                var elderlyId = vm.bedMonitorStatusMappingElderly[data.bedMonitorName];
                 console.log('on alarm elderlyId=>', elderlyId);
                 if (data.alarmId && _.findIndex(vm.alarmQueue, function(alarmObject){
                         return alarmObject.elderlyId == elderlyId && alarmObject.reason == data.reason;
@@ -141,6 +140,19 @@
             });
         }
 
+        function unsubscribeBedMonitorListen(bedMonitorName, tenantId) {
+            var channelOfListen = SocketManager.getChannel(SOCKET_EVENTS.PSN.BED_MONITOR_LISTEN.$SOCKET_URL);
+            if(channelOfListen) {
+                channelOfListen.emit(SOCKET_EVENTS.PSN.BED_MONITOR_LISTEN.C2S.UNSUBSCRIBE, {
+                    tenantId: tenantId,
+                    bedMonitorName: bedMonitorName
+                });
+                SocketManager.unregisterChannel(SOCKET_EVENTS.PSN.BED_MONITOR_LISTEN.$SOCKET_URL);
+            }
+        }
+
+
+
         function onFloorChange () {
             console.log('onFloorChange:',vm.floorData);
             if (vm.floorData.length > 0) {
@@ -159,7 +171,7 @@
                         if (bedMonitor) {
                             if (!vm.elderlyStatusMonitor[elderly.id]) {
                                 console.log('elderly.id=>', elderly.id);
-                                vm.bedMonitorMappingElderly[bedMonitor.bedMonitorName] = elderly.id;
+                                vm.bedMonitorStatusMappingElderly[bedMonitor.bedMonitorName] = elderly.id;
                                 vm.elderlyStatusMonitor[elderly.id] = {bedMonitorName: bedMonitor.bedMonitorName, status:'offline'};
                                 bedMonitorNames.push(bedMonitor.bedMonitorName);
                             }
@@ -265,9 +277,21 @@
                     elderly: elderly,
                     tenantId: vm.tenantId,
                     operated_by: vm.operated_by,
-                    operated_by_name: vm.operated_by_name
+                    operated_by_name: vm.operated_by_name,
+                    haveBindingRobot: false,
+                    bindingBedMonitor: vm.elderlyStatusMonitor[elderly.id],
+                    subscribeBedMonitorListen: vm.subscribeBedMonitorListen
+                },
+                resolve:{
+                    $echarts:  function () {
+                        return $echarts;
+                    }
                 }
             }).closePromise.then(function (ret) {
+                if (vm.elderlyStatusMonitor[elderly.id]) {
+                    unsubscribeBedMonitorListen(vm.elderlyStatusMonitor[elderly.id].bedMonitorName, vm.tenantId)
+                }
+
                 if(ret.value!='$document' && ret.value!='$closeButton' && ret.value!='$escape' ) {
                     console.log('openElderlyDialog close')
                 }
@@ -324,9 +348,9 @@
         }
     }
 
-    NursingStationElderlyDialogController.$inject = ['$scope','ngDialog'];
+    NursingStationElderlyDialogController.$inject = ['$scope','ngDialog', 'SOCKET_EVENTS', 'SocketManager', '$echarts'];
 
-    function NursingStationElderlyDialogController($scope, ngDialog) {
+    function NursingStationElderlyDialogController($scope, ngDialog, SOCKET_EVENTS, SocketManager, $echarts) {
 
         var vm = $scope.vm = {};
         var vmh = $scope.ngDialogData.vmh;
@@ -346,11 +370,16 @@
             vm.tenantId = $scope.ngDialogData.tenantId;
             vm.operated_by = $scope.ngDialogData.operated_by;
             vm.operated_by_name = $scope.ngDialogData.operated_by_name;
+            vm.bindingBedMonitor = $scope.ngDialogData.bindingBedMonitor;
+            vm.haveBindingRobot = $scope.ngDialogData.haveBindingRobot;
+            vm.haveBindingBedMonitor = !!vm.bindingBedMonitor;
+            vm.wave_data = [];
+
 
             vm.onAvatarUploaded = onAvatarUploaded;
             // vm.tab1 = {cid: 'contentTab1', active: true};
-            vm.tab1 = {cid: 'content-nursing_records_today', active: true};
-            vm.tab2 = {cid: 'content-life_integration'};
+            vm.tab1 = {cid: 'content-nursing_records_today'};
+            vm.tab2 = {cid: 'content-life_integration', active: true};
             vm.tab3 = {cid: 'content-hardware_robot'};
 
             vmh.parallel([
@@ -367,6 +396,83 @@
                     return (o.aggr_value || {}).name;
                 }).join();
                 vm.nursingRecords = results[3];
+
+                // 获取睡眠带生命体征及实时数据
+                if (vm.haveBindingBedMonitor) {
+                    subscribeBedMonitorListen(vm.bindingBedMonitor.bedMonitorName, vm.tenantId);
+                    vm.realtime_wave_id = $echarts.generateInstanceIdentity();
+                    console.log('vm.realtime_wave_id:', vm.realtime_wave_id);
+                    vm.realtime_wave_config = {
+                        title: {
+                            text: '动态数据 + 时间坐标轴'
+                        },
+                        xAxis: {
+                            type: 'time',
+                            splitLine: {
+                                show: false
+                            }
+                        },
+                        yAxis: {
+                            type: 'value',
+                            boundaryGap: [0, '100%'],
+                            splitLine: {
+                                show: false
+                            }
+                        },
+                        series: [{
+                            name: '模拟数据',
+                            type: 'line',
+                            showSymbol: false,
+                            hoverAnimation: false,
+                            data: vm.wave_data
+                        }]
+                    };
+                    
+                }
+
+                // 获取睡眠带生命体征及实时数据
+                if(vm.haveBindingRobot) {
+
+                }
+
+            });
+        }
+
+        function subscribeBedMonitorListen (bedMonitorName, tenantId) {
+            var channelOfListen = SocketManager.registerChannel(SOCKET_EVENTS.PSN.BED_MONITOR_LISTEN.$SOCKET_URL);
+            channelOfListen.on(SOCKET_EVENTS.SHARED.CONNECT, function() {
+                console.log('nursing-station bed_monitor_listen socket connected');
+            });
+            channelOfListen.on(SOCKET_EVENTS.SHARED.DISCONNECT, function() {
+                console.log('nursing-station bed_monitor_listen socket disconnected');
+            });
+            channelOfListen.off(SOCKET_EVENTS.PSN.BED_MONITOR_LISTEN.S2C.WAVE_DATA).on(SOCKET_EVENTS.PSN.BED_MONITOR_LISTEN.S2C.WAVE_DATA, function(data) {
+                console.log('nursing-station bed_monitor_listen socket WAVE_DATA =>', data);
+
+                for (var i = 0; i < 5; i++) {
+                    data.shift();
+                    data.push(randomData());
+                }
+
+                if(vm.data.length == 60){
+                    vm.data.shift();
+                }
+                vm.data.push({
+                    value:[
+                        moment().format('HH:mm:ss'),
+                        data.value
+                    ]
+                })
+
+                vm.realtime_wave_instance.setOption({
+                    series: [{
+                        data: vm.data
+                    }]
+                });
+            });
+            channelOfListen.emit(SOCKET_EVENTS.PSN.BED_MONITOR_LISTEN.C2S.SUBSCRIBE, {
+                tenantId: tenantId,
+                bedMonitorName: bedMonitorName
             });
         }
 

@@ -29,6 +29,16 @@
             },
             getChannel: function (channelName) {
                 return this.socketChannels[channelName];
+            },
+            unregisterChannel: function (channelName) {
+                if (this.socketChannels[channelName]) {
+                    this.socketChannels[channelName].close();
+                    var self = this;
+                    setTimeout(function(){
+                        console.log('unregisterChannel set channel null');
+                        self.socketChannels[channelName] = null;
+                    }, 500);
+                }
             }
         };
     }

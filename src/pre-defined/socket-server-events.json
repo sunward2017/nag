@@ -9,7 +9,7 @@
       "ALARM_LEAVE_TIMEOUT": "psn$bed_monitor_status$alarm_leave_timeout"
     },
     "BED_MONITOR_LISTEN":{
-      "DATA": "psn$bed_monitor_listen$data"
+      "WAVE_DATA": "psn$bed_monitor_listen$wave_data"
     }
   },
   "MEMBER": {

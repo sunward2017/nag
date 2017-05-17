@@ -24,8 +24,8 @@
         $scope.vm = vm;
         $scope.utils = vmh.utils.g;
         var tenantService = vm.modelNode.services['pub-tenant'];
-        var today = moment().format('YYYY MM DD');
-        var todayMoment = moment(today,'YYYY MM DD');
+        var today = moment().format('YYYY MM');
+        var todayMoment = moment(today,'YYYY MM');
         var assessmentDay;
         var assessmentExpireDay;
         var assessmentExpireMoment;
@@ -68,10 +68,16 @@
         }
 
         function fiterTime(last_assessment_time){
-            assessmentDay = moment(last_assessment_time,'YYYY MM DD');
-            assessmentExpireDay = moment(assessmentDay,'YYYY MM DD').add(vm.assessment_regular_period,'M').format('YYYY MM DD');
-            assessmentExpireMoment = moment(assessmentExpireDay,'YYYY MM DD');
-            return todayMoment.isAfter(assessmentExpireMoment);
+            assessmentDay = moment(last_assessment_time,'YYYY MM');
+            assessmentExpireDay = moment(assessmentDay,'YYYY MM').add(vm.assessment_regular_period,'M').format('YYYY MM');
+            assessmentExpireMoment = moment(assessmentExpireDay,'YYYY MM');
+            if(todayMoment.isAfter(assessmentExpireMoment)){
+                return 'isAfter';
+            }else if(todayMoment.isBefore(assessmentExpireMoment)){
+                return 'isBefore';
+            }else if(todayMoment.isSame(assessmentExpireMoment)){
+                return 'isSame';
+            }
         }
     }
 

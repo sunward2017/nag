@@ -17,6 +17,7 @@ module.exports = function(ctx,name) {
             operated_on: {type: Date, default: Date.now},
             status: {type: Number, min: 0, max: 1, default: 1},
             barcode:{type: String}, //条形码 added by zppro 2017.5.16
+            img:{type: String},//
             drug_no:{type: String},// 药品编码
             full_name:{type: String},
             short_name:{type: String},
@@ -31,6 +32,7 @@ module.exports = function(ctx,name) {
             vender:{type: String},//厂家 added by zppro 2017.5.12
             dosage_form:{type: String}, //剂型 added by zppro 2017.5.12
             special_individuals:{type: String}, //特殊人群用药 added by zppro 2017.5.12
+            drugSourceId: {type: mongoose.Schema.Types.ObjectId,ref:'pub_drug'},//关联公共的药品库
             tenantId: {type: mongoose.Schema.Types.ObjectId,required: true,ref:'pub_tenant'}//关联机构
         }, {
             toObject: {

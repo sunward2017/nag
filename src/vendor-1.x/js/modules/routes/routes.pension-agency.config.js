@@ -608,6 +608,8 @@
                         modelName: 'psn-elderly',
                         searchForm: { "status": 1},
                         serverPaging: true,
+                        sortColumn: 'last_assessment_time',
+                        sortDirection: 1,
                         columns: [{
                             label: '老人',
                             name: 'name',
@@ -618,22 +620,25 @@
                         },{
                             label: '上次评估时间',
                             name: 'last_assessment_time',
-                            sortable: false,
                             width: 60,
                             sortable: true
                         },{
-                            label: '评估等级',
+                            label: '上次评估等级',
                             name: 'nursing_assessment_grade_name',
                             type: 'string',
                             width: 60,
                             sortable: true,
                             formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D3015/object'),
                         },{
-                            label: '照护级别',
+                            label: '上次照护级别',
                             name: 'nursing_level_name',
                             type: 'string',
                             width: 60,
                             sortable: true
+                        },{
+                            label: '状态',
+                            sortable: false,
+                            width: 30
                         },{
                             label: '',
                             name: 'actions',
@@ -1480,22 +1485,10 @@
                             width: 80,
                             sortable: true
                         }, {
-                            label: '全称',
+                            label: '药品全称',
                             name: 'full_name',
                             type: 'string',
                             width: 100,
-                            sortable: true
-                        }, {
-                            label: '简称',
-                            name: 'short_name',
-                            type: 'string',
-                            width: 60,
-                            sortable: true
-                        }, {
-                            label: '别名',
-                            name: 'alias',
-                            type: 'string',
-                            width: 60,
                             sortable: true
                         }, {
                             label: '处方药',

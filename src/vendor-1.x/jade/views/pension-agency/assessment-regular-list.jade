@@ -19,7 +19,7 @@
                             | {{column.label}}
                             i.glyphicon(ng-if="column.name === vm.sort.column && vm.sort.direction",ng-class="vm.sort.direction|orderClass")
                 tbody
-                    tr(ng-repeat="row in vm.rows|filter:vm.filter|orderBy:vm.sort.column:vm.sort.direction===-1|paging:vm" , ng-click="vm.selectRow($event,row)",ng-dblclick="vm.dblclickRow(row.id)")
+                    tr(ng-repeat="row in vm.rows|filter:vm.filter|orderBy:vm.sort.column:vm.sort.direction===-1|paging:vm" , ng-click="vm.selectRow($event,row)")
                         td
                             .checkbox.c-checkbox
                                 label
@@ -30,11 +30,18 @@
                         td.text-left {{::row.nursing_assessment_grade_name}}
                         td.text-left {{::row.nursing_level_name}}
                         td
+                            i.fa.fa-square.text-danger(ng-if="vm.fiterTime(row.last_assessment_time) == 'isAfter'")
+                                span 超期
+                            i.fa.fa-square.text-success(ng-if="vm.fiterTime(row.last_assessment_time) == 'isBefore'")
+                                span 已评
+                            i.fa.fa-square.text-warning(ng-if="vm.fiterTime(row.last_assessment_time) == 'isSame'")
+                                span 待评
+                        td
                             .btn-group
                                 a.btn.btn-primary.btn-xs(title="{{'button.READ'|translate}}",ng-click="vm.readLastAssessment(row._id,row.name,row.lastAssessmentId)")
                                     i.glyphicon.glyphicon-search
                             .btn-group
-                                a.btn.btn-primary.btn-xs(ng-disabled="!vm.fiterTime(row.last_assessment_time)",title="{{'button.BEGIN-ASSESSMENT'|translate}}",ng-click="vm.addRegularAssessment(row._id,row.name)")
+                                a.btn.btn-primary.btn-xs(ng-if="vm.fiterTime(row.last_assessment_time) == 'isSame' || vm.fiterTime(row.last_assessment_time) == 'isAfter'",title="{{'button.BEGIN-ASSESSMENT'|translate}}",ng-click="vm.addRegularAssessment(row._id,row.name)")
                                     i.glyphicon.glyphicon-pencil
                     tr(ng-if="vm.paged.length==0")
                         td(colspan="{{utils.noResultsColspan(vm)}}") {{ 'grid.NO-RESULTS' | translate}}
@@ -44,6 +51,6 @@
                         .btn-toolbar
                             .btn-group
                                 a.btn.btn-primary.btn-sm(title="{{'button.ADD'|translate}}",ng-click="vm.addNew()")
-                                    i.glyphicon.glyphicon-plus
+                                    i.glyphicon.glyphicon-plus  突发评估
                     .col-md-8
                         pagination.pagination-sm.pull-right(total-items="vm.page.totals",ng-model="vm.page.no",max-size="5",items-per-page="vm.page.size",boundary-links="true" ,ng-change="vm.paging()")

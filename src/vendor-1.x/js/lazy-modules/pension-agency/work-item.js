@@ -87,20 +87,21 @@
             if (vm.model.voice_template) {
                 var reg = /\${[^}]+}/g;
                 var arr = vm.model.voice_template.match(reg);
-                
-                var isVerify = false;
-                for (var i = 0, len = arr.length; i < len; i++) {
+                if (arr && arr.length > 0) {
+                    var isVerify = false;
+                    for (var i = 0, len = arr.length; i < len; i++) {
 
-                    if (arr[i] == "${项目名称}" || arr[i] == "${工作描述}"|| arr[i] == "${老人姓名}") {
-                        continue;
-                    } else {
-                        isVerify = true;
-                        break;
+                        if (arr[i] == "${项目名称}" || arr[i] == "${工作描述}" || arr[i] == "${老人姓名}") {
+                            continue;
+                        } else {
+                            isVerify = true;
+                            break;
+                        }
                     }
-                }
-                if (isVerify) {
-                    vmh.alertWarning(vm.viewTranslatePath('VOICE_TEPLATE_ERROR'), true);
-                    return;
+                    if (isVerify) {
+                        vmh.alertWarning(vm.viewTranslatePath('VOICE_TEPLATE_ERROR'), true);
+                        return;
+                    }
                 }
             }
 

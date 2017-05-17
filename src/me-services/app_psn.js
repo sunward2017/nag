@@ -174,13 +174,14 @@ module.exports = {
             handler: function (app, options) {
                 return function* (next) {
                     try {
-                        console.log("request", this.request.body);
-                        if (!this.request.body.local_flag) {
-                            yield app.modelFactory().model_create(app.models['psn_drugDirectory'], this.request.body);
+                        console.log("request", this.request.body.drug);
+                        var drug = this.request.body.drug;
+                        if (!drug.local_flag) {
+                            yield app.modelFactory().model_create(app.models['psn_drugDirectory'], drug);
                         };
-                        var img = this.request.body.img;
+                        var img = drug.img;
                         if (img) {
-                            var barcode = this.request.body.barcode;
+                            var barcode = drug.barcode;
                             var pubDrug = yield app.modelFactory().model_one(app.models['pub_drug'], {
                                 where: { barcode: barcode }
                             });
@@ -190,7 +191,8 @@ module.exports = {
                             }
 
                         }
-                        this.body = app.wrapper.res.default();
+                        var msg = "药品入库保存成功"
+                        this.body = app.wrapper.res.ret({success:true,msg:msg});
                     } catch (e) {
                         self.logger.error(e.message);
                         this.body = app.wrapper.res.error(e);

@@ -82,7 +82,7 @@ module.exports = {
     },
     closeBedMonitorAlarm: function (alarm, operated_by, operated_by_name) {
         var self = this;
-        var channelName = 'psn$bed_monitor';
+        var channelName = 'psn$bed_monitor_status';
         return co(function* () {
             try {
 
@@ -103,7 +103,7 @@ module.exports = {
                 var bedMonitorName = alarm.subject_name;
                 var key = bedMonitorName;
                 self.ctx.cache.del(key);
-                self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR.COME, {bedMonitorName: bedMonitorName});
+                self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR_STATUS.COME, {bedMonitorName: bedMonitorName});
             } catch (e) {
                 console.log(e);
                 self.logger.error(e.message);

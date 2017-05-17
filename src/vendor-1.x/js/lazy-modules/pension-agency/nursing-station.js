@@ -53,14 +53,14 @@
             processAlarmQueue();
         }
         function subscribeBedMonitor () {
-            var channel = SocketManager.registerChannel(SOCKET_EVENTS.PSN.BED_MONITOR.$SOCKET_URL);
+            var channel = SocketManager.registerChannel(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.$SOCKET_URL);
             channel.on(SOCKET_EVENTS.SHARED.CONNECT, function() {
                 console.log('nursing-station socket connected');
             });
             channel.on(SOCKET_EVENTS.SHARED.DISCONNECT, function() {
                 console.log('nursing-station socket disconnected');
             });
-            channel.off(SOCKET_EVENTS.PSN.BED_MONITOR.S2C.ON_LINE).on(SOCKET_EVENTS.PSN.BED_MONITOR.S2C.ON_LINE, function(data) {
+            channel.off(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.S2C.ON_LINE).on(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.S2C.ON_LINE, function(data) {
                 // console.log('nursing-station socket ON_LINE =>', data);
                 // var bedMonitorStatus = vm.monitorStatus[data.bedMonitorName];
                 var elderlyId = vm.bedMonitorMappingElderly[data.bedMonitorName];
@@ -72,7 +72,7 @@
                     });
                 }
             });
-            channel.off(SOCKET_EVENTS.PSN.BED_MONITOR.S2C.OFF_LINE).on(SOCKET_EVENTS.PSN.BED_MONITOR.S2C.OFF_LINE, function(data) {
+            channel.off(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.S2C.OFF_LINE).on(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.S2C.OFF_LINE, function(data) {
                 // console.log('nursing-station socket OFF_LINE =>', data);
                 var elderlyId = vm.bedMonitorMappingElderly[data.bedMonitorName];
                 var bedMonitorStatus = vm.elderlyStatusMonitor[elderlyId];
@@ -83,7 +83,7 @@
                     });
                 }
             });
-            channel.off(SOCKET_EVENTS.PSN.BED_MONITOR.S2C.COME).on(SOCKET_EVENTS.PSN.BED_MONITOR.S2C.COME, function(data) {
+            channel.off(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.S2C.COME).on(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.S2C.COME, function(data) {
                 // console.log('nursing-station socket COME =>', data);
                 var elderlyId = vm.bedMonitorMappingElderly[data.bedMonitorName];
                 var bedMonitorStatus = vm.elderlyStatusMonitor[elderlyId];
@@ -94,7 +94,7 @@
                     });
                 }
             });
-            channel.off(SOCKET_EVENTS.PSN.BED_MONITOR.S2C.LEAVE).on(SOCKET_EVENTS.PSN.BED_MONITOR.S2C.LEAVE, function(data) {
+            channel.off(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.S2C.LEAVE).on(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.S2C.LEAVE, function(data) {
                 // console.log('nursing-station socket LEAVE =>', data);
                 var elderlyId = vm.bedMonitorMappingElderly[data.bedMonitorName];
                 var bedMonitorStatus = vm.elderlyStatusMonitor[elderlyId];
@@ -105,7 +105,7 @@
                     })
                 }
             });
-            channel.off(SOCKET_EVENTS.PSN.BED_MONITOR.S2C.NO_MAN_IN_BED).on(SOCKET_EVENTS.PSN.BED_MONITOR.S2C.NO_MAN_IN_BED, function(data) {
+            channel.off(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.S2C.NO_MAN_IN_BED).on(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.S2C.NO_MAN_IN_BED, function(data) {
                 // console.log('nursing-station socket NO_MAN_IN_BED =>', data);
                 var elderlyId = vm.bedMonitorMappingElderly[data.bedMonitorName];
                 var bedMonitorStatus = vm.elderlyStatusMonitor[elderlyId];
@@ -116,7 +116,7 @@
                     })
                 }
             });
-            channel.off(SOCKET_EVENTS.PSN.BED_MONITOR.S2C.ALARM_LEAVE_TIMEOUT).on(SOCKET_EVENTS.PSN.BED_MONITOR.S2C.ALARM_LEAVE_TIMEOUT, function(data){
+            channel.off(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.S2C.ALARM_LEAVE_TIMEOUT).on(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.S2C.ALARM_LEAVE_TIMEOUT, function(data){
                 // console.log('nursing-station socket ALARM_LEAVE_TIMEOUT =>', data);
                 var elderlyId = vm.bedMonitorMappingElderly[data.bedMonitorName];
                 console.log('on alarm elderlyId=>', elderlyId);
@@ -167,8 +167,8 @@
                     });
                     if (bedMonitorNames.length > 0) {
                         console.log('SUBSCRIBE>', bedMonitorNames);
-                        var channel = SocketManager.getChannel(SOCKET_EVENTS.PSN.BED_MONITOR.$SOCKET_URL);
-                        channel && channel.emit(SOCKET_EVENTS.PSN.BED_MONITOR.C2S.SUBSCRIBE, {
+                        var channel = SocketManager.getChannel(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.$SOCKET_URL);
+                        channel && channel.emit(SOCKET_EVENTS.PSN.BED_MONITOR_STATUS.C2S.SUBSCRIBE, {
                             tenantId: vm.tenantId,
                             bedMonitorNames: bedMonitorNames
                         });

@@ -2109,13 +2109,13 @@
                         searchForm: { "status": 1 },
                         serverPaging: true,
                         columns: [{
-                            label: '睡眠带编号',
+                            label: '名称',
                             name: 'code',
                             type: 'string',
                             width: 120,
                             sortable: true
                         }, {
-                            label: '名称',
+                            label: '睡眠带编号',
                             name: 'name',
                             type: 'string',
                             width: 120,

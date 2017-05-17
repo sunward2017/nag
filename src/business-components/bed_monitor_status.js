@@ -120,7 +120,7 @@ module.exports = {
 
                 var ret = yield rp({
                     method: 'POST',
-                    url: externalSystemConfig.bed_monitor_provider.api_url + '/ECSServer/userws/sessionIsExpired.json',
+                    url: externalSystemConfig.bed_monitor_status.api_url + '/ECSServer/userws/sessionIsExpired.json',
                     form: { sessionId: sessionId },
                 });
                 // console.log('checkSessionIsExpired:', ret);
@@ -187,7 +187,7 @@ module.exports = {
                 });
                 var ret = yield rp({
                     method: 'POST',
-                    url: externalSystemConfig.bed_monitor_provider.api_url + '/ECSServer/userws/userRegister.json',
+                    url: externalSystemConfig.bed_monitor_status.api_url + '/ECSServer/userws/userRegister.json',
                     form: {
                         userName: userInfo.nickName,
                         encryptedName: userInfo.nickName,
@@ -516,7 +516,7 @@ module.exports = {
                 var dateReport;
                 var ret = yield rp({
                     method: 'POST',
-                    url: externalSystemConfig.bed_monitor_provider.api_url + '/ECSServer/devicews/getSleepBriefReport.json',
+                    url: externalSystemConfig.bed_monitor_status.api_url + '/ECSServer/devicews/getSleepBriefReport.json',
                     form: { sessionId: sessionId, devId: devId, startTime: startTime.unix() * 1000, endTime: endTime.unix() * 1000 }
                 });
                 ret = JSON.parse(ret);
@@ -596,7 +596,7 @@ module.exports = {
             try {
                 console.log(uniqueId);
                 var ret = yield rp({
-                    url: externalSystemConfig.bed_monitor_provider.api_url + '/ECSServer/userws/getToken.json?uniqueId=' + uniqueId,
+                    url: externalSystemConfig.bed_monitor_status.api_url + '/ECSServer/userws/getToken.json?uniqueId=' + uniqueId,
                     json: true
                 });
                 console.log(ret);
@@ -617,7 +617,7 @@ module.exports = {
                 self.logger.info('userAuthenticate');
                 var ret = yield rp({
                     method: 'POST',
-                    url: externalSystemConfig.bed_monitor_provider.api_url + '/ECSServer/userws/userAuthenticate.json',
+                    url: externalSystemConfig.bed_monitor_status.api_url + '/ECSServer/userws/userAuthenticate.json',
                     form: {
                         token: token,
                         userName: member.name,
@@ -664,7 +664,7 @@ module.exports = {
                 console.log(sendData);
                 var ret = yield rp({
                     method: 'POST',
-                    url: externalSystemConfig.bed_monitor_provider.api_url + '/ECSServer/devicews/updateDevice',
+                    url: externalSystemConfig.bed_monitor_status.api_url + '/ECSServer/devicews/updateDevice',
                     form: sendData
                 });
                 ret = JSON.parse(ret);
@@ -699,7 +699,7 @@ module.exports = {
             try {
                 var ret = yield rp({
                     method: 'POST',
-                    url: externalSystemConfig.bed_monitor_provider.api_url + '/ECSServer/cpws/updateConcernPerson.json',
+                    url: externalSystemConfig.bed_monitor_status.api_url + '/ECSServer/cpws/updateConcernPerson.json',
                     form: sendData
                 });
                 ret = JSON.parse(ret);
@@ -731,7 +731,7 @@ module.exports = {
             try {
                 var ret = yield rp({
                     method: 'POST',
-                    url: externalSystemConfig.bed_monitor_provider.api_url + '/ECSServer/devicews/updateDeviceAttachState',
+                    url: externalSystemConfig.bed_monitor_status.api_url + '/ECSServer/devicews/updateDeviceAttachState',
                     form: sendData,
                     json: true
                 });
@@ -795,7 +795,7 @@ module.exports = {
     updatebedMonitorInfo: function () { // modified by zppro 2017-3.31
         var self = this;
         var timeout = 5 * 60 * 1000; // 离床5分钟报警
-        var channelName = 'psn$bed_monitor';
+        var channelName = 'psn$bed_monitor_status';
         return co(function* () {
             try {
                 if (self.isExecuting) {
@@ -963,11 +963,11 @@ module.exports = {
                     key = bedMonitor.name;
                     if (isOffLine) {
                         self.ctx.clog.log(self.logger, '发送睡眠带设备离线消息');
-                        self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR.OFF_LINE, { bedMonitorName: bedMonitor.name });
+                        self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR_STATUS.OFF_LINE, { bedMonitorName: bedMonitor.name });
                         self.ctx.cache.del(key);
                     } else {
                         self.ctx.clog.log(self.logger, '发送睡眠带设备在线消息');
-                        self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR.ON_LINE, {bedMonitorName: bedMonitor.name});
+                        self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR_STATUS.ON_LINE, {bedMonitorName: bedMonitor.name});
 
                         oldBedStatus = self.ctx.cache.get(key);
                         bedStatus = {
@@ -984,7 +984,7 @@ module.exports = {
                                 // self.logger.info('a系统启动或者刚报警 -> 在床 不做任何事情');
                                 self.ctx.clog.log(self.logger, 'a系统启动或者刚报警 -> 在床 不做任何事情');
                                 self.ctx.cache.put(key, bedStatus);
-                                self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR.COME, { bedMonitorName: bedMonitor.name });
+                                self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR_STATUS.COME, { bedMonitorName: bedMonitor.name });
                             } else {
                                 // console.log('a系统启动或者刚报警 -> 离床 重置报警');
                                 // self.logger.info('a系统启动或者刚报警 -> 离床 重置报警');
@@ -1001,7 +1001,7 @@ module.exports = {
                                             // console.log('a elderly:', e);
                                             self.ctx.pub_alarm_service.saveBedMonitorAlarmForElderly(b, e).then(function (alarmId) {
                                                 "use strict";
-                                                self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR.ALARM_LEAVE_TIMEOUT, {
+                                                self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR_STATUS.ALARM_LEAVE_TIMEOUT, {
                                                     bedMonitorName: k,
                                                     reason: DIC.D3016.LEAVE_BED_TIMEOUT,
                                                     alarmId: alarmId
@@ -1012,10 +1012,10 @@ module.exports = {
                                         });
                                     })(bedMonitor, elderly);
                                     self.ctx.clog.log(self.logger, '在报警时间段内 发送离床消息 睡眠带:' + bedMonitor);
-                                    self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR.LEAVE, { bedMonitorName: bedMonitor.name });
+                                    self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR_STATUS.LEAVE, { bedMonitorName: bedMonitor.name });
                                 } else {
                                     self.ctx.clog.log(self.logger, '不在报警时间段内 发送无人在床消息 睡眠带:' + bedMonitor);
-                                    self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR.NO_MAN_IN_BED, { bedMonitorName: bedMonitor.name });
+                                    self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR_STATUS.NO_MAN_IN_BED, { bedMonitorName: bedMonitor.name });
                                 }
                             }
                         } else {
@@ -1026,14 +1026,14 @@ module.exports = {
                                         // console.log('b在床 -> 在床 不做任何事情');
                                         // self.logger.info('b在床 -> 在床 不做任何事情');
                                         self.ctx.clog.log(self.logger, 'b在床 -> 在床 发送在床消息');
-                                        self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR.COME, { bedMonitorName: bedMonitor.name });
+                                        self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR_STATUS.COME, { bedMonitorName: bedMonitor.name });
                                     } else {
                                         // 离床 -> 离床 不做任何事情
                                         // console.log('b离床 -> 离床 处于离床计时,不做任何事情');
                                         // self.logger.info('b离床 -> 离床 处于离床计时,不做任何事情');
                                         self.ctx.clog.log(self.logger, 'b离床 -> 离床 处于离床计时,发送离床消息');
 
-                                        self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR.LEAVE, { bedMonitorName: bedMonitor.name });
+                                        self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR_STATUS.LEAVE, { bedMonitorName: bedMonitor.name });
                                     }
                                 } else {
                                     if (bedStatus.isBed == true) {
@@ -1041,7 +1041,7 @@ module.exports = {
                                         // self.logger.info('b离床 -> 在床 时限内回来了');
                                         self.ctx.clog.log(self.logger, 'b离床 -> 在床 时限内回来了');
                                         self.ctx.cache.put(key, bedStatus);
-                                        self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR.COME, { bedMonitorName: bedMonitor.name });
+                                        self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR_STATUS.COME, { bedMonitorName: bedMonitor.name });
                                     } else {
                                         // console.log('b在床 -> 离床 开始离床计时');
                                         // self.logger.info('b在床 -> 离床 开始离床计时');
@@ -1059,7 +1059,7 @@ module.exports = {
                                                     console.log('b elderly:', e);
                                                     self.ctx.pub_alarm_service.saveBedMonitorAlarmForElderly(b, e).then(function (alarmId) {
                                                         "use strict";
-                                                        self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR.ALARM_LEAVE_TIMEOUT, {
+                                                        self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR_STATUS.ALARM_LEAVE_TIMEOUT, {
                                                             bedMonitorName: k,
                                                             reason: DIC.D3016.LEAVE_BED_TIMEOUT,
                                                             alarmId: alarmId
@@ -1070,10 +1070,10 @@ module.exports = {
                                                 });
                                             })(bedMonitor, elderly);
                                             self.ctx.clog.log(self.logger, 'b 在报警时间段内 发送离床消息 睡眠带:' + bedMonitor);
-                                            self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR.LEAVE, { bedMonitorName: bedMonitor.name });
+                                            self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR_STATUS.LEAVE, { bedMonitorName: bedMonitor.name });
                                         } else {
                                             self.ctx.clog.log(self.logger, 'b 不在报警时间段内 发送无人在床消息 睡眠带:' + bedMonitor);
-                                            self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR.NO_MAN_IN_BED, { bedMonitorName: bedMonitor.name });
+                                            self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR_STATUS.NO_MAN_IN_BED, { bedMonitorName: bedMonitor.name });
                                         }
                                     }
                                 }
@@ -1101,7 +1101,7 @@ module.exports = {
     //             console.log('c 关闭报警');
     //             var key = bedMonitorName;
     //             self.ctx.cache.del(key);
-    //             self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR.COME, { bedMonitorName: bedMonitorName });
+    //             self.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR_STATUS.COME, { bedMonitorName: bedMonitorName });
     //         } catch (e) {
     //             console.log(e);
     //             self.logger.error(e.message);
@@ -1116,7 +1116,7 @@ module.exports = {
                 // console.log('getLatestSmbPerMinuteRecord:')
                 var ret = yield rp({
                     method: 'POST',
-                    url: externalSystemConfig.bed_monitor_provider.api_url + '/ECSServer/devicews/getLatestSmbPerMinuteRecord.json',
+                    url: externalSystemConfig.bed_monitor_status.api_url + '/ECSServer/devicews/getLatestSmbPerMinuteRecord.json',
                     form: { sessionId: sessionId, devId: devId }
                 });
                 // self.logger.info('b:' + ret);
@@ -1197,7 +1197,7 @@ module.exports = {
                 });
                 var ret = yield rp({
                     method: 'POST',
-                    url: externalSystemConfig.bed_monitor_provider.api_url + '/ECSServer/userws/userRegister.json',
+                    url: externalSystemConfig.bed_monitor_status.api_url + '/ECSServer/userws/userRegister.json',
                     form: {
                         userName: tenantId,
                         encryptedName: tenantId,
@@ -1234,7 +1234,7 @@ module.exports = {
                 });
                 var ret = yield rp({
                     method: 'POST',
-                    url: externalSystemConfig.bed_monitor_provider.api_url + '/ECSServer/userws/userRegister.json',
+                    url: externalSystemConfig.bed_monitor_status.api_url + '/ECSServer/userws/userRegister.json',
                     form: {
                         userName: userInfo.name,
                         encryptedName: userInfo.name,
@@ -1666,7 +1666,7 @@ module.exports = {
             try {
                 var ret = yield rp({
                     method: 'POST',
-                    url: externalSystemConfig.bed_monitor_provider.api_url + '/ECSServer/devicews/getStatisticsReportByDevId.json',
+                    url: externalSystemConfig.bed_monitor_status.api_url + '/ECSServer/devicews/getStatisticsReportByDevId.json',
                     form: { sessionId: sessionId, devId: devId, startTime: startTime.format('YYYY-MM-DD'), endTime: endTime.format('YYYY-MM-DD') }
                 });
                 ret = JSON.parse(ret);
@@ -1814,10 +1814,4 @@ module.exports = {
             }
         }).catch(self.ctx.coOnError);
     }
-
-
-
-
-
-
 };

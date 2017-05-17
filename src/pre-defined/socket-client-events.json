@@ -1,7 +1,10 @@
 {
   "PSN": {
-    "BED_MONITOR": {
-      "SUBSCRIBE": "psn$bed_monitor$subscribe"
+    "BED_MONITOR_STATUS": {
+      "SUBSCRIBE": "psn$bed_monitor_status$subscribe"
+    },
+    "BED_MONITOR_LISTEN": {
+      "SUBSCRIBE": "psn$bed_monitor_listen$subscribe"
     }
   },
   "MEMBER": {

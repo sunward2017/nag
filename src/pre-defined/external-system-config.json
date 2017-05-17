@@ -5,7 +5,7 @@
   "member_repository_java": {
     "api_url": "http://apij.okertrip.com"
   },
-  "bed_monitor_provider": {
+  "bed_monitor_status": {
     "api_url": "http://www.qinkeshi.com:8080"
   }
 }

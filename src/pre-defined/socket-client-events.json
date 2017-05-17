@@ -4,7 +4,8 @@
       "SUBSCRIBE": "psn$bed_monitor_status$subscribe"
     },
     "BED_MONITOR_LISTEN": {
-      "SUBSCRIBE": "psn$bed_monitor_listen$subscribe"
+      "SUBSCRIBE": "psn$bed_monitor_listen$subscribe",
+      "UNSUBSCRIBE": "psn$bed_monitor_listen$unsubscribe"
     }
   },
   "MEMBER": {

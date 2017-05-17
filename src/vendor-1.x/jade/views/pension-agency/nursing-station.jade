@@ -105,7 +105,9 @@ script(type="text/ng-template", id="nursing-station-elderly.html")
                     tab-heading
                         | {{ vm.moduleTranslatePath('DLG-ELDERLY-HEAD-LIFE_INTEGRATION') | translate}}
                     .tab-content-block#content-life_integration
-                        | 生命体征图表
+                        .col-md-12.block-per-miniute-vital-sign
+                        .col-md-6.block-per-miniute-heart-rate-bar
+                        .col-md-6.block-realtime-wave
                 tab(active="vm.tab3.active")
                     tab-heading
                         | {{ vm.moduleTranslatePath('DLG-ELDERLY-HEAD-HARDWARE_ROBOT') | translate}}

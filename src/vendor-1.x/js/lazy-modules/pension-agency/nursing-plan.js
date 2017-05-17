@@ -53,7 +53,7 @@
                 vmh.clientData.getJson('nursingPlanAxis'),
                 vmh.shareService.tmp('T3001/psn-nursingLevel', 'name short_name nursing_assessment_grade', null),
                 vmh.shareService.tmp('T3001/psn-workItem', 'name elderlyId sourceId nursingLevelId', null),
-                vmh.shareService.tmp('T3001/psn-drugUseItem', 'drugId drug_full_name elderlyId', null),
+                vmh.shareService.tmp('T3001/psn-drugUseItem', 'drugId name elderlyId', null),
                 vmh.shareService.d('D3015'),
 
             ]).then(function (results) {
@@ -97,7 +97,7 @@
                 }
                 
                 var drugUseItems = _.map(results[3], function (row) {
-                    return { id: row._id, name: row.drug_full_name, drugId: row.drugId, elderlyId: row.elderlyId }
+                    return { id: row._id, name: row.name, drugId: row.drugId, elderlyId: row.elderlyId }
                 });
                 var drugUseItemMap = {},
                     elderlys = [];

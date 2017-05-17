@@ -54,12 +54,26 @@ module.exports = {
             return co(function *() {
                 try {
                     console.log(socketClientEvents.PSN.BED_MONITOR_LISTEN.SUBSCRIBE + ':' + socket.id + '  => data  ' +  JSON.stringify(data));
-                    var bedMonitorMac = data.bedMonitorMac;
-                    if (bedMonitorMac) {
-                        console.log('join bedMonitorListen_', bedMonitorMac);
-                        socket.join('bedMonitorListen_' + bedMonitorMac);
+                    var bedMonitor = yield self.ctx.modelFactory().model_one(self.ctx.models['pub_bedMonitor'], {
+                        select: 'mac',
+                        where: {
+                            status: 1,
+                            name: data.bedMonitorName,
+                            tenantId: data.tenantId
+                        }
+                    });
+                    if(bedMonitor) {
+                        var bedMonitorMac = bedMonitor.mac;
+                        if (bedMonitorMac) {
+                            console.log('join bedMonitorListen_', bedMonitorMac);
+                            socket.join('bedMonitorListen_' + bedMonitorMac);
+                            console.log('PSN.BED_MONITOR_LISTEN.SUBSCRIBE finished')
+                        } else {
+                            console.log('PSN.BED_MONITOR_LISTEN.SUBSCRIBE not finished for no config mac')
+                        }
+                    } else {
+                        console.log('PSN.BED_MONITOR_LISTEN.SUBSCRIBE not finished for invalid bedMonitorName')
                     }
-                    console.log('PSN.BED_MONITOR_LISTEN.SUBSCRIBE finished')
                 }
                 catch (e) {
                     console.log(e);
@@ -71,12 +85,26 @@ module.exports = {
             return co(function *() {
                 try {
                     console.log(socketClientEvents.PSN.BED_MONITOR_LISTEN.UNSUBSCRIBE + ':' + socket.id + '  => data  ' +  JSON.stringify(data));
-                    var bedMonitorMac = data.bedMonitorMac;
-                    if (bedMonitorMac) {
-                        console.log('leave bedMonitorListen_', bedMonitorMac);
-                        socket.leave('bedMonitorListen_' + bedMonitorMac);
+                    var bedMonitor = yield self.ctx.modelFactory().model_one(self.ctx.models['pub_bedMonitor'], {
+                        select: 'mac',
+                        where: {
+                            status: 1,
+                            name: data.bedMonitorName,
+                            tenantId: data.tenantId
+                        }
+                    });
+                    if(bedMonitor) {
+                        var bedMonitorMac = bedMonitor.mac;
+                        if (bedMonitorMac) {
+                            console.log('leave bedMonitorListen_', bedMonitorMac);
+                            socket.leave('bedMonitorListen_' + bedMonitorMac);
+                            console.log('PSN.BED_MONITOR_LISTEN.UNSUBSCRIBE finished')
+                        } else {
+                            console.log('PSN.BED_MONITOR_LISTEN.UNSUBSCRIBE not finished for no config mac')
+                        }
+                    } else {
+                        console.log('PSN.BED_MONITOR_LISTEN.UNSUBSCRIBE not finished for invalid bedMonitorName')
                     }
-                    console.log('PSN.BED_MONITOR_LISTEN.UNSUBSCRIBE finished')
                 }
                 catch (e) {
                     console.log(e);

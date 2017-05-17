@@ -21,6 +21,16 @@
                     C2S: {
                         SUBSCRIBE: 'psn$bed_monitor_status$subscribe'
                     }
+                },
+                BED_MONITOR_LISTEN: {
+                    $SOCKET_URL: '/psn$bed_monitor_listen',
+                    S2C: {
+                        WAVE_DATA: 'psn$bed_monitor_listen$wave_data'
+                    },
+                    C2S: {
+                        SUBSCRIBE: 'psn$bed_monitor_listen$subscribe',
+                        UNSUBSCRIBE: "psn$bed_monitor_listen$unsubscribe"
+                    }
                 }
             }
         })

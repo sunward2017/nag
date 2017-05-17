@@ -101,14 +101,15 @@ script(type="text/ng-template", id="nursing-station-elderly.html")
                                         span.glyphicon.glyphicon-remove(ng-if="!row.confirmed_flag && moment().isAfter(row.exec_on)")
                                         span.glyphicon.glyphicon-time(ng-if="!row.confirmed_flag && moment().isBefore(row.exec_on)")
                                     td
-                tab(active="vm.tab2.active")
+                tab(active="vm.tab2.active" )
                     tab-heading
                         | {{ vm.moduleTranslatePath('DLG-ELDERLY-HEAD-LIFE_INTEGRATION') | translate}}
                     .tab-content-block#content-life_integration
                         .col-md-12.block-per-miniute-vital-sign
                         .col-md-6.block-per-miniute-heart-rate-bar
                         .col-md-6.block-realtime-wave
-                tab(active="vm.tab3.active")
+                            div(echarts="vm.realtime_wave_id",config="vm.realtime_wave_config",echarts-dimension="'2:1'",style="height:100%;")
+                tab(active="vm.tab3.active" ,ng-if="vm.haveBindingRobot")
                     tab-heading
                         | {{ vm.moduleTranslatePath('DLG-ELDERLY-HEAD-HARDWARE_ROBOT') | translate}}
                     .tab-content-block#content-hardware_robot

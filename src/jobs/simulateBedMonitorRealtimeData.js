@@ -20,7 +20,7 @@ var printLog = true;
 var socketServerEvents = require('../pre-defined/socket-server-events.json');
 
  module.exports = {
-     needRegister: true,
+     needRegister: false,
      register: function (ctx) {
          if (this.needRegister) {
              return co(function*() {
@@ -35,7 +35,7 @@ var socketServerEvents = require('../pre-defined/socket-server-events.json');
                      value = Math.ceil(value + Math.random() * 21 - 10);
                      console.log('生成模拟数据:', ts, value);
                      var channelName = 'psn$bed_monitor_listen';
-                     ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR_LISTEN.DATA, {
+                     ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR_LISTEN.WAVE_DATA, {
                          bedMonitorMac: 'A0:E6:F8:55:12:9F',
                          time: ts,
                          value: value

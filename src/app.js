@@ -62,7 +62,7 @@ app.conf = {
         toPaths: ['/me-services/psn']
     },
     authWXApp: {
-        toPaths: ['/me-services/het', '/me-services/qiniu/open/uploadTokenForWXApp']
+        toPaths: ['/me-services/het', '/me-services/app', '/me-services/qiniu/open/uploadTokenForWXApp']
     },
     crossDomainInterceptor:{
         toPaths:['/me-services/api', '/me-services/trv', '/me-services/weixin/open', '/me-services/weixin/open', '/me-services/qiniu/open/uploadToken']
@@ -177,8 +177,7 @@ app.moment = moment;
 
 //rfcore.util
 app.util = rfcore.util;
-
-
+ 
 //mongoose default date function
 app.utcNow  = function() {
     return moment().add(8, 'h');

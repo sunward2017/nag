@@ -16,7 +16,7 @@ module.exports = function(ctx,name) {
             check_in_time: {type: Date, default: Date.now},
             operated_on: {type: Date, default: Date.now},
             status: {type: Number, min: 0, max: 1, default: 1},
-            barcode:{type: String}, //条形码
+            barcode:{type: String, required: true}, //条形码
             name:{type: String, required: true}, //名称
             reference_price:{type: Number}, //参考价
             vender:{type: String},//厂家

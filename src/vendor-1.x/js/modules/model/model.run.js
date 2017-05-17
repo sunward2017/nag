@@ -69,7 +69,7 @@
         modelNode.factory('pub-jobStatus');
         modelNode.factory('pub-robot');
         modelNode.factory('pub-bedMonitor');
-
+        modelNode.factory('pub-drug');
     }
 
 })();

@@ -27,14 +27,11 @@
                                 label
                                     input(type='checkbox' data="trBubble" ng-model="row.checked" )
                                     span.fa.fa-check(data="trBubble")
-                        td.text-center {{::row.drug_no}}
-                        //td.text-center {{::row.validate_util|date:'yyyy-MM-dd'}}
-                        td.text-center {{::row.full_name}}
-                        td.text-center {{::row.short_name}}
-                        td.text-center {{::row.alias}}
+                        td.text-center {{::row.barcode}}
+                        td.text-center {{::row.name}}
                         td {{::row.otc_flag|boolFilter}}
-                        td {{::row.health_care_flag|boolFilter}}
-                        td {{::row.price}}
+                        td {{::row.medical_insurance_flag|boolFilter}}
+                        td {{::row.reference_price | currency}}
                         td {{::row.specification}}
                         td
                             .btn-group
@@ -52,5 +49,15 @@
                                     i.glyphicon.glyphicon-plus
                                 a.btn.btn-primary.btn-sm(title="{{'button.REMOVE'|translate}}",ng-click="vm.remove()")
                                     i.glyphicon.glyphicon-minus
+                            .btn-group
+                                a.btn.btn-primary.btn-sm(ng-click="vm.openImportDialog()") {{ vm.viewTranslatePath('BTN-IMPORT-DRUG-DIALOG') | translate}}
                     .col-md-8
                         pagination.pagination-sm.pull-right(total-items="vm.page.totals",ng-model="vm.page.no",max-size="5",items-per-page="vm.page.size",boundary-links="true" ,ng-change="vm.paging()")
+script(type='text/ng-template', id="dlg-drug-import-file-pick.html")
+    .ngdialog-title
+        | {{ vm.translatePath('TITLE') | translate }}
+    .ngdialog-body(block-ui="import-drug")
+        .tree.tree-basic(s-tree,s-tree-data="vm.drugImportExcelsPromise",s-tree-height="240", s-tree-option="{mode:'grid'}", s-tree-template-url='tree-directive-default-renderer.html',ng-model="vm.toImport")
+        .col-md-6.pull-right.text-right.mt
+            button.btn.btn-success(ng-click="vm.importSelected()") {{'button.CONFIRM'|translate}}
+

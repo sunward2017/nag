@@ -269,7 +269,8 @@
                     userChangePassword: userChangePassword,
                     resetUserPassword: resetUserPassword,
                     upgradeAppServerSide: upgradeAppServerSide,
-                    upgradeAppClientSide: upgradeAppClientSide
+                    upgradeAppClientSide: upgradeAppClientSide,
+                    importDrug: importDrug
                 };
 
                 function tenantInfo(tenantId,select) {
@@ -323,6 +324,10 @@
 
                 function upgradeAppClientSide(appId, os) {
                     return $http.post(baseUrl + 'upgradeAppClientSide/' + appId + ',' + os);
+                }
+
+                function importDrug(file_name) {
+                    return $http.post(baseUrl + 'importDrug', {file_name: file_name});
                 }
             }]
         };

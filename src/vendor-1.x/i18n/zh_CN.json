@@ -111,7 +111,8 @@
     "DISABLE-RECHARGE-SUCCESS": "撤销充值成功",
     "CHANGE-RECHARGE-BOOKING-AMOUNT-SUCCESS": "修改充值记账金额成功",
     "DISABLE-RED-SUCCESS": "撤销冲红成功",
-    "CHANGE-RED-BOOKING-AMOUNT-SUCCESS": "修改冲红金额成功"
+    "CHANGE-RED-BOOKING-AMOUNT-SUCCESS": "修改冲红金额成功",
+    "IMPORT-SUCCESS": "数据导入成功"
   },
   "confirm": {
     "SUBMIT": "确定要提交么？",
@@ -273,6 +274,9 @@
       "APP-SERVERSIDE-UPDATE": "app站点更新",
       "APP-CLIENTSIDE-UPDATE": "app更新",
       "DEVICE-ACCESS": "访问设备",
+      "------------": "",
+      "DATA-MANAGE": "数据管理",
+      "DRUG": "药品",
       "------------": "",
       "METADATA-MANAGE": "元数据管理",
       "DICTIONARY-MANAGE": "字典管理",

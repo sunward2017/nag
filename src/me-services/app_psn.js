@@ -174,25 +174,33 @@ module.exports = {
             handler: function (app, options) {
                 return function* (next) {
                     try {
-                        console.log("request", this.request.body.drug);
+                        // console.log("request", this.request.body.drug);
                         var drug = this.request.body.drug;
-                        if (!drug.local_flag) {
-                            yield app.modelFactory().model_create(app.models['psn_drugDirectory'], drug);
-                        };
+                        var barcode = drug.barcode;
+                        var stock = yield app.modelFactory().model_one(app.models['psn_drugDirectory'], { where: { barcode: barcode } });
+
                         var img = drug.img;
                         if (img) {
                             var barcode = drug.barcode;
                             var pubDrug = yield app.modelFactory().model_one(app.models['pub_drug'], {
                                 where: { barcode: barcode }
                             });
-                            if (!pubDrug.img) {
-                                pubDrug.img = img;
-                                pugDrug.save();
-                            }
-
+                            
+                            pubDrug.img = img;
+                            yield pubDrug.save();
                         }
-                        var msg = "药品入库保存成功"
-                        this.body = app.wrapper.res.ret({success:true,msg:msg});
+
+                        if (stock) {
+                            yield app.modelFactory().model_update(app.models['psn_drugDirectory'], stock.id, drug);
+                            var msg = "药品入库更新成功"
+                            this.body = app.wrapper.res.ret({ success: true, exec:201,msg: msg });
+
+                        } else {
+                            yield app.modelFactory().model_create(app.models['psn_drugDirectory'], drug);
+                            var msg = "药品入库新增成功"
+                            this.body = app.wrapper.res.ret({ success: true, exec:200, msg: msg });
+                        }
+
                     } catch (e) {
                         self.logger.error(e.message);
                         this.body = app.wrapper.res.error(e);

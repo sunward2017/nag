@@ -69,7 +69,7 @@
                 }
                 if (vm.model.elderlyId) {
                     vm.selectedElderly = { _id: vm.model.elderlyId, name: vm.model.elderly_name };
-                    vm.selectedDrug = { _id: vm.model.drugId, name: vm.model.drug_full_name };
+                    vm.selectedDrug = { _id: vm.model.drugId, name: vm.model.name };
                 }
             });
         }
@@ -89,7 +89,7 @@
             if (row) {
                 vm.model.drugId = row.id;
                 vm.model.drug_no = row.drug_no;
-                vm.model.drug_full_name = row.full_name;
+                vm.model.name = row.full_name;
             }
         }
 

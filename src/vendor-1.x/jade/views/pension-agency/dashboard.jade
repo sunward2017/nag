@@ -107,8 +107,8 @@
    .col-lg-6
       .panel.panel-primary.widget
           .panel-heading
-              h3.panel-title 当月及下月生日老人
+              h3.panel-title {{ vm.moduleTranslatePath('BIRTHDAY-ELDERLY') | translate}}
           .panel-body     
               ul.list-inline
-                  li(ng-repeat="elderly in vm.birthdayElderlys")
+                  li.widget(ng-repeat="elderly in vm.birthdayElderlys")
                       .btn.btn-info.btn-xs {{ elderly.name+"("+(elderly.sex=="M"?"男":"女" )+")"}}

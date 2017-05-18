@@ -437,8 +437,8 @@
 
             vm.onAvatarUploaded = onAvatarUploaded;
             // vm.tab1 = {cid: 'contentTab1', active: true};
-            vm.tab1 = {cid: 'content-nursing_records_today'};
-            vm.tab2 = {cid: 'content-life_integration', active: true};
+            vm.tab1 = {cid: 'content-nursing_records_today', active: !vm.haveBindingBedMonitor};
+            vm.tab2 = {cid: 'content-life_integration', active: vm.haveBindingBedMonitor};
             vm.tab3 = {cid: 'content-hardware_robot'};
 
 

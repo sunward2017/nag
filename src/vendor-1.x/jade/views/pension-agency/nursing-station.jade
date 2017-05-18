@@ -27,6 +27,7 @@ form.search-form
                     .name.text-center {{ alarm.elderly.name }}
 .nursing-station
     .col-md-12.monitor-objects(block-ui="nursing-station")
+        //div(echarts="vm.realtime_wave_id",config="vm.realtime_wave_config",echarts-dimension="'2:1'",style="height:100%;")
         .elderly(ng-repeat="elderly in vm.elderlys")
             .online-offline
                 span.fa(ng-class='{"fa-plug online": vm.elderlyStatusMonitor[elderly.id].status && vm.elderlyStatusMonitor[elderly.id].status != "offline", "fa-plug offline": vm.elderlyStatusMonitor[elderly.id].status == "offline"}')
@@ -72,6 +73,7 @@ script(type="text/ng-template", id="nursing-station-elderly.html")
                 .label.col-md-2.field-label.double-row-height {{ vm.moduleTranslatePath('DLG-ELDERLY-LABEL-FAMILY_MEMBERS') | translate }}
                 .col-md-10.field-value.family-members.double-row-height {{vm.family_members}}
         .elderly-more-info.col-md-12
+
             tabset(justified="true")
                 tab(active="vm.tab1.active")
                     tab-heading
@@ -107,8 +109,10 @@ script(type="text/ng-template", id="nursing-station-elderly.html")
                     .tab-content-block#content-life_integration
                         .col-md-12.block-per-miniute-vital-sign
                         .col-md-6.block-per-miniute-heart-rate-bar
+                            div(echarts="vm.miniute_hr_bar_id",config="vm.miniute_hr_bar_config",style="width: 400px;height:200px;")
                         .col-md-6.block-realtime-wave
-                            div(echarts="vm.realtime_wave_id",config="vm.realtime_wave_config",echarts-dimension="'2:1'",style="height:100%;")
+                            div(echarts="vm.realtime_wave_id",config="vm.realtime_wave_config",style="width: 400px;height:200px;")
+                            //div(id="{{vm.realtime_wave_id}}" style="width: 400px;height:200px;")
                 tab(active="vm.tab3.active" ,ng-if="vm.haveBindingRobot")
                     tab-heading
                         | {{ vm.moduleTranslatePath('DLG-ELDERLY-HEAD-HARDWARE_ROBOT') | translate}}

@@ -102,7 +102,7 @@
         }
 
         function doSubmit() {
-            vm.model.repeat_values = vm.repeat_values ? vm.repeat_values.split(",") : "";
+            vm.model.repeat_values = vm.repeat_values ? vm.repeat_values.split(",") : [];
             if (vm.model.voice_template) {
                 var reg = /\${[^}]+}/g;
                 var arr = vm.model.voice_template.match(reg);

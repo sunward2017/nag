@@ -52,39 +52,39 @@ module.exports = {
 
     },
     isInWhiteList: function (ip) {
+        var self = this;
         return !!this.ctx._.find(this.white_list_regs, (re)=> {
             // console.log('ip:',ip, re.test(ip));
+            self.ctx.clog.log(self.logger, 'ip: ', ip, re.test(ip));
             return re.test(ip);
         });
     },
     startListen: function (listenConfig) {
-
         var self = this;
         // tcp服务端
         var server = net.createServer(function(socket){
-            console.log('服务端：收到来自客户端的请求', socket.remoteAddress);
+            self.ctx.clog.log(self.logger, '服务端：收到来自客户端的请求', socket.remoteAddress);
             if (!self.isInWhiteList(socket.remoteAddress)) {
-                console.log('服务端：不在白名单,拒绝', socket.remoteAddress);
+                self.ctx.clog.log(self.logger, '服务端：不在白名单,拒绝', socket.remoteAddress);
                 socket.end()
             }
 
             socket.on('data', function(data){
-                console.log('服务端：收到客户端数据，内容为{'+ data +'}');
-
+                self.ctx.clog.log(self.logger, '服务端：收到客户端数据，内容为{'+ data +'}');
                 // 给客户端返回数据
                 socket.write('你好，我是服务端');
             });
 
             socket.on('close', function(){
-                console.log('服务端：客户端连接断开');
+                self.ctx.clog.log(self.logger, '服务端：客户端连接断开');
             });
 
         }).listen(listenConfig.port, listenConfig.ip, function(){
-            console.log('服务端：开始监听来自客户端的请求');
+            self.ctx.clog.log(self.logger, '服务端：开始监听来自客户端的请求');
         });
 
         server.on('error', function(error){
-            console.log( 'error事件：服务端异常：' + error.message );
+            self.ctx.clog.log(self.logger, 'error事件：服务端异常：', error);
         });
 
     },

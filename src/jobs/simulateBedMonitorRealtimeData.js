@@ -32,7 +32,7 @@ var socketServerEvents = require('../pre-defined/socket-server-events.json');
                      }
 
                      var ts = ctx.moment().unix();
-                     value = Math.ceil(value + Math.random() * 21 - 10);
+                     value = Math.ceil(value + Math.random() * 21 - (ts % 2 == 0? 10 : 13));
                      console.log('生成模拟数据:', ts, value);
                      var channelName = 'psn$bed_monitor_listen';
                      ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR_LISTEN.WAVE_DATA, {

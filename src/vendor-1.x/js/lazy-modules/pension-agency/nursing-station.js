@@ -48,6 +48,33 @@
                 return nodes;
             });
 
+            // vm.realtime_wave_id = $echarts.generateInstanceIdentity();
+            // vm.realtime_wave_config = {
+            //     title: {
+            //         text: '动态数据 + 时间坐标轴'
+            //     },
+            //     xAxis: {
+            //         type: 'time',
+            //         splitLine: {
+            //             show: false
+            //         }
+            //     },
+            //     yAxis: {
+            //         type: 'value',
+            //         boundaryGap: [0, '100%'],
+            //         splitLine: {
+            //             show: false
+            //         }
+            //     },
+            //     series: [{
+            //         name: '模拟数据',
+            //         type: 'line',
+            //         showSymbol: false,
+            //         hoverAnimation: false,
+            //         data: []
+            //     }]
+            // };
+
             subscribeBedMonitorStatus();
             processAlarmQueue();
         }
@@ -281,11 +308,6 @@
                     haveBindingRobot: false,
                     bindingBedMonitor: vm.elderlyStatusMonitor[elderly.id],
                     subscribeBedMonitorListen: vm.subscribeBedMonitorListen
-                },
-                resolve:{
-                    $echarts:  function () {
-                        return $echarts;
-                    }
                 }
             }).closePromise.then(function (ret) {
                 if (vm.elderlyStatusMonitor[elderly.id]) {
@@ -356,9 +378,48 @@
         var vmh = $scope.ngDialogData.vmh;
 
         $scope.utils = vmh.utils.v;
-        $scope.moment = vmh.utils.m;
+        var moment = $scope.moment = vmh.utils.m;
+
+        var minute_hr_x_data = [], minute_hr_y_data = [], wave_x_data = [], wave_y_data = [];
+
+
+        // var now = moment().unix();
+        // var oneDay = 24 * 3600 * 1000;
+        // var oneMinute = 60 * 1000;
+        // var value = Math.random() * 1000;
+        // for (var i = 0; i < 60; i++) {
+        //     var ts = now;
+        //     xData.push(ts);
+        //     wave_data.push(randomData(ts));
+        // }
+        // function randomData(ts) {
+        //     value = value + Math.random() * 21 - 10;
+        //     return {
+        //         value: [
+        //             ts,
+        //             Math.round(value)
+        //         ]
+        //     }
+        // }
+        // setInterval(function () {
+        //     var ts = moment().unix();
+        //     xData.shift();
+        //     xData.push(ts);
+        //     wave_data.shift();
+        //     wave_data.push(randomData(ts));
+        //     $echarts.updateEchartsInstance(vm.realtime_wave_id, {
+        //         xAxis: {
+        //             data: xData
+        //         },
+        //         series: [{
+        //             data: wave_data
+        //         }]
+        //     });
+        // }, 1000);
 
         init();
+
+
 
         function init() {
             vm.moduleTranslatePathRoot = $scope.ngDialogData.moduleTranslatePathRoot;
@@ -373,14 +434,13 @@
             vm.bindingBedMonitor = $scope.ngDialogData.bindingBedMonitor;
             vm.haveBindingRobot = $scope.ngDialogData.haveBindingRobot;
             vm.haveBindingBedMonitor = !!vm.bindingBedMonitor;
-            vm.wave_data = [];
-
 
             vm.onAvatarUploaded = onAvatarUploaded;
             // vm.tab1 = {cid: 'contentTab1', active: true};
             vm.tab1 = {cid: 'content-nursing_records_today'};
             vm.tab2 = {cid: 'content-life_integration', active: true};
             vm.tab3 = {cid: 'content-hardware_robot'};
+
 
             vmh.parallel([
                 vmh.shareService.d2('D1012'),
@@ -396,46 +456,73 @@
                     return (o.aggr_value || {}).name;
                 }).join();
                 vm.nursingRecords = results[3];
-
-                // 获取睡眠带生命体征及实时数据
-                if (vm.haveBindingBedMonitor) {
-                    subscribeBedMonitorListen(vm.bindingBedMonitor.bedMonitorName, vm.tenantId);
-                    vm.realtime_wave_id = $echarts.generateInstanceIdentity();
-                    console.log('vm.realtime_wave_id:', vm.realtime_wave_id);
-                    vm.realtime_wave_config = {
-                        title: {
-                            text: '动态数据 + 时间坐标轴'
-                        },
-                        xAxis: {
-                            type: 'time',
-                            splitLine: {
-                                show: false
-                            }
-                        },
-                        yAxis: {
-                            type: 'value',
-                            boundaryGap: [0, '100%'],
-                            splitLine: {
-                                show: false
-                            }
-                        },
-                        series: [{
-                            name: '模拟数据',
-                            type: 'line',
-                            showSymbol: false,
-                            hoverAnimation: false,
-                            data: vm.wave_data
-                        }]
-                    };
-                    
-                }
-
-                // 获取睡眠带生命体征及实时数据
-                if(vm.haveBindingRobot) {
-
-                }
-
             });
+
+            // 获取睡眠带生命体征及实时数据
+            if (vm.haveBindingBedMonitor) {
+
+                vm.miniute_hr_bar_id = $echarts.generateInstanceIdentity();
+                vm.miniute_hr_bar_config = {
+                    title: {
+                        text: '心率'
+                    },
+                    xAxis: {
+                        type: 'category',
+                        splitLine: {
+                            show: false
+                        },
+                        data: minute_hr_x_data
+                    },
+                    yAxis: {
+                        type: 'value',
+                        boundaryGap: [0, '100%'],
+                        splitLine: {
+                            show: false
+                        }
+                    },
+                    series: [{
+                        // name: '心律(波形)',
+                        type: 'line',
+                        showSymbol: false,
+                        hoverAnimation: false,
+                        data: minute_hr_y_data
+                    }]
+                };
+
+                vm.realtime_wave_id = $echarts.generateInstanceIdentity();
+                vm.realtime_wave_config = {
+                    title: {
+                        text: '心律(波形)'
+                    },
+                    xAxis: {
+                        type: 'category',
+                        splitLine: {
+                            show: false
+                        },
+                        data: wave_x_data
+                    },
+                    yAxis: {
+                        type: 'value',
+                        boundaryGap: [0, '100%'],
+                        splitLine: {
+                            show: false
+                        }
+                    },
+                    series: [{
+                        // name: '心律(波形)',
+                        type: 'line',
+                        showSymbol: false,
+                        hoverAnimation: false,
+                        data: wave_y_data
+                    }]
+                };
+                subscribeBedMonitorListen(vm.bindingBedMonitor.bedMonitorName, vm.tenantId);
+            }
+
+            // 获取睡眠带生命体征及实时数据
+            if(vm.haveBindingRobot) {
+
+            }
         }
 
         function subscribeBedMonitorListen (bedMonitorName, tenantId) {
@@ -448,25 +535,29 @@
             });
             channelOfListen.off(SOCKET_EVENTS.PSN.BED_MONITOR_LISTEN.S2C.WAVE_DATA).on(SOCKET_EVENTS.PSN.BED_MONITOR_LISTEN.S2C.WAVE_DATA, function(data) {
                 console.log('nursing-station bed_monitor_listen socket WAVE_DATA =>', data);
+                var ts = moment().unix();
 
-                for (var i = 0; i < 5; i++) {
-                    data.shift();
-                    data.push(randomData());
+                if(wave_x_data.length == 60){
+                    wave_x_data.shift();
                 }
+                wave_x_data.push(ts);
 
-                if(vm.data.length == 60){
-                    vm.data.shift();
+                if(wave_y_data.length == 60){
+                    wave_y_data.shift();
                 }
-                vm.data.push({
-                    value:[
-                        moment().format('HH:mm:ss'),
+                wave_y_data.push({
+                    value: [
+                        ts,
                         data.value
                     ]
-                })
+                });
 
-                vm.realtime_wave_instance.setOption({
+                $echarts.updateEchartsInstance(vm.realtime_wave_id, {
+                    xAxis: {
+                        data: wave_x_data
+                    },
                     series: [{
-                        data: vm.data
+                        data: wave_y_data
                     }]
                 });
             });

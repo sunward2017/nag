@@ -224,7 +224,7 @@ module.exports = {
                         // console.log("<<<<<user<<<<<", user);
 
                         if (!user || user.status == 0) {
-                            this.body = app.wrapper.res.error({ message: '认证失败,请重新认证' });
+                            this.body = app.wrapper.res.ret({code:500, message: '认证失败,请重新认证' });
                             yield next;
                             return;
                         } else {

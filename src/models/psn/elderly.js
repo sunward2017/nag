@@ -106,7 +106,7 @@ module.exports = function(ctx,name) {
             bed_monitor_timeout_alarm_begin:{type:String,minlength: 5, maxlength: 5},//超时报警起始时间
             bed_monitor_timeout_alarm_end:{type:String,minlength: 5, maxlength: 5},//超时报警结束时间
             last_assessment_time:{type: Date},//最近一次评估时间
-            lastAssessmentId:{type: mongoose.Schema.Types.ObjectId, required: true, ref: 'psn_assessment'},//最近一次评估
+            lastAssessmentId:{type: mongoose.Schema.Types.ObjectId, ref: 'psn_assessment'},//最近一次评估
             tenantId: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'pub_tenant'}
         }, {
             toObject: {

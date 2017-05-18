@@ -3600,18 +3600,23 @@ module.exports = {
 
                             yield elderly.save();
                             steps += "A";
-
+                            
+                            
                             new_tenantJournalAccount_B0006 = yield app.modelFactory().model_create(app.models['pub_tenantJournalAccount'], new_tenantJournalAccount_B0006);
                             remove_tenantJournalAccount_B0006_id = new_tenantJournalAccount_B0006._id;
                             steps += "A";
-                            new_tenantJournalAccount_item = yield app.modelFactory().model_create(app.models['pub_tenantJournalAccount'], new_tenantJournalAccount_item);
-                            remove_tenantJournalAccount_item_id = new_tenantJournalAccount_item._id;
-                            steps += "A";
+                            
+                            if(new_tenantJournalAccount_item){
+                                 new_tenantJournalAccount_item = yield app.modelFactory().model_create(app.models['pub_tenantJournalAccount'], new_tenantJournalAccount_item);
+                                 remove_tenantJournalAccount_item_id = new_tenantJournalAccount_item._id;
+                                 steps += "A";
+                            }
+                           
 
                             yield tenant.save();
 
                             this.body = app.wrapper.res.ret(exit.settlement_info);
-                        } catch (e) {
+                        } catch (e) { 
                             self.logger.error(e.message);
                             this.body = app.wrapper.res.error(e);
 

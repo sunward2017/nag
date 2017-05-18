@@ -28,9 +28,15 @@ module.exports = {
         var listenConfig = ctx.conf.isProduction ? bedMonitorListenConfigs.production : bedMonitorListenConfigs.dev;
         console.log('listenConfig:', listenConfig);
 
-        this.connectTo(listenConfig);
+        // this.connectTo(listenConfig);
+        
+        this.bedMonitorMacToName = {}; //mac作键 tenantId+name做值
 
         return this;
+    },
+    updateBedMonitors: function() {
+        "use strict";
+
     },
     connectTo: function (listenConfig) {
         var self = this;
@@ -41,35 +47,37 @@ module.exports = {
                 // 完全关闭连接
                 self.socket.destroy();
             }
-
             self.socket = new net.Socket();
 
             self.socket.connect(listenConfig.port, listenConfig.ip, function() {
                 self.ctx.clog.log(self.logger, 'CONNECTED TO: ' + listenConfig.ip + ':' + listenConfig.port);
                 // 建立连接后立即向服务器发送数据，服务器将收到这些数据
-                self.socket.write('333333');
+                self.socket.write('6666666666');
+                console.log('socket', self.socket);
+
+                // 为客户端添加“data”事件处理函数
+                // data是服务器发回的数据
+                self.socket.on('data', function(data) {
+                    // self.ctx.clog.log(self.logger, 'DATA: ' + data);
+                    console.log('DATA: ', data)
+                    // self.client.end('received:' + data);
+                });
+
+                // 为客户端添加“close”事件处理函数
+                self.socket.on('close', function() {
+                    setTimeout(()=>{
+                        self.ctx.clog.log(self.logger, 'Connection closed 重连');
+                        self.connectTo(listenConfig);
+                    }, 30000);
+
+                });
+
+                self.socket.on('error', function(err) {
+                    self.ctx.clog.log(self.logger, 'socket err:', err);
+                });
             });
             //
-            // 为客户端添加“data”事件处理函数
-            // data是服务器发回的数据
-            self.socket.on('data', function(data) {
-                // self.ctx.clog.log(self.logger, 'DATA: ' + data);
-                console.log('DATA: ' + data)
-                self.client.end('received:' + data);
-            });
 
-            // 为客户端添加“close”事件处理函数
-            self.socket.on('close', function() {
-                setTimeout(()=>{
-                    self.ctx.clog.log(self.logger, 'Connection closed 重连');
-                    self.connectTo(listenConfig);
-                }, 30000);
-
-            });
-
-            self.socket.on('error', function(err) {
-                self.ctx.clog.log(self.logger, 'socket err:', err);
-            });
         }
         catch (e) {
             console.log(e);

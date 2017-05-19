@@ -536,7 +536,8 @@
                     nursingStationCloseBedMonitorAlarm: nursingStationCloseBedMonitorAlarm,
                     nursingLevelsByAssessmentGrade: nursingLevelsByAssessmentGrade,
                     nursingLevels:nursingLevels,
-                    customizedWorkItem:customizedWorkItem
+                    customizedWorkItem:customizedWorkItem,
+                    getLatestSmbPerMinuteRecord:getLatestSmbPerMinuteRecord
                 };
 
                 function roomStatusInfo(tenantId) {
@@ -802,6 +803,9 @@
                 }
                 function customizedWorkItem(workItemId,customizedWorkItem){
                     return $http.post(baseUrl + 'customizedWorkItem',{workItemId:workItemId,customizedWorkItem:customizedWorkItem})
+                }
+                function getLatestSmbPerMinuteRecord(sessionId,devId,openId){
+                    return $http.post(baseUrl + 'getLatestSmbPerMinuteRecord', {sessionId: sessionId,devId:devId,openId:openId});
                 }
             }]
         };

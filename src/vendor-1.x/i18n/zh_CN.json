@@ -85,6 +85,7 @@
     "ALREADY-EXISTS": "已经存在相同的{{item}};",
     "ORDER-MUST_CHOOSE_ONE_FUNC": "订单必须选择至少一个功能;",
     "ID-NO": "身份证格式不正确;",
+    "BARCODE":"药品条形码不正确",
     "SERVER-SIDE-CHECK":"后端验证错误：{{item}};",
     "BED-FORBIDDEN":"该床位被禁用;"
   },

@@ -6,7 +6,7 @@ var co = require('co');
 var net = require('net');
 var bedMonitorListenConfigs = require('../pre-defined/bed-monitor-listen-config.json');
 // var DIC = require('../pre-defined/dictionary-constants.json');
-// var socketServerEvents = require('../pre-defined/socket-server-events.json');
+var socketServerEvents = require('../pre-defined/socket-server-events.json');
 
 module.exports = {
     init: function (ctx) {
@@ -59,6 +59,15 @@ module.exports = {
             return re.test(ip);
         });
     },
+    parseData: function (data) {
+        if (!data) return;
+        var channelName = 'psn$bed_monitor_listen', arr = data.split('^');
+        var mac = arr[1].toUpperCase(), raw_values = JSON.parse(arr[2]);
+        this.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR_LISTEN.WAVE_DATA, {
+            bedMonitorMac: mac,
+            values: raw_values
+        });
+    },
     startListen: function (listenConfig) {
         var self = this;
         // tcp服务端
@@ -69,10 +78,11 @@ module.exports = {
                 socket.end()
             }
 
-            socket.on('data', function(data){
-                self.ctx.clog.log(self.logger, '服务端：收到客户端数据，内容为{'+ data +'}');
+            socket.on('data', function(buffer){
+                self.ctx.clog.log(self.logger, '服务端：收到客户端数据，内容为{'+ buffer +'}');
+                self.parseData(buffer.toString());
                 // 给客户端返回数据
-                socket.write('你好，我是服务端');
+                // socket.write('你好，我是服务端');
             });
 
             socket.on('close', function(){

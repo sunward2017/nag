@@ -5027,8 +5027,8 @@ module.exports = {
                                     live_in_flag: true,
                                     _id: { '$in': elderlyIds },
                                     tenantId: tenantId
-                                }
-
+                                },
+                                sort: {'room_value.roomId': 1}
                             }).populate('nursingLevelId', 'name short_name nursing_assessment_grade', 'psn_nursingLevel')
                                 .populate('room_value.roomId', 'name bedMonitors', 'psn_room');
 

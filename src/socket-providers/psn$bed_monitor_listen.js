@@ -32,6 +32,7 @@ module.exports = {
         return this;
     },
     sendToClient: function (eventName, eventData) {
+        eventData.ts = this.ctx.moment().unix();
         console.log('eventName: ', eventName);
         console.log('eventData: ', eventData);
         if (eventData.bedMonitorMac) {
@@ -65,6 +66,7 @@ module.exports = {
                     if(bedMonitor) {
                         var bedMonitorMac = bedMonitor.mac;
                         if (bedMonitorMac) {
+                            bedMonitorMac = bedMonitorMac.toUpperCase();
                             console.log('join bedMonitorListen_', bedMonitorMac);
                             socket.join('bedMonitorListen_' + bedMonitorMac);
                             console.log('PSN.BED_MONITOR_LISTEN.SUBSCRIBE finished')
@@ -96,6 +98,7 @@ module.exports = {
                     if(bedMonitor) {
                         var bedMonitorMac = bedMonitor.mac;
                         if (bedMonitorMac) {
+                            bedMonitorMac = bedMonitorMac.toUpperCase();
                             console.log('leave bedMonitorListen_', bedMonitorMac);
                             socket.leave('bedMonitorListen_' + bedMonitorMac);
                             console.log('PSN.BED_MONITOR_LISTEN.UNSUBSCRIBE finished')

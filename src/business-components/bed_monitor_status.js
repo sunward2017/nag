@@ -1814,13 +1814,20 @@ module.exports = {
             }
         }).catch(self.ctx.coOnError);
     },
-    checkSessionAndGetLatestSmbPerMinuteRecord:function(sessionId,devId){
+    checkSessionAndGetLatestSmbPerMinuteRecord:function(sessionId,devId,openId){
         var self = this;
         return co(function* (){
             try {
                 var sessionIsExpired = yield self.checkSessionIsExpired(sessionId);
                 if (!sessionIsExpired) {
-                    return yield self.getLatestSmbPerMinuteRecord(sessionId,devId);
+                    var ret = yield self.getLatestSmbPerMinuteRecord(sessionId,devId);
+                    if (ret.retCode == 'success') {
+                        return self.ctx.wrapper.res.ret(ret.retValue);
+                    } else {
+                        return self.ctx.wrapper.res.error({ message: ret.retValue });
+                    }
+                }else{
+                    yield self.login(openId);
                 }
             } catch (e) {
                 console.log(e);

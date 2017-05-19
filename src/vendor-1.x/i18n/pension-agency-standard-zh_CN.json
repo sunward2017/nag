@@ -356,6 +356,12 @@
       "DLG-ELDERLY-TH-ASSIGNED_WORKER": "护工",
       "DLG-ELDERLY-TH-CONFIRM_FLAG": "完成情况",
       "DLG-ELDERLY-HEAD-LIFE_INTEGRATION": "生命体征",
+      "DLG-ELDERLY-TH-OCCUR_TIME": "时间",
+      "DLG-ELDERLY-TH-HEART_RATE_COUNT": "心率",
+      "DLG-ELDERLY-TH-BREATH_RATE_COUNT": "呼吸率",
+      "DLG-ELDERLY-TH-TURN_OVER_COUNT": "翻身次数",
+      "DLG-ELDERLY-TH-BODY_MOVE_COUNT": "移动次数",
+      "DLG-ELDERLY-TH-IN_BED": "在床",
       "DLG-ELDERLY-HEAD-HARDWARE_ROBOT": "照护机器人"
     },
     "nursing-plan": {

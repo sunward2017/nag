@@ -70,6 +70,9 @@
         modelNode.factory('pub-robot');
         modelNode.factory('pub-bedMonitor');
         modelNode.factory('pub-drug');
+
+        //het
+        modelNode.factory('het-member');
     }
 
 })();

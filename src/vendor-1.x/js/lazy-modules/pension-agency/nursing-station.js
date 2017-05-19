@@ -452,7 +452,8 @@
                 vmh.shareService.d2('D1012'),
                 vmh.getModelService('psn-elderly').single({_id: vm.elderly._id},'nursing_assessment_grade family_members'),
                 vmh.psnService.nursingScheduleByElderlyDaily(vm.tenantId, vm.elderly._id),
-                vmh.psnService.nursingRecordsByElderlyToday(vm.tenantId, vm.elderly._id)
+                vmh.psnService.nursingRecordsByElderlyToday(vm.tenantId, vm.elderly._id),
+                vmh.getModelService('het-member').single({tenantId: vm.tenantId},'session_id_hzfanweng')
             ]).then(function (results) {
                 vm.nursing_assessment_grade_name = results[1].nursing_assessment_grade_name;
                 vm.family_members = _.map(results[1].family_members, function (o) {
@@ -462,10 +463,48 @@
                     return (o.aggr_value || {}).name;
                 }).join();
                 vm.nursingRecords = results[3];
+                vm.sessionId = results[4].session_id_hzfanweng;
+                vmh.psnService.getLatestSmbPerMinuteRecord(results[4].session_id_hzfanweng,vm.bindingBedMonitor.bedMonitorName,vm.tenantId).then(function(result){
+                    vm.occurTime = result.occurTime;
+                    vm.heartRateCount = result.heartRateCount;
+                    vm.breathRateCount = result.breathRateCount;
+                    vm.turnOverCount = result.turnOverCount;
+                    vm.bodyMoveCount = result.bodyMoveCount;
+                    vm.inBed = result.inBed;
+                    minute_hr_y_data.push(result.heartRateCount);
+                        $echarts.updateEchartsInstance(vm.miniute_hr_bar_id, {
+                            xAxis: {
+                                data: minute_hr_x_data
+                            },
+                            series: [{
+                                data: minute_hr_y_data
+                            }]
+                        });
+                });
             });
 
             // 获取睡眠带生命体征及实时数据
             if (vm.haveBindingBedMonitor) {
+                setInterval(function(){
+                    vmh.psnService.getLatestSmbPerMinuteRecord(vm.sessionId,vm.bindingBedMonitor.bedMonitorName,vm.tenantId).then(function(result){
+                        vm.occurTime = result.occurTime;
+                        vm.heartRateCount = result.heartRateCount;
+                        vm.breathRateCount = result.breathRateCount;
+                        vm.turnOverCount = result.turnOverCount;
+                        vm.bodyMoveCount = result.bodyMoveCount;
+                        vm.inBed = result.inBed;
+                        if(minute_hr_y_data.length > 9) minute_hr_y_data.shift();
+                        minute_hr_y_data.push(result.heartRateCount);
+                        $echarts.updateEchartsInstance(vm.miniute_hr_bar_id, {
+                            xAxis: {
+                                data: minute_hr_x_data
+                            },
+                            series: [{
+                                data: minute_hr_y_data
+                            }]
+                        });
+                    });
+                },1000*60);
 
                 vm.miniute_hr_bar_id = $echarts.generateInstanceIdentity();
                 vm.miniute_hr_bar_config = {
@@ -480,6 +519,8 @@
                         data: minute_hr_x_data
                     },
                     yAxis: {
+                        min:0,
+                        max:160,
                         type: 'value',
                         boundaryGap: [0, '100%'],
                         splitLine: {
@@ -488,7 +529,7 @@
                     },
                     series: [{
                         // name: '心律(波形)',
-                        type: 'line',
+                        type: 'bar',
                         showSymbol: false,
                         hoverAnimation: false,
                         data: minute_hr_y_data

@@ -5421,6 +5421,23 @@ module.exports = {
                         yield next;
                     };
                 }
+            },{
+                method: 'getLatestSmbPerMinuteRecord',
+                verb: 'post',
+                url: this.service_url_prefix + "/getLatestSmbPerMinuteRecord",
+                handler: function (app, options) {
+                    return function* (next) {
+                        try {
+                            var ret = yield app.bed_monitor_status.checkSessionAndGetLatestSmbPerMinuteRecord(this.request.body.sessionId, this.request.body.devId, this.request.body.openId);
+                            this.body = ret;
+                        } catch (e) {
+                            console.log(e);
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
             }
             /**********************其他*****************************/
 

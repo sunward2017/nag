@@ -592,14 +592,22 @@
                 vm.IoC.intervalIdOfRealWave = setInterval(function () {
                     var value = wave_raw_data.pop();
                     console.log('value:', value);
-                    if (!value) return;
-
-                    value =  (value / radio).toFixed(2) - 100;
+                    if (!value) {
+                        value = 0;
+                    } else {
+                        value =  (value / radio).toFixed(2) - 100;
+                    }
 
                     if(wave_x_data.length == 0) {
                         wave_x_data.shift();
-                        wave_x_data = _.range(renderMax)
-                        wave_y_data = wave_raw_data.slice(0, renderMax);
+                        wave_x_data = _.range(renderMax);
+                        if(wave_raw_data.length>0){
+                            wave_y_data = wave_raw_data.slice(0, renderMax);
+                        } else {
+                            wave_y_data = _.map(wave_x_data, function (o) {
+                                return {value: [o, 0]}
+                            });
+                        }
                         ts = renderMax;
                     } else {
                         wave_x_data.shift();
@@ -622,7 +630,7 @@
                         }]
                     });
 
-                }, 250);
+                }, 150);
             }
 
             // 获取睡眠带生命体征及实时数据

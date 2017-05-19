@@ -131,7 +131,6 @@ module.exports = {
                             var pubDrug_json = yield app.modelFactory().model_one(app.models['pub_drug'], { where: { barcode: barcode } });
                             if (pubDrug_json) {
                                 var rows = {
-                                    local_flag: false,
                                     barcode: pubDrug_json.barcode, //条形码 added by zppro 2017.5.12
                                     drug_no: pubDrug_json.approval_no,// 药品编码
                                     full_name: pubDrug_json.name,
@@ -156,7 +155,6 @@ module.exports = {
                                 this.body = app.wrapper.res.default();
                             }
                         } else {
-                            psnDrug.local_flag = true;
                             this.body = app.wrapper.res.rows(psnDrug);
                         }
 
@@ -178,28 +176,45 @@ module.exports = {
                         var drug = this.request.body.drug;
                         var barcode = drug.barcode;
                         var stock = yield app.modelFactory().model_one(app.models['psn_drugDirectory'], { where: { barcode: barcode } });
-
+                        var pubDrug = yield app.modelFactory().model_one(app.models['pub_drug'], { where: { barcode: barcode } });
+                        if (!pubDrug) {
+                            yield app.modelFactory().model_create(app.models['pub_drug'], {
+                                barcode: drug.barcode,
+                                img: drug.img,
+                                name: drug.full_name,
+                                reference_price: drug.price,
+                                vender: drug.vender,
+                                dosage_form: drug.dosage_form,
+                                short_name: drug.short_name,
+                                alias: drug.alias,
+                                english_name: drug.english_name,
+                                specification: drug.special_individuals,
+                                usage: drug.usage,
+                                indications_function: drug.indications_function,
+                                otc_flag: drug.otc_flag,
+                                medical_insurance_flag: drug.health_care_flag
+                            });
+                        }
+                        
                         var img = drug.img;
                         if (img) {
-                            var barcode = drug.barcode;
-                            var pubDrug = yield app.modelFactory().model_one(app.models['pub_drug'], {
-                                where: { barcode: barcode }
-                            });
-                            
-                            pubDrug.img = img;
-                            yield pubDrug.save();
+                            if (pubDrug) {
+                                pubDrug.img = img;
+                                yield pubDrug.save();
+                            }
                         }
 
                         if (stock) {
                             yield app.modelFactory().model_update(app.models['psn_drugDirectory'], stock.id, drug);
                             var msg = "药品入库更新成功"
-                            this.body = app.wrapper.res.ret({ success: true, exec:201,msg: msg });
+                            this.body = app.wrapper.res.ret({ success: true, exec: 201, msg: msg });
 
                         } else {
                             yield app.modelFactory().model_create(app.models['psn_drugDirectory'], drug);
                             var msg = "药品入库新增成功"
-                            this.body = app.wrapper.res.ret({ success: true, exec:200, msg: msg });
+                            this.body = app.wrapper.res.ret({ success: true, exec: 200, msg: msg });
                         }
+
 
                     } catch (e) {
                         self.logger.error(e.message);
@@ -230,7 +245,6 @@ module.exports = {
                         } else {
                             var tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], user.tenantId);
                             var rows = { name: user.name, tenantId: tenant.id, tenantName: tenant.name };
-                            // console.log(rows);
                             this.body = app.wrapper.res.rows(rows);
                         }
 

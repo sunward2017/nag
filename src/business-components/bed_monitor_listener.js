@@ -29,13 +29,63 @@ module.exports = {
         console.log('listenConfig:', listenConfig);
 
         // this.connectTo(listenConfig);
-        
-        this.bedMonitorMacToName = {}; //mac作键 tenantId+name做值
+        this.startListen(listenConfig); //作为server监听
+
+        this.white_list_regs = ctx._.map(listenConfig.white_list, (o)=>{
+            var str = ctx._.map(o.split('.'), (o2)=>{
+                return o2 == '*' ? '(\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5])': o2;
+            }).join('\\.');
+            str = '^' + str + '$';
+            return new RegExp(str)
+        });
+
+        // console.log(this.white_list_regs);
+
+        // console.log('isInWhiteList:', this.isInWhiteList('192.168.10.194'));
+
+        // this.bedMonitorMacToName = {}; //mac作键 tenantId+name做值
 
         return this;
     },
     updateBedMonitors: function() {
         "use strict";
+
+    },
+    isInWhiteList: function (ip) {
+        var self = this;
+        return !!this.ctx._.find(this.white_list_regs, (re)=> {
+            // console.log('ip:',ip, re.test(ip));
+            self.ctx.clog.log(self.logger, 'ip: ', ip, re.test(ip));
+            return re.test(ip);
+        });
+    },
+    startListen: function (listenConfig) {
+        var self = this;
+        // tcp服务端
+        var server = net.createServer(function(socket){
+            self.ctx.clog.log(self.logger, '服务端：收到来自客户端的请求', socket.remoteAddress);
+            if (!self.isInWhiteList(socket.remoteAddress)) {
+                self.ctx.clog.log(self.logger, '服务端：不在白名单,拒绝', socket.remoteAddress);
+                socket.end()
+            }
+
+            socket.on('data', function(data){
+                self.ctx.clog.log(self.logger, '服务端：收到客户端数据，内容为{'+ data +'}');
+                // 给客户端返回数据
+                socket.write('你好，我是服务端');
+            });
+
+            socket.on('close', function(){
+                self.ctx.clog.log(self.logger, '服务端：客户端连接断开');
+            });
+
+        }).listen(listenConfig.port, listenConfig.ip, function(){
+            self.ctx.clog.log(self.logger, '服务端：开始监听来自客户端的请求');
+        });
+
+        server.on('error', function(error){
+            self.ctx.clog.log(self.logger, 'error事件：服务端异常：', error);
+        });
 
     },
     connectTo: function (listenConfig) {

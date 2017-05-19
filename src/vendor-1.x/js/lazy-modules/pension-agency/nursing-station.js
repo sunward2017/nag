@@ -315,6 +315,9 @@
                 if (vm.elderlyStatusMonitor[elderly.id]) {
                     unsubscribeBedMonitorListen(vm.elderlyStatusMonitor[elderly.id].bedMonitorName, vm.tenantId)
                 }
+                if(vm.IoC.intervalIdOfRealWave){
+                    clearInterval(vm.IoC.intervalIdOfHeartRate);
+                }
                 if (vm.IoC.intervalIdOfRealWave) {
                     clearInterval(vm.IoC.intervalIdOfRealWave);
                 }
@@ -465,13 +468,14 @@
                 vm.nursingRecords = results[3];
                 vm.sessionId = results[4].session_id_hzfanweng;
                 vmh.psnService.getLatestSmbPerMinuteRecord(results[4].session_id_hzfanweng,vm.bindingBedMonitor.bedMonitorName,vm.tenantId).then(function(result){
-                    vm.occurTime = result.occurTime;
-                    vm.heartRateCount = result.heartRateCount;
-                    vm.breathRateCount = result.breathRateCount;
-                    vm.turnOverCount = result.turnOverCount;
-                    vm.bodyMoveCount = result.bodyMoveCount;
-                    vm.inBed = result.inBed;
-                    minute_hr_y_data.push(result.heartRateCount);
+                    if(result.success == true){
+                        vm.occurTime = result.occurTime;
+                        vm.heartRateCount = result.heartRateCount;
+                        vm.breathRateCount = result.breathRateCount;
+                        vm.turnOverCount = result.turnOverCount;
+                        vm.bodyMoveCount = result.bodyMoveCount;
+                        vm.inBed = result.inBed;
+                        minute_hr_y_data.push(result.heartRateCount);
                         $echarts.updateEchartsInstance(vm.miniute_hr_bar_id, {
                             xAxis: {
                                 data: minute_hr_x_data
@@ -480,12 +484,15 @@
                                 data: minute_hr_y_data
                             }]
                         });
+                    }else{
+                        vm.inBed = 'offline';
+                    }
                 });
             });
 
             // 获取睡眠带生命体征及实时数据
             if (vm.haveBindingBedMonitor) {
-                setInterval(function(){
+                vm.IoC.intervalIdOfHeartRate = setInterval(function(){
                     vmh.psnService.getLatestSmbPerMinuteRecord(vm.sessionId,vm.bindingBedMonitor.bedMonitorName,vm.tenantId).then(function(result){
                         vm.occurTime = result.occurTime;
                         vm.heartRateCount = result.heartRateCount;

@@ -124,13 +124,16 @@ script(type="text/ng-template", id="nursing-station-elderly.html")
                                         th.text-center(width="100")
                                             | {{ vm.moduleTranslatePath('DLG-ELDERLY-TH-IN_BED') | translate}}   
                                 tbody
-                                    tr
+                                    tr(height="40")
                                         td.text-center(width="365") {{vm.occurTime|date:'yyyy-MM-dd HH:mm'}}
                                         td.text-center(width="116") {{vm.heartRateCount}}
                                         td.text-center(width="116") {{vm.breathRateCount}}
                                         td.text-center(width="116") {{vm.turnOverCount}}
                                         td.text-center(width="116") {{vm.bodyMoveCount}}
-                                        td.text-center(width="100") {{vm.inBed|boolFilter}}
+                                        td.text-center(width="100") 
+                                            i.fa.fa-square.img-tip.normal(ng-if="vm.inBed == true")
+                                            i.fa.fa-square.img-tip.alarm(ng-if="vm.inBed == false")
+                                            i.fa.fa-square.img-tip.offline(ng-if="vm.inBed == 'offline'")
                         .col-md-6.block-per-miniute-heart-rate-bar
                             div(echarts="vm.miniute_hr_bar_id",config="vm.miniute_hr_bar_config",style="width: 400px;height:200px;")
                         .col-md-6.block-realtime-wave

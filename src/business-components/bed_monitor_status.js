@@ -1822,9 +1822,10 @@ module.exports = {
                 if (!sessionIsExpired) {
                     var ret = yield self.getLatestSmbPerMinuteRecord(sessionId,devId);
                     if (ret.retCode == 'success') {
-                        return self.ctx.wrapper.res.ret(ret.retValue);
+                        return self.ctx.wrapper.res.ret({msg:'success',res:ret.retValue});
                     } else {
-                        return self.ctx.wrapper.res.error({ message: ret.retValue });
+                        console.log('ret.retCode===='+ret.retCode);
+                        return self.ctx.wrapper.res.ret({ msg: 'offline' });
                     }
                 }else{
                     yield self.login(openId);

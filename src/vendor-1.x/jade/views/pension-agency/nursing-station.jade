@@ -133,7 +133,7 @@ script(type="text/ng-template", id="nursing-station-elderly.html")
                                         td.text-center(width="100") 
                                             i.fa.fa-square.img-tip.normal(ng-if="vm.inBed == true")
                                             i.fa.fa-square.img-tip.alarm(ng-if="vm.inBed == false")
-                                            i.fa.fa-square.img-tip.offline(ng-if="vm.inBed == offline")
+                                            i.fa.fa-square.img-tip.offline(ng-if="vm.inBed == 'offline'")
                         .col-md-6.block-per-miniute-heart-rate-bar
                             div(echarts="vm.miniute_hr_bar_id",config="vm.miniute_hr_bar_config",style="width: 400px;height:200px;")
                         .col-md-6.block-realtime-wave

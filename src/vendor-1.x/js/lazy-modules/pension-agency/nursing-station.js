@@ -315,8 +315,8 @@
                 if (vm.elderlyStatusMonitor[elderly.id]) {
                     unsubscribeBedMonitorListen(vm.elderlyStatusMonitor[elderly.id].bedMonitorName, vm.tenantId)
                 }
-                if (vm.IoC.intervalId) {
-                    clearInterval(vm.IoC.intervalId);
+                if (vm.IoC.intervalIdOfRealWave) {
+                    clearInterval(vm.IoC.intervalIdOfRealWave);
                 }
 
                 if(ret.value!='$document' && ret.value!='$closeButton' && ret.value!='$escape' ) {
@@ -573,7 +573,7 @@
 
                 var renderMax = 64, radio = 4000 / 200;
                 var ts = 0;
-                vm.IoC.intervalId = setInterval(function () {
+                vm.IoC.intervalIdOfRealWave = setInterval(function () {
                     var value = wave_raw_data.pop();
                     console.log('value:', value);
                     if (!value) return;

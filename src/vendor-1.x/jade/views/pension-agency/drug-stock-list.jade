@@ -26,8 +26,9 @@
                                 label
                                     input(type='checkbox' data="trBubble" ng-model="row.checked" )
                                     span.fa.fa-check(data="trBubble")   
-                        td.text-center {{::row.drug_no}}
+                        td.text-center {{::row.barcode}}
                         td.text-center {{::row.drug_full_name}}
+                        td.text-center {{::row.period_validity |date:'yyyy-MM-dd'}}
                         td.text-center {{::row.elderly_name}}
                         td.text-center {{::row.current_quantity}}
                         td.text-center {{::row.unit|formatter:'unit':vm.columns}}

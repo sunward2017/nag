@@ -1566,8 +1566,8 @@
                         searchForm: { "status": 1 },
                         serverPaging: true,
                         columns: [{
-                            label: '药品编码',
-                            name: 'drug_no',
+                            label: '药品条形码',
+                            name: 'barcode',
                             type: 'string',
                             width: 80,
                             sortable: true
@@ -1577,6 +1577,12 @@
                             type: 'string',
                             width: 80,
                             sortable: true
+                        }, {
+                            label: '有效期',
+                            name: 'period_validity',
+                            type: 'date',
+                            width: 100,
+                            sortable: true 
                         }, {
                             label: '关联老人',
                             name: 'elderly_name',

@@ -121,15 +121,15 @@
         }
 
         function doSubmit() {
+
             if ($scope.theForm.$valid) {
                 vm.model.in_out_no = "IN-" + new Date().valueOf();
-                vm.model.in_out_type = 1;
+                 vm.model.in_out_type =1;
                 vm.save(true).then(function (ret) {
-                    console.log(ret);
-                    // vmh.psnService.drugInStock(vm.tenantId, vm.model.elderlyId, vm.model.elderly_name, vm.model.drugId, vm.model.barcode, vm.model.drug_full_name, vm.model.in_out_quantity, vm.model.type, vm.model.unit).then(function (ret) {
-                    //     vmh.alertSuccess(vm.viewTranslatePath('SYNC_FAMILY_MEMBERS_SUCCESS'), true);
-                    //     vm.returnBack();
-                    // });
+                    vmh.psnService.drugInStock(vm.model).then(function (ret) {
+                        vmh.alertSuccess(vm.viewTranslatePath('SYNC_FAMILY_MEMBERS_SUCCESS'), true);
+                        vm.returnBack();
+                    });
                 })
             }
             else {

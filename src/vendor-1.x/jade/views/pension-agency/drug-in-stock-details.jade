@@ -39,7 +39,7 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-PERIOD_VALIDITY') | translate}}:
                         .col-md-2(ng-if="!vm.readonly")
                             .input-group
-                                input.form-control(type="text",name='elderly$birthday',is-open="vm.openedDP[1]",datepicker-popup="",ng-model="vm.elderlyModel.period_validity" ,placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-PERIOD_VILIDITY")|translate}}',required='',ng-click="vm.openDP($event,2,1)",extract-birthday="vm.elderlyModel.id_no")
+                                input.form-control(type="text",name='elderly$birthday',is-open="vm.openedDP[1]",datepicker-popup="",ng-model="vm.model.period_validity" ,placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-PERIOD_VILIDITY")|translate}}',ng-click="vm.openDP($event,2,1)",extract-birthday="vm.elderlyModel.id_no")
                                 span.input-group-btn
                                     button.btn.btn-primary(ng-click="vm.openDP($event,2,1)")
                                         i.glyphicon.glyphicon-calendar

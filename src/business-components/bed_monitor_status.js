@@ -1813,5 +1813,27 @@ module.exports = {
                 self.logger.error(emessage);
             }
         }).catch(self.ctx.coOnError);
+    },
+    checkSessionAndGetLatestSmbPerMinuteRecord:function(sessionId,devId,openId){
+        var self = this;
+        return co(function* (){
+            try {
+                var sessionIsExpired = yield self.checkSessionIsExpired(sessionId);
+                if (!sessionIsExpired) {
+                    var ret = yield self.getLatestSmbPerMinuteRecord(sessionId,devId);
+                    if (ret.retCode == 'success') {
+                        return self.ctx.wrapper.res.ret({msg:'success',res:ret.retValue});
+                    } else {
+                        console.log('ret.retCode===='+ret.retCode);
+                        return self.ctx.wrapper.res.ret({ msg: 'offline' });
+                    }
+                }else{
+                    yield self.login(openId);
+                }
+            } catch (e) {
+                console.log(e);
+                self.logger.error(e.message);
+            }
+        }).catch(self.ctx.coOnError);
     }
 };

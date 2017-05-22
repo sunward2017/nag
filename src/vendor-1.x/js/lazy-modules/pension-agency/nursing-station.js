@@ -36,6 +36,7 @@
             vm.bedMonitorStatusMappingElderly = {};// bedMonitorName做key
             vm.bedMonitorStatusMonitor = {};
             vm.alarmQueue = [];
+            vm.IoC = {}; // 控制弹出窗口的容器
             vm.defaultElderlyAvatar = 'app/img/user/avatar-in-nursing-station.png';
             vm.nursingStationBlocker = blockUI.instances.get('nursing-station');
             vm.toggleAlarmButton = vm.moduleTranslatePath('EXPAND-ALARM-QUEUE');
@@ -307,11 +308,18 @@
                     operated_by_name: vm.operated_by_name,
                     haveBindingRobot: false,
                     bindingBedMonitor: vm.elderlyStatusMonitor[elderly.id],
-                    subscribeBedMonitorListen: vm.subscribeBedMonitorListen
+                    subscribeBedMonitorListen: vm.subscribeBedMonitorListen,
+                    IoC: vm.IoC
                 }
             }).closePromise.then(function (ret) {
                 if (vm.elderlyStatusMonitor[elderly.id]) {
                     unsubscribeBedMonitorListen(vm.elderlyStatusMonitor[elderly.id].bedMonitorName, vm.tenantId)
+                }
+                if(vm.IoC.intervalIdOfRealWave){
+                    clearInterval(vm.IoC.intervalIdOfHeartRate);
+                }
+                if (vm.IoC.intervalIdOfRealWave) {
+                    clearInterval(vm.IoC.intervalIdOfRealWave);
                 }
 
                 if(ret.value!='$document' && ret.value!='$closeButton' && ret.value!='$escape' ) {
@@ -380,7 +388,7 @@
         $scope.utils = vmh.utils.v;
         var moment = $scope.moment = vmh.utils.m;
 
-        var minute_hr_x_data = [], minute_hr_y_data = [], wave_x_data = [], wave_y_data = [];
+        var minute_hr_x_data = [], minute_hr_y_data = [], wave_raw_data =[], wave_x_data = [], wave_y_data = [];
 
 
         // var now = moment().unix();
@@ -434,6 +442,7 @@
             vm.bindingBedMonitor = $scope.ngDialogData.bindingBedMonitor;
             vm.haveBindingRobot = $scope.ngDialogData.haveBindingRobot;
             vm.haveBindingBedMonitor = !!vm.bindingBedMonitor;
+            vm.IoC = $scope.ngDialogData.IoC;
 
             vm.onAvatarUploaded = onAvatarUploaded;
             // vm.tab1 = {cid: 'contentTab1', active: true};
@@ -446,7 +455,8 @@
                 vmh.shareService.d2('D1012'),
                 vmh.getModelService('psn-elderly').single({_id: vm.elderly._id},'nursing_assessment_grade family_members'),
                 vmh.psnService.nursingScheduleByElderlyDaily(vm.tenantId, vm.elderly._id),
-                vmh.psnService.nursingRecordsByElderlyToday(vm.tenantId, vm.elderly._id)
+                vmh.psnService.nursingRecordsByElderlyToday(vm.tenantId, vm.elderly._id),
+                vmh.getModelService('het-member').single({tenantId: vm.tenantId},'session_id_hzfanweng')
             ]).then(function (results) {
                 vm.nursing_assessment_grade_name = results[1].nursing_assessment_grade_name;
                 vm.family_members = _.map(results[1].family_members, function (o) {
@@ -456,10 +466,61 @@
                     return (o.aggr_value || {}).name;
                 }).join();
                 vm.nursingRecords = results[3];
+                vm.sessionId = results[4].session_id_hzfanweng;
+                vmh.psnService.getLatestSmbPerMinuteRecord(results[4].session_id_hzfanweng,vm.bindingBedMonitor.bedMonitorName,vm.tenantId).then(function(result){
+                    console.log('result is >>>>>>>>>>>>>>>>>>>>>>>>>>>>');
+                    console.log(result);
+                    if(result.msg == 'success'){
+                        vm.occurTime = result.res.occurTime;
+                            vm.heartRateCount = result.res.heartRateCount;
+                            vm.breathRateCount = result.res.breathRateCount;
+                            vm.turnOverCount = result.res.turnOverCount;
+                            vm.bodyMoveCount = result.res.bodyMoveCount;
+                            vm.inBed = result.res.inBed;
+                        if(minute_hr_y_data.length > 9) minute_hr_y_data.shift();
+                        minute_hr_y_data.push(result.res.heartRateCount);
+                        $echarts.updateEchartsInstance(vm.miniute_hr_bar_id, {
+                            xAxis: {
+                                data: minute_hr_x_data
+                            },
+                            series: [{
+                                data: minute_hr_y_data
+                            }]
+                        });
+                    }else{
+                        vm.inBed = 'offline';
+                    }
+                });
             });
 
             // 获取睡眠带生命体征及实时数据
             if (vm.haveBindingBedMonitor) {
+                vm.IoC.intervalIdOfHeartRate = setInterval(function(){
+                    vmh.psnService.getLatestSmbPerMinuteRecord(vm.sessionId,vm.bindingBedMonitor.bedMonitorName,vm.tenantId).then(function(result){
+                        console.log('result is >>>>>>>>>>>>>>>>>>>>>>>>>>>>');
+                        console.log(result);
+                        if(result.msg == 'success'){
+                            vm.occurTime = result.res.occurTime;
+                            vm.heartRateCount = result.res.heartRateCount;
+                            vm.breathRateCount = result.res.breathRateCount;
+                            vm.turnOverCount = result.res.turnOverCount;
+                            vm.bodyMoveCount = result.res.bodyMoveCount;
+                            vm.inBed = result.res.inBed;
+                            if(minute_hr_y_data.length > 9) minute_hr_y_data.shift();
+                            minute_hr_y_data.push(result.res.heartRateCount);
+                            $echarts.updateEchartsInstance(vm.miniute_hr_bar_id, {
+                                xAxis: {
+                                    data: minute_hr_x_data
+                                },
+                                series: [{
+                                    data: minute_hr_y_data
+                                }]
+                            });
+                        }else{
+                            vm.inBed = 'offline';
+                        }
+                    });
+                },1000*60);
 
                 vm.miniute_hr_bar_id = $echarts.generateInstanceIdentity();
                 vm.miniute_hr_bar_config = {
@@ -474,6 +535,8 @@
                         data: minute_hr_x_data
                     },
                     yAxis: {
+                        min:0,
+                        max:160,
                         type: 'value',
                         boundaryGap: [0, '100%'],
                         splitLine: {
@@ -482,7 +545,7 @@
                     },
                     series: [{
                         // name: '心律(波形)',
-                        type: 'line',
+                        type: 'bar',
                         showSymbol: false,
                         hoverAnimation: false,
                         data: minute_hr_y_data
@@ -492,21 +555,27 @@
                 vm.realtime_wave_id = $echarts.generateInstanceIdentity();
                 vm.realtime_wave_config = {
                     title: {
-                        text: '心律(波形)'
+                        text: '实时波形'
                     },
                     xAxis: {
+                        show: false,
                         type: 'category',
                         splitLine: {
                             show: false
                         },
+                        boundaryGap: false,
                         data: wave_x_data
                     },
                     yAxis: {
+                        show: false,
                         type: 'value',
-                        boundaryGap: [0, '100%'],
+                        // boundaryGap: [0, '100%'],
+                        boundaryGap: false,
                         splitLine: {
                             show: false
-                        }
+                        },
+                        min: -100,
+                        max: 100
                     },
                     series: [{
                         // name: '心律(波形)',
@@ -517,6 +586,51 @@
                     }]
                 };
                 subscribeBedMonitorListen(vm.bindingBedMonitor.bedMonitorName, vm.tenantId);
+
+                var renderMax = 64, radio = 4000 / 200;
+                var ts = 0;
+                vm.IoC.intervalIdOfRealWave = setInterval(function () {
+                    var value = wave_raw_data.pop();
+                    console.log('value:', value);
+                    if (!value) {
+                        value = 0;
+                    } else {
+                        value =  (value / radio).toFixed(2) - 100;
+                    }
+
+                    if(wave_x_data.length == 0) {
+                        wave_x_data.shift();
+                        wave_x_data = _.range(renderMax);
+                        if(wave_raw_data.length>0){
+                            wave_y_data = wave_raw_data.slice(0, renderMax);
+                        } else {
+                            wave_y_data = _.map(wave_x_data, function (o) {
+                                return {value: [o, 0]}
+                            });
+                        }
+                        ts = renderMax;
+                    } else {
+                        wave_x_data.shift();
+                        wave_x_data.push(ts);
+                        wave_y_data.shift();
+                        wave_y_data.push({
+                            value: [
+                                ts++,
+                                value
+                            ]
+                        });
+                    }
+
+                    $echarts.updateEchartsInstance(vm.realtime_wave_id, {
+                        xAxis: {
+                            data: wave_x_data
+                        },
+                        series: [{
+                            data: wave_y_data
+                        }]
+                    });
+
+                }, 150);
             }
 
             // 获取睡眠带生命体征及实时数据
@@ -526,40 +640,17 @@
         }
 
         function subscribeBedMonitorListen (bedMonitorName, tenantId) {
+
             var channelOfListen = SocketManager.registerChannel(SOCKET_EVENTS.PSN.BED_MONITOR_LISTEN.$SOCKET_URL);
-            channelOfListen.on(SOCKET_EVENTS.SHARED.CONNECT, function() {
+            channelOfListen.on(SOCKET_EVENTS.SHARED.CONNECT, function () {
                 console.log('nursing-station bed_monitor_listen socket connected');
             });
-            channelOfListen.on(SOCKET_EVENTS.SHARED.DISCONNECT, function() {
+            channelOfListen.on(SOCKET_EVENTS.SHARED.DISCONNECT, function () {
                 console.log('nursing-station bed_monitor_listen socket disconnected');
             });
-            channelOfListen.off(SOCKET_EVENTS.PSN.BED_MONITOR_LISTEN.S2C.WAVE_DATA).on(SOCKET_EVENTS.PSN.BED_MONITOR_LISTEN.S2C.WAVE_DATA, function(data) {
+            channelOfListen.off(SOCKET_EVENTS.PSN.BED_MONITOR_LISTEN.S2C.WAVE_DATA).on(SOCKET_EVENTS.PSN.BED_MONITOR_LISTEN.S2C.WAVE_DATA, function (data) {
                 console.log('nursing-station bed_monitor_listen socket WAVE_DATA =>', data);
-                var ts = moment().unix();
-
-                if(wave_x_data.length == 60){
-                    wave_x_data.shift();
-                }
-                wave_x_data.push(ts);
-
-                if(wave_y_data.length == 60){
-                    wave_y_data.shift();
-                }
-                wave_y_data.push({
-                    value: [
-                        ts,
-                        data.value
-                    ]
-                });
-
-                $echarts.updateEchartsInstance(vm.realtime_wave_id, {
-                    xAxis: {
-                        data: wave_x_data
-                    },
-                    series: [{
-                        data: wave_y_data
-                    }]
-                });
+                wave_raw_data = wave_raw_data.concat(data.values);
             });
             channelOfListen.emit(SOCKET_EVENTS.PSN.BED_MONITOR_LISTEN.C2S.SUBSCRIBE, {
                 tenantId: tenantId,

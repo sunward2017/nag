@@ -5027,8 +5027,8 @@ module.exports = {
                                     live_in_flag: true,
                                     _id: { '$in': elderlyIds },
                                     tenantId: tenantId
-                                }
-
+                                },
+                                sort: {'room_value.roomId': 1}
                             }).populate('nursingLevelId', 'name short_name nursing_assessment_grade', 'psn_nursingLevel')
                                 .populate('room_value.roomId', 'name bedMonitors', 'psn_room');
 
@@ -5204,8 +5204,7 @@ module.exports = {
                             var unit = this.request.body.unit;
                             var type = this.request.body.type;
                             var period_validity = this.request.body.period_validity ;
-                            console.log("**888",this.request.body);
-                            console.log("<<<<<<<",app.moment(period_validity).toDate());
+                            
 
                             var barcode = this.request.body.barcode;
                             var drug_full_name = this.request.body.drug_full_name;
@@ -5496,6 +5495,23 @@ module.exports = {
                                 });
                             }
                             this.body = app.wrapper.res.default();
+                        } catch (e) {
+                            console.log(e);
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },{
+                method: 'getLatestSmbPerMinuteRecord',
+                verb: 'post',
+                url: this.service_url_prefix + "/getLatestSmbPerMinuteRecord",
+                handler: function (app, options) {
+                    return function* (next) {
+                        try {
+                            var ret = yield app.bed_monitor_status.checkSessionAndGetLatestSmbPerMinuteRecord(this.request.body.sessionId, this.request.body.devId, this.request.body.openId);
+                            this.body = ret;
                         } catch (e) {
                             console.log(e);
                             self.logger.error(e.message);

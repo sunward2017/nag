@@ -4,9 +4,10 @@
  */
 var co = require('co');
 var net = require('net');
+var dgram = require('dgram');
 var bedMonitorListenConfigs = require('../pre-defined/bed-monitor-listen-config.json');
 // var DIC = require('../pre-defined/dictionary-constants.json');
-// var socketServerEvents = require('../pre-defined/socket-server-events.json');
+var socketServerEvents = require('../pre-defined/socket-server-events.json');
 
 module.exports = {
     init: function (ctx) {
@@ -25,18 +26,95 @@ module.exports = {
         }
         console.log(this.filename + ' ready... ');
 
-        var listenConfig = ctx.conf.isProduction ? bedMonitorListenConfigs.production : bedMonitorListenConfigs.dev;
-        console.log('listenConfig:', listenConfig);
+        var listenServerConfig = ctx.conf.isProduction ? bedMonitorListenConfigs.server.production : bedMonitorListenConfigs.server.dev;
+        console.log('listenServerConfig:', listenServerConfig);
 
         // this.connectTo(listenConfig);
-        
-        this.bedMonitorMacToName = {}; //mac作键 tenantId+name做值
+        this.startListen(listenServerConfig); //作为server监听
+
+        this.white_list_regs = ctx._.map(listenServerConfig.white_list, (o)=>{
+            var str = ctx._.map(o.split('.'), (o2)=>{
+                return o2 == '*' ? '(\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5])': o2;
+            }).join('\\.');
+            str = '^' + str + '$';
+            return new RegExp(str)
+        });
+
+        this.clientCommandConfig = ctx.conf.isProduction ? bedMonitorListenConfigs.client.production : bedMonitorListenConfigs.client.dev;
+        console.log('clientCommandConfig:', this.clientCommandConfig);
+
+        // console.log(this.white_list_regs);
+
+        // console.log('isInWhiteList:', this.isInWhiteList('192.168.10.194'));
+
+        // this.bedMonitorMacToName = {}; //mac作键 tenantId+name做值
 
         return this;
     },
     updateBedMonitors: function() {
         "use strict";
 
+    },
+    isInWhiteList: function (ip) {
+        var self = this;
+        return !!this.ctx._.find(this.white_list_regs, (re)=> {
+            // console.log('ip:',ip, re.test(ip));
+            self.ctx.clog.log(self.logger, 'ip: ', ip, re.test(ip));
+            return re.test(ip);
+        });
+    },
+    parseData: function (data) {
+        if (!data) return;
+        var channelName = 'psn$bed_monitor_listen', arr = data.split('^');
+        var mac = arr[1].toUpperCase(), raw_values = JSON.parse(arr[2]);
+        this.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR_LISTEN.WAVE_DATA, {
+            bedMonitorMac: mac,
+            values: raw_values
+        });
+    },
+    startListen: function (listenConfig) {
+        var self = this;
+        // tcp服务端
+        var server = net.createServer(function(socket){
+            self.ctx.clog.log(self.logger, '服务端：收到来自客户端的请求', socket.remoteAddress);
+            if (!self.isInWhiteList(socket.remoteAddress)) {
+                self.ctx.clog.log(self.logger, '服务端：不在白名单,拒绝', socket.remoteAddress);
+                socket.end()
+            }
+
+            socket.on('data', function(buffer){
+                self.ctx.clog.log(self.logger, '服务端：收到客户端数据，内容为{'+ buffer +'}');
+                self.parseData(buffer.toString());
+                // 给客户端返回数据
+                // socket.write('你好，我是服务端');
+            });
+
+            socket.on('close', function(){
+                self.ctx.clog.log(self.logger, '服务端：客户端连接断开');
+            });
+
+        }).listen(listenConfig.port, listenConfig.ip, function(){
+            self.ctx.clog.log(self.logger, '服务端：开始监听来自客户端的请求');
+        });
+
+        server.on('error', function(error){
+            self.ctx.clog.log(self.logger, 'error事件：服务端异常：', error);
+        });
+
+    },
+    sendCommandToRemote: function (commandStr) {
+        var self = this;
+        self.ctx.clog.log(self.logger, 'sendCommandToRemote command:', commandStr);
+        var message = new Buffer(commandStr);
+        var client = dgram.createSocket("udp4");
+        client.send(message, 0, message.length, this.clientCommandConfig.port, this.clientCommandConfig.ip, function (err, bytes) {
+            if(err) {
+                self.ctx.clog.log(self.logger, 'sendCommandToRemote，返回错误{'+ err +'}');
+            } else {
+                self.ctx.clog.log(self.logger, 'sendCommandToRemote，返回内容为{'+ bytes +'}');
+            }
+            client.close();
+        });
     },
     connectTo: function (listenConfig) {
         var self = this;

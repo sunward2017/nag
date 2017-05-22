@@ -32,6 +32,7 @@ module.exports = {
         return this;
     },
     sendToClient: function (eventName, eventData) {
+        eventData.ts = this.ctx.moment().unix();
         console.log('eventName: ', eventName);
         console.log('eventData: ', eventData);
         if (eventData.bedMonitorMac) {
@@ -65,8 +66,13 @@ module.exports = {
                     if(bedMonitor) {
                         var bedMonitorMac = bedMonitor.mac;
                         if (bedMonitorMac) {
+                            bedMonitorMac = bedMonitorMac.toUpperCase();
                             console.log('join bedMonitorListen_', bedMonitorMac);
                             socket.join('bedMonitorListen_' + bedMonitorMac);
+
+                            // 告诉对端服务器开始上报数据
+                            self.ctx.bed_monitor_listener.sendCommandToRemote(bedMonitorMac.toLowerCase() + '^1');
+
                             console.log('PSN.BED_MONITOR_LISTEN.SUBSCRIBE finished')
                         } else {
                             console.log('PSN.BED_MONITOR_LISTEN.SUBSCRIBE not finished for no config mac')
@@ -96,8 +102,11 @@ module.exports = {
                     if(bedMonitor) {
                         var bedMonitorMac = bedMonitor.mac;
                         if (bedMonitorMac) {
+                            bedMonitorMac = bedMonitorMac.toUpperCase();
                             console.log('leave bedMonitorListen_', bedMonitorMac);
                             socket.leave('bedMonitorListen_' + bedMonitorMac);
+                            // 告诉对端服务器开始上报数据
+                            self.ctx.bed_monitor_listener.sendCommandToRemote(bedMonitorMac.toLowerCase() + '^2');
                             console.log('PSN.BED_MONITOR_LISTEN.UNSUBSCRIBE finished')
                         } else {
                             console.log('PSN.BED_MONITOR_LISTEN.UNSUBSCRIBE not finished for no config mac')

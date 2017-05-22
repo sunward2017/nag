@@ -59,6 +59,25 @@
     color:  #F05050;
   }
 }
+.block-per-miniute-vital-sign{
+  .img-tip{
+    margin: 0 4px;
+    height: 32px;
+    line-height: 32px;
+  }
+  .normal{
+    color: #27C24C;
+  }
+  .warning {
+    color: #FF902B;
+  }
+  .alarm{
+    color:  #F05050;
+  }
+  .offline{
+    color: grey;
+  }
+}
 .nursing-station{
   width: 100%;
   margin: 0 auto;
@@ -304,13 +323,17 @@
         }
         .block-per-miniute-vital-sign{
           height: 200px;
-          background-color: #37bc9b;
+          // background-color: #37bc9b;
         }
         .block-per-miniute-heart-rate-bar{
           height: 200px;
         }
         .block-realtime-wave{
           height: 200px;
+          background: url('../../app/img/bg/grid-bg.png') center center no-repeat;
+          div{
+            background-color: transparent!important;
+          }
           //background-color: #f0ad4e;
         }
       }

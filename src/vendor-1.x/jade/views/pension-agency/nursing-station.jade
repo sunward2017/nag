@@ -108,6 +108,32 @@ script(type="text/ng-template", id="nursing-station-elderly.html")
                         | {{ vm.moduleTranslatePath('DLG-ELDERLY-HEAD-LIFE_INTEGRATION') | translate}}
                     .tab-content-block#content-life_integration
                         .col-md-12.block-per-miniute-vital-sign
+                            table.grid.table.table-bordered.table-hover.table-striped
+                                thead
+                                    tr
+                                        th.text-center(width="365")
+                                            | {{ vm.moduleTranslatePath('DLG-ELDERLY-TH-OCCUR_TIME') | translate}}
+                                        th.text-center(width="116")
+                                            | {{ vm.moduleTranslatePath('DLG-ELDERLY-TH-HEART_RATE_COUNT') | translate}}
+                                        th.text-center(width="116")
+                                            | {{ vm.moduleTranslatePath('DLG-ELDERLY-TH-BREATH_RATE_COUNT') | translate}}
+                                        th.text-center(width="116")
+                                            | {{ vm.moduleTranslatePath('DLG-ELDERLY-TH-TURN_OVER_COUNT') | translate}}
+                                        th.text-center(width="116")
+                                            | {{ vm.moduleTranslatePath('DLG-ELDERLY-TH-BODY_MOVE_COUNT') | translate}}
+                                        th.text-center(width="100")
+                                            | {{ vm.moduleTranslatePath('DLG-ELDERLY-TH-IN_BED') | translate}}   
+                                tbody
+                                    tr(height="40")
+                                        td.text-center(width="365") {{vm.occurTime|date:'yyyy-MM-dd HH:mm'}}
+                                        td.text-center(width="116") {{vm.heartRateCount}}
+                                        td.text-center(width="116") {{vm.breathRateCount}}
+                                        td.text-center(width="116") {{vm.turnOverCount}}
+                                        td.text-center(width="116") {{vm.bodyMoveCount}}
+                                        td.text-center(width="100") 
+                                            i.fa.fa-square.img-tip.normal(ng-if="vm.inBed == true")
+                                            i.fa.fa-square.img-tip.alarm(ng-if="vm.inBed == false")
+                                            i.fa.fa-square.img-tip.offline(ng-if="vm.inBed == 'offline'")
                         .col-md-6.block-per-miniute-heart-rate-bar
                             div(echarts="vm.miniute_hr_bar_id",config="vm.miniute_hr_bar_config",style="width: 400px;height:200px;")
                         .col-md-6.block-realtime-wave

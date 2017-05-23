@@ -449,6 +449,36 @@ module.exports = {
                         yield next;
                     };
                 }
+            },
+            {
+                method: 'nursingAlarmAndRecordAndWorkerAndBedMonitorAndRobot',
+                verb: 'get',
+                url: this.service_url_prefix + "/nursingAlarmAndRecordAndWorkerAndBedMonitorAndRobot/:_id",
+                handler: function (app, options) {
+                    return function * (next) {
+                        try {
+                            var tenant = yield  app.modelFactory().model_read(app.models['pub_tenant'],this.params._id);
+                            if (!tenant || tenant.status == 0) {
+                                this.body = app.wrapper.res.error({message: '无法找到租户!'});
+                                yield next;
+                                return;
+                            }
+                            var result = {
+                                leaveBedAlarm: yield app.psn_tenant_stat_service.getAmountOfLeaveBedAlarmToday(tenant, self.logger),
+                                nursingRecordUnusual: yield app.psn_tenant_stat_service.getAmountOfNursingRecordUnusualToday(tenant, self.logger),
+                                nursingRecordUsual: yield app.psn_tenant_stat_service.getAmountOfNursingRecordUsualToday(tenant, self.logger),
+                                nursingWorker: yield app.psn_tenant_stat_service.getAmountOfNursingWorker(tenant, self.logger),
+                                bedMonitor: yield app.psn_tenant_stat_service.getAmountOfBedMonitor(tenant, self.logger),
+                                robot: yield app.psn_tenant_stat_service.getAmountOfRobot(tenant, self.logger)
+                            }
+                            this.body = app.wrapper.res.ret(result);
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
             }
         ];
 

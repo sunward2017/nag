@@ -100,5 +100,86 @@ module.exports = {
                 vacancy_rate: (100 * (totals - liveins) / (totals || 1)).toFixed(1)
             };
         });
+    },
+    getAmountOfLeaveBedAlarmToday: function (tenant, logger) {
+        var self = this;
+        return co(function *() {
+            var begin = self.ctx.moment(self.ctx.moment().format('YYYY-MM-DD'));
+            var end = self.ctx.moment(begin.add(1, 'days'));
+            var totals = yield self.ctx.modelFactory().model_totals(self.ctx.models['pub_alarm'], {
+                tenantId: tenant._id,
+                status: 1,
+                subject: 'pub_bedMonitor',
+                check_in_time: {"$gte": begin, "$lt": end}
+            });
+
+            return totals.length;
+        });
+    },
+    getAmountOfNursingRecordUnusualToday: function (tenant, logger) {
+        var self = this;
+        return co(function *() {
+            var begin = self.ctx.moment(self.ctx.moment().format('YYYY-MM-DD'));
+            var end = self.ctx.moment(begin.add(1, 'days'));
+            var totals = yield self.ctx.modelFactory().model_totals(self.ctx.models['psn_nursingRecord'], {
+                tenantId: tenant._id,
+                status: 1,
+                exec_on: {"$gte": begin, "$lt": end},
+                confirm_flag: false
+            });
+
+            return totals.length;
+        });
+    },
+    getAmountOfNursingRecordUsualToday: function (tenant, logger) {
+        var self = this;
+        return co(function *() {
+            var begin = self.ctx.moment(self.ctx.moment().format('YYYY-MM-DD'));
+            var end = self.ctx.moment(begin.add(1, 'days'));
+            var totals = yield self.ctx.modelFactory().model_totals(self.ctx.models['psn_nursingRecord'], {
+                tenantId: tenant._id,
+                status: 1,
+                exec_on: {"$gte": begin, "$lt": end},
+                confirm_flag: true
+            });
+
+            return totals.length;
+        });
+    },
+    getAmountOfNursingWorker: function (tenant, logger) {
+        var self = this;
+        return co(function *() {
+            var totals = yield self.ctx.modelFactory().model_totals(self.ctx.models['psn_nursingWorker'], {
+                tenantId: tenant._id,
+                status: 1,
+                stop_flag: false
+            });
+
+            return totals.length;
+        });
+    },
+    getAmountOfBedMonitor: function (tenant, logger) {
+        var self = this;
+        return co(function *() {
+            var totals = yield self.ctx.modelFactory().model_totals(self.ctx.models['pub_bedMonitor'], {
+                tenantId: tenant._id,
+                status: 1,
+                stop_flag: false
+            });
+
+            return totals.length;
+        });
+    },
+    getAmountOfRobot: function (tenant, logger) {
+        var self = this;
+        return co(function *() {
+            var totals = yield self.ctx.modelFactory().model_totals(self.ctx.models['pub_robot'], {
+                tenantId: tenant._id,
+                status: 1,
+                stop_flag: false
+            });
+
+            return totals.length;
+        });
     }
 };

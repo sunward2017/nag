@@ -82,6 +82,7 @@
                 if(vm._action_ == 'edit' && vm.model.forbiddens.length) vm.forbiddens = vm.model.forbiddens;
                 switchDistrict();
                 switchFloor();
+                vm.old_name = vm.model.name;
             });
 
         }
@@ -180,7 +181,11 @@
             if ($scope.theForm.$valid) {
                 console.log(vm.forbiddens);
                 if(vm.forbiddens) vm.model.forbiddens = vm.forbiddens.split(',');
-                vm.save();
+                vm.save().then(function (ret) {
+                    if (vm.old_name != vm.model.name && vm._action_ == 'edit') {
+                        vmh.shareService.notifyDataChange('psn$room$name', vm.model._id);
+                    }
+                });
             }
             else {
                 if ($scope.utils.vtab(vm.tab1.cid)) {

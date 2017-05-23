@@ -301,10 +301,10 @@ co(function*() {
         _.map(app.conf.businessComponentNames, function (o) {
             var logName = 'bc_' + o + '.js';
             return {
-                type: 'dateFile',
+                type: 'file',
                 filename: path.join(app.conf.dir.log, logName),
-                pattern: '-yyyy-MM-dd.log',
-                alwaysIncludePattern: true,
+                maxLogSize: 2 * 1024 * 1024, //2M
+                backups: 5,
                 category: logName
             };
         }),

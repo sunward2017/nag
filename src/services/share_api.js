@@ -22,19 +22,16 @@ module.exports = {
 
         this.actions = [
             {
-                method: 'bedMonitor$fetch',
-                verb: 'get',
-                url: this.service_url_prefix + "/bedMonitor$fetch",
+                method: 'notifyDataChange',
+                verb: 'post',
+                url: this.service_url_prefix + "/notifyDataChange",
                 handler: function (app, options) {
                     return function *(next) {
                         try {
-                            var rows = yield app.modelFactory().model_query(app.models['pub_bedMonitor'], {
-                                select: 'mac -_id',
-                                where: {
-                                    status: 1
-                                }
-                            });
-                            this.body = app.wrapper.res.rows(rows);
+                            var item = this.request.body.item;
+                            var id = this.request.body.id;
+                            yield app.data_change_notify_service[item](id);
+                            this.body = app.wrapper.res.default();
                         } catch (e) {
                             self.logger.error(e.message);
                             this.body = app.wrapper.res.error(e);

@@ -21,11 +21,18 @@
         function init() {
 
             vm.init();
+
+            vm.tab1 = {active: true};
+            vm.tab2 = {active: false};
+            vm.tab3 = {active: false};
+
             liveinAndAccountAndBedInfo();
             elderlyAgeGroups();
             roomVacancyRateMonthly();
             roomCatagoryOfManTime();
             roomCatagoryOfManTimeMonthly();
+
+            nursingAlarmAndRecordAndWorkerAndBedMonitorAndRobot();
         }
 
         function liveinAndAccountAndBedInfo() {
@@ -44,10 +51,10 @@
                 //    {value: 135, name: '80岁及以上'}
                 //],//serials data   "$lte": end
 
-                var titles = _.map(rows, function (o) { return vm.moduleTranslatePath(o.title); });
+                var titles = _.map(rows, function (o) { return vm.moduleTranslatePath('TAB-INTEGRATION-'+o.title); });
                 var values = _.map(rows, function (o) { return o.value; });
-                var key_chart_title_elderlyagegroups = vm.moduleTranslatePath('CHART-TITLE-ELDERLY-AGE-GROUPS');
-                var key_chart_serie_name_elderlyagegroups = vm.moduleTranslatePath('CHART-SERIE-NAME-ELDERLY-AGE-GROUPS');
+                var key_chart_title_elderlyagegroups = vm.moduleTranslatePath('TAB-INTEGRATION-CHART-TITLE-ELDERLY-AGE-GROUPS');
+                var key_chart_serie_name_elderlyagegroups = vm.moduleTranslatePath('TAB-INTEGRATION-CHART-SERIE-NAME-ELDERLY-AGE-GROUPS');
                 vmh.q.all([vmh.translate([key_chart_title_elderlyagegroups, key_chart_serie_name_elderlyagegroups]), vmh.translate(titles),
                 vmh.psnService.queryElderly(vm.tenantId, '', {
                     live_in_flag: true,
@@ -121,9 +128,9 @@
                 var names = _.pluck(rows, 'period_value');
                 var data = _.pluck(rows, 'amount');
 
-                var key_chart_title_roomVacancyRateMonthly = vm.moduleTranslatePath('CHART-TITLE-ROOM-VACANCY_RATE-MONTHLY');
-                var key_chart_serie_name_roomVacancyRateMonthly = vm.moduleTranslatePath('CHART-SERIE-NAME-ROOM-VACANCY_RATE-MONTHLY');
-                var key_chart_serie_data_unit_roomVacancyRateMonthly = vm.moduleTranslatePath('CHART-SERIE-DATA-UNIT-ROOM-VACANCY_RATE-MONTHLY');
+                var key_chart_title_roomVacancyRateMonthly = vm.moduleTranslatePath('TAB-INTEGRATION-CHART-TITLE-ROOM-VACANCY_RATE-MONTHLY');
+                var key_chart_serie_name_roomVacancyRateMonthly = vm.moduleTranslatePath('TAB-INTEGRATION-CHART-SERIE-NAME-ROOM-VACANCY_RATE-MONTHLY');
+                var key_chart_serie_data_unit_roomVacancyRateMonthly = vm.moduleTranslatePath('TAB-INTEGRATION-CHART-SERIE-DATA-UNIT-ROOM-VACANCY_RATE-MONTHLY');
                 var key_aggregate_keywords_max = 'aggregate_keywords.MAX';
                 var key_aggregate_keywords_min = 'aggregate_keywords.MIN';
                 var key_aggregate_keywords_average = 'aggregate_keywords.AVERAGE';
@@ -182,11 +189,11 @@
 
         function roomCatagoryOfManTime() {
             psnDashboardNode.roomCatagoryOfManTime(vm.tenantId).then(function (rows) {
-                var titles = _.map(rows, function (o) { return vm.moduleTranslatePath(o.title); });
+                var titles = _.map(rows, function (o) { return vm.moduleTranslatePath('TAB-INTEGRATION-'+o.title); });
                 var values = _.pluck(rows, 'value');
 
-                var key_chart_title_roomCatagoryOfManTime = vm.moduleTranslatePath('CHART-TITLE-ROOM-CATAGORY-OF-MANTIME');
-                var key_chart_serie_name_roomCatagoryOfManTime = vm.moduleTranslatePath('CHART-SERIE-NAME-ROOM-CATAGORY-OF-MANTIME');
+                var key_chart_title_roomCatagoryOfManTime = vm.moduleTranslatePath('TAB-INTEGRATION-CHART-TITLE-ROOM-CATAGORY-OF-MANTIME');
+                var key_chart_serie_name_roomCatagoryOfManTime = vm.moduleTranslatePath('TAB-INTEGRATION-CHART-SERIE-NAME-ROOM-CATAGORY-OF-MANTIME');
 
 
                 vmh.q.all([vmh.translate([
@@ -251,8 +258,8 @@
         function roomCatagoryOfManTimeMonthly() {
             psnDashboardNode.roomCatagoryOfManTimeMonthly(vm.tenantId, moment().subtract(5, 'months').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')).then(function (result) {
                 var xAxisData = result.xAxisData;
-                var titles = _.map(result.seriesData, function (o) { return vm.moduleTranslatePath(o.name); });
-                var key_chart_title_roomCatagoryOfManTimeMonthly = vm.moduleTranslatePath('CHART-TITLE-ROOM-CATAGORY-OF-MANTIME-Monthly');
+                var titles = _.map(result.seriesData, function (o) { return vm.moduleTranslatePath('TAB-INTEGRATION-'+o.name); });
+                var key_chart_title_roomCatagoryOfManTimeMonthly = vm.moduleTranslatePath('TAB-INTEGRATION-CHART-TITLE-ROOM-CATAGORY-OF-MANTIME-Monthly');
 
                 vmh.q.all([vmh.translate([
                     key_chart_title_roomCatagoryOfManTimeMonthly
@@ -300,6 +307,12 @@
                 });
 
 
+            });
+        }
+
+        function nursingAlarmAndRecordAndWorkerAndBedMonitorAndRobot() {
+            psnDashboardNode.nursingAlarmAndRecordAndWorkerAndBedMonitorAndRobot(vm.tenantId).then(function (ret) {
+                vm.nursingAlarmAndRecordAndWorkerAndBedMonitorAndRobot = ret;
             });
         }
     }

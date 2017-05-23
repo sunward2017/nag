@@ -1814,21 +1814,26 @@ module.exports = {
             }
         }).catch(self.ctx.coOnError);
     },
-    checkSessionAndGetLatestSmbPerMinuteRecord:function(sessionId,devId,openId){
+    checkSessionAndGetLatestSmbPerMinuteRecord:function(devId,openId){
         var self = this;
         return co(function* (){
             try {
-                var sessionIsExpired = yield self.checkSessionIsExpired(sessionId);
+                var member = yield self.ctx.modelFactory().model_one(self.ctx.models['het_member'], {
+                    where: {
+                        status: 1,
+                        tenantId: openId
+                    }
+                });
+
+                var sessionIsExpired = yield self.checkSessionIsExpired(member.session_id_hzfanweng);
                 if (!sessionIsExpired) {
-                    var ret = yield self.getLatestSmbPerMinuteRecord(sessionId,devId);
+                    var ret = yield self.getLatestSmbPerMinuteRecord(member.session_id_hzfanweng,devId);
                     if (ret.retCode == 'success') {
                         return self.ctx.wrapper.res.ret({msg:'success',res:ret.retValue});
                     } else {
                         console.log('ret.retCode===='+ret.retCode);
                         return self.ctx.wrapper.res.ret({ msg: 'offline' });
                     }
-                }else{
-                    yield self.login(openId);
                 }
             } catch (e) {
                 console.log(e);

@@ -5428,7 +5428,7 @@ module.exports = {
                 handler: function (app, options) {
                     return function* (next) {
                         try {
-                            var ret = yield app.bed_monitor_status.checkSessionAndGetLatestSmbPerMinuteRecord(this.request.body.sessionId, this.request.body.devId, this.request.body.openId);
+                            var ret = yield app.bed_monitor_status.checkSessionAndGetLatestSmbPerMinuteRecord(this.request.body.devId, this.request.body.openId);
                             this.body = ret;
                         } catch (e) {
                             console.log(e);

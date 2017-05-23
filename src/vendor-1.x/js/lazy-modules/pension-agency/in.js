@@ -45,6 +45,7 @@
         $scope.utils = vmh.utils.v;
 
         var roomOccupancyChangeHistoryService = vm.modelNode.services['psn-roomOccupancyChangeHistory'];
+        var enterService = vm.modelNode.services['psn-enter'];
 
         init();
 
@@ -345,7 +346,13 @@
 
         function doSubmit() {
             if ($scope.theForm.$valid) {
-                vm.save();
+                vmh.fetch(enterService.query({elderlyId:vm.model._id})).then(function(ret){
+                    var enterModel = ret[0];
+                    enterModel.elderly_summary = vm.model.name;
+                    vmh.fetch(enterService.update(enterModel._id, enterModel)).then(function(ret){
+                        vm.save();
+                    })
+                });
             }
             else {
                 if ($scope.utils.vtab(vm.tab1.cid)) {

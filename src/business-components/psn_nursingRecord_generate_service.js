@@ -56,7 +56,7 @@ module.exports = {
         var self = this;
         return co(function*() {
 
-            var tenant, elderly, elderlyRoomValue, roomId, nursingPlanItems, nursingPlanItem, workItems, workOrDrugUseItem,
+            var tenant, elderly, elderlyIds, elderlyRoomValue, roomId, nursingPlanItems, nursingPlanItem, workItems, workOrDrugUseItem,
                 nursingRecord, now, gen_batch_no, nursingWorkerScheduleItems, exec_date, exec_on, exec_date_string, remind_on;
             var elderlyMapRoom = {},
                 nursingRecordsToSave = [],
@@ -287,7 +287,7 @@ module.exports = {
 
                     } else {
                         allElderly = yield self.ctx.modelFactory().model_query(self.ctx.models['psn_elderly'], {
-                            select: 'room_value',
+                            select: 'name room_value',
                             where: {
                                 status: 1,
                                 live_in_flag: true,
@@ -295,8 +295,12 @@ module.exports = {
                             }
                         });
 
+                        console.log('allElderly:', allElderly);
+                        elderlyIds = [];
                         self.ctx._.each(allElderly, (o) => {
+                            console.log('o.room_value:', o.name, o.room_value);
                             elderlyMapRoom[o._id.toString()] = o.room_value;
+                            elderlyIds.push(o._id);
                         });
 
                         // 为所有老人
@@ -304,17 +308,19 @@ module.exports = {
                             select: 'elderlyId elderly_name work_items',
                             where: {
                                 status: 1,
+                                elderlyId: {$in: elderlyIds},
                                 tenantId: tenantId
                             }
                         });
                     }
-                    console.log('nursingPlanItems', nursingPlanItems);
+                    // console.log('nursingPlanItems', nursingPlanItems);
                     if (nursingPlanItems.length) {
                         now = self.ctx.moment();
                         gen_batch_no = yield self.ctx.sequenceFactory.getSequenceVal(self.ctx.modelVariables.SEQUENCE_DEFS.CODE_OF_NURSING_RECORD);
                         // console.log('gen_batch_no:',gen_batch_no);
                         for (var i = 0, len = nursingPlanItems.length; i < len; i++) {
                             nursingPlanItem = nursingPlanItems[i];
+                            console.log('elderlyRoomValue:', nursingPlanItem.elderlyId, elderlyMapRoom[nursingPlanItem.elderlyId]);
                             elderlyRoomValue = elderlyMapRoom[nursingPlanItem.elderlyId];
                             nursingRecord = {
                                 elderlyId: nursingPlanItem.elderlyId,
@@ -325,7 +331,7 @@ module.exports = {
                                 tenantId: tenantId
                             }
                             workItems = nursingPlanItem.work_items;
-                            console.log("workItems", workItems)
+                            // console.log("workItems", workItems)
                             for (var j = 0, len2 = workItems.length; j < len2; j++) {
                                 workOrDrugUseItem = workItems[j];
                                 remind_max = workOrDrugUseItem.remind_times || 1;

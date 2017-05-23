@@ -7,7 +7,7 @@
 
  var job_id = 'nursingRecordInfoUpdate';
  var job_name =  '照护记录数据更新';
- var job_rule = '15 0 * * *';//每天 几点:几分
+ var job_rule = '15 0 * * *';//每天 几点:几分 '15 0 * * *' 零点15分执行
  var printLog = true;
 
  module.exports = {

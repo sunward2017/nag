@@ -50,7 +50,7 @@
                 vm.origin_quantity = vm.model.current_quantity
                 if(vm.model.elderlyId){
                     vm.selectedElderly = {_id: vm.model.elderlyId, name: vm.model.elderly_name};
-                    vm.selectedDrug = {_id:vm.model.drugId,drug_no:vm.model.drug_no};
+                    vm.selectedDrug = {_id:vm.model.drugId,barcode:vm.model.barcode};
                 }
             });
 
@@ -58,7 +58,6 @@
         }
 
         function queryElderly(keyword) {
-            console.log('keyword', keyword)
             return vmh.fetch(vmh.psnService.queryElderly(vm.tenantId, keyword, {
                   live_in_flag: true,
                   // sbegin_exit_flow: {'$in':[false,undefined]}
@@ -74,14 +73,13 @@
         }
          
         function queryDrug(keyword) {
-            return vmh.fetch(vmh.psnService.queryDrug(vm.tenantId, keyword, {}, 'drug_no full_name'));
+            return vmh.fetch(vmh.psnService.queryDrug(vm.tenantId, keyword, {}, 'barcode full_name'));
         }
 
         function selectDrug(o) {
-            console.log(o);
             if(o){
                 vm.model.drugId = o.originalObject._id;
-                vm.model.drug_no = o.originalObject.drug_no;
+                vm.model.barcode = o.originalObject.barcode;
                 vm.model.drug_full_name = o.originalObject.full_name;
             }
         }

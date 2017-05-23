@@ -371,6 +371,7 @@
                     vm.elderlyModel.nursing_assessment_grade = vm.model.current_nursing_assessment_grade;
                     vm.elderlyModel.nursingLevelId = vm.model.nursingLevelId;
                     vm.elderlyModel.nursing_level_name = vm.model.current_nursing_level_name;
+                    vm.elderlyModel.nursing_info = vm.model.current_nursing_assessment_grade_name +'-'+ vm.model.current_nursing_level_name;
                     vm.elderlyModel.last_assessment_time = ret.time;
                     vm.elderlyModel.lastAssessmentId = ret.id;
                     vmh.fetch(elderlyService.update(vm.model.elderlyId, vm.elderlyModel));

@@ -819,8 +819,8 @@
                 function customizedWorkItem(workItemId, customizedWorkItem) {
                     return $http.post(baseUrl + 'customizedWorkItem', { workItemId: workItemId, customizedWorkItem: customizedWorkItem })
                 }
-                function getLatestSmbPerMinuteRecord(sessionId,devId,openId){
-                    return $http.post(baseUrl + 'getLatestSmbPerMinuteRecord', {sessionId: sessionId,devId:devId,openId:openId});
+                function getLatestSmbPerMinuteRecord(devId,openId){
+                    return $http.post(baseUrl + 'getLatestSmbPerMinuteRecord', {devId:devId,openId:openId});
                 }
             }]
         };

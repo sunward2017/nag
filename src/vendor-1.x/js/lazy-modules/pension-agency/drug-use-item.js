@@ -9,6 +9,7 @@
     angular
         .module('subsystem.pension-agency')
         .controller('DrugUseItemGridController', DrugUseItemGridController)
+        .controller('ElderlyByDrugUseController', ElderlyByDrugUseController)
         .controller('DrugUseItemDetailsController', DrugUseItemDetailsController);
 
 
@@ -18,14 +19,72 @@
 
         $scope.vm = vm;
         $scope.utils = vmh.utils.g;
-
-        init();
-
-        function init() {
-            vm.init({ removeDialog: ngDialog });
-            vm.query();
+        vm.onRoomChange = onRoomChange;
+        vm.init({ removeDialog: ngDialog });
+        
+        vm.yAxisDataPromise = vmh.shareService.tmp('T3009', null, { tenantId: vm.tenantId }).then(function (nodes) {
+                return nodes;
+        });
+        fetchElderly()
+        function fetchElderly(){
+            vmh.psnService.nursingPlansByRoom(vm.tenantId, ['name', 'sex', 'birthday', 'enter_code' ,'nursing_info','begin_exit_flow'], ['elderlyId']).then(function(ret){
+                 vm.aggrData = ret;
+            })
+        }
+        function onRoomChange() {  
+            var yAxisDataFlatten = [];
+            _.each(vm.yAxisData, function (o) {
+                for (var i = 1, len = o.capacity; i <= len; i++) {
+                    if (_.contains(o.forbiddens, i)) continue;
+                    var trackedKey = o._id + '$' + i;
+                    yAxisDataFlatten.push(_.extend({ trackedKey: trackedKey, bed_no: i }, o));
+                }
+            });
+            vm.yAxisDataFlatten = yAxisDataFlatten;
+            // console.log('yAxisDataFlatten:',vm.yAxisDataFlatten);
         }
     }
+    
+    ElderlyByDrugUseController.$inject = ['$scope','ngDialog','vmh', 'entityVM'];
+    
+    function ElderlyByDrugUseController($scope, ngDialog, vmh, vm){
+        var vm = $scope.vm = vm;
+        $scope.utils = vmh.utils.v;
+        vm.fetchDrugUseItem = fetchDrugUseItem;
+
+        var drugUseService = vm.modelNode.services['psn-drugUseItem'];
+        init();
+        function init(){
+            vm.init({removeDialog: ngDialog});
+            vmh.parallel([
+                vmh.shareService.d('D1006'),
+                vmh.shareService.d('D1008'),   
+            ]).then(function (results) {
+                vm.selectBinding.sex = results[0];
+                vm.selectBinding.medical_insurances = results[1];
+            });
+            vm.medical_historiesPromise = vmh.shareService.d('D1014').then(function (medical_histories) {
+                vmh.utils.v.changeProperyName(medical_histories, [{o: 'value', n: '_id'}]);
+                return medical_histories;
+            });
+            vm.load().then(function(){
+                vm.fetchDrugUseItem();
+            })  
+        }
+        function fetchDrugUseItem(){
+            drugUseService.query({
+                elderlyId: vm.model._id,
+                tenantId: vm.model.tenantId
+            }).$promise.then(function (rows) {
+                console.log(rows);
+                vm.elderlyDrugUseItems = rows 
+            });
+        }
+    }
+
+
+
+
 
     DrugUseItemDetailsController.$inject = ['$scope', 'ngDialog', 'vmh', 'entityVM'];
 
@@ -40,8 +99,8 @@
             vm.init({ removeDialog: ngDialog });
 
             vm.doSubmit = doSubmit;
-            vm.queryElderlyPromise = queryElderly();
-            vm.fetchElderlyColumnsPromise = [{ label: '入院登记号', name: 'enter_code', width: 100 }, { label: '姓名', name: 'name', width: 100 }];
+            // vm.queryElderlyPromise = queryElderly();
+            // vm.fetchElderlyColumnsPromise = [{ label: '入院登记号', name: 'enter_code', width: 100 }, { label: '姓名', name: 'name', width: 100 }];
 
             vm.queryDrugPromise = queryDrug();
             vm.fetchDrugColumnsPromise = [{ label: '药品编码', name: 'drug_no', width: 100 }, { label: '药品全称', name: 'full_name', width: 100 }];

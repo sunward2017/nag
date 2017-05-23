@@ -1,43 +1,32 @@
-.col-xs-12.text-center
+.col-xs-2(ng-if="vm.switches.leftTree")
+    .tree.tree-basic(name='yAxisData',s-tree, s-tree-data="vm.yAxisDataPromise",s-tree-height="vm.size.h-15", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{mode:'check',selectNodeFormat:'object'}",ng-model="vm.yAxisData",required='', on-check-change="vm.onRoomChange()")
+.text-left(ng-class='{"col-xs-10":vm.switches.leftTree,"col-xs-12":!vm.switches.leftTree}')
     .row
-        form.form-search
-            .input-group.pull-right.page-search
-                label.input-group-addon {{'grid.LABEL-SEARACH'|translate}}
-                input.form-control(type="text",ng-model="vm.filter.$")
+        .col-md-5
+        .col-md-7
+            //.dropdown(s-dropdown,is-button,ng-model="vm.editing$NursingLevel",s-dropdown-data="vm.selectBinding.nursingLevels")
     .row-split
-    .row
         .panel.panel-default.panel-grid
             table.grid.table.table-bordered.table-hover.table-striped
                 thead
                     tr
-                        th.text-center(check-all,width="30")
-                            .checkbox.c-checkbox(data-toggle="tooltip",data-title="Check All")
-                                label(ng-click="vm.selectAll($event)")
-                                    input(type='checkbox')
-                                    span.fa.fa-check
                         th.text-center(ng-repeat="column in vm.columns",width="{{column|width}}",ng-hide="column|hide",ng-click="vm.sort.toggle(column)",ng-class="{sortable: column.sortable !== false}")
                             | {{column.label}}
                             i.glyphicon(ng-if="column.name === vm.sort.column && vm.sort.direction",ng-class="vm.sort.direction|orderClass")
                 tbody
-                    tr(ng-repeat="row in vm.rows|filter:vm.filter|orderBy:vm.sort.column:vm.sort.direction===-1|paging:vm" , ng-click="vm.selectRow($event,row)",ng-dblclick="vm.dblclickRow(row.id)")
-                        td
-                            .checkbox.c-checkbox
-                                label
-                                    input(type='checkbox' data="trBubble" ng-model="row.checked" )
-                                    span.fa.fa-check(data="trBubble")
-                        td {{::row.elderly_name}}
-                        td {{::row.name}}
-                        td {{::row.drug_no}}
-                        td {{::row.repeat_type_name }}{{row.repeat_values | repeatInfoCombo: row.repeat_start}}
-                        td {{::row.duration}}
-                        td {{::row.confirm_flag|boolFilter}}
-                        td {{::row.remind_flag|boolFilter}}
-                        td {{::row.remind_mode_name}}
-                        td {{::row.remind_times}}
-                        td.text-left
+                    tr(ng-repeat="row in vm.yAxisDataFlatten track by row.trackedKey" ng-if="vm.aggrData[row.trackedKey]['elderly']['name']")
+                        td.text-center {{vm.aggrData[row.trackedKey]['room_name']}}
+                        td.text-center {{vm.aggrData[row.trackedKey]['bed_no']}}
+                        td.text-center {{vm.aggrData[row.trackedKey]['elderly']['name']}}
+                        td.text-center {{vm.aggrData[row.trackedKey]['elderly']['sex']|formatter:'sex':vm.columns}}
+                        td.text-center {{vm.aggrData[row.trackedKey]['elderly']['birthday']|calcAge}}
+                        td.text-center {{vm.aggrData[row.trackedKey]['elderly']['enter_code']}}
+                        td.text-center {{vm.aggrData[row.trackedKey]['elderly']['nursing_info']}}
+                        td.text-center {{vm.aggrData[row.trackedKey]['elderly']['begin_exit_flow']|formatter:'begin_exit_flow':vm.columns}} 
+                        td.text-center
                             .btn-group
-                                a.btn.btn-primary.btn-xs(title="{{'button.EDIT'|translate}}",ng-click="vm.edit(row._id)")
-                                    i.glyphicon.glyphicon-pencil
+                                a.btn.btn-primary.btn-xs(title="{{'button.ADD'|translate}}",ng-click="vm.edit(vm.aggrData[row.trackedKey]['elderly']['_id'])")
+                                     i.glyphicon.glyphicon-plus
                     tr(ng-if="vm.paged.length==0")
                         td(colspan="{{utils.noResultsColspan(vm)}}") {{ 'grid.NO-RESULTS' | translate}}
             .panel-footer
@@ -45,9 +34,5 @@
                     .col-md-4.text-left
                         .btn-toolbar
                             .btn-group
-                                a.btn.btn-primary.btn-sm(title="{{'button.ADD'|translate}}",ng-click="vm.add()")
-                                    i.glyphicon.glyphicon-plus
-                                a.btn.btn-primary.btn-sm(title="{{'button.REMOVE'|translate}}",ng-click="vm.disable()")
-                                    i.glyphicon.glyphicon-minus
                     .col-md-8
                         pagination.pagination-sm.pull-right(total-items="vm.page.totals",ng-model="vm.page.no",max-size="5",items-per-page="vm.page.size",boundary-links="true" ,ng-change="vm.paging()")

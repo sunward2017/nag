@@ -1,4 +1,5 @@
-form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="vm.doSubmit()")
+ 
+form.form-validate.mb-lg(role='form', name="theForm", novalidate='')
     .panel
         tabset(justified="true")
             tab(active="vm.tab1.active")
@@ -8,101 +9,199 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                         i.glyphicon.glyphicon-minus-sign
                 div#contentTab1
                     fieldset: .form-group
-                        <!--老人-->
+                        <!--姓名-->
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-ELDERLY-NAME') | translate}}:
-                        .col-md-10(ng-if="!vm.readonly && vm._action_!='edit' ")
-                            .backfiller(backfiller,ng-model="vm.selectedElderly", input-name="elderly", fetch-rows="vm.queryElderlyPromise", fetch-columns="vm.fetchElderlyColumnsPromise", picker-title="挑选老人" on-select="vm.selectElerlyForBackFiller(row)")
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'elderly','autocomplete-required')") {{ "validator.REQUIRED" | translate}}
                         .col-md-10(ng-if="vm.readonly || vm._action_=='edit'")
-                            .form-readable {{vm.model.elderly_name}}  
+                            .form-readable {{vm.model.name}}
                     fieldset: .form-group
-                        <!--药品目录-->
-                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-DRUG-NAME') | translate}}:
-                        .col-md-10(ng-if="!vm.readonly && vm._action_!='edit' ")
-                            .backfiller(backfiller,ng-model="vm.selectedDrug", text-key="full_name", input-name="drug", fetch-rows="vm.queryDrugPromise", fetch-columns="vm.fetchDrugColumnsPromise", picker-title="挑选药品" on-select="vm.selectDrugForBackFiller(row)")
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'drug','autocomplete-required')") {{ "validator.REQUIRED" | translate}}
+                        <!--性别-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-SEX') | translate}}:
                         .col-md-10(ng-if="vm.readonly || vm._action_=='edit'")
-                            .form-readable {{vm.model.name}}     
-                    fieldset: .form-group
-                        <!--服用方法-->
-                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-DESCRIPTION') | translate}}:
-                        .col-md-10
-                            textarea.form-control(name='description',ng-model='vm.model.description',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-DESCRIPTION")|translate}}',maxlength="400")
-                    fieldset: .form-group
-                        <!--时长(分)-->
-                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-DURATION') | translate}}:
-                        .col-md-10
-                            input.form-control(type='number',name='duration' ,ng-model='vm.model.duration',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-DURATION")|translate}}', required='' ui-validate="'$value>=0'" )
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'duration','required')") {{ "validator.REQUIRED" | translate}}
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'duration','number')") {{ "validator.NUMBER" | translate}}
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'duration','validator')") {{ "validator.MIN" | translate:{min:0} }}
-                    fieldset: .form-group
-                        <!--重复类型-->
-                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-REPEAT_TYPE') | translate}}:
-                        .col-md-10
                             .btn-group
-                                .btn.btn-primary(name='repeat_type',ng-change="vm.initVoiceTemplate()",ng-repeat='repeatType in vm.selectBinding.repeatTypes',ng-model='vm.model.repeat_type',btn-radio="repeatType.value",required='') {{repeatType.name}}
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'repeat_type','required')") {{ "validator.REQUIRED" | translate}}
+                                .btn.btn-primary.cursor-not-allowed(name='sex',ng-repeat='sex in vm.selectBinding.sex',ng-class="{'active':vm.model.sex==sex.value}") {{sex.name}}
                     fieldset: .form-group
-                        <!--重复值域-->
-                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-REPEAT_VALUES') | translate}}:
-                        .col-md-10
-                            input.form-control(type='text',ng-disabled="vm.repeatValuesSwitch", name='repeat_values',ng-model='vm.repeat_values',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-REPEAT_VALUES")|translate}}')
+                        <!--出生日期-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-BIRTHDAY') | translate}}:
+                        .col-md-2(ng-if="vm.readonly || vm._action_=='edit'")
+                            .form-readable {{vm.model.birthday|date}}
                     fieldset: .form-group
-                        <!--重复点-->
-                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-REPEAT_START') | translate}}:
-                        .col-md-10
-                            input.form-control(type='text',ng-disabled="vm.repeatStartSwitch", name='repeat_start',ng-model='vm.model.repeat_start',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-REPEAT_START")|translate}}')
-                    fieldset: .form-group
-                        <!--语音播报-->
-                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-VOICE-TEMPLATE') | translate}}:
-                        .col-md-10
-                            textarea.form-control(name='voice_template',ng-disabled="vm.voiceSwitch",ng-model='vm.model.voice_template',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-VOICE")|translate}}',maxlength="400")
-                    fieldset: .form-group
-                        <!--标识集合-->
-                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-FLAG-COLLECTION') | translate}}:
-                        .col-md-2
-                            .checkbox.c-checkbox
-                                label
-                                    input#confirmFlag(type='checkbox',ng-model='vm.model.confirm_flag')
-                                    span.fa.fa-check
-                            label(for="confirmFlag") {{ vm.viewTranslatePath('TAB1-LABEL-CONFIRM_FLAG') | translate}}
-                        .col-md-2
-                            .checkbox.c-checkbox
-                                label
-                                    input#remindFlag(type='checkbox',ng-model='vm.model.remind_flag')
-                                    span.fa.fa-check
-                            label(for="remindFlag") {{ vm.viewTranslatePath('TAB1-LABEL-REMIND_FLAG') | translate}}
-                        .col-md-2
-                            .checkbox.c-checkbox
-                                label
-                                    input#feeFlag(type='checkbox',ng-model='vm.model.fee_flag')
-                                    span.fa.fa-check
-                            label(for="feeFlag") {{ vm.viewTranslatePath('TAB1-LABEL-FEE_FLAG') | translate}}
-                    fieldset(ng-if="vm.model.remind_flag"): .form-group
-                        <!--提醒方式-->
-                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-REMIND_MODE') | translate}}:
-                        .col-md-10
+                        <!--医保所在地-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-MEDICAL_INSURANCE') | translate}}:
+                        .col-md-10(ng-if="vm.readonly || vm._action_=='edit'")
                             .btn-group
-                                .btn.btn-primary(name='remind_mode',ng-repeat='remindMode in vm.selectBinding.remindModes',ng-model='vm.model.remind_mode',btn-radio="remindMode.value",required='') {{remindMode.name}}
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'remind_mode','required')") {{ "validator.REQUIRED" | translate}}
-                    fieldset(ng-if="vm.model.remind_flag"): .form-group
-                        <!--提醒次数-->
-                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-REMIND_TIMES') | translate}}:
+                                .btn.btn-primary.cursor-not-allowed(name='medical_insurance',ng-repeat='medical_insurance in vm.selectBinding.medical_insurances',ng-class="{'active':vm.model.medical_insurance==medical_insurance.value}") {{medical_insurance.name}}
+                    fieldset: .form-group
+                        <!--过往病史-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-MEDICAL_HISTORIES') | translate}}:
                         .col-md-10
-                            input.form-control(type='number',name='remind_times' ,ng-model='vm.model.remind_times',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-REMIND_TIMES")|translate}}', required='' ui-validate="'$value>=1'" )
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'remind_times','required')") {{ "validator.REQUIRED" | translate}}
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'remind_times','number')") {{ "validator.NUMBER" | translate}}
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'remind_times','validator')") {{ "validator.MIN" | translate:{min:1} }}
-                    fieldset(ng-if="vm.model.fee_flag"): .form-group
-                        <!--费用(￥)-->
-                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-FEE') | translate}}:
-                        .col-md-10
-                            input.form-control(type='number',name='fee' ,ng-model='vm.model.fee',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-FEE")|translate}}', required='' ui-validate="'$value>=1'" )
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'fee','required')") {{ "validator.REQUIRED" | translate}}
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'fee','number')") {{ "validator.NUMBER" | translate}}
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'fee','validator')") {{ "validator.MIN" | translate:{min:1} }}
+                            .tree.tree-dropdown(name='medical_histories',s-tree,s-tree-data="vm.medical_historiesPromise",s-tree-height="200", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{mode:'check',layout:'dropdown',readonly:{{vm.readonly}} }",ng-model="vm.model.medical_histories",required='')
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'medical_histories','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset: .form-group
+                    .panel.panel-default.panel-grid
+                        .panel-heading-normal
+                            a {{ vm.viewTranslatePath('TAB1-LABEL-DRUG-LIST') | translate}}
+                        table.grid.table.table-bordered.table-hover.table-striped
+                            thead
+                                tr
+                                    th.text-center(ng-if="!vm.readonly",check-all,width="30")
+                                        .checkbox.c-checkbox(data-toggle="tooltip",data-title="Check All")
+                                            label(ng-click="vm.checkElderlyDrugUseAll($event)")
+                                                input(type='checkbox')
+                                                span.fa.fa-check
+                                    th.text-center(width="60")
+                                        | {{ vm.viewTranslatePath('TAB1-LABEL-DRUG-NAME') | translate}}
+                                    th.text-center(width="60")
+                                        | {{ vm.viewTranslatePath('TAB1-LABEL-BARCODE') | translate}}
+                                    th.text-center(width="80")
+                                        | {{ vm.viewTranslatePath('TAB1-LABEL-REPEAT_VALUES') | translate}}
+                                    th.text-center(width="100")
+                                        | {{ vm.viewTranslatePath('TAB1-LABEL-DESCRIPTION') | translate}}
+                                    th.text-center(width="40")
+                                        | {{ vm.viewTranslatePath('TAB1-LABEL-CONFIRM_FLAG') | translate}}
+                                    th.text-center(width="40")
+                                        | {{ vm.viewTranslatePath('TAB1-LABEL-REMIND_FLAG') | translate}}
+                                    th.text-center(width="70")
+                                        | {{ vm.viewTranslatePath('TAB1-LABEL-REMIND_MODE') | translate}}
+                                    th.text-center(width="40")
+                                        | {{ vm.viewTranslatePath('TAB1-LABEL-REMIND_TIMES') | translate}}    
+                                    th.text-center(width="50",ng-if="!vm.readonly")
+                            tbody
+                                tr(ng-repeat="row in vm.elderlyDrugUseItems|orderBy:'-check_in_time'" )
+                                    td.text-center(ng-if="!vm.readonly")
+                                        .checkbox.c-checkbox(ng-if="!row.$editing")
+                                            label
+                                                input(type='checkbox',ng-model="row.checked" )
+                                                span.fa.fa-check
+                                    td.text-center {{::row.name}}
+                                    td.text-center {{::row.drug_no}}
+                                    td.text-center {{::row.repeat_type_name }}{{row.repeat_values | repeatInfoCombo: row.repeat_start}}
+                                    td.text-center {{::row.description}}
+                                    td.text-center {{::row.confirm_flag|boolFilter}}
+                                    td.text-center {{::row.remind_flag|boolFilter}}
+                                    td.text-center {{::row.remind_mode_name}}
+                                    td.text-center {{::row.remind_times}}
+                                    td.text-center                             
+                                        .btn-group                                 
+                                            a.btn.btn-primary.btn-xs(title="{{'button.EDIT'|translate}}",ng-click="vm.edit(row._id)")                                     
+                                                i.glyphicon.glyphicon-pencil
+                                    tr(ng-if="vm.paged.length==0")
+                                        td(colspan="{{utils.noResultsColspan(vm)}}") {{ 'grid.NO-RESULTS' | translate}}               
+                        .panel-footer
+                            .row
+                                .col-md-4.text-left
+                                    .btn-toolbar(ng-if="!vm.readonly")
+                                        .btn-group
+                                            a.btn.btn-primary.btn-sm(title="{{'button.ADD'|translate}}",ng-click="vm.addElderlyDrugUseItem()")
+                                                i.glyphicon.glyphicon-plus
+                                            a.btn.btn-primary.btn-sm(title="{{'button.REMOVE'|translate}}",ng-click="vm.removeElderlyDrugUseItem()")
+                                                i.glyphicon.glyphicon-minus
+            
+script(type="text/ng-template", id="change-elderly-board-info.html")
+    form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="vm.doSubmit()")
+        .panel
+            tabset(justified="true")
+                tab(active="vm.tab1.active")
+                    tab-heading
+                        | {{ vm.viewTranslatePath('TAB1') | translate}}
+                        span.text-danger(title="{{'validator.FIELD-INVALID'|translate}}" , ng-show="utils.vtab('contentTab1')")
+                            i.glyphicon.glyphicon-minus-sign
+                    div#contentTab1
+                        fieldset: .form-group
+                            <!--老人-->
+                            label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-ELDERLY-NAME') | translate}}:
+                            .col-md-10(ng-if="!vm.readonly && vm._action_!='edit' ")
+                                .backfiller(backfiller,ng-model="vm.selectedElderly", input-name="elderly", fetch-rows="vm.queryElderlyPromise", fetch-columns="vm.fetchElderlyColumnsPromise", picker-title="挑选老人" on-select="vm.selectElerlyForBackFiller(row)")
+                                span.text-danger(ng-show="utils.vinput(this.theForm,'elderly','autocomplete-required')") {{ "validator.REQUIRED" | translate}}
+                            .col-md-10(ng-if="vm.readonly || vm._action_=='edit'")
+                                .form-readable {{vm.model.elderly_name}}  
+                        fieldset: .form-group
+                            <!--药品目录-->
+                            label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-DRUG-NAME') | translate}}:
+                            .col-md-10(ng-if="!vm.readonly && vm._action_!='edit' ")
+                                .backfiller(backfiller,ng-model="vm.selectedDrug", text-key="full_name", input-name="drug", fetch-rows="vm.queryDrugPromise", fetch-columns="vm.fetchDrugColumnsPromise", picker-title="挑选药品" on-select="vm.selectDrugForBackFiller(row)")
+                                span.text-danger(ng-show="utils.vinput(this.theForm,'drug','autocomplete-required')") {{ "validator.REQUIRED" | translate}}
+                            .col-md-10(ng-if="vm.readonly || vm._action_=='edit'")
+                                .form-readable {{vm.model.name}}     
+                        fieldset: .form-group
+                            <!--服用方法-->
+                            label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-DESCRIPTION') | translate}}:
+                            .col-md-10
+                                textarea.form-control(name='description',ng-model='vm.model.description',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-DESCRIPTION")|translate}}',maxlength="400")
+                        fieldset: .form-group
+                            <!--时长(分)-->
+                            label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-DURATION') | translate}}:
+                            .col-md-10
+                                input.form-control(type='number',name='duration' ,ng-model='vm.model.duration',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-DURATION")|translate}}', required='' ui-validate="'$value>=0'" )
+                                span.text-danger(ng-show="utils.vinput(this.theForm,'duration','required')") {{ "validator.REQUIRED" | translate}}
+                                span.text-danger(ng-show="utils.vinput(this.theForm,'duration','number')") {{ "validator.NUMBER" | translate}}
+                                span.text-danger(ng-show="utils.vinput(this.theForm,'duration','validator')") {{ "validator.MIN" | translate:{min:0} }}
+                        fieldset: .form-group
+                            <!--重复类型-->
+                            label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-REPEAT_TYPE') | translate}}:
+                            .col-md-10
+                                .btn-group
+                                    .btn.btn-primary(name='repeat_type',ng-change="vm.initVoiceTemplate()",ng-repeat='repeatType in vm.selectBinding.repeatTypes',ng-model='vm.model.repeat_type',btn-radio="repeatType.value",required='') {{repeatType.name}}
+                                span.text-danger(ng-show="utils.vinput(this.theForm,'repeat_type','required')") {{ "validator.REQUIRED" | translate}}
+                        fieldset: .form-group
+                            <!--重复值域-->
+                            label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-REPEAT_VALUES') | translate}}:
+                            .col-md-10
+                                input.form-control(type='text',ng-disabled="vm.repeatValuesSwitch", name='repeat_values',ng-model='vm.repeat_values',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-REPEAT_VALUES")|translate}}')
+                        fieldset: .form-group
+                            <!--重复点-->
+                            label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-REPEAT_START') | translate}}:
+                            .col-md-10
+                                input.form-control(type='text',ng-disabled="vm.repeatStartSwitch", name='repeat_start',ng-model='vm.model.repeat_start',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-REPEAT_START")|translate}}')
+                        fieldset: .form-group
+                            <!--语音播报-->
+                            label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-VOICE-TEMPLATE') | translate}}:
+                            .col-md-10
+                                textarea.form-control(name='voice_template',ng-disabled="vm.voiceSwitch",ng-model='vm.model.voice_template',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-VOICE")|translate}}',maxlength="400")
+                        fieldset: .form-group
+                            <!--标识集合-->
+                            label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-FLAG-COLLECTION') | translate}}:
+                            .col-md-2
+                                .checkbox.c-checkbox
+                                    label
+                                        input#confirmFlag(type='checkbox',ng-model='vm.model.confirm_flag')
+                                        span.fa.fa-check
+                                label(for="confirmFlag") {{ vm.viewTranslatePath('TAB1-LABEL-CONFIRM_FLAG') | translate}}
+                            .col-md-2
+                                .checkbox.c-checkbox
+                                    label
+                                        input#remindFlag(type='checkbox',ng-model='vm.model.remind_flag')
+                                        span.fa.fa-check
+                                label(for="remindFlag") {{ vm.viewTranslatePath('TAB1-LABEL-REMIND_FLAG') | translate}}
+                            .col-md-2
+                                .checkbox.c-checkbox
+                                    label
+                                        input#feeFlag(type='checkbox',ng-model='vm.model.fee_flag')
+                                        span.fa.fa-check
+                                label(for="feeFlag") {{ vm.viewTranslatePath('TAB1-LABEL-FEE_FLAG') | translate}}
+                        fieldset(ng-if="vm.model.remind_flag"): .form-group
+                            <!--提醒方式-->
+                            label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-REMIND_MODE') | translate}}:
+                            .col-md-10
+                                .btn-group
+                                    .btn.btn-primary(name='remind_mode',ng-repeat='remindMode in vm.selectBinding.remindModes',ng-model='vm.model.remind_mode',btn-radio="remindMode.value",required='') {{remindMode.name}}
+                                span.text-danger(ng-show="utils.vinput(this.theForm,'remind_mode','required')") {{ "validator.REQUIRED" | translate}}
+                        fieldset(ng-if="vm.model.remind_flag"): .form-group
+                            <!--提醒次数-->
+                            label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-REMIND_TIMES') | translate}}:
+                            .col-md-10
+                                input.form-control(type='number',name='remind_times' ,ng-model='vm.model.remind_times',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-REMIND_TIMES")|translate}}', required='' ui-validate="'$value>=1'" )
+                                span.text-danger(ng-show="utils.vinput(this.theForm,'remind_times','required')") {{ "validator.REQUIRED" | translate}}
+                                span.text-danger(ng-show="utils.vinput(this.theForm,'remind_times','number')") {{ "validator.NUMBER" | translate}}
+                                span.text-danger(ng-show="utils.vinput(this.theForm,'remind_times','validator')") {{ "validator.MIN" | translate:{min:1} }}
+                        fieldset(ng-if="vm.model.fee_flag"): .form-group
+                            <!--费用(￥)-->
+                            label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-FEE') | translate}}:
+                            .col-md-10
+                                input.form-control(type='number',name='fee' ,ng-model='vm.model.fee',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-FEE")|translate}}', required='' ui-validate="'$value>=1'" )
+                                span.text-danger(ng-show="utils.vinput(this.theForm,'fee','required')") {{ "validator.REQUIRED" | translate}}
+                                span.text-danger(ng-show="utils.vinput(this.theForm,'fee','number')") {{ "validator.NUMBER" | translate}}
+                                span.text-danger(ng-show="utils.vinput(this.theForm,'fee','validator')") {{ "validator.MIN" | translate:{min:1} }}
 
-    .text-right.mt-lg
-        button.btn.btn-warning(type="button",ng-click="vm.cancel()") {{'button.CANCEL'|translate}}
-        button.btn.btn-success(type="submit") {{'button.SAVE'|translate}}
+        .text-right.mt-lg
+            button.btn.btn-warning(type="button",ng-click="vm.cancel()") {{'button.CANCEL'|translate}}
+            button.btn.btn-success(type="submit") {{'button.SAVE'|translate}}

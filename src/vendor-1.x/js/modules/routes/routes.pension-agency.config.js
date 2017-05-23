@@ -1377,6 +1377,16 @@
                         },
                         serverPaging: true,
                         columns: [{
+                            label: '房间',
+                            name: 'room_name',
+                            type: 'string',
+                            width: 120
+                        }, {
+                            label: '床号',
+                            name: 'bed_no',
+                            type: 'string',
+                            width: 80
+                        }, {
                             label: '老人',
                             name: 'name',
                             type: 'string',
@@ -1400,17 +1410,7 @@
                             type: 'string',
                             width: 80,
                             sortable: true
-                        }, {
-                            label: '饮食套餐',
-                            name: 'board_summary',
-                            type: 'string',
-                            width: 80
-                        }, {
-                            label: '房间床位',
-                            name: 'room_summary',
-                            type: 'string',
-                            width: 120
-                        }, {
+                        },  {
                             label: '照护信息',
                             name: 'nursing_info',
                             type: 'string',
@@ -1436,17 +1436,13 @@
                 url: '/details/:action/:_id/:nursingLevelId',
                 templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'drug-use-item-details.html'),
                 access_level: AUTH_ACCESS_LEVELS.USER,
-                controller: 'DrugUseItemDetailsController',
+                controller: 'ElderlyByDrugUseController',
                 resolve: {
                     entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'drug-use-item.details', {
-                        modelName: 'psn-drugUseItem',
-                        model: {
-                            duration: 30
-                        },
+                        modelName: 'psn-elderly',
                         blockUI: true,
 
-                    }),
-                    deps: helper.resolveFor2('angucomplete-alt')
+                    })
                 }
             })
             .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'drug-directory', {

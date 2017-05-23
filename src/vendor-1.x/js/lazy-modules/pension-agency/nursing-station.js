@@ -556,7 +556,7 @@
                             vm.inBed = 'offline';
                         }
                     });
-                },1000*10);
+                },1000*60);
 
                 vm.miniute_hr_bar_id = $echarts.generateInstanceIdentity();
                 vm.miniute_hr_bar_config = {

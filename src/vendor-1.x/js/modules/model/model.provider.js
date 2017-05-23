@@ -2,7 +2,7 @@
  * Module: ModelProvider.js
  * Provides ModelService functions for node.js
  =========================================================*/
-(function() {
+(function () {
     'use strict';
     angular
         .module('app.model')
@@ -13,11 +13,11 @@
         .provider('psnNode', PSNNode)
         .provider('psnDashboardNode', PSNDashboardNode)
         .provider('trvDashboardNode', TRVDashboardNode)
-        .provider('idtNode',IDTNode)
-        .provider('qiniuNode',QiniuNode)
-        .provider('debugNode',DebugNode)
-        .provider('clientData',ClientData)
-    ;
+        .provider('idtNode', IDTNode)
+        .provider('qiniuNode', QiniuNode)
+        .provider('debugNode', DebugNode)
+        .provider('clientData', ClientData)
+        ;
 
     function ModelNode() {
         var baseUrl;
@@ -33,32 +33,32 @@
                         this.services[name] = $resource(baseUrl + name + '/:_id', {
                             _id: '@_id'
                         }, {
-                            'get': {method: 'GET', headers: {'_$resource$_': true}},
-                            'list': {method: 'GET', isArray: true, headers: {'_$resource$_': true}},
-                            '_query': {method: 'POST', isArray: true, headers: {'_$resource$_': true}},
-                            '_post': {method: 'POST', headers: {'_$resource$_': true}},
-                            '_update': {method: 'PUT', headers: {'_$resource$_': true}},
-                            '_save': {method: 'POST', headers: {'_$resource$_': true}},
-                            '_remove': {method: 'DELETE', headers: {'_$resource$_': true}}
-                            //'delete': {method: 'DELETE'}
-                        });
+                                'get': { method: 'GET', headers: { '_$resource$_': true } },
+                                'list': { method: 'GET', isArray: true, headers: { '_$resource$_': true } },
+                                '_query': { method: 'POST', isArray: true, headers: { '_$resource$_': true } },
+                                '_post': { method: 'POST', headers: { '_$resource$_': true } },
+                                '_update': { method: 'PUT', headers: { '_$resource$_': true } },
+                                '_save': { method: 'POST', headers: { '_$resource$_': true } },
+                                '_remove': { method: 'DELETE', headers: { '_$resource$_': true } }
+                                //'delete': {method: 'DELETE'}
+                            });
                         this.services[name].save = function (params, successFn, errorFn) {
                             return this._save(null, params, successFn, errorFn)
                         };
                         this.services[name].update = function (_id, params, successFn, errorFn) {
-                            return this._update({_id: _id}, params, successFn, errorFn)
+                            return this._update({ _id: _id }, params, successFn, errorFn)
                         };
                         this.services[name].disable = function (_id, successFn, errorFn) {
-                            return this._update({_id: _id}, {status: 0}, successFn, errorFn);
+                            return this._update({ _id: _id }, { status: 0 }, successFn, errorFn);
                         };
                         this.services[name].remove = function (_id, successFn, errorFn) {
-                            return this._remove({_id: _id}, null, successFn, errorFn);
+                            return this._remove({ _id: _id }, null, successFn, errorFn);
                         };
                         this.services[name].one = function (params, successFn, errorFn) {
-                            return this.get(_.extend(params, {_id: '$one'}), successFn, errorFn)
+                            return this.get(_.extend(params, { _id: '$one' }), successFn, errorFn)
                         };
                         this.services[name].page = function (page, where, select, sort, populates, successFn, errorFn) {
-                            return this._query({_id: '$query'}, {
+                            return this._query({ _id: '$query' }, {
                                 page: page,
                                 where: where,
                                 select: select,
@@ -67,7 +67,7 @@
                             }, successFn, errorFn);
                         };
                         this.services[name].query = function (where, select, sort, populates, successFn, errorFn) {
-                            return this._query({_id: '$query'}, {
+                            return this._query({ _id: '$query' }, {
                                 where: where,
                                 select: select,
                                 sort: sort,
@@ -75,7 +75,7 @@
                             }, successFn, errorFn);
                         };
                         this.services[name].single = function (where, select, sort, populates, successFn, errorFn) {
-                            return this._post({_id: '$single'}, {
+                            return this._post({ _id: '$single' }, {
                                 where: where,
                                 select: select,
                                 sort: sort,
@@ -83,16 +83,16 @@
                             }, successFn, errorFn);
                         };
                         this.services[name].totals = function (where, successFn, errorFn) {
-                            return this._post({_id: '$totals'}, where, successFn, errorFn)
+                            return this._post({ _id: '$totals' }, where, successFn, errorFn)
                         };
                         this.services[name].bulkInsert = function (rows, removeWhere, successFn, errorFn) {
-                            return this._post({_id: '$bulkInsert'}, {
+                            return this._post({ _id: '$bulkInsert' }, {
                                 removeWhere: removeWhere,
                                 rows: rows
                             }, successFn, errorFn)
                         };
-                        this.services[name].bulkUpdate = function (conditions,batchModel, successFn, errorFn) {
-                            return this._post({_id: '$bulkUpdate'}, {
+                        this.services[name].bulkUpdate = function (conditions, batchModel, successFn, errorFn) {
+                            return this._post({ _id: '$bulkUpdate' }, {
                                 conditions: conditions,
                                 batchModel: batchModel
                             }, successFn, errorFn)
@@ -107,7 +107,7 @@
         }
     }
 
-    function ShareNode(){
+    function ShareNode() {
         var baseUrl;
         return {
             // provider access level
@@ -150,7 +150,7 @@
                     },
                     t: function (id, where, forceRefresh) {//tmg 本地过滤
                         var promise;
-                        var cacheKey = 'get-'+id
+                        var cacheKey = 'get-' + id
                         if (forceRefresh || angular.isUndefined(this.shareTree[cacheKey])) {
                             var self = this;
                             promise = $http.get(baseUrl + 'tree/T/' + id).then(function (nodes) {
@@ -183,7 +183,7 @@
                     },
                     tmg: function (id, select, where, forceRefresh) {//tmg 本地过滤
                         var promise;
-                        var cacheKey = 'get-'+id
+                        var cacheKey = 'get-' + id
                         if (forceRefresh || angular.isUndefined(this.shareTree[cacheKey])) {
                             var self = this;
                             if (select && (select.indexOf('_id ') == -1 || select.indexOf(' _id') == -1)) {
@@ -248,7 +248,7 @@
         }
     }
 
-    function ExtensionNode(){
+    function ExtensionNode() {
         var baseUrl;
         return {
             // provider access level
@@ -262,7 +262,7 @@
                     tenantChargeItemNursingLevelAsTree: tenantChargeItemNursingLevelAsTree,
                     tenantChargeItemCustomizedAsTree: tenantChargeItemCustomizedAsTree,
                     saveTenantChargeItemCustomized: saveTenantChargeItemCustomized,
-                    saveTenantOtherConfig:saveTenantOtherConfig,
+                    saveTenantOtherConfig: saveTenantOtherConfig,
                     queryVoucherNo: queryVoucherNo,
                     completeOrder: completeOrder,
                     refundOrder: refundOrder,
@@ -273,15 +273,15 @@
                     importDrug: importDrug
                 };
 
-                function tenantInfo(tenantId,select) {
+                function tenantInfo(tenantId, select) {
                     return $http.get(baseUrl + 'tenantInfo/' + tenantId + '/' + select);
                 }
 
-                function tenantChargeItemNursingLevelAsTree(tenantId, charge_standard, subsystem){
+                function tenantChargeItemNursingLevelAsTree(tenantId, charge_standard, subsystem) {
                     return $http.get(baseUrl + 'tenantChargeItemNursingLevelAsTree/' + tenantId + ',' + charge_standard + ',' + subsystem);
                 }
 
-                function tenantChargeItemCustomizedAsTree(tenantId, charge_standard, subsystem){
+                function tenantChargeItemCustomizedAsTree(tenantId, charge_standard, subsystem) {
                     return $http.get(baseUrl + 'tenantChargeItemCustomizedAsTree/' + tenantId + ',' + charge_standard + ',' + subsystem);
                 }
 
@@ -289,16 +289,18 @@
                     return $http.post(baseUrl + 'saveTenantChargeItemCustomized/' + tenantId, chargeStandard);
                 }
 
-                function saveTenantOtherConfig(tenantId, otherConfig, name){
-                    return $http.post(baseUrl + 'saveTenantOtherConfig/' + tenantId, {otherConfig:otherConfig,name:name});
+                function saveTenantOtherConfig(tenantId, otherConfig, name) {
+                    return $http.post(baseUrl + 'saveTenantOtherConfig/' + tenantId, { otherConfig: otherConfig, name: name });
                 }
 
-                function queryVoucherNo(tenantId, modelName, keyword, where, select, sort){
-                    return $http.post(baseUrl + 'q/voucher_no', {tenantId: tenantId, modelName: modelName, keyword: keyword,  data: {
-                        where: where,
-                        select: select,
-                        sort: sort
-                    }});
+                function queryVoucherNo(tenantId, modelName, keyword, where, select, sort) {
+                    return $http.post(baseUrl + 'q/voucher_no', {
+                        tenantId: tenantId, modelName: modelName, keyword: keyword, data: {
+                            where: where,
+                            select: select,
+                            sort: sort
+                        }
+                    });
                 }
 
 
@@ -310,7 +312,7 @@
                     return $http.post(baseUrl + 'refundOrder/' + orderId);
                 }
 
-                function userChangePassword(userId,data) {
+                function userChangePassword(userId, data) {
                     return $http.post(baseUrl + 'userChangePassword/' + userId, data);
                 }
 
@@ -327,7 +329,7 @@
                 }
 
                 function importDrug(file_name) {
-                    return $http.post(baseUrl + 'importDrug', {file_name: file_name});
+                    return $http.post(baseUrl + 'importDrug', { file_name: file_name });
                 }
             }]
         };
@@ -337,7 +339,7 @@
         }
     }
 
-    function IDTNode(){
+    function IDTNode() {
         var baseUrl;
         return {
             // provider access level
@@ -363,11 +365,11 @@
                     return $http.get(baseUrl + 'PFT$fetchScenicSpotList');
                 }
 
-                function PFT$fetchTicket(scenicSpotId){
+                function PFT$fetchTicket(scenicSpotId) {
                     return $http.get(baseUrl + 'PFT$fetchTicket/' + scenicSpotId);
                 }
 
-                function PFT$syncScenicSpot(){
+                function PFT$syncScenicSpot() {
                     return $http.post(baseUrl + 'PFT$syncScenicSpot');
                 }
 
@@ -459,7 +461,7 @@
                 }
 
                 function requestAccessToken(app_id) {
-                    return $http.post(baseUrl + 'requestAccessToken', {appid: app_id});
+                    return $http.post(baseUrl + 'requestAccessToken', { appid: app_id });
                 }
 
             }]
@@ -497,7 +499,8 @@
                     disableEnterRelatedAction: disableEnterRelatedAction,
                     checkBeforeAddEnter: checkBeforeAddEnter,
                     queryElderly: queryElderly,
-                    queryDrug:queryDrug,
+                    queryDrug: queryDrug,
+                    drugQueryAll: drugQueryAll,
                     elderlyInfo: elderlyInfo,
                     changeElderlyRoomBed: changeElderlyRoomBed,
                     changeElderlyChargeItem: changeElderlyChargeItem,
@@ -505,11 +508,11 @@
                     changeElderlyNursingLevel: changeElderlyNursingLevel,
                     receptionVisiterSyncElderlyFamilyMembers: receptionVisiterSyncElderlyFamilyMembers,
                     leaveAccompanierSyncElderlyFamilyMembers: leaveAccompanierSyncElderlyFamilyMembers,
-                    drugInStock:drugInStock,
-                    instockAbolish:instockAbolish,
-                    drugOutStock:drugOutStock,
-                    drugOutStockInvalid:drugOutStockInvalid,
-                    drugStockEditLogInsert:drugStockEditLogInsert,
+                    drugInStock: drugInStock,
+                    instockAbolish: instockAbolish,
+                    drugOutStock: drugOutStock,
+                    drugOutStockInvalid: drugOutStockInvalid,
+                    drugStockEditLogInsert: drugStockEditLogInsert,
                     checkCanChangeBookingOrUnbookingRecharge: checkCanChangeBookingOrUnbookingRecharge,
                     bookingRecharge: bookingRecharge,
                     disableRechargeAndUnbooking: disableRechargeAndUnbooking,
@@ -527,11 +530,11 @@
                     nursingScheduleByElderlyDaily: nursingScheduleByElderlyDaily,
                     nursingPlansByRoom: nursingPlansByRoom,
                     nursingPlanSaveNursingItem: nursingPlanSaveNursingItem,
-                    nursingPlanSaveAll:nursingPlanSaveAll,
+                    nursingPlanSaveAll: nursingPlanSaveAll,
                     nursingPlanSaveRemark: nursingPlanSaveRemark,
                     nursingRecordGenerate: nursingRecordGenerate,
                     nursingRecordsByElderlyToday: nursingRecordsByElderlyToday,
-                    workItemQuery:workItemQuery,
+                    workItemQuery: workItemQuery,
                     elderlysByDistrictFloors: elderlysByDistrictFloors,
                     nursingStationCloseBedMonitorAlarm: nursingStationCloseBedMonitorAlarm,
                     nursingLevelsByAssessmentGrade: nursingLevelsByAssessmentGrade,
@@ -544,7 +547,7 @@
                     return $http.get(baseUrl + 'roomStatusInfo/' + tenantId);
                 }
 
-                function updateRoomStatusInfo(tenantId,roomId,bed_no,elderlyId) {
+                function updateRoomStatusInfo(tenantId, roomId, bed_no, elderlyId) {
                     return $http.post(baseUrl + 'updateRoomStatusInfo', {
                         tenantId: tenantId,
                         roomId: roomId,
@@ -567,35 +570,35 @@
                     });
                 }
 
-                function submitApplicationToExit(elderlyId,data) {
+                function submitApplicationToExit(elderlyId, data) {
                     return $http.post(baseUrl + 'submitApplicationToExit/' + elderlyId, data);
                 }
 
-                function submitToAuditItemReturn(exitId){
+                function submitToAuditItemReturn(exitId) {
                     return $http.post(baseUrl + 'submitToAuditItemReturn/' + exitId);
                 }
 
-                function submitToAuditSettlement(exitId,data){
+                function submitToAuditSettlement(exitId, data) {
                     return $http.post(baseUrl + 'submitToAuditSettlement/' + exitId, data);
                 }
 
-                function submitToConfirmExit(exitId,data){
+                function submitToConfirmExit(exitId, data) {
                     return $http.post(baseUrl + 'submitToConfirmExit/' + exitId, data);
                 }
 
-                function advancePaymentItemsWhenExitSettlement(exitId){
+                function advancePaymentItemsWhenExitSettlement(exitId) {
                     return $http.get(baseUrl + 'advancePaymentItemsWhenExitSettlement/' + exitId);
                 }
 
-                function chargeItemsRecordedWhenExitSettlement(exitId){
+                function chargeItemsRecordedWhenExitSettlement(exitId) {
                     return $http.get(baseUrl + 'chargeItemsRecordedWhenExitSettlement/' + exitId);
                 }
 
-                function chargeItemsUnRecordedWhenExitSettlement(exitId){
+                function chargeItemsUnRecordedWhenExitSettlement(exitId) {
                     return $http.get(baseUrl + 'chargeItemsUnRecordedWhenExitSettlement/' + exitId);
                 }
 
-                function exitSettlement(exitId,data) {
+                function exitSettlement(exitId, data) {
                     return $http.post(baseUrl + 'exitSettlement/' + exitId, data);
                 }
 
@@ -607,46 +610,54 @@
                     return $http.post(baseUrl + 'completeEnter/' + enterId, data);
                 }
 
-                function disableEnterRelatedAction(enterId){
+                function disableEnterRelatedAction(enterId) {
                     return $http.post(baseUrl + 'disableEnterRelatedAction/' + enterId);
                 }
 
-                function checkBeforeAddEnter(id_no,tenantId) {
+                function checkBeforeAddEnter(id_no, tenantId) {
                     return $http.get(baseUrl + 'checkBeforeAddEnter/' + tenantId + '/' + id_no);
                 }
 
-                function queryElderly(tenantId,keyword,where,select,sort) {
-                    return $http.post(baseUrl + 'q/elderly', {tenantId: tenantId, keyword: keyword,  data: {
-                        where: where,
-                        select: select,
-                        sort: sort
-                    }});
+                function queryElderly(tenantId, keyword, where, select, sort) {
+                    return $http.post(baseUrl + 'q/elderly', {
+                        tenantId: tenantId, keyword: keyword, data: {
+                            where: where,
+                            select: select,
+                            sort: sort
+                        }
+                    });
                 }
 
-                function queryDrug(tenantId,keyword,where,select,sort) {
-                    return $http.post(baseUrl + 'q/drug', {tenantId: tenantId, keyword: keyword,  data: {
-                        where: where,
-                        select: select,
-                        sort: sort
-                    }});
+                function queryDrug(tenantId, keyword, where, select, sort) {
+                    return $http.post(baseUrl + 'q/drug', {
+                        tenantId: tenantId, keyword: keyword, data: {
+                            where: where,
+                            select: select,
+                            sort: sort
+                        }
+                    });
                 }
-                function instockAbolish(inStockId){
+
+                function drugQueryAll(tenantId, barcode) {
+                    return $http.post(baseUrl + 'drugQueryAll', { tenantId: tenantId, barcode: barcode });
+                }
+                function instockAbolish(inStockId) {
                     return $http.get(baseUrl + 'inStockAbolish/' + inStockId);
                 }
 
-                function drugOutStockInvalid(drugInOutStockId){
-                    return $http.post(baseUrl + 'drugOutStockInvalid', {drugInOutStockId: drugInOutStockId});
+                function drugOutStockInvalid(drugInOutStockId) {
+                    return $http.post(baseUrl + 'drugOutStockInvalid', { drugInOutStockId: drugInOutStockId });
                 }
 
-                function drugStockEditLogInsert(tenantId,drugStockId,origin_quantity,revised_quantity,operated_by_name){
-                    return $http.post(baseUrl + 'drugStockEditLogInsert', {tenantId:tenantId,drugStockId: drugStockId,origin_quantity:origin_quantity,revised_quantity:revised_quantity,operated_by_name:operated_by_name});
+                function drugStockEditLogInsert(tenantId, drugStockId, origin_quantity, revised_quantity, operated_by_name) {
+                    return $http.post(baseUrl + 'drugStockEditLogInsert', { tenantId: tenantId, drugStockId: drugStockId, origin_quantity: origin_quantity, revised_quantity: revised_quantity, operated_by_name: operated_by_name });
                 }
 
-                function elderlyInfo(elderlyId,select) {
+                function elderlyInfo(elderlyId, select) {
                     return $http.get(baseUrl + 'elderlyInfo/' + elderlyId + '/' + select);
                 }
 
-                function changeElderlyRoomBed(tenantId,elderlyId,roomId,bed_no) {
+                function changeElderlyRoomBed(tenantId, elderlyId, roomId, bed_no) {
                     return $http.post(baseUrl + 'changeElderlyRoomBed', {
                         tenantId: tenantId,
                         elderlyId: elderlyId,
@@ -655,7 +666,7 @@
                     });
                 }
 
-                function changeElderlyChargeItem(tenantId,elderlyId,charge_item_catalog_id,old_charge_item_id,new_charge_item) {
+                function changeElderlyChargeItem(tenantId, elderlyId, charge_item_catalog_id, old_charge_item_id, new_charge_item) {
                     return $http.post(baseUrl + 'changeElderlyChargeItem', {
                         tenantId: tenantId,
                         elderlyId: elderlyId,
@@ -665,7 +676,7 @@
                     });
                 }
 
-                function changeElderlyChargeItemForOtherAndCustomized(tenantId,elderlyId,charge_item_catalog_id,selectedOtherAndCustomized){
+                function changeElderlyChargeItemForOtherAndCustomized(tenantId, elderlyId, charge_item_catalog_id, selectedOtherAndCustomized) {
                     return $http.post(baseUrl + 'changeElderlyChargeItemForOtherAndCustomized', {
                         tenantId: tenantId,
                         elderlyId: elderlyId,
@@ -675,57 +686,58 @@
                 }
 
                 function changeElderlyNursingLevel(tenantId, elderlyId, nursingLevelId, operated_by, operated_by_name) {
-                    return $http.post(baseUrl + 'changeElderlyNursingLevel', {tenantId: tenantId, elderlyId: elderlyId, nursingLevelId: nursingLevelId, operated_by: operated_by, operated_by_name: operated_by_name});
+                    return $http.post(baseUrl + 'changeElderlyNursingLevel', { tenantId: tenantId, elderlyId: elderlyId, nursingLevelId: nursingLevelId, operated_by: operated_by, operated_by_name: operated_by_name });
                 }
 
                 function receptionVisiterSyncElderlyFamilyMembers(receptionId) {
                     return $http.post(baseUrl + 'receptionVisiterSyncElderlyFamilyMembers/' + receptionId);
                 }
 
-                function leaveAccompanierSyncElderlyFamilyMembers(leaveId){
+                function leaveAccompanierSyncElderlyFamilyMembers(leaveId) {
                     return $http.post(baseUrl + 'leaveAccompanierSyncElderlyFamilyMembers/' + leaveId);
                 }
 
-                function drugInStock(tenantId,elderlyId,elderly_name,drugId,drug_no,drug_full_name,in_out_quantity,type,unit){
-                     return $http.post(baseUrl + 'inStock', {tenantId: tenantId, elderlyId: elderlyId,elderly_name:elderly_name,drugId: drugId,drug_no:drug_no,drug_full_name:drug_full_name,in_out_quantity:in_out_quantity,type: type, unit: unit});
+                function drugInStock(data) {
+                    console.log(data);
+                    return $http.post(baseUrl + 'inStock', data);
                 }
-                 function drugOutStock(tenantId,elderlyId,drugId,in_out_quantity,type,unit){
-                     return $http.post(baseUrl + 'outStock', {tenantId: tenantId, elderlyId: elderlyId, drugId: drugId,in_out_quantity:in_out_quantity,type: type, unit: unit});
+                function drugOutStock(tenantId, elderlyId, drugId, in_out_quantity, type, unit) {
+                    return $http.post(baseUrl + 'outStock', { tenantId: tenantId, elderlyId: elderlyId, drugId: drugId, in_out_quantity: in_out_quantity, type: type, unit: unit });
                 }
 
-                function checkCanChangeBookingOrUnbookingRecharge(rechargeId){
+                function checkCanChangeBookingOrUnbookingRecharge(rechargeId) {
                     return $http.get(baseUrl + 'checkCanChangeBookingOrUnbookingRecharge/' + rechargeId);
                 }
 
-                function bookingRecharge(rechargeId,data){
+                function bookingRecharge(rechargeId, data) {
                     return $http.post(baseUrl + 'bookingRecharge/' + rechargeId, data);
                 }
 
-                function disableRechargeAndUnbooking(rechargeId,data){
+                function disableRechargeAndUnbooking(rechargeId, data) {
                     return $http.post(baseUrl + 'disableRechargeAndUnbooking/' + rechargeId, data);
                 }
 
-                function changeRechargeBookingAmount(rechargeId,data){
+                function changeRechargeBookingAmount(rechargeId, data) {
                     return $http.post(baseUrl + 'changeRechargeBookingAmount/' + rechargeId, data);
                 }
-                
+
                 function checkCanBookingRedToElderlyRecharge(data) {
                     return $http.post(baseUrl + 'checkCanBookingRedToElderlyRecharge', data);
                 }
 
-                function bookingRedToElderlyRecharge(data){
+                function bookingRedToElderlyRecharge(data) {
                     return $http.post(baseUrl + 'bookingRedToElderlyRecharge', data);
                 }
 
-                function checkCanChangeBookingOrUnbookingRedToElderlyRecharge(redId){
+                function checkCanChangeBookingOrUnbookingRedToElderlyRecharge(redId) {
                     return $http.get(baseUrl + 'checkCanChangeBookingOrUnbookingRedToElderlyRecharge/' + redId);
                 }
 
-                function disableRedAndUnbookingToElderlyRecharge(redId,data){
+                function disableRedAndUnbookingToElderlyRecharge(redId, data) {
                     return $http.post(baseUrl + 'disableRedAndUnbookingToElderlyRecharge/' + redId, data);
                 }
 
-                function changeRedBookingAmountToElderlyRecharge(redId,data){
+                function changeRedBookingAmountToElderlyRecharge(redId, data) {
                     return $http.post(baseUrl + 'changeRedBookingAmountToElderlyRecharge/' + redId, data);
                 }
 
@@ -740,69 +752,69 @@
                 }
 
                 function nursingScheduleSave(tenantId, toSaveRows) {
-                    return $http.post(baseUrl + 'nursingScheduleSave', {tenantId: tenantId, toSaveRows: toSaveRows});
+                    return $http.post(baseUrl + 'nursingScheduleSave', { tenantId: tenantId, toSaveRows: toSaveRows });
                 }
 
                 function nursingScheduleRemove(tenantId, toRemoveRows) {
-                    return $http.post(baseUrl + 'nursingScheduleRemove', {tenantId: tenantId, toRemoveRows: toRemoveRows});
+                    return $http.post(baseUrl + 'nursingScheduleRemove', { tenantId: tenantId, toRemoveRows: toRemoveRows });
                 }
 
                 function nursingScheduleTemplateImport(nursingScheduleTemplateId, toImportXAxisRange) {
-                    return $http.post(baseUrl + 'nursingScheduleTemplateImport', {nursingScheduleTemplateId: nursingScheduleTemplateId, toImportXAxisRange: toImportXAxisRange});
+                    return $http.post(baseUrl + 'nursingScheduleTemplateImport', { nursingScheduleTemplateId: nursingScheduleTemplateId, toImportXAxisRange: toImportXAxisRange });
                 }
 
-                function nursingScheduleSaveAsTemplateWeekly (tenantId, nursingScheduleTemplateName, toSaveRows) {
-                    return $http.post(baseUrl + 'nursingScheduleSaveAsTemplateWeekly', {tenantId: tenantId, nursingScheduleTemplateName: nursingScheduleTemplateName, toSaveRows: toSaveRows});
-                }
-                
-                function nursingScheduleByElderlyDaily (tenantId, elderlyId, dateString) {
-                    return $http.post(baseUrl + 'nursingScheduleByElderlyDaily', {tenantId: tenantId, elderlyId: elderlyId, dateString: dateString});
+                function nursingScheduleSaveAsTemplateWeekly(tenantId, nursingScheduleTemplateName, toSaveRows) {
+                    return $http.post(baseUrl + 'nursingScheduleSaveAsTemplateWeekly', { tenantId: tenantId, nursingScheduleTemplateName: nursingScheduleTemplateName, toSaveRows: toSaveRows });
                 }
 
-                function nursingPlansByRoom (tenantId, elderlySelectArray, nursingPlanSelectArray) {
-                    return $http.post(baseUrl + 'nursingPlansByRoom', {tenantId: tenantId, elderlySelectArray: elderlySelectArray, nursingPlanSelectArray: nursingPlanSelectArray});
+                function nursingScheduleByElderlyDaily(tenantId, elderlyId, dateString) {
+                    return $http.post(baseUrl + 'nursingScheduleByElderlyDaily', { tenantId: tenantId, elderlyId: elderlyId, dateString: dateString });
+                }
+
+                function nursingPlansByRoom(tenantId, elderlySelectArray, nursingPlanSelectArray) {
+                    return $http.post(baseUrl + 'nursingPlansByRoom', { tenantId: tenantId, elderlySelectArray: elderlySelectArray, nursingPlanSelectArray: nursingPlanSelectArray });
                 }
 
                 function nursingPlanSaveNursingItem(tenantId, elderlyId, work_item_check_info) {
-                    return $http.post(baseUrl + 'nursingPlanSaveNursingItem', {tenantId: tenantId, elderlyId: elderlyId, work_item_check_info: work_item_check_info});
+                    return $http.post(baseUrl + 'nursingPlanSaveNursingItem', { tenantId: tenantId, elderlyId: elderlyId, work_item_check_info: work_item_check_info });
                 }
 
-                function nursingPlanSaveAll(tenantId,elderlyId,type,workItemIds,checked){
-                    return $http.post(baseUrl + 'nursingPlanSaveAll',{tenantId:tenantId,elderlyId:elderlyId,type:type,workItemIds:workItemIds,checked:checked})
+                function nursingPlanSaveAll(tenantId, elderlyId, type, workItemIds, checked) {
+                    return $http.post(baseUrl + 'nursingPlanSaveAll', { tenantId: tenantId, elderlyId: elderlyId, type: type, workItemIds: workItemIds, checked: checked })
                 }
 
                 function nursingPlanSaveRemark(tenantId, elderlyId, remark) {
-                    return $http.post(baseUrl + 'nursingPlanSaveRemark', {tenantId: tenantId, elderlyId: elderlyId, remark: remark});
+                    return $http.post(baseUrl + 'nursingPlanSaveRemark', { tenantId: tenantId, elderlyId: elderlyId, remark: remark });
                 }
 
                 function nursingRecordGenerate(tenantId, elderlyId) {
-                    return $http.post(baseUrl + 'nursingRecordGenerate', {tenantId: tenantId, elderlyId: elderlyId});
+                    return $http.post(baseUrl + 'nursingRecordGenerate', { tenantId: tenantId, elderlyId: elderlyId });
                 }
-                
+
                 function nursingRecordsByElderlyToday(tenantId, elderlyId) {
-                    return $http.post(baseUrl + 'nursingRecordsByElderlyToday', {tenantId: tenantId, elderlyId: elderlyId});
+                    return $http.post(baseUrl + 'nursingRecordsByElderlyToday', { tenantId: tenantId, elderlyId: elderlyId });
                 }
-                
-                function workItemQuery(workItemId){
-                    return $http.post(baseUrl + 'q/workItem', {workItemId: workItemId});
+
+                function workItemQuery(workItemId) {
+                    return $http.post(baseUrl + 'q/workItem', { workItemId: workItemId });
                 }
                 function elderlysByDistrictFloors(tenantId, districtFloors) {
-                    return $http.post(baseUrl + 'elderlysByDistrictFloors', {tenantId: tenantId, districtFloors: districtFloors});
+                    return $http.post(baseUrl + 'elderlysByDistrictFloors', { tenantId: tenantId, districtFloors: districtFloors });
                 }
-                
+
                 function nursingStationCloseBedMonitorAlarm(alarmId, sharedData) {
-                    return $http.post(baseUrl + 'nursingStationCloseBedMonitorAlarm', {alarmId: alarmId, operated_by: sharedData.operated_by, operated_by_name: sharedData.operated_by_name});
+                    return $http.post(baseUrl + 'nursingStationCloseBedMonitorAlarm', { alarmId: alarmId, operated_by: sharedData.operated_by, operated_by_name: sharedData.operated_by_name });
                 }
 
-                function nursingLevelsByAssessmentGrade(tenantId,nursing_assessment_grade){
-                    return $http.post(baseUrl + 'nursingLevelsByAssessmentGrade', {tenantId: tenantId,nursing_assessment_grade: nursing_assessment_grade});
+                function nursingLevelsByAssessmentGrade(tenantId, nursing_assessment_grade) {
+                    return $http.post(baseUrl + 'nursingLevelsByAssessmentGrade', { tenantId: tenantId, nursing_assessment_grade: nursing_assessment_grade });
                 }
 
-                function nursingLevels(tenantId){
-                    return $http.post(baseUrl + 'nursingLevels', {tenantId: tenantId});
+                function nursingLevels(tenantId) {
+                    return $http.post(baseUrl + 'nursingLevels', { tenantId: tenantId });
                 }
-                function customizedWorkItem(workItemId,customizedWorkItem){
-                    return $http.post(baseUrl + 'customizedWorkItem',{workItemId:workItemId,customizedWorkItem:customizedWorkItem})
+                function customizedWorkItem(workItemId, customizedWorkItem) {
+                    return $http.post(baseUrl + 'customizedWorkItem', { workItemId: workItemId, customizedWorkItem: customizedWorkItem })
                 }
                 function getLatestSmbPerMinuteRecord(sessionId,devId,openId){
                     return $http.post(baseUrl + 'getLatestSmbPerMinuteRecord', {sessionId: sessionId,devId:devId,openId:openId});
@@ -814,8 +826,8 @@
             baseUrl = url;
         }
     }
-    
-    function PSNDashboardNode(){
+
+    function PSNDashboardNode() {
         var baseUrl;
         return {
             // provider access level
@@ -830,7 +842,7 @@
                     liveInManTime: liveInManTime,
                     tenantAccountInfo: tenantAccountInfo,
                     bedInfo: bedInfo,
-                    liveinAndAccountAndBedInfo:liveinAndAccountAndBedInfo,
+                    liveinAndAccountAndBedInfo: liveinAndAccountAndBedInfo,
                     elderlyAgeGroups: elderlyAgeGroups,
                     roomVacancyRateMonthly: roomVacancyRateMonthly,
                     roomCatagoryOfManTime: roomCatagoryOfManTime,
@@ -841,40 +853,40 @@
                     return $http.get(baseUrl + 'liveIn/' + tenantId);
                 }
 
-                function liveInOnCurrentMonth(tenantId){
+                function liveInOnCurrentMonth(tenantId) {
                     return $http.get(baseUrl + 'liveInOnCurrentMonth/' + tenantId);
                 }
 
-                function liveInManTime(tenantId){
+                function liveInManTime(tenantId) {
                     return $http.get(baseUrl + 'liveInManTime/' + tenantId);
                 }
-                
-                function tenantAccountInfo(tenantId){
+
+                function tenantAccountInfo(tenantId) {
                     return $http.get(baseUrl + 'tenantAccountInfo/' + tenantId);
                 }
 
-                function bedInfo(tenantId){
+                function bedInfo(tenantId) {
                     return $http.get(baseUrl + 'bedInfo/' + tenantId);
                 }
 
-                function liveinAndAccountAndBedInfo(tenantId){
+                function liveinAndAccountAndBedInfo(tenantId) {
                     return $http.get(baseUrl + 'liveinAndAccountAndBedInfo/' + tenantId);
                 }
 
-                function elderlyAgeGroups(tenantId){
-                    return $http.get(baseUrl + 'elderlyAgeGroups/' + tenantId+'/60/10');
+                function elderlyAgeGroups(tenantId) {
+                    return $http.get(baseUrl + 'elderlyAgeGroups/' + tenantId + '/60/10');
                 }
 
-                function roomVacancyRateMonthly(tenantId,start,end) {
+                function roomVacancyRateMonthly(tenantId, start, end) {
                     return $http.get(baseUrl + 'roomVacancyRateMonthly/' + tenantId + '/' + start + '/' + end);
                 }
 
-                function roomCatagoryOfManTime(tenantId){
+                function roomCatagoryOfManTime(tenantId) {
                     return $http.get(baseUrl + 'roomCatagoryOfManTime/' + tenantId);
                 }
 
-                function roomCatagoryOfManTimeMonthly(tenantId,start,end){
-                    return $http.get(baseUrl + 'roomCatagoryOfManTimeMonthly/' + tenantId+ '/' + start + '/' + end);
+                function roomCatagoryOfManTimeMonthly(tenantId, start, end) {
+                    return $http.get(baseUrl + 'roomCatagoryOfManTimeMonthly/' + tenantId + '/' + start + '/' + end);
                 }
             }]
         };
@@ -884,7 +896,7 @@
         }
     }
 
-    function TRVDashboardNode(){
+    function TRVDashboardNode() {
         var baseUrl;
         return {
             // provider access level
@@ -909,7 +921,7 @@
         }
     }
 
-    function QiniuNode(){
+    function QiniuNode() {
         var baseUrl;
         return {
             // provider access level
@@ -925,12 +937,12 @@
                     download2: download2
                 };
 
-                function uploadToken(user,bucket,key) {
+                function uploadToken(user, bucket, key) {
                     if (!bucket) {
                         return null;
                     }
 
-                    if(!user){
+                    if (!user) {
                         user = 'admin@local'
                     }
 
@@ -940,17 +952,17 @@
 
                     return $http.get(baseUrl + 'uploadToken/' + user + ',' + bucket + ',' + key);
                 }
-                
+
                 function upload() {
                     return $http.post(baseUrl + 'upload');
                 }
 
                 function download(downloadUrl, fileName) {
-                    if(!downloadUrl) return false;
+                    if (!downloadUrl) return false;
                     var xhr = new XMLHttpRequest();
                     xhr.open('get', downloadUrl, true);
                     xhr.responseType = 'blob';
-                    xhr.onload = function() {
+                    xhr.onload = function () {
                         // 注意这里的this.response 是一个blob对象 就是文件对象
                         if (this.status == 200) {
                             saveAs(this.response, fileName);
@@ -961,13 +973,13 @@
                 }
 
                 function download2(downloadUrl, fileName) {
-                    return $http.post(baseUrl + 'download', {downloadUrl: downloadUrl}, {responseType: 'blob'}).success(function (res){
+                    return $http.post(baseUrl + 'download', { downloadUrl: downloadUrl }, { responseType: 'blob' }).success(function (res) {
                         saveAs(res, decodeURI(fileName || downloadUrl));
                     });
                 }
 
-                var loadImageToBlob  = function(url, callback) {
-                    if(!url || !callback) return false;
+                var loadImageToBlob = function (url, callback) {
+                    if (!url || !callback) return false;
 
                     var xhr = new XMLHttpRequest();
 
@@ -975,7 +987,7 @@
 
                     xhr.responseType = 'blob';
 
-                    xhr.onload = function() {
+                    xhr.onload = function () {
 
                         // 注意这里的this.response 是一个blob对象 就是文件对象
 
@@ -1038,7 +1050,7 @@
                         if (arr[arr.length - 1] != 'json') {
                             name += '.json'
                         }
-                        var promise = $http.get(baseUrl + name).then(function(res){
+                        var promise = $http.get(baseUrl + name).then(function (res) {
                             // console.log('----------------get json')
                             // console.log(res.data);
                             return res.data;

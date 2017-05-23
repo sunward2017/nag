@@ -18,9 +18,11 @@ module.exports = function(ctx,name) {
             status: {type: Number, min: 0, max: 1, default: 1},
             elderlyId:{type: mongoose.Schema.Types.ObjectId,required: true,ref:'psn_elderly'},//关联老人
             elderly_name: {type: String, maxlength: 20},
-            drugId:{type: mongoose.Schema.Types.ObjectId,required: true,ref:'psn_drugDirectory'},//关联药品
+            drugId:{type: mongoose.Schema.Types.ObjectId,ref:'psn_drugDirectory'},//关联药品
             drug_no:{type: String, maxlength: 20},
+            barcode:{type:String,maxlength:20},
             drug_full_name: {type: String, maxlength: 20},
+            period_validity: {type: Date },
             conversion_ratio:{type : String,maxlength: 100},
             current_quantity:{type:Number},//当前数量
             unit:{type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3013"])},//包装单位

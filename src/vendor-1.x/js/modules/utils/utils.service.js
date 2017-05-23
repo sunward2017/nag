@@ -247,6 +247,7 @@
             vtab: vtab,
             vinput: vinput,
             isPhone: isPhone,
+            isBarcode:isBarcode,
             changeProperyName: changeProperyName,
             unescapeHTML: unescapeHTML,
             safeArrayMember: safeArrayMember,
@@ -283,6 +284,14 @@
                 return false;
         }
 
+        function isBarcode(barcode){
+            var validate = RegExp(/^\d{13}$/).test(barcode);
+            if(validate){ 
+                return true;
+            }else{
+                return false;
+            };
+        }   
 
         function changeProperyName(o,pairs) {
             if (!o)

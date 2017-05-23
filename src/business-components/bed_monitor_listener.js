@@ -3,6 +3,7 @@
  * 从公司服务器用tcp 通道读取
  */
 var co = require('co');
+var path = require('path');
 var net = require('net');
 var dgram = require('dgram');
 var bedMonitorListenConfigs = require('../pre-defined/bed-monitor-listen-config.json');
@@ -10,12 +11,25 @@ var bedMonitorListenConfigs = require('../pre-defined/bed-monitor-listen-config.
 var socketServerEvents = require('../pre-defined/socket-server-events.json');
 
 module.exports = {
+    _getLogName: function () {
+        return 'bc_' + __filename.substr(__filename.lastIndexOf('/') + 1) + '.log';
+    },
+    getLogConfig: function (ctx) {
+        var logName = this._getLogName();
+        return {
+            type: 'file',
+            filename: path.join(ctx.conf.dir.log, logName),
+            maxLogSize: 2 * 1024 * 1024, //2M
+            backups: 5,
+            category: logName
+        }
+    },
     init: function (ctx) {
         console.log('init sleep... ');
         var self = this;
         this.file = __filename;
         this.filename = this.file.substr(this.file.lastIndexOf('/') + 1);
-        this.log_name = 'bc_' + this.filename;
+        this.log_name = this._getLogName();
         this.ctx = ctx;
         this.logger = require('log4js').getLogger(this.log_name);
         if (!this.logger) {

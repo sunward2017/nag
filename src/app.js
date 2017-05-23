@@ -279,56 +279,81 @@ co(function*() {
     var configAppenders = [];
     configAppenders = _.union(configAppenders,
         _.map(app.conf.serviceNames, function (o) {
-            var logName = 'svc_' + o + '.js';
-            return {
-                type: 'dateFile',
-                filename: path.join(app.conf.dir.log, logName),
-                pattern: '-yyyy-MM-dd.log',
-                alwaysIncludePattern: true,
-                category: logName
-            };
+            var getLogConfig = require('./services/' + o).getLogConfig;
+            if (getLogConfig && typeof getLogConfig === 'function') {
+                return require('./services/' + o).getLogConfig(app);
+            } else {
+                var logName = 'svc_' + o + '.js';
+                return {
+                    type: 'dateFile',
+                    filename: path.join(app.conf.dir.log, logName),
+                    pattern: '-yyyy-MM-dd.log',
+                    alwaysIncludePattern: true,
+                    category: logName
+                };
+            }
         }),
         _.map(app.conf.meServiceNames, function (o) {
-            var logName = 'mesvc_' + o + '.js';
-            return {
-                type: 'dateFile',
-                filename: path.join(app.conf.dir.log, logName),
-                pattern: '-yyyy-MM-dd.log',
-                alwaysIncludePattern: true,
-                category: logName
-            };
+            var getLogConfig = require('./me-services/' + o).getLogConfig;
+            if (getLogConfig && typeof getLogConfig === 'function') {
+                return require('./me-services/' + o).getLogConfig(app);
+            } else {
+                var logName = 'mesvc_' + o + '.js';
+                return {
+                    type: 'dateFile',
+                    filename: path.join(app.conf.dir.log, logName),
+                    pattern: '-yyyy-MM-dd.log',
+                    alwaysIncludePattern: true,
+                    category: logName
+                };
+            }
         }),
         _.map(app.conf.businessComponentNames, function (o) {
-            var logName = 'bc_' + o + '.js';
-            return {
-                type: 'file',
-                filename: path.join(app.conf.dir.log, logName),
-                maxLogSize: 2 * 1024 * 1024, //2M
-                backups: 5,
-                category: logName
-            };
+            var getLogConfig = require('./business-components/' + o).getLogConfig;
+            if (getLogConfig && typeof getLogConfig === 'function') {
+                return require('./business-components/' + o).getLogConfig(app);
+            } else {
+                var logName = 'bc_' + o + '.js';
+                return {
+                    type: 'dateFile',
+                    filename: path.join(app.conf.dir.log, logName),
+                    pattern: '-yyyy-MM-dd.log',
+                    alwaysIncludePattern: true,
+                    category: logName
+                };
+            }
         }),
         _.map(app.conf.socketProviderNames, function (o) {
-            var logName = 'sp_' + o + '.js';
-            return {
-                type: 'dateFile',
-                filename: path.join(app.conf.dir.log, logName),
-                pattern: '-yyyy-MM-dd.log',
-                alwaysIncludePattern: true,
-                category: logName
-            };
+            var getLogConfig = require('./socket-providers/' + o).getLogConfig;
+            if (getLogConfig && typeof getLogConfig === 'function') {
+                return require('./socket-providers/' + o).getLogConfig(app);
+            } else {
+                var logName = 'sp_' + o + '.js';
+                return {
+                    type: 'dateFile',
+                    filename: path.join(app.conf.dir.log, logName),
+                    pattern: '-yyyy-MM-dd.log',
+                    alwaysIncludePattern: true,
+                    category: logName
+                };
+            }
         }));
 
     if (!app.conf.isProduction) {
         configAppenders = _.union(configAppenders, _.map(app.conf.debugServiceNames, function (o) {
-            var logName = 'dsvc_' + o + '.js';
-            return {
-                type: 'dateFile',
-                filename: path.join(app.conf.dir.log, logName),
-                pattern: '-yyyy-MM-dd.log',
-                alwaysIncludePattern: true,
-                category: logName
-            };
+            var getLogConfig = require('./debug-services/' + o).getLogConfig;
+            if (getLogConfig && typeof getLogConfig === 'function') {
+                return require('./debug-services/' + o).getLogConfig(app);
+            } else {
+                var logName = 'dsvc_' + o + '.js';
+                return {
+                    type: 'dateFile',
+                    filename: path.join(app.conf.dir.log, logName),
+                    pattern: '-yyyy-MM-dd.log',
+                    alwaysIncludePattern: true,
+                    category: logName
+                };
+            }
         }));
     }
 

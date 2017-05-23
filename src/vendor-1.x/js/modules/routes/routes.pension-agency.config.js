@@ -1369,68 +1369,67 @@
                 controller: 'DrugUseItemGridController',
                 resolve: {
                     entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'drug-use-item.list', {
-                        modelName: 'psn-drugUseItem',
-                        searchForm: { "status": 1 },
+                        modelName: 'psn-elderly',
+                        searchForm: { "status": 1, "live_in_flag": true },
+                        switches: { leftTree: true },
+                        transTo: {
+                            "inConfig": MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'in.config'
+                        },
                         serverPaging: true,
                         columns: [{
-                            label: '老人姓名',
-                            name: 'elderly_name',
-                            type: 'string',
-                            width: 80,
-                            formatter: { type: 'populate', options: { path: 'nursingLevelId', select: '-_id name' } }
-                        }, {
-                            label: '药品全称',
+                            label: '老人',
                             name: 'name',
                             type: 'string',
-                            width: 100,
+                            width: 80,
                             sortable: true
                         }, {
-                            label: '药品编码',
-                            name: 'drug_no',
+                            label: '性别',
+                            name: 'sex',
                             type: 'string',
-                            width: 100,
+                            width: 40,
+                            formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D1006/object')
+                        }, {
+                            label: '年龄',
+                            name: 'birthday',
+                            type: 'date',
+                            width: 40,
                             sortable: true
                         }, {
-                            label: '重复',
-                            name: 'repeat',
+                            label: '入院登记号',
+                            name: 'enter_code',
                             type: 'string',
-                            width: 100,
+                            width: 80,
                             sortable: true
                         }, {
-                            label: '时长(分)',
-                            name: 'duration',
+                            label: '饮食套餐',
+                            name: 'board_summary',
                             type: 'string',
-                            width: 60,
-                            sortable: true
-                        }, {
-                            label: '护工确认',
-                            name: 'confirm_flag',
-                            type: 'bool',
                             width: 80
                         }, {
-                            label: '提醒',
-                            name: 'remind_flag',
-                            type: 'bool',
-                            width: 80
+                            label: '房间床位',
+                            name: 'room_summary',
+                            type: 'string',
+                            width: 120
                         }, {
-                            label: '提醒方式',
-                            name: 'remind_mode',
-                            type: 'bool',
-                            width: 80
+                            label: '照护信息',
+                            name: 'nursing_info',
+                            type: 'string',
+                            width: 120
                         }, {
-                            label: '提醒次数',
-                            name: 'remind_times',
-                            type: 'number',
-                            width: 80
+                            label: '状态',
+                            name: 'begin_exit_flow',
+                            type: 'string',
+                            width: 80,
+                            formatter: function () {
+                                return { "true": "正在出院", "false": "在院", "undefined": "在院" }
+                            }
                         }, {
-                            label: '操作',
+                            label: '',
                             name: 'actions',
                             sortable: false,
                             width: 60
-                        }],
-                        switches: { leftTree: true },
-                        toDetails: ['nursingLevelId']
-                    })
+                        }]
+                    }) 
                 }
             })
             .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'drug-use-item.details', {

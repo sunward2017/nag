@@ -25,6 +25,9 @@
             vm.init({ removeDialog: ngDialog });
             vm.query();
         }
+        vm.yAxisDataPromise = vmh.shareService.tmp('T3009', null, { tenantId: vm.tenantId }).then(function (nodes) {
+                return nodes;
+        });
     }
 
     DrugUseItemDetailsController.$inject = ['$scope', 'ngDialog', 'vmh', 'entityVM'];

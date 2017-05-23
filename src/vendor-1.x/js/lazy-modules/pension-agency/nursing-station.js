@@ -472,13 +472,37 @@
                     console.log(result);
                     if(result.msg == 'success'){
                         vm.occurTime = result.res.occurTime;
-                            vm.heartRateCount = result.res.heartRateCount;
-                            vm.breathRateCount = result.res.breathRateCount;
-                            vm.turnOverCount = result.res.turnOverCount;
-                            vm.bodyMoveCount = result.res.bodyMoveCount;
-                            vm.inBed = result.res.inBed;
-                        if(minute_hr_y_data.length > 9) minute_hr_y_data.shift();
-                        minute_hr_y_data.push(result.res.heartRateCount);
+                        vm.heartRateCount = result.res.heartRateCount;
+                        vm.breathRateCount = result.res.breathRateCount;
+                        vm.turnOverCount = result.res.turnOverCount;
+                        vm.bodyMoveCount = result.res.bodyMoveCount;
+                        vm.inBed = result.res.inBed;
+                        for(var i=0;i<15;i++){
+                            minute_hr_x_data.push(i);
+                            if(i == 14){
+                                minute_hr_y_data.push({
+                                    value:[
+                                        i,
+                                        result.res.heartRateCount
+                                    ]
+                                });
+                            }else{
+                                minute_hr_y_data.push({
+                                    value:[
+                                        i,
+                                        0
+                                    ]
+                                });
+                            }
+                            
+                        }
+                        // minute_hr_y_data.push(result.res.heartRateCount);
+                        // minute_hr_y_data.push({
+                        //     value:[
+                        //         0,
+                        //         result.res.heartRateCount
+                        //     ]
+                        // });
                         $echarts.updateEchartsInstance(vm.miniute_hr_bar_id, {
                             xAxis: {
                                 data: minute_hr_x_data
@@ -495,6 +519,8 @@
 
             // 获取睡眠带生命体征及实时数据
             if (vm.haveBindingBedMonitor) {
+                var dataCount = 15;
+                console.log('dataCount is:'+dataCount);
                 vm.IoC.intervalIdOfHeartRate = setInterval(function(){
                     vmh.psnService.getLatestSmbPerMinuteRecord(vm.sessionId,vm.bindingBedMonitor.bedMonitorName,vm.tenantId).then(function(result){
                         console.log('result is >>>>>>>>>>>>>>>>>>>>>>>>>>>>');
@@ -506,8 +532,17 @@
                             vm.turnOverCount = result.res.turnOverCount;
                             vm.bodyMoveCount = result.res.bodyMoveCount;
                             vm.inBed = result.res.inBed;
-                            if(minute_hr_y_data.length > 9) minute_hr_y_data.shift();
-                            minute_hr_y_data.push(result.res.heartRateCount);
+                            minute_hr_x_data.shift();
+                            minute_hr_x_data.push(dataCount);
+                            minute_hr_y_data.shift();
+                            minute_hr_y_data.push({
+                                    value:[
+                                        dataCount,
+                                        result.res.heartRateCount
+                                    ]
+                                });
+                            console.log(minute_hr_x_data);
+                            // minute_hr_y_data.push(result.res.heartRateCount);
                             $echarts.updateEchartsInstance(vm.miniute_hr_bar_id, {
                                 xAxis: {
                                     data: minute_hr_x_data
@@ -516,11 +551,12 @@
                                     data: minute_hr_y_data
                                 }]
                             });
+                            dataCount++;
                         }else{
                             vm.inBed = 'offline';
                         }
                     });
-                },1000*60);
+                },1000*10);
 
                 vm.miniute_hr_bar_id = $echarts.generateInstanceIdentity();
                 vm.miniute_hr_bar_config = {
@@ -532,13 +568,20 @@
                         splitLine: {
                             show: false
                         },
+                        axisLabel:{
+                            show: false
+                        },
+                        axisTick:{
+                            show: false
+                        },
                         data: minute_hr_x_data
                     },
                     yAxis: {
                         min:0,
                         max:160,
                         type: 'value',
-                        boundaryGap: [0, '100%'],
+                        // boundaryGap: [0, '100%'],
+                        boundaryGap: false,
                         splitLine: {
                             show: false
                         }
@@ -548,7 +591,16 @@
                         type: 'bar',
                         showSymbol: false,
                         hoverAnimation: false,
-                        data: minute_hr_y_data
+                        data: minute_hr_y_data,
+                        label: {
+                        normal: {
+                            show: true,
+                            position: 'insideTop',
+                            formatter: function(params) {
+                                return params.value[1];
+                                }
+                            }
+                        },
                     }]
                 };
 

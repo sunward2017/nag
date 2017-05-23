@@ -3,17 +3,31 @@
  */
 var co = require('co');
 var rp = require('request-promise-native');
+var path = require('path');
 var externalSystemConfig = require('../pre-defined/external-system-config.json');
 var DIC = require('../pre-defined/dictionary-constants.json');
 var socketServerEvents = require('../pre-defined/socket-server-events.json');
 
 module.exports = {
+    _getLogName: function () {
+        return 'bc_' + __filename.substr(__filename.lastIndexOf('/') + 1) + '.log';
+    },
+    getLogConfig: function (ctx) {
+        var logName = this._getLogName();
+        return {
+            type: 'file',
+            filename: path.join(ctx.conf.dir.log, logName),
+            maxLogSize: 2 * 1024 * 1024, //2M
+            backups: 5,
+            category: logName
+        }
+    },
     init: function (ctx) {
-        console.log('init sleep... ');
+        console.log('init bed_monitor_status... ');
         var self = this;
         this.file = __filename;
         this.filename = this.file.substr(this.file.lastIndexOf('/') + 1);
-        this.log_name = 'bc_' + this.filename;
+        this.log_name = this._getLogName();
         this.ctx = ctx;
         this.CACHE_MODULE = 'N-BED-M-P-';
         this.CACHE_ITEM_SESSION = 'SESSIONID';

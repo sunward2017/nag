@@ -180,7 +180,7 @@
                             type: 'date',
                             width: 40,
                             sortable: true
-                        },  {
+                        }, {
                             label: '入院登记号',
                             name: 'enter_code',
                             type: 'string',
@@ -524,7 +524,7 @@
                 resolve: {
                     entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'assessment-enter.list', {
                         modelName: 'psn-assessment',
-                        searchForm: { "status": 1,"type":'A0001'},
+                        searchForm: { "status": 1, "type": 'A0001' },
                         serverPaging: true,
                         columns: [{
                             label: '评估号',
@@ -532,32 +532,32 @@
                             type: 'string',
                             width: 60,
                             sortable: true
-                        },{
+                        }, {
                             label: '老人',
                             name: 'elderlyId',
                             type: 'string',
                             width: 60,
                             sortable: true
-                        },{
+                        }, {
                             label: '评估时间',
                             name: 'time',
                             type: 'date',
                             width: 60,
                             sortable: true
-                        },{
+                        }, {
                             label: '评估等级',
                             name: 'current_nursing_assessment_grade',
                             type: 'string',
                             width: 60,
                             sortable: true,
                             formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D3015/object'),
-                        },{
+                        }, {
                             label: '照护级别',
                             name: 'current_nursing_level_name',
                             type: 'string',
                             width: 60,
                             sortable: true
-                        },{
+                        }, {
                             label: '',
                             name: 'actions',
                             sortable: false,
@@ -574,7 +574,7 @@
                 resolve: {
                     entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'assessment-enter.details', {
                         modelName: 'psn-assessment',
-                        model: {code: MODEL_VARIABLES.PRE_DEFINED.SERVER_GEN},
+                        model: { code: MODEL_VARIABLES.PRE_DEFINED.SERVER_GEN },
                         blockUI: true
                     }),
                     deps: helper.resolveFor2('angucomplete-alt')
@@ -606,7 +606,7 @@
                 resolve: {
                     entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'assessment-regular.list', {
                         modelName: 'psn-elderly',
-                        searchForm: { "status": 1},
+                        searchForm: { "status": 1 },
                         serverPaging: true,
                         sortColumn: 'last_assessment_time',
                         sortDirection: 1,
@@ -616,30 +616,30 @@
                             type: 'string',
                             width: 60,
                             sortable: true
-                            
-                        },{
+
+                        }, {
                             label: '上次评估时间',
                             name: 'last_assessment_time',
                             width: 60,
                             sortable: true
-                        },{
+                        }, {
                             label: '上次评估等级',
                             name: 'nursing_assessment_grade_name',
                             type: 'string',
                             width: 60,
                             sortable: true,
                             formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D3015/object'),
-                        },{
+                        }, {
                             label: '上次照护级别',
                             name: 'nursing_level_name',
                             type: 'string',
                             width: 60,
                             sortable: true
-                        },{
+                        }, {
                             label: '状态',
                             sortable: false,
                             width: 30
-                        },{
+                        }, {
                             label: '',
                             name: 'actions',
                             sortable: false,
@@ -656,7 +656,7 @@
                 resolve: {
                     entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'assessment-regular.details', {
                         modelName: 'psn-assessment',
-                        model: {code: MODEL_VARIABLES.PRE_DEFINED.SERVER_GEN},
+                        model: { code: MODEL_VARIABLES.PRE_DEFINED.SERVER_GEN },
                         blockUI: true
                     }),
                     deps: helper.resolveFor2('angucomplete-alt')
@@ -1479,8 +1479,8 @@
                         searchForm: { "status": 1 },
                         serverPaging: true,
                         columns: [{
-                            label: '药品编码',
-                            name: 'drug_no',
+                            label: '药品条形码',
+                            name: 'barcode',
                             type: 'string',
                             width: 80,
                             sortable: true
@@ -1566,8 +1566,8 @@
                         searchForm: { "status": 1 },
                         serverPaging: true,
                         columns: [{
-                            label: '药品编码',
-                            name: 'drug_no',
+                            label: '药品条形码',
+                            name: 'barcode',
                             type: 'string',
                             width: 80,
                             sortable: true
@@ -1578,7 +1578,13 @@
                             width: 80,
                             sortable: true
                         }, {
-                            label: '老人',
+                            label: '有效期',
+                            name: 'period_validity',
+                            type: 'date',
+                            width: 100,
+                            sortable: true 
+                        }, {
+                            label: '关联老人',
                             name: 'elderly_name',
                             type: 'string',
                             width: 100,
@@ -1590,7 +1596,7 @@
                             width: 60,
                             sortable: true
                         }, {
-                            label: '单位',
+                            label: '最小包装',
                             name: 'unit',
                             type: 'string',
                             width: 60,
@@ -1661,16 +1667,16 @@
                             width: 60,
                             sortable: true
                         }, {
+                            label: '药品条形码',
+                            name: 'barcode',
+                            type: 'string',
+                            width: 80,
+                            sortable: true
+                        }, {
                             label: '药品名称',
                             name: 'drug_full_name',
                             type: 'string',
                             width: 60,
-                            sortable: true
-                        }, {
-                            label: '药品编码',
-                            name: 'drug_no',
-                            type: 'string',
-                            width: 80,
                             sortable: true
                         }, {
                             label: '药品来源',
@@ -1686,7 +1692,7 @@
                             width: 80,
                             sortable: true
                         }, {
-                            label: '包装单位',
+                            label: '最小包装',
                             name: 'unit',
                             type: 'string',
                             width: 60,
@@ -1927,7 +1933,7 @@
                 resolve: {
                     entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'work-item.list', {
                         modelName: 'psn-workItem',
-                        searchForm: { "status": 1,customize_flag:false},
+                        searchForm: { "status": 1, customize_flag: false },
                         serverPaging: true,
                         columns: [{
                             label: '照护级别',

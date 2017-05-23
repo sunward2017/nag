@@ -21,12 +21,12 @@
                         td.text-center {{vm.aggrData[row.trackedKey]['elderly']['sex']|formatter:'sex':vm.columns}}
                         td.text-center {{vm.aggrData[row.trackedKey]['elderly']['birthday']|calcAge}}
                         td.text-center {{vm.aggrData[row.trackedKey]['elderly']['enter_code']}}
-                        td.text-center {{vm.aggrData[row.trackedKey]['elderly']['name']['nursing_info']}}
-                        td.text-center {{vm.aggrData[row.trackedKey]['elderly']['name']['begin_exit_flow']|formatter:'begin_exit_flow':vm.columns}} 
-                        td.text-left
+                        td.text-center {{vm.aggrData[row.trackedKey]['elderly']['nursing_info']}}
+                        td.text-center {{vm.aggrData[row.trackedKey]['elderly']['begin_exit_flow']|formatter:'begin_exit_flow':vm.columns}} 
+                        td.text-center
                             .btn-group
-                                a.btn.btn-primary.btn-xs(title="{{'button.EDIT'|translate}}",ng-click="vm.edit(row._id)")
-                                    i.glyphicon.glyphicon-pencil
+                                a.btn.btn-primary.btn-xs(title="{{'button.ADD'|translate}}",ng-click="vm.edit(vm.aggrData[row.trackedKey]['elderly']['_id'])")
+                                     i.glyphicon.glyphicon-plus
                     tr(ng-if="vm.paged.length==0")
                         td(colspan="{{utils.noResultsColspan(vm)}}") {{ 'grid.NO-RESULTS' | translate}}
             .panel-footer

@@ -50,6 +50,9 @@
     function ElderlyByDrugUseController($scope, ngDialog, vmh, vm){
         var vm = $scope.vm = vm;
         $scope.utils = vmh.utils.v;
+        vm.fetchDrugUseItem = fetchDrugUseItem;
+
+        var drugUseService = vm.modelNode.services['psn-drugUseItem'];
         init();
         function init(){
             vm.init({removeDialog: ngDialog});
@@ -65,8 +68,17 @@
                 return medical_histories;
             });
             vm.load().then(function(){
-                console.log(vm.model);
+                vm.fetchDrugUseItem();
             })  
+        }
+        function fetchDrugUseItem(){
+            drugUseService.query({
+                elderlyId: vm.model._id,
+                tenantId: vm.model.tenantId
+            }).$promise.then(function (rows) {
+                console.log(rows);
+                vm.elderlyDrugUseItems = rows 
+            });
         }
     }
 

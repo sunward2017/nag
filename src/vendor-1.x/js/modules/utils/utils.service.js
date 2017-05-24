@@ -276,7 +276,7 @@
         }
 
         function isPhone(aPhone) {
-            var bValidate = RegExp(/^(0|86|17951)?(13[0-9]|15[012356789]|18[0-9]|14[57])[0-9]{8}$/).test(aPhone);
+            var bValidate = RegExp(/^(0|86|17951)?(13[0-9]|15[012356789]|18[0-9]|14[57]|177)[0-9]{8}$/).test(aPhone);
             if (bValidate) {
                 return true;
             }

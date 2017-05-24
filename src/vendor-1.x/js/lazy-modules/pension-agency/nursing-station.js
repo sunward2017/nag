@@ -456,7 +456,7 @@
                 vmh.getModelService('psn-elderly').single({_id: vm.elderly._id},'nursing_assessment_grade family_members'),
                 vmh.psnService.nursingScheduleByElderlyDaily(vm.tenantId, vm.elderly._id),
                 vmh.psnService.nursingRecordsByElderlyToday(vm.tenantId, vm.elderly._id),
-                vmh.getModelService('het-member').single({tenantId: vm.tenantId},'session_id_hzfanweng')
+                // vmh.getModelService('het-member').single({tenantId: vm.tenantId},'session_id_hzfanweng')
             ]).then(function (results) {
                 vm.nursing_assessment_grade_name = results[1].nursing_assessment_grade_name;
                 vm.family_members = _.map(results[1].family_members, function (o) {
@@ -466,8 +466,13 @@
                     return (o.aggr_value || {}).name;
                 }).join();
                 vm.nursingRecords = results[3];
-                vm.sessionId = results[4].session_id_hzfanweng;
-                vmh.psnService.getLatestSmbPerMinuteRecord(results[4].session_id_hzfanweng,vm.bindingBedMonitor.bedMonitorName,vm.tenantId).then(function(result){
+                
+            });
+
+            // 获取睡眠带生命体征及实时数据
+            if (vm.haveBindingBedMonitor) {
+
+                vmh.psnService.getLatestSmbPerMinuteRecord(vm.bindingBedMonitor.bedMonitorName,vm.tenantId).then(function(result){
                     console.log('result is >>>>>>>>>>>>>>>>>>>>>>>>>>>>');
                     console.log(result);
                     if(result.msg == 'success'){
@@ -496,13 +501,6 @@
                             }
                             
                         }
-                        // minute_hr_y_data.push(result.res.heartRateCount);
-                        // minute_hr_y_data.push({
-                        //     value:[
-                        //         0,
-                        //         result.res.heartRateCount
-                        //     ]
-                        // });
                         $echarts.updateEchartsInstance(vm.miniute_hr_bar_id, {
                             xAxis: {
                                 data: minute_hr_x_data
@@ -515,16 +513,9 @@
                         vm.inBed = 'offline';
                     }
                 });
-            });
-
-            // 获取睡眠带生命体征及实时数据
-            if (vm.haveBindingBedMonitor) {
                 var dataCount = 15;
-                console.log('dataCount is:'+dataCount);
                 vm.IoC.intervalIdOfHeartRate = setInterval(function(){
-                    vmh.psnService.getLatestSmbPerMinuteRecord(vm.sessionId,vm.bindingBedMonitor.bedMonitorName,vm.tenantId).then(function(result){
-                        console.log('result is >>>>>>>>>>>>>>>>>>>>>>>>>>>>');
-                        console.log(result);
+                    vmh.psnService.getLatestSmbPerMinuteRecord(vm.bindingBedMonitor.bedMonitorName,vm.tenantId).then(function(result){
                         if(result.msg == 'success'){
                             vm.occurTime = result.res.occurTime;
                             vm.heartRateCount = result.res.heartRateCount;
@@ -556,7 +547,7 @@
                             vm.inBed = 'offline';
                         }
                     });
-                },1000*10);
+                },1000*60);
 
                 vm.miniute_hr_bar_id = $echarts.generateInstanceIdentity();
                 vm.miniute_hr_bar_config = {

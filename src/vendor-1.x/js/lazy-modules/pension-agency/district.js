@@ -46,7 +46,9 @@
             vm.doSubmit = doSubmit;
             vm.tab1 = {cid: 'contentTab1'};
 
-            vm.load();
+            vm.load().then(function(){
+                vm.old_name = vm.model.name;
+            });
 
         }
 
@@ -54,7 +56,12 @@
         function doSubmit() {
 
             if ($scope.theForm.$valid) {
-                vm.save();
+                vm.save().then(function (ret) {
+                    if (vm.old_name != vm.model.name && vm._action_ == 'edit') {
+                        console.log('notifyDataChange');
+                        vmh.shareService.notifyDataChange('psn$district$name', vm.model._id);
+                    }
+                });
             }
             else {
                 if ($scope.utils.vtab(vm.tab1.cid)) {

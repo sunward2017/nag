@@ -238,6 +238,9 @@
                         }
 
                         return promise;
+                    },
+                    notifyDataChange: function (item, id) {
+                        return $http.post(baseUrl + 'api/notifyDataChange', {item: item, id: id});
                     }
                 };
             }]
@@ -827,8 +830,8 @@
                 function customizedWorkItem(workItemId, customizedWorkItem) {
                     return $http.post(baseUrl + 'customizedWorkItem', { workItemId: workItemId, customizedWorkItem: customizedWorkItem })
                 }
-                function getLatestSmbPerMinuteRecord(sessionId,devId,openId){
-                    return $http.post(baseUrl + 'getLatestSmbPerMinuteRecord', {sessionId: sessionId,devId:devId,openId:openId});
+                function getLatestSmbPerMinuteRecord(devId,openId){
+                    return $http.post(baseUrl + 'getLatestSmbPerMinuteRecord', {devId:devId,openId:openId});
                 }
             }]
         };
@@ -857,7 +860,8 @@
                     elderlyAgeGroups: elderlyAgeGroups,
                     roomVacancyRateMonthly: roomVacancyRateMonthly,
                     roomCatagoryOfManTime: roomCatagoryOfManTime,
-                    roomCatagoryOfManTimeMonthly: roomCatagoryOfManTimeMonthly
+                    roomCatagoryOfManTimeMonthly: roomCatagoryOfManTimeMonthly,
+                    nursingAlarmAndRecordAndWorkerAndBedMonitorAndRobot: nursingAlarmAndRecordAndWorkerAndBedMonitorAndRobot
                 };
 
                 function liveIn(tenantId) {
@@ -898,6 +902,10 @@
 
                 function roomCatagoryOfManTimeMonthly(tenantId, start, end) {
                     return $http.get(baseUrl + 'roomCatagoryOfManTimeMonthly/' + tenantId + '/' + start + '/' + end);
+                }
+
+                function nursingAlarmAndRecordAndWorkerAndBedMonitorAndRobot(tenantId) {
+                    return $http.get(baseUrl + 'nursingAlarmAndRecordAndWorkerAndBedMonitorAndRobot/' + tenantId);
                 }
             }]
         };

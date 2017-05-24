@@ -79,12 +79,30 @@ module.exports = {
     },
     parseData: function (data) {
         if (!data) return;
-        var channelName = 'psn$bed_monitor_listen', arr = data.split('^');
-        var mac = arr[1].toUpperCase(), raw_values = JSON.parse(arr[2]);
-        this.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR_LISTEN.WAVE_DATA, {
-            bedMonitorMac: mac,
-            values: raw_values
-        });
+        // console.log('a0:e6:f8:55:12:9f=>', data);
+        try{
+            var channelName = 'psn$bed_monitor_listen', arr = data.split('^');
+            // console.log('arr:', arr);
+            var mac, raw_values;
+            if(arr.length == 2) {
+                mac = arr[0].toUpperCase();
+                raw_values = JSON.parse(arr[1])
+            } else if(arr.length == 3) {
+                mac = arr[1].toUpperCase();
+                raw_values = JSON.parse(arr[2])
+            } else {
+                this.ctx.clog.log(this.logger, 'parseData：数据无法解析', data);
+            }
+            if(mac && raw_values) {
+                this.ctx.socket_service.sendToChannel(channelName, socketServerEvents.PSN.BED_MONITOR_LISTEN.WAVE_DATA, {
+                    bedMonitorMac: mac,
+                    values: raw_values
+                });
+            }
+        }catch (e) {
+            console.log(e);
+            self.logger.error(e);
+        }
     },
     startListen: function (listenConfig) {
         var self = this;
@@ -97,8 +115,15 @@ module.exports = {
             }
 
             socket.on('data', function(buffer){
-                self.ctx.clog.log(self.logger, '服务端：收到客户端数据，内容为{'+ buffer +'}');
-                self.parseData(buffer.toString());
+                var data = buffer.toString();
+                self.ctx.clog.log(self.logger, '服务端：收到客户端数据，内容为{'+ data +'}');
+
+                var data2 = data.toLowerCase().replace('\r','').replace('\n','');
+                if(data2 == 'q' || data2 == 'quit') {
+                    socket.end()
+                } else {
+                    self.parseData(data);
+                }
                 // 给客户端返回数据
                 // socket.write('你好，我是服务端');
             });

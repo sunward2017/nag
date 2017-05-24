@@ -2461,9 +2461,9 @@ module.exports = {
                                 if (inIndex != -1) {
                                     robots.splice(inIndex, 1);
                                 }
-                                console.log(inIndex)
+                                // console.log(inIndex)
                                 room.robots = robots;
-                                console.log(room.robots)
+                                // console.log(room.robots)
                                 yield room.save();
                             }
 
@@ -5028,7 +5028,7 @@ module.exports = {
                                     _id: { '$in': elderlyIds },
                                     tenantId: tenantId
                                 },
-                                sort: {'room_value.roomId': 1}
+                                sort: { 'room_value.roomId': 1 }
                             }).populate('nursingLevelId', 'name short_name nursing_assessment_grade', 'psn_nursingLevel')
                                 .populate('room_value.roomId', 'name bedMonitors', 'psn_room');
 
@@ -5188,6 +5188,126 @@ module.exports = {
                     }
                 }
             },
+            /***********************用药项目保存**********************/
+            {
+                method: 'drugUseItemSave',
+                verb: 'post',
+                url: this.service_url_prefix + "/drugUseItemSave",
+                handler: function (app, options) {
+                    return function* (next) {
+                        try {
+                            var data = this.request.body;
+                            var elderlyId = data.elderlyId;
+                            var elderly_name = data.elderly_name;
+                            var tenantId = data.tenantId;
+                            var elderlyNursingPlan = yield app.modelFactory().model_one(app.models['psn_nursingPlan'], {
+                                select: 'work_items',
+                                where: {
+                                    status: 1,
+                                    elderlyId: elderlyId,
+                                    tenantId: tenantId
+                                }
+                            });
+                            var drugUseItemstock = yield app.modelFactory().model_one(app.models['psn_drugUseItem'], {
+                                select: 'work_items',
+                                where: {
+                                    status: 1,
+                                    elderlyId: elderlyId,
+                                    tenantId: tenantId,
+                                    barcode: data.barcode,
+                                }
+                            });
+                            if (drugUseItemstock) {
+                                data.drugUseItemId = drugUseItemstock.id;
+                                yield app.modelFactory().model_update(app.models['psn_drugUseItem'], drugUseItemstock.id, data);
+                                var workItems = elderlyNursingPlan.work_items;
+                                var index = app._.findIndex(workItems, (o) => {
+                                    return o.drugUseItemId.toString() == data.drugUseItemId;
+                                });
+
+                                if (index != -1) {
+                                    workItems.splice(index, 1);
+                                }
+                                workItems.push(data)
+                                elderlyNursingPlan.work_items = workItems;
+                                yield elderlyNursingPlan.save();
+                                var msg = "更新成功"
+                                this.body = app.wrapper.res.ret({ success: true, exec: 201, msg: msg });
+                            } else {
+                                var useItem = yield app.modelFactory().model_create(app.models['psn_drugUseItem'], data);
+                                drugUseItem = useItem.toObject();
+                                var Id = drugUseItem.id;
+                                data.type = DIC.D3017.DRUG_USE_ITEM;
+                                data.drugUseItemId = Id;
+
+                                if (elderlyNursingPlan) {
+                                    elderlyNursingPlan.work_items.push(data);
+                                    elderlyNursingPlan.save()
+                                } else {
+                                    yield app.modelFactory().model_create(app.models['psn_nursingPlan'], {
+                                        elderlyId: elderlyId,
+                                        elderly_name: elderly_name,
+                                        work_items: [data],
+                                        tenantId: tenantId
+                                    });
+                                }
+
+                                var msg = "新增成功"
+                                this.body = app.wrapper.res.ret({ success: true, exec: 200, msg: msg });
+                            }
+
+
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    }
+                }
+            },
+            /**************************用药项目删除*******************************/
+            {
+                method: 'drugUseItemRemove',
+                verb: 'post',
+                url: this.service_url_prefix + "/drugUseItemRemove",
+                handler: function (app, options) {
+                    return function* (next) {
+                        console.log("body", this.request.body)
+                        var elderlyId = this.request.body.elderlyId;
+                        var tenantId = this.request.body.tenantId;
+                        var drugUseItemIds = this.request.body.drugUseItemIds;
+                        try {
+                            var elderlyNursingPlan = yield app.modelFactory().model_one(app.models['psn_nursingPlan'], {
+                                select: 'work_items',
+                                where: {
+                                    status: 1,
+                                    elderlyId: elderlyId,
+                                    tenantId: tenantId
+                                }
+                            });
+                            var workItems = elderlyNursingPlan.work_items;
+                            for (var i = 0, len = drugUseItemIds.length; i < len; i++) {
+                                var Id = drugUseItemIds[i];
+                                yield app.modelFactory().model_delete(app.models['psn_drugUseItem'], Id);
+                                var inIndex = app._.findIndex(workItems, (o) => {
+                                    return o.drugUseItemId.toString() == Id;
+                                });
+                                if (inIndex != -1) {
+                                    workItems.splice(inIndex, 1);
+                                }
+                            }
+                            elderlyNursingPlan.work_items = workItems;
+                            yield elderlyNursingPlan.save();
+                            var msg = "删除成功"
+                            this.body = app.wrapper.res.ret({ success: true, exec: 200, msg: msg });
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    }
+                }
+            },
             /**********************药品出入库*****************************/
             {
                 method: 'drugInStock',
@@ -5203,47 +5323,47 @@ module.exports = {
                             var in_out_quantity = this.request.body.in_out_quantity;
                             var unit = this.request.body.unit;
                             var type = this.request.body.type;
-                            var period_validity = this.request.body.period_validity ;
-                            
+                            var period_validity = this.request.body.period_validity;
+
 
                             var barcode = this.request.body.barcode;
                             var drug_full_name = this.request.body.drug_full_name;
                             var vender = this.request.body.vender;
                             var sourceId = this.request.sourceId;
-                            
+
                             var psnDrug = yield app.modelFactory().model_one(app.models['psn_drugDirectory'], {
-                                    where: {
-                                        status: 1,
-                                        tenantId: tenantId,
-                                        barcode: barcode
-                                    }
-                                });   
+                                where: {
+                                    status: 1,
+                                    tenantId: tenantId,
+                                    barcode: barcode
+                                }
+                            });
 
                             if (!psnDrug) {
                                 var pubDrug_json = yield app.modelFactory().model_one(app.models['pub_drug'], { where: { barcode: barcode } });
                                 if (pubDrug_json) {
-                                      drug = {
-                                            barcode: pubDrug_json.barcode, //条形码 added by zppro 2017.5.12
-                                            full_name: pubDrug_json.name,
-                                            vender: pubDrug_json.vender,//厂家 added by zppro 2017.5.12
-                                            drugSourceId: pubDrug_json.id,//关联公共的药品库
-                                            tenantId: tenantId //关联机构   
-                                        };
-                                     
-                                       yield app.modelFactory().model_create(app.models['psn_drugDirectory'], drug);  
-                                 }else{
-                                        drug = {
-                                            barcode: barcode, //条形码 added by zppro 2017.5.12
-                                            name: drug_full_name,
-                                            vender: vender,//厂家 added by zppro 2017.5.12
-                                            tenantId: tenantId //关联机构   
-                                        };
-                                  var pubDrug = yield app.modelFactory().model_create(app.models['pub_drug'], drug);
-                                      drug.drugSourceId = pubDrug.id;
-                                      drug.full_name = drug_full_name;
-                                  yield app.modelFactory().model_create(app.models['psn_drugDirectory'], drug);
-                                 } 
-                             }  
+                                    drug = {
+                                        barcode: pubDrug_json.barcode, //条形码 added by zppro 2017.5.12
+                                        full_name: pubDrug_json.name,
+                                        vender: pubDrug_json.vender,//厂家 added by zppro 2017.5.12
+                                        drugSourceId: pubDrug_json.id,//关联公共的药品库
+                                        tenantId: tenantId //关联机构   
+                                    };
+
+                                    yield app.modelFactory().model_create(app.models['psn_drugDirectory'], drug);
+                                } else {
+                                    drug = {
+                                        barcode: barcode, //条形码 added by zppro 2017.5.12
+                                        name: drug_full_name,
+                                        vender: vender,//厂家 added by zppro 2017.5.12
+                                        tenantId: tenantId //关联机构   
+                                    };
+                                    var pubDrug = yield app.modelFactory().model_create(app.models['pub_drug'], drug);
+                                    drug.drugSourceId = pubDrug.id;
+                                    drug.full_name = drug_full_name;
+                                    yield app.modelFactory().model_create(app.models['psn_drugDirectory'], drug);
+                                }
+                            }
 
                             var drugStock = yield app.modelFactory().model_one(app.models['psn_drugStock'], {
                                 where: {
@@ -5252,19 +5372,19 @@ module.exports = {
                                     barcode: barcode,
                                     tenantId: tenantId,
                                     unit: unit,
-                                    period_validity:{$eq: period_validity},
+                                    period_validity: { $eq: period_validity },
                                 }
                             });
 
-                            console.log("drugStock",drugStock);
+
                             if (!drugStock) {
-                              
+
                                 yield app.modelFactory().model_create(app.models['psn_drugStock'], {
                                     elderlyId: elderlyId,
                                     elderly_name: elderly_name,
                                     tenantId: tenantId,
                                     barcode: barcode,
-                                    period_validity:period_validity, 
+                                    period_validity: period_validity,
                                     drug_full_name: drug_full_name,
                                     current_quantity: in_out_quantity,
                                     type: type,
@@ -5503,7 +5623,7 @@ module.exports = {
                         yield next;
                     };
                 }
-            },{
+            }, {
                 method: 'getLatestSmbPerMinuteRecord',
                 verb: 'post',
                 url: this.service_url_prefix + "/getLatestSmbPerMinuteRecord",

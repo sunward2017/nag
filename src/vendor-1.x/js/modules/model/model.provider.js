@@ -651,9 +651,6 @@
                     return $http.post(baseUrl + 'drugUseItemSave',data);   
                 }
                 function drugUseItemRemove(elderlyId,tenantId,drugUseItemIds){
-                    console.log(elderlyId);
-                    console.log(tenantId);
-                    console.log(drugUseItemIds);
                     return $http.post(baseUrl + 'drugUseItemRemove',{elderlyId:elderlyId,tenantId:tenantId,drugUseItemIds:drugUseItemIds});
                 }
                 function instockAbolish(inStockId) {

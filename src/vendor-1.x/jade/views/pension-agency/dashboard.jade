@@ -100,7 +100,7 @@ tabset(justified="true")
                   .col-xs-4.text-center.bg-danger-dark.pv-lg
                      em.icon-bell.fa-3x
                   .col-xs-8.pv-lg
-                     .h2.mt0 {{vm.nursingAlarmAndRecordAndWorkerAndBedMonitorAndRobot.leaveBedAlarm}}
+                     .h2.mt0 {{vm.nursingStatInfo.leaveBedAlarm}}
                      | {{ vm.moduleTranslatePath('TAB-NURSING-ALARM-TODAY-LEAVE_BED') | translate}}
          .col-lg-3.col-sm-6
             .panel.widget.bg-warning
@@ -108,7 +108,7 @@ tabset(justified="true")
                   .col-xs-4.text-center.bg-warning-dark.pv-lg
                      em.icon-user-unfollow.fa-3x
                   .col-xs-8.pv-lg
-                     .h2.mt0 {{vm.nursingAlarmAndRecordAndWorkerAndBedMonitorAndRobot.nursingRecordUnusual}}
+                     .h2.mt0 {{vm.nursingStatInfo.nursingRecordUnusual}}
                      | {{ vm.moduleTranslatePath('TAB-NURSING-RECORD-TODAY-UNUSUAL') | translate}}
          .col-lg-3.col-sm-6
             .panel.widget.bg-success
@@ -116,7 +116,7 @@ tabset(justified="true")
                   .col-xs-4.text-center.bg-success-dark.pv-lg
                      em.icon-user-follow.fa-3x
                   .col-xs-8.pv-lg
-                     .h2.mt0 {{vm.nursingAlarmAndRecordAndWorkerAndBedMonitorAndRobot.nursingRecordUsual}}
+                     .h2.mt0 {{vm.nursingStatInfo.nursingRecordUsual}}
                      | {{ vm.moduleTranslatePath('TAB-NURSING-RECORD-TODAY-USUAL') | translate}}
          .col-lg-3.col-sm-6
             .panel.widget.bg-primary
@@ -124,7 +124,7 @@ tabset(justified="true")
                   .col-xs-4.text-center.bg-primary-dark.pv-lg
                      em.icon-users.fa-3x
                   .col-xs-8.pv-lg
-                     .h2.mt0 {{vm.nursingAlarmAndRecordAndWorkerAndBedMonitorAndRobot.nursingWorker}}
+                     .h2.mt0 {{vm.nursingStatInfo.nursingWorker}}
                      | {{ vm.moduleTranslatePath('TAB-NURSING-WORKER') | translate}}
          .col-lg-3.col-sm-6
             .panel.widget.bg-primary
@@ -132,7 +132,7 @@ tabset(justified="true")
                   .col-xs-4.text-center.bg-primary-dark.pv-lg
                      em.fa-heartbeat.fa.fa-3x
                   .col-xs-8.pv-lg
-                     .h2.mt0 {{vm.nursingAlarmAndRecordAndWorkerAndBedMonitorAndRobot.bedMonitor}}
+                     .h2.mt0 {{vm.nursingStatInfo.bedMonitor}}
                      | {{ vm.moduleTranslatePath('TAB-NURSING-BED_MONITOR') | translate}}
          .col-lg-3.col-sm-6
             .panel.widget.bg-primary
@@ -140,7 +140,7 @@ tabset(justified="true")
                   .col-xs-4.text-center.bg-primary-dark.pv-lg
                      em.fa-meh-o.fa.fa-3x
                   .col-xs-8.pv-lg
-                     .h2.mt0 {{vm.nursingAlarmAndRecordAndWorkerAndBedMonitorAndRobot.robot}}
+                     .h2.mt0 {{vm.nursingStatInfo.robot}}
                      | {{ vm.moduleTranslatePath('TAB-NURSING-ROBOT') | translate}}
          .clearfix
    tab(active="vm.tab3.active")

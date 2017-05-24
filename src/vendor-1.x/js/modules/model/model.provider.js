@@ -850,7 +850,7 @@
                     roomVacancyRateMonthly: roomVacancyRateMonthly,
                     roomCatagoryOfManTime: roomCatagoryOfManTime,
                     roomCatagoryOfManTimeMonthly: roomCatagoryOfManTimeMonthly,
-                    nursingAlarmAndRecordAndWorkerAndBedMonitorAndRobot: nursingAlarmAndRecordAndWorkerAndBedMonitorAndRobot
+                    nursingStatInfo: nursingStatInfo
                 };
 
                 function liveIn(tenantId) {
@@ -893,8 +893,8 @@
                     return $http.get(baseUrl + 'roomCatagoryOfManTimeMonthly/' + tenantId + '/' + start + '/' + end);
                 }
 
-                function nursingAlarmAndRecordAndWorkerAndBedMonitorAndRobot(tenantId) {
-                    return $http.get(baseUrl + 'nursingAlarmAndRecordAndWorkerAndBedMonitorAndRobot/' + tenantId);
+                function nursingStatInfo(tenantId) {
+                    return $http.get(baseUrl + 'nursingStatInfo/' + tenantId);
                 }
             }]
         };

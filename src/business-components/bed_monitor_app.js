@@ -28,6 +28,7 @@ module.exports = {
         console.log(this.filename + ' ready... ');
         return this;
     },
+
     checkIsRegist: function (code) {
         var self = this;
         return co(function* () {
@@ -199,6 +200,7 @@ module.exports = {
         }).catch(self.ctx.coOnError);
 
     },
+
     _getSleepBriefReport: function (sessionId, devId, tenantId,endTime,startTime) {//报表
         var self = this;
         return co(function* () {
@@ -349,7 +351,6 @@ module.exports = {
             try {
                 var key = self.CACHE_MODULE + self.CACHE_ITEM_SESSION + '@' + openid;
                 var sessionId = self.ctx.cache.get(key);
-
                 if (!sessionId || typeof sessionId !== 'string') {//缓存中不存在或出错
                     var member = yield self.ctx.modelFactory().model_one(self.ctx.models['het_member'], {
                         select: 'session_id_hzfanweng',
@@ -382,13 +383,13 @@ module.exports = {
                             status: 1
                         }
                     });
+                     console.log('member:',member);
                     if (member) {
                         console.log('sssss:',ret);
                         var token = yield self.getToken(member.open_id);
                         var ret = yield self._userAuthenticate(member, token);
                         console.log('sssss:',ret);
                             return ret
-
                     }
                     return self.ctx.wrapper.res.error({ message: '用户不存在' })
                 }                 

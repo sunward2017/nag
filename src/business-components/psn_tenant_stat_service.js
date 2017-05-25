@@ -6,7 +6,7 @@
 var log4js = require('log4js');
 var co = require('co');
 var statHelper = require('rfcore').factory('statHelper');
-
+var DIC = require('../pre-defined/dictionary-constants.json');
 
 module.exports = {
     init: function (ctx) {
@@ -120,27 +120,36 @@ module.exports = {
         var self = this;
         return co(function *() {
             var begin = self.ctx.moment(self.ctx.moment().format('YYYY-MM-DD'));
-            var end = self.ctx.moment(begin.add(1, 'days'));
-            var totals = yield self.ctx.modelFactory().model_totals(self.ctx.models['psn_nursingRecord'], {
-                tenantId: tenant._id,
-                status: 1,
-                exec_on: {"$gte": begin, "$lt": end},
-                confirm_flag: false
+            var end = self.ctx.moment(begin).add(1, 'days');
+
+            var totals = yield self.ctx.modelFactory().model_query(self.ctx.models['psn_nursingRecord'], {
+                select: 'exec_on duration',
+                where: {
+                    tenantId: tenant._id,
+                    type: DIC.D3017.NURSING_ITEM,
+                    exec_on: {"$gte": begin, "$lt": end},
+                    confirmed_flag: false
+                }
             });
 
-            return totals.length;
+            return self.ctx._.filter(totals, (o)=> {
+                if (o.expire_on_ts) {
+                    return o.expire_on_ts.isBefore();
+                } else {
+                    return false;
+                }
+            }).length;
         });
     },
     getAmountOfNursingRecordUsualToday: function (tenant, logger) {
         var self = this;
         return co(function *() {
             var begin = self.ctx.moment(self.ctx.moment().format('YYYY-MM-DD'));
-            var end = self.ctx.moment(begin.add(1, 'days'));
+            var end = self.ctx.moment(begin).add(1, 'days');
             var totals = yield self.ctx.modelFactory().model_totals(self.ctx.models['psn_nursingRecord'], {
                 tenantId: tenant._id,
-                status: 1,
-                exec_on: {"$gte": begin, "$lt": end},
-                confirm_flag: true
+                exec_on: {"$gte": begin.toDate(), "$lt": end.toDate()},
+                confirmed_flag: true
             });
 
             return totals.length;

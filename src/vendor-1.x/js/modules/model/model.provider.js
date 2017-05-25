@@ -273,7 +273,8 @@
                     resetUserPassword: resetUserPassword,
                     upgradeAppServerSide: upgradeAppServerSide,
                     upgradeAppClientSide: upgradeAppClientSide,
-                    importDrug: importDrug
+                    importDrug: importDrug,
+                    syncDrugToTenants: syncDrugToTenants
                 };
 
                 function tenantInfo(tenantId, select) {
@@ -333,6 +334,10 @@
 
                 function importDrug(file_name) {
                     return $http.post(baseUrl + 'importDrug', { file_name: file_name });
+                }
+                
+                function syncDrugToTenants(tenantIds, drugIds) {
+                    return $http.post(baseUrl + 'syncDrugToTenants', { tenantIds: tenantIds, drugIds: drugIds });
                 }
             }]
         };
@@ -864,7 +869,7 @@
                     roomVacancyRateMonthly: roomVacancyRateMonthly,
                     roomCatagoryOfManTime: roomCatagoryOfManTime,
                     roomCatagoryOfManTimeMonthly: roomCatagoryOfManTimeMonthly,
-                    nursingAlarmAndRecordAndWorkerAndBedMonitorAndRobot: nursingAlarmAndRecordAndWorkerAndBedMonitorAndRobot
+                    nursingStatInfo: nursingStatInfo
                 };
 
                 function liveIn(tenantId) {
@@ -907,8 +912,8 @@
                     return $http.get(baseUrl + 'roomCatagoryOfManTimeMonthly/' + tenantId + '/' + start + '/' + end);
                 }
 
-                function nursingAlarmAndRecordAndWorkerAndBedMonitorAndRobot(tenantId) {
-                    return $http.get(baseUrl + 'nursingAlarmAndRecordAndWorkerAndBedMonitorAndRobot/' + tenantId);
+                function nursingStatInfo(tenantId) {
+                    return $http.get(baseUrl + 'nursingStatInfo/' + tenantId);
                 }
             }]
         };

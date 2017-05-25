@@ -32,7 +32,7 @@
             roomCatagoryOfManTime();
             roomCatagoryOfManTimeMonthly();
 
-            nursingAlarmAndRecordAndWorkerAndBedMonitorAndRobot();
+            nursingStatInfo();
         }
 
         function liveinAndAccountAndBedInfo() {
@@ -310,9 +310,9 @@
             });
         }
 
-        function nursingAlarmAndRecordAndWorkerAndBedMonitorAndRobot() {
-            psnDashboardNode.nursingAlarmAndRecordAndWorkerAndBedMonitorAndRobot(vm.tenantId).then(function (ret) {
-                vm.nursingAlarmAndRecordAndWorkerAndBedMonitorAndRobot = ret;
+        function nursingStatInfo() {
+            psnDashboardNode.nursingStatInfo(vm.tenantId).then(function (ret) {
+                vm.nursingStatInfo = ret;
             });
         }
     }

@@ -51,6 +51,8 @@
                                     i.glyphicon.glyphicon-minus
                             .btn-group
                                 a.btn.btn-primary.btn-sm(ng-click="vm.openImportDialog()") {{ vm.viewTranslatePath('BTN-IMPORT-DRUG-DIALOG') | translate}}
+                            .btn-group
+                                a.btn.btn-warning.btn-sm(ng-click="vm.openExportToTenantDialog()") {{ vm.viewTranslatePath('BTN-SYNC-TO-TENANT-DIALOG') | translate}}
                     .col-md-8
                         pagination.pagination-sm.pull-right(total-items="vm.page.totals",ng-model="vm.page.no",max-size="5",items-per-page="vm.page.size",boundary-links="true" ,ng-change="vm.paging()")
 script(type='text/ng-template', id="dlg-drug-import-file-pick.html")
@@ -60,4 +62,10 @@ script(type='text/ng-template', id="dlg-drug-import-file-pick.html")
         .tree.tree-basic(s-tree,s-tree-data="vm.drugImportExcelsPromise",s-tree-height="240", s-tree-option="{mode:'grid'}", s-tree-template-url='tree-directive-default-renderer.html',ng-model="vm.toImport")
         .col-md-6.pull-right.text-right.mt
             button.btn.btn-success(ng-click="vm.importSelected()") {{'button.CONFIRM'|translate}}
-
+script(type='text/ng-template', id="dlg-drug-sync-to-tenant-pick.html")
+    .ngdialog-title
+        | {{ vm.translatePath('TITLE') | translate }}
+    .ngdialog-body(block-ui="sync-to-tenant")
+        .tree.tree-basic(s-tree,s-tree-data="vm.drugSyncToTenantPromise",s-tree-height="420", s-tree-option="{mode:'grid'}", s-tree-template-url='tree-directive-default-renderer.html',ng-model="vm.toSyncTenant")
+        .col-md-6.pull-right.text-right.mt
+            button.btn.btn-success(ng-click="vm.syncSelected()") {{'button.CONFIRM'|translate}}

@@ -630,37 +630,81 @@
                 };
                 subscribeBedMonitorListen(vm.bindingBedMonitor.bedMonitorName, vm.tenantId);
 
-                var renderMax = 64, radio = 4000 / 200;
+                var renderMax = 200, radio = 4000 / 200;
                 var ts = 0;
+                // vm.IoC.intervalIdOfRealWave = setInterval(function () {
+                //     var value = wave_raw_data.shift();
+                //     console.log('wave_raw_data -length:', wave_raw_data.length);
+                //     console.log('value:', value);
+                //     if (!value) {
+                //         value = 0;
+                //     } else {
+                //         value =  (value / radio).toFixed(2) - 100;
+                //     }
+                //
+                //     if(wave_x_data.length == 0) {
+                //         // wave_x_data.shift();
+                //         wave_x_data = _.range(renderMax);
+                //         if(wave_raw_data.length>0){
+                //             wave_y_data = wave_raw_data.slice(0, renderMax);
+                //         } else {
+                //             wave_y_data = _.map(wave_x_data, function (o) {
+                //                 return {value: [o, 0]}
+                //             });
+                //         }
+                //         ts = renderMax;
+                //     } else {
+                //         wave_x_data.shift();
+                //         wave_x_data.push(ts);
+                //         wave_y_data.shift();
+                //         wave_y_data.push({
+                //             value: [
+                //                 ts++,
+                //                 value
+                //             ]
+                //         });
+                //     }
+                //
+                //     $echarts.updateEchartsInstance(vm.realtime_wave_id, {
+                //         xAxis: {
+                //             data: wave_x_data
+                //         },
+                //         series: [{
+                //             data: wave_y_data
+                //         }]
+                //     });
+                //
+                // }, 15);
                 vm.IoC.intervalIdOfRealWave = setInterval(function () {
-                    var value = wave_raw_data.pop();
-                    console.log('value:', value);
-                    if (!value) {
-                        value = 0;
-                    } else {
-                        value =  (value / radio).toFixed(2) - 100;
+                    var values = wave_raw_data.splice(0, 4);//一次取5个点
+                    console.log('wave_raw_data -length:', wave_raw_data.length);
+                    // console.log('values:', values);
+                    var value0 = 0;
+                    if (values.length > 0) {
+                        values = _.map(values, function (v) {
+                            return (v / radio).toFixed() - 100;
+                        })
                     }
 
                     if(wave_x_data.length == 0) {
-                        wave_x_data.shift();
+                        // wave_x_data.shift();
                         wave_x_data = _.range(renderMax);
-                        if(wave_raw_data.length>0){
-                            wave_y_data = wave_raw_data.slice(0, renderMax);
-                        } else {
-                            wave_y_data = _.map(wave_x_data, function (o) {
-                                return {value: [o, 0]}
-                            });
-                        }
+
+                        wave_y_data = _.map(wave_x_data, function (o) {
+                            return {value: [o, value0]}
+                        });
                         ts = renderMax;
                     } else {
-                        wave_x_data.shift();
-                        wave_x_data.push(ts);
-                        wave_y_data.shift();
-                        wave_y_data.push({
-                            value: [
-                                ts++,
-                                value
-                            ]
+                        _.each(values, function (value) {
+                            wave_x_data.shift();
+                            wave_x_data.push(ts);
+                            wave_y_data.shift();
+                            wave_y_data.push({
+                                value: [
+                                    ts++,
+                                    value
+                                ]
+                            });
                         });
                     }
 
@@ -673,7 +717,7 @@
                         }]
                     });
 
-                }, 150);
+                }, 20);
             }
 
             // 获取睡眠带生命体征及实时数据
@@ -692,7 +736,7 @@
                 console.log('nursing-station bed_monitor_listen socket disconnected');
             });
             channelOfListen.off(SOCKET_EVENTS.PSN.BED_MONITOR_LISTEN.S2C.WAVE_DATA).on(SOCKET_EVENTS.PSN.BED_MONITOR_LISTEN.S2C.WAVE_DATA, function (data) {
-                console.log('nursing-station bed_monitor_listen socket WAVE_DATA =>', data);
+                console.log('nursing-station bed_monitor_listen socket WAVE_DATA =>', moment().format('HH:mm:ss'), data);
                 wave_raw_data = wave_raw_data.concat(data.values);
             });
             channelOfListen.emit(SOCKET_EVENTS.PSN.BED_MONITOR_LISTEN.C2S.SUBSCRIBE, {

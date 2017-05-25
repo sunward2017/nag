@@ -113,7 +113,8 @@
     "CHANGE-RECHARGE-BOOKING-AMOUNT-SUCCESS": "修改充值记账金额成功",
     "DISABLE-RED-SUCCESS": "撤销冲红成功",
     "CHANGE-RED-BOOKING-AMOUNT-SUCCESS": "修改冲红金额成功",
-    "IMPORT-SUCCESS": "数据导入成功"
+    "IMPORT-SUCCESS": "数据导入成功",
+    "SYNC-SUCCESS": "数据同步成功"
   },
   "confirm": {
     "SUBMIT": "确定要提交么？",

@@ -31,6 +31,8 @@
         modelNode.factory('psn-nursingPlan');
         modelNode.factory('psn-nursingSchedule');
         modelNode.factory('psn-nursingScheduleTemplate');
+        modelNode.factory('psn-nursingWorkerSchedule');
+        modelNode.factory('psn-nursingWorkerScheduleTemplate');
         modelNode.factory('psn-nursingGroup');
         modelNode.factory('psn-recharge');
         modelNode.factory('psn-drugUseItem');

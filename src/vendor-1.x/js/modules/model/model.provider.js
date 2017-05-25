@@ -551,7 +551,10 @@
                     nursingLevelsByAssessmentGrade: nursingLevelsByAssessmentGrade,
                     nursingLevels:nursingLevels,
                     customizedWorkItem:customizedWorkItem,
-                    getLatestSmbPerMinuteRecord:getLatestSmbPerMinuteRecord
+                    getLatestSmbPerMinuteRecord:getLatestSmbPerMinuteRecord,
+                    nursingWorkerScheduleWeekly: nursingWorkerScheduleWeekly,
+                    nursingWorkerScheduleSave: nursingWorkerScheduleSave,
+                    nursingWorkerScheduleRemove: nursingWorkerScheduleRemove
                 };
 
                 function roomStatusInfo(tenantId) {
@@ -840,6 +843,23 @@
                 }
                 function getLatestSmbPerMinuteRecord(devId,openId){
                     return $http.post(baseUrl + 'getLatestSmbPerMinuteRecord', {devId:devId,openId:openId});
+                }
+                function nursingWorkerScheduleWeekly(tenantId, start, end) {
+                    return $http.post(baseUrl + 'nursingWorkerScheduleWeekly', {
+                        tenantId: tenantId,
+                        x_axis_range_points: {
+                            start: start,
+                            end: end
+                        }
+                    });
+                }
+
+                function nursingWorkerScheduleSave(tenantId, toSaveRows) {
+                    return $http.post(baseUrl + 'nursingWorkerScheduleSave', { tenantId: tenantId, toSaveRows: toSaveRows });
+                }
+
+                function nursingWorkerScheduleRemove(tenantId, toRemoveRows) {
+                    return $http.post(baseUrl + 'nursingWorkerScheduleRemove', { tenantId: tenantId, toRemoveRows: toRemoveRows });
                 }
             }]
         };

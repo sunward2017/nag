@@ -1,6 +1,6 @@
 /**
- * Created by zppro on 17-3-17.
- * 养老机构 照护排班 -> 房间值班日程
+ * Created by zppro on 17-5-25.
+ * 养老机构 护工排班
  */
 var mongoose = require('mongoose');
 
@@ -20,8 +20,8 @@ module.exports = function(ctx,name) {
             operated_on: {type: Date, default: Date.now},
             status: {type: Number, min: 0, max: 1, default: 1},
             x_axis: {type: Date, required: true}, //时间轴
-            y_axis: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'psn_room'}, //房间轴
-            aggr_value: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'psn_nursingWorker'},
+            y_axis: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'psn_nursingWorker'}, //护工轴
+            aggr_value: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'psn_nursingShift'},
             tenantId: {type: mongoose.Schema.Types.ObjectId}
         }, {
             toObject: {

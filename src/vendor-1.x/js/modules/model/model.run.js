@@ -39,6 +39,7 @@
         modelNode.factory('psn-drugInOutStock');
         modelNode.factory('psn-nursingWorker');
         modelNode.factory('psn-workItem');
+        modelNode.factory('psn-nursingShift');
         modelNode.factory('psn-district');
         modelNode.factory('psn-nursingLevel');
         modelNode.factory('psn-room');

@@ -687,6 +687,9 @@ module.exports = {
                                     tenantId = tenantIds[j];
                                     if ((yield app.modelFactory().model_totals(app.models['psn_drugDirectory'], {tenantId: tenantId, status: 1, barcode: drug.barcode})).length == 0) {
                                         drug.full_name = drug.name;
+                                        drug.drugSourceId = drug.id;
+                                        drug._id = undefined;
+                                        drug.id = undefined;
                                         drug.health_care_flag = drug.medical_insurance_flag;
                                         drug.price = drug.reference_price;
                                         drug.tenantId = tenantId;

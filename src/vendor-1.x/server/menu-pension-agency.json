@@ -74,13 +74,23 @@
       },
       {
         "_id": "menu.pension-agency.NURSING-SCHEDULE",
-        "name": "照护排班",
+        "name": "房间值班日程",
         "sref": "app.pension-agency.nursing-schedule"
       },
       {
         "_id": "menu.pension-agency.NURSING-SCHEDULE-TEMPLATE",
-        "name": "照护排班模版",
+        "name": "房间值班日程模版",
         "sref": "app.pension-agency.nursing-schedule-template.list"
+      },
+      {
+        "_id": "menu.pension-agency.NURSING-WORKER-SCHEDULE",
+        "name": "护工排班",
+        "sref": "app.pension-agency.nursing-worker-schedule"
+      },
+      {
+        "_id": "menu.pension-agency.NURSING-WORKER-SCHEDULE-TEMPLATE",
+        "name": "护工排班模版",
+        "sref": "app.pension-agency.nursing-worker-schedule-template.list"
       },
       {
         "_id": "menu.pension-agency.NURSING-GROUP",
@@ -229,6 +239,11 @@
         "_id": "menu.pension-agency.WORK-ITEM",
         "name": "工作项目",
         "sref": "app.pension-agency.work-item.list"
+      },
+      {
+        "_id": "menu.pension-agency.NURSING-SHIFT",
+        "name": "照护班定义",
+        "sref": "app.pension-agency.nursing-shift.list"
       },
       {
         "_id": "menu.pension-agency.ROBOT",

@@ -2001,6 +2001,73 @@
                     })
                 }
             })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'nursing-shift', {
+                url: '/nursing-shift',
+                title: '护理班管理',
+                abstract: true,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath(MODEL_VARIABLES.HEAD_TEMPLATES.PENSION_AGENCY),
+                        controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER_FOR_TENANT
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div>'
+                    }
+                },
+                data: {
+                    func_id: MODEL_VARIABLES.BIZ_FUNC_PREFIXS.PENSION_AGENCY + 'NURSING-SHIFT' //业务系统使用
+                },
+                resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.PENSION_AGENCY + 'nursing-shift.js')
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'nursing-shift.list', {
+                url: '/list/:action',
+                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'nursing-shift-list.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'NursingShiftGridController',
+                resolve: {
+                    entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'nursing-shift.list', {
+                        modelName: 'psn-nursingShift',
+                        searchForm: { "status": 1 },
+                        serverPaging: true,
+                        columns: [{
+                            label: '照护班简称',
+                            name: 'code',
+                            type: 'string',
+                            width: 120,
+                            sortable: true
+                        }, {
+                            label: '照护班全称',
+                            name: 'name',
+                            type: 'string',
+                            width: 120,
+                            sortable: true
+                        }, {
+                            label: '停用',
+                            name: 'stop_flag',
+                            type: 'bool',
+                            width: 80
+                        }, {
+                            label: '',
+                            name: 'actions',
+                            sortable: false,
+                            width: 60
+                        }]
+                    })
+                }
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'nursing-shift.details', {
+                url: '/details/:action/:_id',
+                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'nursing-shift-details.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'NursingShiftDetailsController',
+                resolve: {
+                    entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'nursing-shift.details', {
+                        modelName: 'psn-nursingShift',
+                        blockUI: true
+                    })
+                    //, deps: helper.resolveFor2('ui.select')
+                }
+            })
             .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'robot', {
                 url: '/robot',
                 title: '机器人管理',

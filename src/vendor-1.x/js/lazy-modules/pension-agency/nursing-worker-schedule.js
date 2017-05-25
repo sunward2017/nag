@@ -1,6 +1,6 @@
 /**
  * district Created by zppro on 17-3-17.
- * Target:养老机构 房间值班日程
+ * Target:养老机构 护工排班
  */
 
 (function() {
@@ -8,13 +8,13 @@
     
     angular
         .module('subsystem.pension-agency')
-        .controller('NursingScheduleController', NursingScheduleController)
-        .controller('NursingScheduleSaveAsTemplateController', NursingScheduleSaveAsTemplateController)
+        .controller('NursingWorkerScheduleController', NursingWorkerScheduleController)
+        .controller('NursingWorkerScheduleSaveAsTemplateController', NursingWorkerScheduleSaveAsTemplateController)
     ;
 
-    NursingScheduleController.$inject = ['$scope', 'ngDialog', 'vmh', 'instanceVM'];
+    NursingWorkerScheduleController.$inject = ['$scope', 'ngDialog', 'vmh', 'instanceVM'];
 
-    function NursingScheduleController($scope, ngDialog, vmh, vm) {
+    function NursingWorkerScheduleController($scope, ngDialog, vmh, vm) {
 
         var vm = $scope.vm = vm;
         $scope.utils = vmh.utils.v;
@@ -40,27 +40,23 @@
             vm.tab1 = {cid: 'contentTab1'};
 
             fetchNursingScheduleTemplates();
-            vmh.shareService.tmp('T3001/psn-nursingWorker', 'name', {tenantId: vm.tenantId, status: 1, stop_flag: false}).then(function (treeNodes) {
-                vm.selectBinding.nursingWorkers = treeNodes;
-            });
-
-            vm.aggrValuePromise = vmh.shareService.tmp('T3013', null, {tenantId:vm.tenantId}).then(function(nodes){
-                console.log('aggrValuePromise:', nodes);
+            vm.aggrValuePromise = vmh.shareService.tmp('T3001/psn-nursingShift', 'name', {tenantId: vm.tenantId, status: 1, stop_flag: false}).then(function (nodes) {
+                vm.selectBinding.nursingShifts = nodes;
                 return nodes;
             });
 
             vm.baseWeek = 0;
             var p1 = loadWeek();
-            var p2 = vm.yAxisDataPromise = vmh.shareService.tmp('T3009', null, {tenantId:vm.tenantId}).then(function(nodes){
-                return nodes;
+            vmh.shareService.tmp('T3009', null, {tenantId:vm.tenantId}).then(function(nodes){
+                vm.yAxisData = nodes;
             });
         }
 
 
         function fetchNursingScheduleTemplates () {
-            vmh.shareService.tmp('T3001/psn-nursingScheduleTemplate', 'name', {tenantId: vm.tenantId, status: 1, stop_flag: false}, true).then(function (treeNodes) {
-                vm.selectBinding.nursingScheduleTemplates = treeNodes;
-            });
+            // vmh.shareService.tmp('T3001/psn-nursingScheduleTemplate', 'name', {tenantId: vm.tenantId, status: 1, stop_flag: false}, true).then(function (treeNodes) {
+            //     vm.selectBinding.nursingScheduleTemplates = treeNodes;
+            // });
         }
         
         function preWeek() {
@@ -78,17 +74,17 @@
                     var colId = vm.xAxisData[j]._id;
                     vm.cols[colId] = false;//selectedCol control variable
                 }
-                queryNursingSchedule();
+                queryNursingWorkerSchedule();
             }));
         }
         
-        function queryNursingSchedule() {
+        function queryNursingWorkerSchedule() {
             var start = vm.xAxisData[0].value;
             var end = vm.xAxisData[vm.xAxisData.length-1].value;
-            var p3 = vmh.psnService.nursingScheduleWeekly(vm.tenantId, start, end).then(parseNursingSchedule);
+            var p3 = vmh.psnService.nursingWorkerScheduleWeekly(vm.tenantId, start, end).then(parseNursingWorkerSchedule);
         }
 
-        function parseNursingSchedule(nursingSchedule) {
+        function parseNursingWorkerSchedule(nursingSchedule) {
             console.log('parse nursingScheduleItems');
             var nursingScheduleItems = nursingSchedule.items;
             console.log(nursingSchedule);
@@ -416,9 +412,9 @@
         }
     }
 
-    NursingScheduleSaveAsTemplateController.$inject = ['$scope', 'ngDialog'];
+    NursingWorkerScheduleSaveAsTemplateController.$inject = ['$scope', 'ngDialog'];
 
-    function NursingScheduleSaveAsTemplateController($scope, ngDialog) {
+    function NursingWorkerScheduleSaveAsTemplateController($scope, ngDialog) {
 
         var vm = $scope.vm = {};
         var vmh = $scope.ngDialogData.vmh;

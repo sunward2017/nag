@@ -1,6 +1,6 @@
 /**
  * Created by zppro on 17-3-17.
- * 养老机构 照护排班模版
+ * 养老机构 照护排班模版 -> 房间值班日程模版
  */
 var mongoose = require('mongoose');
 var D3010 = require('../../pre-defined/dictionary.json')['D3010'];

@@ -79,6 +79,7 @@
                 {name:'subsystem.pension-agency.exit-item-return.js',files:['app/js/lazy-modules/pension-agency/exit-item-return.js']},
                 {name:'subsystem.pension-agency.nursing-worker.js',files:['app/js/lazy-modules/pension-agency/nursing-worker.js']},
                 {name:'subsystem.pension-agency.work-item.js',files:['app/js/lazy-modules/pension-agency/work-item.js']},
+                {name:'subsystem.pension-agency.nursing-shift.js',files:['app/js/lazy-modules/pension-agency/nursing-shift.js']},
                 {name:'subsystem.pension-agency.room.js',files:['app/js/lazy-modules/pension-agency/room.js']},
                 {name:'subsystem.pension-agency.district.js',files:['app/js/lazy-modules/pension-agency/district.js']},
                 {name:'subsystem.pension-agency.nursing-level.js',files:['app/js/lazy-modules/pension-agency/nursing-level.js']},

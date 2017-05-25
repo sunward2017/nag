@@ -10,6 +10,7 @@
         .module('subsystem.pension-agency')
         .controller('WorkItemGridController', WorkItemGridController)
         .controller('WorkItemDetailsController', WorkItemDetailsController)
+        .controller('WorkItemCopyController', WorkItemCopyController)
         ;
 
 
@@ -19,6 +20,7 @@
 
         $scope.vm = vm;
         $scope.utils = vmh.utils.g;
+        vm.copyWorkItems = copyWorkItems;
 
         init();
 
@@ -42,6 +44,59 @@
             }
 
             vm.query();
+        }
+
+        function copyWorkItems() {
+            if (!vm.selectedRows || vm.selectedRows.length == 0) {
+                vmh.alertWarning(vm.viewTranslatePath('MSG-NO-WORK-ITEM-SELECTED'), true);
+                return;
+            } else if (vm.selectedRows.length > 1) {
+                vmh.alertWarning(vm.viewTranslatePath('MSG-WOEK-ITEM-ONLYONE'), true);
+                return;
+            }
+            ngDialog.open({
+                template: 'work-item-copy.html',
+                controller: 'WorkItemCopyController',
+                className: 'ngdialog-theme-default ngdialog-work-item-copy',
+                data: {
+                    vmh: vmh,
+                    row: vm.selectedRows[0],
+                    moduleTranslatePathRoot: vm.viewTranslatePath()
+                }
+            })
+        }
+    }
+
+    WorkItemCopyController.$inject = ['$scope', 'ngDialog', 'treeFactory'];
+    function WorkItemCopyController($scope, ngDialog, treeFactory) {
+        var vm = $scope.vm = {};
+        var vmh = $scope.ngDialogData.vmh;
+        var row = $scope.ngDialogData.row;
+        var query = $scope.ngDialogData.query;
+        vm.doSubmit = doSubmit;
+        vm.moduleTranslatePath = moduleTranslatePath
+        vm.cancel = cancel;
+        init();
+        function init() {
+            vm.nursingLevelPromise = vmh.shareService.tmp('T3001/psn-nursingLevel', 'name id', { "status": 1, "_id": { "$ne": row.nursingLevelId } })
+        }
+
+        var moduleTranslatePathRoot = $scope.ngDialogData.moduleTranslatePathRoot;
+        function moduleTranslatePath(key) {
+            return moduleTranslatePathRoot + '.' + key;
+        };
+
+        function doSubmit() {
+            ngDialog.close("#work-item-copy.html")
+            vmh.psnService.workItemCopy(vm.nursingLevelIds,row.id).then(function(ret){
+               if(ret.success){
+                    vmh.alertSuccess('复置成功', false);
+               }
+            })
+        }
+
+        function cancel() {
+           ngDialog.close("#work-item-copy.html")
         }
     }
 

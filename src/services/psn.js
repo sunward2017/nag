@@ -4745,6 +4745,42 @@ module.exports = {
                     };
                 }
             }, {
+                method: 'workItemCopy',
+                verb: 'post',
+                url: this.service_url_prefix + "/workItemCopy",
+                handler: function (app, options) {
+                    return function* (next) {
+                        try {
+                            var nursingLevelIds = this.request.body.nursingLevelIds;
+                            var workItemId = this.request.body.workItemId;
+
+                            var workItem = yield app.modelFactory().model_read(app.models['psn_workItem'],workItemId);
+
+                            if (!workItem) {
+                                this.body = app.wrapper.res.error({ message: '无法找到工作项目!' });
+                                yield next;
+                                return;
+                            }else{
+                               var row = workItem.toObject();
+                                    row.check_in_time = "undefined";
+                                    row._id= "undefined";
+                                    row.operated_on== "undefined";
+                                var workItems=[];
+                                for(var i=0,len=nursingLevelIds.length;i<len;i++){
+                                    row.nursingLevelId = nursingLevelIds[i];
+                                    workItems.push(row); 
+                                }
+                                yield app.modelFactory().model_bulkInsert(app.models['psn_workItem'],{rows:workItems});
+                            }
+                           this.body = app.wrapper.res.rows({success:true}) 
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            }, {
                 method: 'nursingPlanSaveNursingItem',
                 verb: 'post',
                 url: this.service_url_prefix + "/nursingPlanSaveNursingItem", //为老人保存一条照护类目

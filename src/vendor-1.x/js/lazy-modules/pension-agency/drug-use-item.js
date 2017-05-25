@@ -79,6 +79,7 @@
         }
         function fetchDrugUseItem() {
             drugUseService.query({
+                status:1,
                 elderlyId: vm.model._id,
                 tenantId: vm.model.tenantId
             }).$promise.then(function (rows) {

@@ -31,6 +31,8 @@
         modelNode.factory('psn-nursingPlan');
         modelNode.factory('psn-nursingSchedule');
         modelNode.factory('psn-nursingScheduleTemplate');
+        modelNode.factory('psn-nursingWorkerSchedule');
+        modelNode.factory('psn-nursingWorkerScheduleTemplate');
         modelNode.factory('psn-nursingGroup');
         modelNode.factory('psn-recharge');
         modelNode.factory('psn-drugUseItem');
@@ -39,6 +41,7 @@
         modelNode.factory('psn-drugInOutStock');
         modelNode.factory('psn-nursingWorker');
         modelNode.factory('psn-workItem');
+        modelNode.factory('psn-nursingShift');
         modelNode.factory('psn-district');
         modelNode.factory('psn-nursingLevel');
         modelNode.factory('psn-room');

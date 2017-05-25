@@ -1,0 +1,59 @@
+.col-xs-12
+    .row
+        .col-md-6.text-left
+            .btn-toolbar
+                .btn-group
+                    ui-select(name="nursingWorkerScheduleTemplates",theme='bootstrap', ng-Model="vm.selectedNursingWorkerScheduleTemplate" ,ng-style='{width: "180px"}')
+                        ui-select-match(placeholder='{{vm.moduleTranslatePath("PLACEHOLDER-PICK_NURSING_WORKER_SCHEDULE_TEMPLATE")|translate}}') {{$select.selected.name}}
+                        ui-select-choices(repeat='nursingWorkerScheduleTemplate in vm.selectBinding.nursingWorkerScheduleTemplates | filter: {name: $select.search}')
+                            div(ng-bind-html='nursingWorkerScheduleTemplate.name | highlight: $select.search')
+                .btn-group
+                    a.btn.btn-warning.btn-sm(ng-click="vm.importTemplate()") {{ vm.moduleTranslatePath('BTN-IMPORT-TEMPLATE') | translate}}
+                .btn-group
+                    a.btn.btn-success.btn-sm(ng-click="vm.saveAsTemplate()") {{ vm.moduleTranslatePath('BTN-SAVE-TEMPLATE') |translate}}
+                .btn-group
+                    a.btn.btn-primary.btn-sm(title="{{vm.moduleTranslatePath('BTN-PRE-WEEK')|translate}}",ng-click="vm.preWeek()")
+                        i.glyphicon.glyphicon-chevron-left
+                        | {{vm.moduleTranslatePath('BTN-PRE-WEEK')|translate}}
+                .btn-group
+                    a.btn.btn-primary.btn-sm(title="{{vm.moduleTranslatePath('BTN-NEXT-WEEK')|translate}}",ng-click="vm.nextWeek()")
+                        i.glyphicon.glyphicon-chevron-right
+                        | {{vm.moduleTranslatePath('BTN-NEXT-WEEK')|translate}}
+        .col-md-6
+            .btn-toolbar.pull-right
+                .btn-group
+                    .tree.tree-dropdown(name='nursingShifts',s-tree, s-tree-data="vm.aggrValuePromise",s-tree-height="400", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{mode:'check',layout:'dropdown',selectNodeFormat:'object'}",ng-model="vm.selectedNursingShifts")
+                .btn-group
+                    a.btn.btn-primary.btn-sm(ng-click="vm.replaceSelected()") {{'button.REPLACE'|translate}}
+                    a.btn.btn-primary.btn-sm(ng-click="vm.appendSelected()") {{'button.APPEND'|translate}}
+                .btn-group
+                    a.btn.btn-danger.btn-sm(ng-click="vm.removeSelected()") {{'button.REMOVE'|translate}}
+    .row-split
+    .panel.panel-default.panel-grid
+        table.grid.table.table-bordered.table-striped
+            thead
+                tr
+                    th.text-center(ng-click="vm.selectGrid()" width="100") {{ vm.moduleTranslatePath('LABEL-YAXIS_LABEL') | translate}}
+                    th.text-center(title="{{vm.moduleTranslatePath('TITLE-COL')|translate}}",ng-repeat="column in vm.xAxisData",width="100",ng-click="vm.selectGridCol(column._id)") {{::column.name}}
+            tbody
+                tr(ng-repeat="row in vm.yAxisData")
+                    td.text-center(title="{{vm.moduleTranslatePath('TITLE-ROW')|translate}}",ng-click="vm.selectGridRow(row._id)")
+                        | {{::row.name}}
+                    td.text-center(ng-repeat="col in vm.xAxisData",width="100", ng-class='{"grid-cell-selected": vm.cells[row._id][col._id] }',ng-click="vm.selectGridCell(row._id,col._id)" )
+                        span {{(vm.aggrData[row._id][col._id]) | safeArrayMember:'name' }}
+                tr(ng-if="vm.yAxisData.length==0")
+                    td.text-center(colspan="{{vm.xAxisData.length + 1}}") {{ 'grid.NO-RESULTS' | translate}}
+
+script(type="text/ng-template", id="nursing-worker-schedule-save-as-template.html")
+    form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="vm.doSubmit()")
+        .ngdialog-message
+            h3.mt0 {{ vm.moduleTranslatePath('DIALOG-SAVE-AS-TEMPLATE-TITLE') | translate}}
+        .ngdialog-input
+            .col-md-12.cover-nursing-schedule-template-c
+                .tree.tree-dropdown(name='nursingWorkerScheduleTemplateSelected',s-tree, s-tree-data="vm.fetchNursingWorkerScheduleTemplatesPromise",s-tree-height="400", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{layout:'dropdown',selectNodeFormat:'object'}",ng-model="vm.saveToSelected", on-select="vm.selectNuringWorkerScheduleTemplateToSave(selectedNode)")
+                .cover-nursing-schedule-template-tree
+                    input.form-control(type='text', name='name',ng-model='vm.nursingWorkerScheduleTemplateName',placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-SAVE-TO-TEMPLATE_NAME")|translate}}')
+        .ngdialog-buttons
+            .col-md-12.text-right
+                button.btn.btn-warning(type='button',ng-click="vm.cancel()") {{ "button.CANCEL" | translate}}
+                button.btn.btn-success(type='submit') {{ "button.CONFIRM" | translate}}

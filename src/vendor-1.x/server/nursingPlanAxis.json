@@ -17,17 +17,17 @@
   {
     "_id": "nursing_level_name",
     "name": "照护级别",
-    "width": "80"
+    "width": "60"
   },
   {
     "_id": "nursing_workitems_standard",
     "name": "照护项目",
-    "width": "200"
+    "width": "300"
   },
   {
     "_id": "nursing_workitems_customized",
     "name": "用药项目",
-    "width": "160"
+    "width": "130"
   },
   {
     "_id":"generate_nursing_content",

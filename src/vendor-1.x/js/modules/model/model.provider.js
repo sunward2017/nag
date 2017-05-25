@@ -816,8 +816,8 @@
                     return $http.post(baseUrl + 'q/workItem', { workItemId: workItemId });
                 }
                 
-                function workItemCopy(workItemIds,nursingLevelIds) {
-                    return $http.post(baseUrl + 'workItemCopy', { workItemIds: workItemIds,nursingLevelIds:nursingLevelIds });
+                function workItemCopy(nursingLevelIds,workItemId) {
+                    return $http.post(baseUrl + 'workItemCopy', { workItemId: workItemId,nursingLevelIds:nursingLevelIds });
                 }
 
                 function elderlysByDistrictFloors(tenantId, districtFloors) {

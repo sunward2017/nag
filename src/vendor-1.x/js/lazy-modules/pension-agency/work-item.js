@@ -32,7 +32,6 @@
                     var treeNodes = _.map(rows, function (row) { return row });
                     treeNodes.unshift({ _id: '', name: '全部' });
                     vm.trees = [new vmh.treeFactory.sTree('tree1', treeNodes, { mode: 'grid' })];
-                    console.log("vm.trees",vm.trees[0].data)
                     vm.trees[0].selectedNode = vm.trees[0].findNodeById($scope.$stateParams.nursingLevelId);
                 });
 
@@ -48,14 +47,21 @@
         }
 
         function copyWorkItems() {
+            if (!vm.selectedRows || vm.selectedRows.length == 0) {
+                vmh.alertWarning(vm.viewTranslatePath('MSG-NO-WORK-ITEM-SELECTED'), true);
+                return;
+            } else if (vm.selectedRows.length > 1) {
+                vmh.alertWarning(vm.viewTranslatePath('MSG-WOEK-ITEM-ONLYONE'), true);
+                return;
+            }
             ngDialog.open({
                 template: 'work-item-copy.html',
                 controller: 'WorkItemCopyController',
                 className: 'ngdialog-theme-default ngdialog-work-item-copy',
                 data: {
                     vmh: vmh,
-                    rows: vm.selectedRows,
-                    moduleTranslatePathRoot: vm.viewTranslatePath(),
+                    row: vm.selectedRows[0],
+                    moduleTranslatePathRoot: vm.viewTranslatePath()
                 }
             })
         }
@@ -65,20 +71,14 @@
     function WorkItemCopyController($scope, ngDialog, treeFactory) {
         var vm = $scope.vm = {};
         var vmh = $scope.ngDialogData.vmh;
-        var rows = $scope.ngDialogData.rows;
+        var row = $scope.ngDialogData.row;
+        var query = $scope.ngDialogData.query;
         vm.doSubmit = doSubmit;
         vm.moduleTranslatePath = moduleTranslatePath
         vm.cancel = cancel;
-        vm.trees = [];
         init();
         function init() {
-            vm.nursingLevelPromise = vmh.shareService.tmp('T3001/psn-nursingLevel', 'name', { "status": 1 }).then(function (rows) {
-                //    console.log(rows)
-                var treeNodes = _.map(rows, function (row) { return row });
-                treeNodes.unshift({ _id: '', name: '全部' });
-                vm.trees[0] = new vmh.treeFactory.sTree('tree1', treeNodes, { mode: 'grid' });
-                vm.trees[0].selectedNode = vm.trees[0].findNodeById($scope.$stateParams.nursingLevelId);
-            });
+            vm.nursingLevelPromise = vmh.shareService.tmp('T3001/psn-nursingLevel', 'name id', { "status": 1, "_id": { "$ne": row.nursingLevelId } })
         }
 
         var moduleTranslatePathRoot = $scope.ngDialogData.moduleTranslatePathRoot;
@@ -87,11 +87,16 @@
         };
 
         function doSubmit() {
-
+            ngDialog.close("#work-item-copy.html")
+            vmh.psnService.workItemCopy(vm.nursingLevelIds,row.id).then(function(ret){
+               if(ret.success){
+                    vmh.alertSuccess('复置成功', false);
+               }
+            })
         }
 
         function cancel() {
-
+           ngDialog.close("#work-item-copy.html")
         }
     }
 

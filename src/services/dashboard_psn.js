@@ -451,9 +451,9 @@ module.exports = {
                 }
             },
             {
-                method: 'nursingAlarmAndRecordAndWorkerAndBedMonitorAndRobot',
+                method: 'nursingStatInfo',
                 verb: 'get',
-                url: this.service_url_prefix + "/nursingAlarmAndRecordAndWorkerAndBedMonitorAndRobot/:_id",
+                url: this.service_url_prefix + "/nursingStatInfo/:_id",
                 handler: function (app, options) {
                     return function * (next) {
                         try {

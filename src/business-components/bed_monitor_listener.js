@@ -87,7 +87,7 @@ module.exports = {
             if(arr.length == 2) {
                 mac = arr[0].toUpperCase();
                 raw_values = JSON.parse(arr[1])
-            } else if(arr.length == 3) {
+            } else if(arr.length > 2) {
                 mac = arr[1].toUpperCase();
                 raw_values = JSON.parse(arr[2])
             } else {

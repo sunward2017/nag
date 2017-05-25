@@ -573,6 +573,8 @@ module.exports = {
                 var bedTime = self.ctx.moment(value.bedTime);
                 var wakeUpTime = self.ctx.moment(value.wakeUpTime);
                 var sleepTime = awakeTime.diff(fallAsleepTime, 'hours');
+                 
+                var newAweekTime = self.ctx.moment.duration(Number(awakeTime.diff(fallAsleepTime)) - Number(value.lightSleepTime) - Number(value.deepSleepTime)).asHours();
                 // var deepSleepTime = self.ctx.moment.unix(value.deepSleepTime).format('HH:MM:SS');
                 var deepSleepTime = self.ctx.moment.duration(value.deepSleepTime).asHours();
                 var lightSleepTime = self.ctx.moment.duration(value.lightSleepTime).asHours();
@@ -1529,19 +1531,29 @@ module.exports = {
                 //不满足
                 var statisticsReports = yield self.getStatisticsReportByDevId(sessionId, devId, fiveDaysAgoTime, todayTime);
                 console.log("fiveDaysAgoTime:", fiveDaysAgoTime.format('YYYY-MM-DD'));
-                var i = 1;
+                var i = 1,cont =0;
                 var new_statisticsReports = [];
+                var local_statisticsReports = statisticsReports;
                 //远程不足五条
                 if (statisticsReports == "no_day_report" || statisticsReports == "unknown_device" || statisticsReports == "err_date_invalid" || statisticsReports == "err_day_params" || statisticsReports == "bad param" || statisticsReports == "0x8005") {
-                    self.ctx.wrapper.res.error({ message: 'get statistics reports fail' });
+                    return self.ctx.wrapper.res.error({ message: 'get statistics reports fail' });
                 } else {
                     while (statisticsReports.length < 5) {
-
+                        cont++;
                         fiveDaysAgoTime = self.ctx.moment(fiveDaysAgoTime).subtract(5 * i - 1, 'days');
+                        console.log("fiveDaysAgoTime:", fiveDaysAgoTime.format('YYYY-MM-DD'));
                         i = i * 10;
+                        if(cont>5){
+                            break;
+                        }
                         statisticsReports = yield self.getStatisticsReportByDevId(sessionId, devId, fiveDaysAgoTime, todayTime);
-                    }
-
+                 }
+               i=1;
+               cont=0;
+               if (statisticsReports == "no_day_report" || statisticsReports == "unknown_device" || statisticsReports == "err_date_invalid" || statisticsReports == "err_day_params" || statisticsReports == "bad param" || statisticsReports == "0x8005") {
+                    return self.ctx.wrapper.res.error({ message: 'get statistics reports fail' });
+                 } 
+                     console.log("检查问题:",statisticsReports);
                     statisticsReports = statisticsReports.splice(-5);
                     console.log("后五条数据", statisticsReports);
                     for (var i = 0, len = statisticsReports.length; i < len; i++) {

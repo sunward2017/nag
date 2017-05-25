@@ -10,6 +10,7 @@
         .module('subsystem.pension-agency')
         .controller('WorkItemGridController', WorkItemGridController)
         .controller('WorkItemDetailsController', WorkItemDetailsController)
+        .controller('WorkItemCopyController', WorkItemCopyController)
         ;
 
 
@@ -19,6 +20,7 @@
 
         $scope.vm = vm;
         $scope.utils = vmh.utils.g;
+        vm.copyWorkItems = copyWorkItems;
 
         init();
 
@@ -30,6 +32,7 @@
                     var treeNodes = _.map(rows, function (row) { return row });
                     treeNodes.unshift({ _id: '', name: '全部' });
                     vm.trees = [new vmh.treeFactory.sTree('tree1', treeNodes, { mode: 'grid' })];
+                    console.log("vm.trees",vm.trees[0].data)
                     vm.trees[0].selectedNode = vm.trees[0].findNodeById($scope.$stateParams.nursingLevelId);
                 });
 
@@ -42,6 +45,53 @@
             }
 
             vm.query();
+        }
+
+        function copyWorkItems() {
+            ngDialog.open({
+                template: 'work-item-copy.html',
+                controller: 'WorkItemCopyController',
+                className: 'ngdialog-theme-default ngdialog-work-item-copy',
+                data: {
+                    vmh: vmh,
+                    rows: vm.selectedRows,
+                    moduleTranslatePathRoot: vm.viewTranslatePath(),
+                }
+            })
+        }
+    }
+
+    WorkItemCopyController.$inject = ['$scope', 'ngDialog', 'treeFactory'];
+    function WorkItemCopyController($scope, ngDialog, treeFactory) {
+        var vm = $scope.vm = {};
+        var vmh = $scope.ngDialogData.vmh;
+        var rows = $scope.ngDialogData.rows;
+        vm.doSubmit = doSubmit;
+        vm.moduleTranslatePath = moduleTranslatePath
+        vm.cancel = cancel;
+        vm.trees = [];
+        init();
+        function init() {
+            vm.nursingLevelPromise = vmh.shareService.tmp('T3001/psn-nursingLevel', 'name', { "status": 1 }).then(function (rows) {
+                //    console.log(rows)
+                var treeNodes = _.map(rows, function (row) { return row });
+                treeNodes.unshift({ _id: '', name: '全部' });
+                vm.trees[0] = new vmh.treeFactory.sTree('tree1', treeNodes, { mode: 'grid' });
+                vm.trees[0].selectedNode = vm.trees[0].findNodeById($scope.$stateParams.nursingLevelId);
+            });
+        }
+
+        var moduleTranslatePathRoot = $scope.ngDialogData.moduleTranslatePathRoot;
+        function moduleTranslatePath(key) {
+            return moduleTranslatePathRoot + '.' + key;
+        };
+
+        function doSubmit() {
+
+        }
+
+        function cancel() {
+
         }
     }
 

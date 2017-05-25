@@ -4555,6 +4555,43 @@ module.exports = {
                     };
                 }
             }, {
+                method: 'workItemCopy',
+                verb: 'post',
+                url: this.service_url_prefix + "/workItemCopy",
+                handler: function (app, options) {
+                    return function* (next) {
+                        try {
+                            var nursingLevelIds = this.request.body.nursingLevelIds;
+                            var workItemIds = this.request.body.workItemIds;
+
+                            var rows = yield app.modelFactory().model_query(app.models['psn_workItem'],{whrere:{
+                                id: { '$in': workItemIds } 
+                            }});
+                            if (!rows) {
+                                this.body = app.wrapper.res.error({ message: '无法找到工作项目!' });
+                                yield next;
+                                return;
+                            }else{
+                                var workItems=[];
+                                for(var i=0,len=nursingLevelIds.length;i<len;i++){
+                                    for(var j=0,l=rows.length;j<l;j++){
+                                        rows[j].nursingLevelId = nursingLevelIds[i];
+                                        workItems.push(rows[j])
+                                    }
+                                }
+                                console.log("copyWorkItems",worItems);
+                                yield app.modelFactory().model_bulkInsert(app.models['psn_workItem'],{rows:workItems,removeWhere:{id: { '$in': workItemIds}}});
+                            }
+                            this.body = app.wrapper.res.rows(rows);
+                        } catch (e) {
+                            console.log(e);
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            }, {
                 method: 'nursingPlanSaveNursingItem',
                 verb: 'post',
                 url: this.service_url_prefix + "/nursingPlanSaveNursingItem", //为老人保存一条照护类目

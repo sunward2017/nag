@@ -679,7 +679,9 @@
     },
     "work-item": {
       "list": {
-        "TITLE": "养老机构-基础设置-工作项目-列表"
+        "TITLE": "养老机构-基础设置-工作项目-列表",
+        "LABEL-COPY": "复制...",
+        "DLG-WORK-ITEM-TITLE": "护理等级选择"
       },
       "details": {
         "TITLE": "养老机构-基础设置-工作项目-详情",

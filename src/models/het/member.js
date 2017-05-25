@@ -25,6 +25,7 @@ module.exports = function(ctx,name) {
             bindingBedMonitors:[{type: mongoose.Schema.Types.ObjectId, ref: 'pub_bedMonitor'}],
             sync_flag_hzfanweng: {type: Boolean, default: false},//is success
             session_id_hzfanweng:{type:String},
+            phone: {type: String, maxlength: 20, unique: true, index: true},
             tenantId: {type: mongoose.Schema.Types.ObjectId}
         });
 

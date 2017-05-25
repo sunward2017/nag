@@ -63,13 +63,13 @@
                             //-         label
                             //-             input(id="{{row.trackedKey + '$alldrug'}}",type='checkbox',ng-disabled="!vm.$editings[row.trackedKey]['drugUseItems']", ng-checked="vm.$selectAll[row.trackedKey]['drugUseItems']" ng-click="vm.alldrugUseItemChecked(row.trackedKey)")
                             //-             span.fa.fa-check
-                                label(for="{{row.trackedKey + '$alldrug'}}",) {{vm.moduleTranslatePath('ALL-SELECTED') | translate}}
+                            //-     label(for="{{row.trackedKey + '$alldrug'}}",) {{vm.moduleTranslatePath('ALL-SELECTED') | translate}}
                             //- .split
                             
                             .btn-group.drug-use-item(ng-if="vm.aggrData[row.trackedKey]['elderly']['id']", ng-repeat="drugUseItem in vm.drugUseItemMap[vm.aggrData[row.trackedKey]['elderly']['id']]")
                                 .checkbox.c-checkbox
                                     label
-                                        input(id="{{row.trackedKey + '$' +drugUseItem.id}}",type='checkbox', ng-disabled="!vm.$editings[row.trackedKey]['drugUseItems']", ng-model="vm.work_items['A0003'][row.trackedKey + '$' + vm.aggrData[row.trackedKey]['elderly']['id']][drugUseItem.id]" ng-change="vm.drugUseItemChecked(row.trackedKey,drugUseItem.id)")
+                                        input(id="{{row.trackedKey + '$' +drugUseItem.id}}",type='checkbox', ng-disabled="vm.$editings[row.trackedKey]['drugUseItems']", ng-model="vm.work_items['A0003'][row.trackedKey + '$' + vm.aggrData[row.trackedKey]['elderly']['id']][drugUseItem.id]" ng-change="vm.drugUseItemChecked(row.trackedKey,drugUseItem.id)")
                                         span.fa.fa-check 
                                 label {{ drugUseItem.name }}
                         td.text-center 
@@ -78,7 +78,7 @@
                                     i.glyphicon.glyphicon-list
                                     span.ml-sm {{ vm.moduleTranslatePath('BTN-GEN-NURSING-CONTENT') | translate}}
                         //- td.text-center
-                        //-     div(ng-if="vm.aggrData[row.trackedKey]['elderly']['id']")
+                            div(ng-if="vm.aggrData[row.trackedKey]['elderly']['id']")
                         //-         span(ng-if="!vm.$editings[row.trackedKey]['remark'] && vm.aggrData[row.trackedKey]['nursing_plan']['remark']") {{vm.aggrData[row.trackedKey]['nursing_plan']['remark']}}
                         //-         a.btn.btn-primary.btn-sm(ng-if="!vm.$editings[row.trackedKey]['remark'] && !vm.aggrData[row.trackedKey]['nursing_plan']['remark']" ng-click="vm.addNursingPlanRemark(row.trackedKey)") {{ vm.moduleTranslatePath('BTN-SET-NURSING-PLAN-REMARK') | translate}}
                         //-         .btn-group(ng-if="!vm.$editings[row.trackedKey]['remark'] && vm.aggrData[row.trackedKey]['nursing_plan']['remark']")

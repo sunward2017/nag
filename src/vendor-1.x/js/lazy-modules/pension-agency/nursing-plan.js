@@ -133,7 +133,7 @@
             vmh.psnService.nursingPlansByRoom(vm.tenantId, ['name', 'sex', 'nursingLevelId', 'nursing_assessment_grade'], ['elderlyId', 'work_items', 'remark']).then(function (data) {
                 vm.aggrData = data;
                 // tarnckedKey room + bed ;
-                // console.log("data", data)
+                console.log("data", data)
                 for (var trackedKey in vm.aggrData) {
                     vm.$editings[trackedKey] = {};
                     vm.$selectAll[trackedKey] = {};

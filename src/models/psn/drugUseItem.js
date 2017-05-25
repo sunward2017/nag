@@ -25,6 +25,7 @@ module.exports = function(ctx,name) {
             elderly_name: {type: String},
             drugId:{type: mongoose.Schema.Types.ObjectId,required: true,ref:'psn_drugDirectory'},//关联药品
             drug_no:{type: String,},// 药品编码
+            barcode:{type: String,},// 药品编码
             name:{type: String},
             description:{type: String},
             duration: {type: Number, default: 0}, // 完成时长 单为分

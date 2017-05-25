@@ -170,7 +170,7 @@
                             if (work_items) {
                                 for (var i = 0, len = work_items.length; i < len; i++) {
                                     if (work_items[i].type == 'A0003') {
-                                        vm.work_items['A0003'][drugUseItemkey][work_items[i].workItemId] = true;
+                                        vm.work_items['A0003'][drugUseItemkey][work_items[i].drugUseItemId] = true;
                                     }
                                 }
                             }

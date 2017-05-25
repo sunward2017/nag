@@ -545,7 +545,7 @@ module.exports = {
             },
             /******************数据管理*********************************/
             {
-                method: 'importDrug',//管理中心将复制一条客户端升级记录，并增加一位版本号
+                method: 'importDrug',//将药品的excel文件导入到公共药品库中
                 verb: 'post',
                 url: this.service_url_prefix + "/importDrug",
                 handler: function (app, options) {
@@ -647,7 +647,73 @@ module.exports = {
                         yield next;
                     };
                 }
+            },
+            {
+                method: 'syncDrugToTenants',//选中的药品同步到指定的机构
+                verb: 'post',
+                url: this.service_url_prefix + "/syncDrugToTenants",
+                handler: function (app, options) {
+                    return function *(next) {
+                        try {
+                            var tenantIds = this.request.body.tenantIds;
+                            var drugIds = this.request.body.drugIds;
+                            if(tenantIds.length == 0) {
+                                this.body = app.wrapper.res.error({ message: '必须选择至少一家养老机构!' });
+                                yield next;
+                                return;
+                            }
+                            if(drugIds.length == 0) {
+                                this.body = app.wrapper.res.error({ message: '必须选择至少一条药品记录!' });
+                                yield next;
+                                return;
+                            }
+                            
+                            // 只同步有条形码的药
+                            var drugsToSync = yield app.modelFactory().model_query(app.models['pub_drug'], {
+                                select: 'barcode img name vender dosage_form specification usage indications_function special_individuals otc_flag medical_insurance_flag reference_price',
+                                where:{
+                                    status: 1,
+                                    barcode:{$exists: true},
+                                    _id: {$in: drugIds}
+                                }
+                            });
+
+                            // 查询指定租户下某条码的药品是否存在
+                            var saveRows = [], drug, tenantId;
+                            for (var i = 0, len = drugsToSync.length; i < len; i++) {
+                                // console.log('arrChunked:',s,arrChunked[s]);
+                                drug = drugsToSync[i].toObject();
+                                for(var j=0, jLen = tenantIds.length;j<jLen;j++) {
+                                    tenantId = tenantIds[j];
+                                    if ((yield app.modelFactory().model_totals(app.models['psn_drugDirectory'], {tenantId: tenantId, status: 1, barcode: drug.barcode})).length == 0) {
+                                        drug.full_name = drug.name;
+                                        drug.health_care_flag = drug.medical_insurance_flag;
+                                        drug.price = drug.reference_price;
+                                        drug.tenantId = tenantId;
+                                        saveRows.push(drug);
+                                    } else {
+                                        console.log('exist drug:', drug.name);
+                                    }
+                                }
+                            }
+
+                            if (saveRows.length > 0) {
+                                yield app.modelFactory().model_bulkInsert(app.models['psn_drugDirectory'], {
+                                    rows: saveRows
+                                });
+                            }
+
+                            this.body = app.wrapper.res.default();
+                        } catch (e) {
+                            console.log(e);
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
             }
+
         ];
 
         return this;

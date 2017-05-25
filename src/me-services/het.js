@@ -324,11 +324,13 @@
                      return function *(next) {
                          try {
                              console.log("body:");
-                             console.log(this.request.body)
+                             console.log(this.request.body);
+                             console.log(this.request.body.endTime);
+                             console.log(this.request.body.startTime);
                             //console.log("test:",this.openid);
                              var deviceId = 'A1200006';
                               var tenantId = '58f5e9add2b7261ba8af97b8';
-                             var ret = yield app.bed_monitor_app.getWeekDatas(this.openid,this.request.body.info);
+                             var ret = yield app.bed_monitor_app.getWeekDatas(this.openid,this.request.body.info,this.request.body.endTime,this.request.body.startTime);
                              console.log("test recall:", ret);
                              this.body = ret;
                          } catch (e) {

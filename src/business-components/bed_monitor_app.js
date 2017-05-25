@@ -18,7 +18,7 @@ module.exports = {
         this.CACHE_MODULE = 'N-BED-M-P-';
         this.CACHE_ITEM_SESSION = 'SESSIONID';
         this.logger = require('log4js').getLogger(this.log_name);
-       
+
         if (!this.logger) {
             console.error('logger not loaded in ' + this.file);
         }
@@ -89,8 +89,8 @@ module.exports = {
         var self = this;
         return co(function* () {
             try {
-                console.log("openid:", memberInfo.openid);
-                var psd = self.ctx.crypto.createHash('md5').update('123456').digest('hex');              
+                console.log("openid:", self.openid);
+                var psd = self.ctx.crypto.createHash('md5').update('123456').digest('hex');
                 var ret = yield rp({
                     method: 'POST',
                     url: externalSystemConfig.bed_monitor_status.api_url + '/ECSServer/userws/userRegister.json',
@@ -103,21 +103,21 @@ module.exports = {
                     // form: {userName:'testt',encryptedName:'testt',encryptedPwd:psd,userType:"zjwsy"}
                 });
                 ret = JSON.parse(ret);
-                 console.log(" sync regist success",ret);
+                console.log(" sync regist success", ret);
                 if (ret.retCode == 'success') {
                     console.log(" sync regist success");
                     var member = yield self.ctx.modelFactory().model_create(self.ctx.models['het_member'], {
-                            open_id: memberInfo.openid,
-                            name: memberInfo.nickName,
-                            union_id:memberInfo.unionid,
-                            phone:memberInfo.phone,
-                            passhash: psd,
-                            head_portrait: memberInfo.avatarUrl,
-                            tenantId: memberInfo.tenantId,
-                            sync_flag_hzfanweng : true,
-                });
-                    return self.ctx.wrapper.res.ret({message:'注册成功'});
-                }else if(ret.retValue == '0x8001'){
+                        open_id: memberInfo.openid,
+                        name: memberInfo.nickName,
+                        union_id: memberInfo.unionid,
+                        phone: memberInfo.phone,
+                        passhash: psd,
+                        head_portrait: memberInfo.avatarUrl,
+                        tenantId: memberInfo.tenantId,
+                        sync_flag_hzfanweng: true,
+                    });
+                    return self.ctx.wrapper.res.ret({ message: '注册成功' });
+                } else if (ret.retValue == '0x8001') {
                     return self.ctx.wrapper.res.error({ message: '用户已经注册' })
                 }
                 return self.ctx.wrapper.res.error({ message: '注册失败' })
@@ -129,6 +129,63 @@ module.exports = {
             }
         }).catch(self.ctx.coOnError);
 
+    },
+    login: function () {//uniqueId
+        var self = this;
+        return co(function* () {
+            try {
+                console.log(getToken);
+                var ret = yield rp({
+                    url: externalSystemConfig.bed_monitor_status.api_url + '/ECSServer/userws/getToken.json?uniqueId=' + uniqueId,
+                    json: true
+                });
+                console.log(ret);
+                console.log(ret.retCode);
+                if (ret.retCode == 'success') {
+                    var ret = yield rp({
+                        method: 'POST',
+                        url: externalSystemConfig.bed_monitor_status.api_url + '/ECSServer/userws/userAuthenticate.json',
+                        form: {
+                            token: token,
+                            userName: member.name,
+                            encryptedName: member.name,
+                            encryptedPwd: member.passhash,
+                            userType: "zjwsy"
+                        }
+                    });
+                    ret = JSON.parse(ret);
+                    if (ret.retCode == 'success') {//成功返回session
+                        self.logger.info('setSession:', member.open_id, ret.retValue);
+                        var key = self.CACHE_MODULE + self.CACHE_ITEM_SESSION + '@' + member.open_id;
+                        self.ctx.cache.put(key, ret.retValue.sessionId);
+                        return self.ctx.wrapper.res.ret(ret.retValue.sessionId);
+                    } else {
+                        if (ret.retValue == '1') {//用户不存在 重新注册
+                            var memberInfo = {
+                                nickName: member.name
+                            }
+                            var regist_status = yield self._registByQinKeShi(member);
+                            console.log(regist_status);
+                            if (regist_status.ret.registStatus == 'success') {//成功 重新登陆
+                                if (authenticateTryTimes === 0) {
+                                    return self.ctx.wrapper.res.error({ message: 'regist fail again' });
+                                } else {
+                                    return self._userAuthenticate(member, token, 0);
+                                }
+                            } else {//失败 返回
+                                return self.ctx.wrapper.res.error({ message: 'regist fail' });
+                            }
+                        }
+
+                    }
+                }
+                return ret.retValue;
+            }
+            catch (e) {
+                console.log(e);
+                self.logger.error(e.message);
+            }
+        }).catch(self.ctx.coOnError);
     },
     _getToken: function (uniqueId) {//亲可视token获取
         var self = this;
@@ -175,7 +232,7 @@ module.exports = {
                 } else {
                     if (ret.retValue == '1') {//用户不存在 重新注册
                         var memberInfo = {
-                            nickName:member.name
+                            nickName: member.name
                         }
                         var regist_status = yield self._registByQinKeShi(member);
                         console.log(regist_status);
@@ -201,13 +258,13 @@ module.exports = {
 
     },
 
-    _getSleepBriefReport: function (sessionId, devId, tenantId,endTime,startTime) {//报表
+    _getSleepBriefReport: function (sessionId, devId, tenantId, endTime, startTime) {//报表
         var self = this;
         return co(function* () {
             try {
                 // var endTime = self.ctx.moment(self.ctx.moment().format('YYYY-MM-DD 12:00:00'));
                 // var startTime = self.ctx.moment(endTime).subtract(1, 'days');
-               // var ti = self.ctx.moment(startTime.format('YYYY-MM-DD  HH:MM:SS'));
+                // var ti = self.ctx.moment(startTime.format('YYYY-MM-DD  HH:MM:SS'));
                 var dateReport;
                 var ret = yield rp({
                     method: 'POST',
@@ -361,12 +418,12 @@ module.exports = {
                     if (member.session_id_hzfanweng) {
                         self.ctx.cache.put(key, member.session_id_hzfanweng);
                         sessionId = member.session_id_hzfanweng;
-                    }else{
-                       return self.ctx.wrapper.res.error({ message: '用户不存在' })
-                    } 
+                    } else {
+                        return self.ctx.wrapper.res.error({ message: '用户不存在' })
+                    }
                 }
 
-                 var effectiveValue = yield rp({//是否过期
+                var effectiveValue = yield rp({//是否过期
                     method: 'POST',
                     url: externalSystemConfig.bed_monitor_status.api_url + '/ECSServer/userws/sessionIsExpired.json',
                     form: { sessionId: sessionId },
@@ -374,25 +431,25 @@ module.exports = {
                 effectiveValue = JSON.parse(effectiveValue);
                 if (effectiveValue.retCode == "success") {
                     if (effectiveValue.retValue == "0x0021") {
-                       return self.ctx.wrapper.res.ret(sessionId);
+                        return self.ctx.wrapper.res.ret(sessionId);
                     }
-                }else{
+                } else {
                     var member = yield self.ctx.modelFactory().model_one(self.ctx.models['het_member'], {
                         where: {
                             open_id: openid,
                             status: 1
                         }
                     });
-                     console.log('member:',member);
+                    console.log('member:', member);
                     if (member) {
-                        console.log('sssss:',ret);
+                        console.log('sssss:', ret);
                         var token = yield self.getToken(member.open_id);
                         var ret = yield self._userAuthenticate(member, token);
-                        console.log('sssss:',ret);
-                            return ret
+                        console.log('sssss:', ret);
+                        return ret
                     }
                     return self.ctx.wrapper.res.error({ message: '用户不存在' })
-                }                 
+                }
             }
             catch (e) {
                 console.log(e);
@@ -402,23 +459,23 @@ module.exports = {
 
         }).catch(self.ctx.coOnError);
     },
-    getWeekDatas:function(openid,info){
-          var self = this;
+    getWeekDatas: function (openid, info) {
+        var self = this;
         return co(function* () {
             try {
-                if(info.times == 0){
-                    var isThisweek =true;
+                if (info.times == 0) {
+                    var isThisweek = true;
                 }
                 var sessionIdRet = yield self._ensuresessionIdIsEffective(openid);
-                if(!sessionIdRet.success){
+                if (!sessionIdRet.success) {
                     return sessionIdRet
                 }
                 sessionId = sessionIdRet.ret
-                console.log("data from wx:",sessionId);
+                console.log("data from wx:", sessionId);
                 var week = self.ctx.moment().format('dddd');
                 var day = self.ctx.moment().day();
-                var sunday =self.ctx.moment().day(info.times)
-                console.log("data sunday wx:",sunday.format('YYYY-MM-DD'));
+                var sunday = self.ctx.moment().day(info.times)
+                console.log("data sunday wx:", sunday.format('YYYY-MM-DD'));
                 var device = yield self.ctx.modelFactory().model_one(self.ctx.models['pub_bedMonitor'], {
                     where: {
                         status: 1,
@@ -445,18 +502,18 @@ module.exports = {
                 });
                 //判断关心时间与最后时间是否一致，以关心时间为首要条件
                 if (sunday.isSame(self.ctx.moment(memberCarePerson.check_in_time), 'day')) {
-                     sunday = sunday;
+                    sunday = sunday;
                 } else if (sunday.isAfter(self.ctx.moment(memberCarePerson.check_in_time), 'day')) {
-                     sunday = sunday;
+                    sunday = sunday;
                 } else {
-                     sunday = self.ctx.moment(memberCarePerson.check_in_time);
-                     var isBindingTime = true;
+                    sunday = self.ctx.moment(memberCarePerson.check_in_time);
+                    var isBindingTime = true;
                 }
-                 var reports = yield self.ctx.modelFactory().model_query(self.ctx.models['dwh_sleepDateReportOfHZFanWeng'], {
+                var reports = yield self.ctx.modelFactory().model_query(self.ctx.models['dwh_sleepDateReportOfHZFanWeng'], {
                     where: {
                         status: 1,
                         date_end: {
-                         $gte: self.ctx.moment(self.ctx.moment(sunday).format('YYYY-MM-DD')),
+                            $gte: self.ctx.moment(self.ctx.moment(sunday).format('YYYY-MM-DD')),
                             $lt: self.ctx.moment(sunday).add(6, 'day').format('YYYY-MM-DD')
                         },
                         devId: info.deviceName,
@@ -464,63 +521,71 @@ module.exports = {
                     },
                     sort: { date_end: 1 }
                 });
-                var aweekTimes=[],lightSleepTimes=[],deepSleepTimes=[],maxHearts=[],minHearts=[];
-                var  maxHeart,minHeart,aweekTime,lightSleepTime,deepSleepTime,startTime,endTime,dataTime;
+                var aweekTimes = [], lightSleepTimes = [], deepSleepTimes = [], maxHearts = [], minHearts = [];
+                var maxHeart, minHeart, aweekTime, lightSleepTime, deepSleepTime, startTime, endTime, dataTime;
                 //数据封装 库中有的话直接封装，没有则去第三方取回封装并插入数据库
-                for(var j = 0;j<7;j++){
-                    for(var i=0,len=reports.length;i<len;i++){
+                for (var j = 0; j < 7; j++) {
+                    for (var i = 0, len = reports.length; i < len; i++) {
                         var report = reports[i];
-                        if(self.ctx.moment(report.date_end).day()==j){
-                           var fallasleep_time = self.ctx.moment(report.fallasleep_time);
-                           var awake_time = self.ctx.moment(report.awake_time);
-                           aweekTime =awake_time.diff(fallasleep_time);
-                           lightSleepTime = self.ctx.moment.duration(report.light_sleep_duraion).asHours();
-                           deepSleepTime = self.ctx.moment.duration(report.deep_sleep_duraion).asHours();
-                           aweekTimes[j] = self.ctx.moment.duration(Number(aweekTime)-Number(report.light_sleep_duraion)-Number(report.deep_sleep_duraion)).asHours().toFixed(2);
-                           lightSleepTimes[j] = lightSleepTime.toFixed(1);
-                           deepSleepTimes[j] = deepSleepTime.toFixed(1);
-                           maxHearts[j] = report.max_heart_rate;
-                           minHearts[j] = report.min_heart_rate;
+                        if (self.ctx.moment(report.date_end).day() == j) {
+                            var fallasleep_time = self.ctx.moment(report.fallasleep_time);
+                            var awake_time = self.ctx.moment(report.awake_time);
+                            aweekTime = awake_time.diff(fallasleep_time);
+                            lightSleepTime = self.ctx.moment.duration(report.light_sleep_duraion).asHours();
+                            deepSleepTime = self.ctx.moment.duration(report.deep_sleep_duraion).asHours();
+                            var newAweekTime = self.ctx.moment.duration(Number(aweekTime) - Number(report.light_sleep_duraion) - Number(report.deep_sleep_duraion)).asHours().toFixed(1);
+                            if (newAweekTime < 0.1) {
+                                newAweekTime = null;
+                            }
+                            aweekTimes[j] = newAweekTime
+                            lightSleepTimes[j] = lightSleepTime.toFixed(1) < 0.1 ? null : lightSleepTime.toFixed(1);
+                            deepSleepTimes[j] = deepSleepTime.toFixed(1) <0.1 ? null : deepSleepTime.toFixed(1);
+                            maxHearts[j] = report.max_heart_rate;
+                            minHearts[j] = report.min_heart_rate;
                         }
                     }
-                    if(!aweekTimes[j]&&!lightSleepTimes[j]&&!deepSleepTimes[j]&&!maxHearts[j]&&!minHearts[j]){
-                           var endTime = self.ctx.moment(self.ctx.moment().day(j).format('YYYY-MM-DD 12:00:00'));
-                           var startTime = self.ctx.moment(self.ctx.moment().day(j-1).format('YYYY-MM-DD 12:00:00'));
-                            var dateReport = yield self._getSleepBriefReport(sessionId,info.deviceName,info.tenantId,endTime,startTime);
-                           if(dateReport.lastEventOccTime ==0){
-                                aweekTimes[j] = null;
-                                lightSleepTimes[j] = null;
-                                deepSleepTimes[j] = null;
-                                maxHearts[j] = null;
-                                minHearts[j] = null;
-                           }else{
-                                yield self._setDateReport(info.deviceName, info.tenantId, dateReport,endTime,startTime);
-                                var fallasleep_time = self.ctx.moment(dateReport.fallAsleepTime);
-                                var awake_time = self.ctx.moment(dateReport.awakeTime);
-                                aweekTime =  awake_time.diff(fallasleep_time);
-                                lightSleepTime = self.ctx.moment.duration(dateReport.lightSleepTime).asHours();
-                                deepSleepTime = self.ctx.moment.duration(dateReport.deepSleepTime).asHours();
-                                aweekTimes[j] = self.ctx.moment.duration(Number(aweekTime)-Number(dateReport.lightSleepTime)-Number(dateReport.deepSleepTime)).asHours().toFixed(2);;
-                                lightSleepTimes[j] =  lightSleepTime.toFixed(1);
-                                deepSleepTimes[j] = deepSleepTime.toFixed(1);
-                                maxHearts[j] = dateReport.maxHeartRate;
-                                minHearts[j] = dateReport.minHeartRate;
-                           }
+                    if (!aweekTimes[j] && !lightSleepTimes[j] && !deepSleepTimes[j] && !maxHearts[j] && !minHearts[j]) {
+                        var endTime = self.ctx.moment(self.ctx.moment().day(j).format('YYYY-MM-DD 12:00:00'));
+                        var startTime = self.ctx.moment(self.ctx.moment().day(j - 1).format('YYYY-MM-DD 12:00:00'));
+                        var dateReport = yield self._getSleepBriefReport(sessionId, info.deviceName, info.tenantId, endTime, startTime);
+                        if (dateReport.lastEventOccTime == 0) {
+                            aweekTimes[j] = null;
+                            lightSleepTimes[j] = null;
+                            deepSleepTimes[j] = null;
+                            maxHearts[j] = null;
+                            minHearts[j] = null;
+                        } else {
+                            yield self._setDateReport(info.deviceName, info.tenantId, dateReport, endTime, startTime);
+                            var fallasleep_time = self.ctx.moment(dateReport.fallAsleepTime);
+                            var awake_time = self.ctx.moment(dateReport.awakeTime);
+                            aweekTime = awake_time.diff(fallasleep_time);
+                            lightSleepTime = self.ctx.moment.duration(dateReport.lightSleepTime).asHours();
+                            deepSleepTime = self.ctx.moment.duration(dateReport.deepSleepTime).asHours();
+                            var newAweekTime = self.ctx.moment.duration(Number(aweekTime) - Number(report.lightSleepTime) - Number(report.deepSleepTime)).asHours().toFixed(1);
+                            if (newAweekTime < 0.1) {
+                                newAweekTime = null;
+                            }
+                            aweekTimes[j] = newAweekTime;
+                            lightSleepTimes[j] =lightSleepTime.toFixed(1) < 0.1 ? null : lightSleepTime.toFixed(1);
+                            deepSleepTimes[j] =deepSleepTime.toFixed(1) <0.1 ? null : deepSleepTime.toFixed(1);
+                            maxHearts[j] = dateReport.maxHeartRate;
+                            minHearts[j] = dateReport.minHeartRate;
+                        }
                     }
                 }
 
                 var weekdays = {
-                    aweekTimes:aweekTimes,
-                    lightSleepTimes:lightSleepTimes,
-                    deepSleepTimes:deepSleepTimes,
-                    maxHearts:maxHearts,
-                    minHearts:minHearts,
-                    dateTime:{
-                        sunday:sunday.format('MM-DD'),
-                        saturday:self.ctx.moment(sunday).add(6, 'day').format('MM-DD')
+                    aweekTimes: aweekTimes,
+                    lightSleepTimes: lightSleepTimes,
+                    deepSleepTimes: deepSleepTimes,
+                    maxHearts: maxHearts,
+                    minHearts: minHearts,
+                    dateTime: {
+                        sunday: sunday.format('MM-DD'),
+                        saturday: self.ctx.moment(sunday).add(6, 'day').format('MM-DD')
                     },
-                    isBindingTime:isBindingTime,
-                    isThisweek:isThisweek
+                    isBindingTime: isBindingTime,
+                    isThisweek: isThisweek
                 }
                 return self.ctx.wrapper.res.ret(weekdays);;
             }
@@ -532,7 +597,7 @@ module.exports = {
 
         }).catch(self.ctx.coOnError);
     },
-    _setDateReport: function (devId, tenantId, dateReport,endTime,startTime) {
+    _setDateReport: function (devId, tenantId, dateReport, endTime, startTime) {
         var self = this;
         return co(function* () {
             try {
@@ -545,11 +610,11 @@ module.exports = {
                         status: 1,
                         date_begin: {
                             $gte: self.ctx.moment(startTime.format('YYYY-MM-DD')),
-                            $lt: self.ctx.moment(startTime.add(1, 'day').format('YYYY-MM-DD'))
+                            $lt: self.ctx.moment(self.ctx.moment(startTime).add(1, 'day').format('YYYY-MM-DD'))
                         },
                         date_end: {
                             $gte: self.ctx.moment(endTime.format('YYYY-MM-DD')),
-                            $lt: self.ctx.moment(endTime.add(1, 'day').format('YYYY-MM-DD'))
+                            $lt: self.ctx.moment(self.ctx.moment(endTime).add(1, 'day').format('YYYY-MM-DD'))
                         },
                         devId: devId,
                         tenantId: tenantId
@@ -598,8 +663,8 @@ module.exports = {
                 yield self.ctx.modelFactory().model_create(self.ctx.models['dwh_sleepDateReportOfHZFanWeng'], {
                     status: 1,
                     devId: devId,
-                    date_begin: self.ctx.moment(self.ctx.moment().format('YYYY-MM-DD 12:00:00')).subtract(1, 'days'),
-                    date_end: self.ctx.moment(self.ctx.moment().format('YYYY-MM-DD 12:00:00')),
+                    date_begin: self.ctx.moment(self.ctx.moment(startTime).format('YYYY-MM-DD 12:00:00')),
+                    date_end: self.ctx.moment(self.ctx.moment(endTime).format('YYYY-MM-DD 12:00:00')),
                     bed_time: bedTime,
                     wakeup_time: wakeUpTime,
                     fallasleep_time: fallAsleepTime,

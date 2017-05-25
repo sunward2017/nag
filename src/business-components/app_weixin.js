@@ -257,7 +257,7 @@ module.exports = {
                     url: 'https://api.weixin.qq.com/sns/jscode2session?appid=' + config.appid + '&secret=' + config.secret + '&js_code=' + code + '&grant_type=authorization_code',
                     json: true
                 });
-                console.log(ret);
+                console.log("123:",ret);
                 var new_gen_session_key;
                 if (ret.session_key) {
                     new_gen_session_key  = require('child_process').execSync('head -n 80 /dev/urandom | tr -dc A-Za-z0-9 | head -c 168').toString();

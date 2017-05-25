@@ -30,13 +30,11 @@
                          try {
                              var member = yield app.bed_monitor_status.regist(this.openid, this.request.body.userInfo, this.request.body.tenantId);
                              console.log("regist reback");		
-				    console.log("this.openid:",this.openid);	
+				    console.log("member:",member);	
                              if (member) {
                                  console.log("getToken");
                                  var token = yield app.bed_monitor_status.getToken(member.open_id);
                                  var ret = yield app.bed_monitor_status.userAuthenticate(member, token);
-                                //  var session_id = yield app.bed_monitor_status.getSession(member.open_id)
-                                //  console.log(session_id);
                                  this.body = app.wrapper.res.default();
                              }
                          } catch (e) {
@@ -171,7 +169,7 @@
              {
                  method: 'sleepDevicews$test',
                  verb: 'get',
-                 url: this.service_url_prefix + "/sleepDevicews$test",
+                 url: this.service_url_prefix + "/sleepDevicews/test",
                  handler: function (app, options) {
                      return function *(next) {
                          try {
@@ -184,7 +182,10 @@
                                  deviceMac:'A0E6F8855129F',
                                  cpNewName:'HCL',
                                  sex:'女',
-                                 cpNewAge:'59'
+                                 cpNewAge:'59',
+                                 tenantId:'58f5e9add2b7261ba8af97b8',
+                                 //openid :'oYoT70Fw1BPC-oTUI7-Q-NiHKOq8'
+                                 openid :'oYoT70Fw1BPC-oTUI7-Q-123456'
                              }
                              var deviceInfo={
                                  devId:'A1100065',
@@ -206,9 +207,10 @@
                              }
 					
                              var token='47843085';
-                             var ret = yield app.bed_monitor_status.getDateReport(deviceInfo.devId,tenantId);
+                             console.log("test:");
+                             var ret = yield app.bed_monitor_app.regist(userInfo);
                               
-                             console.log("isAttach:", ret);
+                             console.log("test recall:", ret);
                              this.body = "ok";
                          } catch (e) {
                              self.logger.error(e.message);
@@ -306,6 +308,29 @@
                              console.log("body:");
                              console.log(this.request.body)
                              this.body =  yield app.bed_monitor_status.getReportByDate(this.request.body.devId,this.request.body.tenantId,this.request.body.targetdDate);
+                         } catch (e) {
+                             self.logger.error(e.message);
+                             this.body = app.wrapper.res.error(e);
+                         }
+                         yield next;
+                     };
+                 }
+             },
+             {
+                 method: 'sleepDevicews$getWeekDatas',
+                 verb: 'post',
+                 url: this.service_url_prefix + "/sleepDevicews/getWeekDatas",
+                 handler: function (app, options) {
+                     return function *(next) {
+                         try {
+                             console.log("body:");
+                             console.log(this.request.body)
+                            //console.log("test:",this.openid);
+                             var deviceId = 'A1200006';
+                              var tenantId = '58f5e9add2b7261ba8af97b8';
+                             var ret = yield app.bed_monitor_app.getWeekDatas(this.openid,this.request.body.info);
+                             console.log("test recall:", ret);
+                             this.body = ret;
                          } catch (e) {
                              self.logger.error(e.message);
                              this.body = app.wrapper.res.error(e);

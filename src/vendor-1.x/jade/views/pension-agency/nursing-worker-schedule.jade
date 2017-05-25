@@ -4,7 +4,7 @@
             .btn-toolbar
                 .btn-group
                     ui-select(name="nursingWorkerScheduleTemplates",theme='bootstrap', ng-Model="vm.selectedNursingWorkerScheduleTemplate" ,ng-style='{width: "180px"}')
-                        ui-select-match(placeholder='{{vm.moduleTranslatePath("PLACEHOLDER-PICK_NURSING_SCHEDULE_TEMPLATE")|translate}}') {{$select.selected.name}}
+                        ui-select-match(placeholder='{{vm.moduleTranslatePath("PLACEHOLDER-PICK_NURSING_WORKER_SCHEDULE_TEMPLATE")|translate}}') {{$select.selected.name}}
                         ui-select-choices(repeat='nursingWorkerScheduleTemplate in vm.selectBinding.nursingWorkerScheduleTemplates | filter: {name: $select.search}')
                             div(ng-bind-html='nursingWorkerScheduleTemplate.name | highlight: $select.search')
                 .btn-group

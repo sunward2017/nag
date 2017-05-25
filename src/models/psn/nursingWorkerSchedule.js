@@ -15,7 +15,7 @@ module.exports = function(ctx,name) {
     else {
         module.isloaded = true;
 
-        var nursingScheduleSchema = new mongoose.Schema({
+        var nursingWorkerScheduleSchema = new mongoose.Schema({
             check_in_time: {type: Date, default: Date.now},
             operated_on: {type: Date, default: Date.now},
             status: {type: Number, min: 0, max: 1, default: 1},
@@ -32,15 +32,15 @@ module.exports = function(ctx,name) {
             }
         });
 
-        nursingScheduleSchema.virtual('x_axis_value').get(function () {
+        nursingWorkerScheduleSchema.virtual('x_axis_value').get(function () {
             return ctx.moment(this.x_axis).day();
         });
 
-        nursingScheduleSchema.pre('update', function (next) {
+        nursingWorkerScheduleSchema.pre('update', function (next) {
             this.update({}, {$set: {operated_on: new Date()}});
             next();
         });
 
-        return mongoose.model(name, nursingScheduleSchema, name);
+        return mongoose.model(name, nursingWorkerScheduleSchema, name);
     }
 }

@@ -446,6 +446,27 @@
         "MSG-NO-NURSING-WORKER-FOR-ROOM": "至少为一个房间设置护工"
       }
     },
+    "nursing-worker-schedule": {
+      "TITLE": "养老机构-照护管理-护工排班",
+      "DIALOG-SAVE-AS-TEMPLATE-TITLE": "保存为护工排班模版",
+      "LABEL-YAXIS_LABEL": "护工",
+      "PLACEHOLDER-PICK_NURSING_WORKER_SCHEDULE_TEMPLATE": "选择一个模版导入..",
+      "PLACEHOLDER-PICK_NURSING_SHIFT": "挑选照护班..",
+      "TITLE-ROW": "点此选中整行",
+      "TITLE-COL": "点此选中整列",
+      "DIALOG-IMPORT-MESSAGE": "导入模版有可能会覆盖已有的排班,您确定要导入吗？",
+      "CONFIRM-MESSAGE-SAVE-AS-TEMPLATE": "一旦执行将覆盖现有同名模版，您确定要继续执行么？",
+      "MSG-NO-PICK-NURSING_WORKER_SCHEDULE_TEMPLATE": "没有选择模版,无法导入",
+      "MSG-NO-PICK-NURSING": "没有挑选护工,无法应用",
+      "MSG-SAVE-AS-TEMPLATE-DATA-INVALID": "有房间没有指定照护班,无法存为模版",
+      "BTN-IMPORT-TEMPLATE": "导入",
+      "BTN-SAVE-TEMPLATE": "保存模版",
+      "BTN-PRE-WEEK": "上周",
+      "BTN-NEXT-WEEK": "下周",
+      "TAB1-LABEL-TEMPLATE_LIST": "保存到选中的模版",
+      "TAB1-LABEL-SAVE-TO-TEMPLATE_NAME": "新模版名称",
+      "TAB1-PLACEHOLDER-SAVE-TO-TEMPLATE_NAME": "选择一个模版或者输入一个新模版名称"
+    },
     "nursing-group": {
       "list": {
         "TITLE": "养老机构-照护管理-照护组-列表"

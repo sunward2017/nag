@@ -298,8 +298,12 @@
                                 if (findIndex == -1) {
                                     console.log('o:', o);
                                     arr.push(o);
-                                    toSaveRows.push({ x_axis: date, y_axis: rowId, aggr_value: o.id });
+                                    // toSaveRows.push({ x_axis: date, y_axis: rowId, aggr_value: o.id });
                                 }
+                            });
+
+                            _.each(arr, function(o){
+                                toSaveRows.push({ x_axis: date, y_axis: rowId, aggr_value: o.id });
                             });
                         }
                     }

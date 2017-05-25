@@ -11,6 +11,7 @@
         .controller('DrugGridController',DrugGridController)
         .controller('DrugDetailsController',DrugDetailsController)
         .controller('DrugImportDialogController', DrugImportDialogController)
+        .controller('DrugSyncToTenantDialogController', DrugSyncToTenantDialogController)
     ;
 
     DrugGridController.$inject = ['$scope', 'ngDialog', 'vmh', 'entryVM'];
@@ -26,6 +27,7 @@
             vm.init({removeDialog: ngDialog});
 
             vm.openImportDialog = openImportDialog;
+            vm.openExportToTenantDialog = openExportToTenantDialog;
 
             vm.query();
         }
@@ -72,6 +74,60 @@
             }).closePromise.then(function (ret) {
                 if (ret.value != '$document' && ret.value != '$closeButton' && ret.value != '$escape') {
                     vmh.alertSuccess('notification.IMPORT-SUCCESS', true);
+                    vm.query();
+                }
+            });
+        }
+        
+        function openExportToTenantDialog () {
+            if (vm.selectedRows.length == 0) {
+                vmh.alertWarning('notification.SELECT-NONE-WARNING', true);
+                return;
+            }
+
+            var drugIds = _.map(vm.selectedRows, function(row) {return row.id});
+            vm.dialogData = {
+                drugIds: drugIds,
+                isSync: false
+            };
+
+            ngDialog.open({
+                template: 'dlg-drug-sync-to-tenant-pick.html',
+                controller: 'DrugSyncToTenantDialogController',
+                className: 'ngdialog-theme-default dialog-drug-sync-to-tenant',
+                data: vm.dialogData,
+                resolve:{
+                    vmh: function () {
+                        return vmh;
+                    },
+                    translatePath: function () {
+                        return function (key) {
+                            return 'dlg-drug-sync-to-tenant-pick.html.' + key;
+                        }
+                    }
+                },
+                preCloseCallback: function () {
+                    console.log('dialog:', vm.dialogData)
+                    if(vm.dialogData.isSync) {
+                        // if (confirm('Are you sure you want to close without saving your changes?')) {
+                        //     return true;
+                        // }
+                        return ngDialog.openConfirm({
+                            template: 'customConfirmDialog.html',
+                            className: 'ngdialog-theme-default',
+                            controller: ['$scope', function ($scopeConfirm) {
+                                $scopeConfirm.message = '正在同步药品到指定的机构,如果此时关闭将导致不可预料的后果,继续关闭么?'
+                            }]
+                        }).then(function () {
+                            return true;
+                        });
+                    } else {
+                        return true;
+                    }
+                }
+            }).closePromise.then(function (ret) {
+                if (ret.value != '$document' && ret.value != '$closeButton' && ret.value != '$escape') {
+                    vmh.alertSuccess('notification.SYNC-SUCCESS', true);
                     vm.query();
                 }
             });
@@ -168,6 +224,58 @@
                 })
                 
 
+            });
+        }
+    }
+
+    DrugSyncToTenantDialogController.$inject = ['$scope', 'vmh', 'translatePath', 'ngDialog', 'blockUI'];
+
+    function DrugSyncToTenantDialogController($scope, vmh, translatePath, ngDialog, blockUI) {
+        var vm = $scope.vm = {};
+        vm.translatePath = translatePath;
+        init();
+
+        function init() {
+            vm.syncSelected = syncSelected;
+
+            vm.drugIds = $scope.ngDialogData.drugIds;
+
+            vm.syncToTenantBlocker = blockUI.instances.get('sync-to-tenant');
+            vm.drugSyncToTenantPromise = vmh.shareService.tmp('T3001/pub-tenant', 'name type', {status: 1, type: {$in:['A0001', 'A0002', 'A0003']}});
+        }
+
+        function syncSelected () {
+            if(!vm.toSyncTenant){
+                vmh.alertWarning(vm.translatePath('MSG-NO-TENANT-SELECTED'), true);
+                return;
+            }
+
+            ngDialog.openConfirm({
+                template: 'normalConfirmDialog.html',
+                className: 'ngdialog-theme-default'
+            }).then(function () {
+
+                console.log('-----------sync to selected tenant:', vm.toSyncTenant);
+
+                vmh.translate(vm.translatePath('LOADING-TEXT-SYNC-TO-TENANT')).then(function(translatedText){
+                    vm.syncToTenantBlocker.start({
+                        message: translatedText,
+                    });
+
+                    $scope.ngDialogData.isSync = true;
+
+                    vmh.extensionService.syncDrugToTenants([vm.toSyncTenant], vm.drugIds).then(function (ret) {
+                        $scope.ngDialogData.isSync = false;
+                        $scope.closeThisDialog();
+                    }, function (err) {
+                        console.log(err);
+                    }).finally(function(){
+                        if($scope.ngDialogData.isSync){
+                            $scope.ngDialogData.isSync = false;
+                        }
+                        vm.syncToTenantBlocker.stop();
+                    })
+                });
             });
         }
     }

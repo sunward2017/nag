@@ -254,7 +254,8 @@
     "drug": {
       "list": {
         "TITLE": "管理中心-数据管理-药品-列表",
-        "BTN-IMPORT-DRUG-DIALOG": "导入药品..."
+        "BTN-IMPORT-DRUG-DIALOG": "导入药品...",
+        "BTN-SYNC-TO-TENANT-DIALOG": "同步到机构..."
       },
       "details": {
         "TITLE": "管理中心-数据管理-药品-详情",

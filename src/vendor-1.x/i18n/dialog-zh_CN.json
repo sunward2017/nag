@@ -15,6 +15,13 @@
       "MSG-NO-FILE-SELECTED": "没有选中任何文件",
       "LOADING-TEXT-IMPORTING-DRUG": "正在导入药品.."
     }
+  },
+  "dlg-drug-sync-to-tenant-pick": {
+    "html": {
+      "TITLE": "药品同步到机构对话框",
+      "MSG-NO-TENANT-SELECTED": "没有选中任何机构",
+      "LOADING-TEXT-SYNC-TO-TENANT": "正在同步药品.."
+    }
   }
 }
 

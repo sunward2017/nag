@@ -1935,7 +1935,7 @@
                             name: 'nursing_level_name',
                             type: 'string',
                             width: 80,
-                            formatter: { type: 'populate', options: { path: 'nursingLevelId', select: '-_id name' } }
+                            formatter: { type: 'populate', options: { path: 'nursingLevelId', select: '_id name' } }
                         }, {
                             label: '项目名称',
                             name: 'name',

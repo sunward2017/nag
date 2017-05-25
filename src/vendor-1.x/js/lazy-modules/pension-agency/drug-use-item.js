@@ -21,17 +21,17 @@
         $scope.utils = vmh.utils.g;
         vm.onRoomChange = onRoomChange;
         vm.init({ removeDialog: ngDialog });
-        
+
         vm.yAxisDataPromise = vmh.shareService.tmp('T3009', null, { tenantId: vm.tenantId }).then(function (nodes) {
-                return nodes;
+            return nodes;
         });
         fetchElderly()
-        function fetchElderly(){
-            vmh.psnService.nursingPlansByRoom(vm.tenantId, ['name', 'sex', 'birthday', 'enter_code' ,'nursing_info','begin_exit_flow'], ['elderlyId']).then(function(ret){
-                 vm.aggrData = ret;
+        function fetchElderly() {
+            vmh.psnService.nursingPlansByRoom(vm.tenantId, ['name', 'sex', 'birthday', 'enter_code', 'nursing_info', 'begin_exit_flow'], ['elderlyId']).then(function (ret) {
+                vm.aggrData = ret;
             })
         }
-        function onRoomChange() {  
+        function onRoomChange() {
             var yAxisDataFlatten = [];
             _.each(vm.yAxisData, function (o) {
                 for (var i = 1, len = o.capacity; i <= len; i++) {
@@ -44,41 +44,99 @@
             // console.log('yAxisDataFlatten:',vm.yAxisDataFlatten);
         }
     }
-    
-    ElderlyByDrugUseController.$inject = ['$scope','ngDialog','vmh', 'entityVM'];
-    
-    function ElderlyByDrugUseController($scope, ngDialog, vmh, vm){
+
+    ElderlyByDrugUseController.$inject = ['$scope', 'ngDialog', 'vmh', 'entityVM'];
+
+    function ElderlyByDrugUseController($scope, ngDialog, vmh, vm) {
         var vm = $scope.vm = vm;
         $scope.utils = vmh.utils.v;
         vm.fetchDrugUseItem = fetchDrugUseItem;
+        vm.configDrugUseItem = configDrugUseItem;
+        vm.addRowIds = addRowIds;
+        vm.selectAll = selectAll;
+        vm.drugUseItemIds = [];
+        vm.removeElderlyDrugUseItem = removeElderlyDrugUseItem;
 
         var drugUseService = vm.modelNode.services['psn-drugUseItem'];
         init();
-        function init(){
-            vm.init({removeDialog: ngDialog});
+
+        function init() {
+            vm.init({ removeDialog: ngDialog });
             vmh.parallel([
                 vmh.shareService.d('D1006'),
-                vmh.shareService.d('D1008'),   
+                vmh.shareService.d('D1008'),
             ]).then(function (results) {
                 vm.selectBinding.sex = results[0];
                 vm.selectBinding.medical_insurances = results[1];
             });
             vm.medical_historiesPromise = vmh.shareService.d('D1014').then(function (medical_histories) {
-                vmh.utils.v.changeProperyName(medical_histories, [{o: 'value', n: '_id'}]);
+                vmh.utils.v.changeProperyName(medical_histories, [{ o: 'value', n: '_id' }]);
                 return medical_histories;
             });
-            vm.load().then(function(){
+            vm.load().then(function () {
                 vm.fetchDrugUseItem();
-            })  
+            })
         }
-        function fetchDrugUseItem(){
+        function fetchDrugUseItem() {
             drugUseService.query({
                 elderlyId: vm.model._id,
                 tenantId: vm.model.tenantId
             }).$promise.then(function (rows) {
-                console.log(rows);
-                vm.elderlyDrugUseItems = rows 
+                vm.elderlyDrugUseItems = rows
             });
+        }
+
+        function configDrugUseItem(drugUseItem) {
+            ngDialog.open({
+                template: 'drug-use-item.html',
+                controller: 'DrugUseItemDetailsController',
+                className: 'ngdialog-theme-default ngdialog-drug-use-item',
+                data: {
+                    vmh: vmh,
+                    moduleTranslatePathRoot: vm.viewTranslatePath(),
+                    elderlyId: vm.model._id,
+                    elderlyName: vm.model.name,
+                    tenantId: vm.model.tenantId,
+                    drugUseItem: drugUseItem,
+                    fetchDrugUseItem: vm.fetchDrugUseItem
+                }
+            })
+        }
+
+        function addRowIds(r) {
+            var id = r._id;
+            var index = _.findIndex(vm.drugUseItemIds, function (o) {
+                return o == id
+            });
+            if (r.checked && (index == -1)) {
+                vm.drugUseItemIds.push(id);
+                // console.log("++",vm.drugUseItemIds);
+                return;
+            }
+            if (index != -1) {
+                vm.drugUseItemIds.splice(index, 1);
+                // console.log("--",vm.drugUseItemIds)
+            }
+        }
+
+        function selectAll() {
+            vm.drugUseItemIds = [];
+            if (vm.all) {
+                _.each(vm.elderlyDrugUseItems, function (o) {
+                    vm.drugUseItemIds.push(o._id);
+                })
+            }
+        }
+
+        function removeElderlyDrugUseItem() {
+            vmh.fetch(vmh.psnService.drugUseItemRemove(vm.model._id, vm.model.tenantId, vm.drugUseItemIds)).then(function (ret) {
+                if (ret.success === true) {
+                    vmh.alertSuccess(ret.msg, false);
+                    vm.fetchDrugUseItem();
+                } else {
+                    vmh.alertSuccess('保存失败,请重试', false);
+                }
+            })
         }
     }
 
@@ -86,77 +144,65 @@
 
 
 
-    DrugUseItemDetailsController.$inject = ['$scope', 'ngDialog', 'vmh', 'entityVM'];
+    DrugUseItemDetailsController.$inject = ['$scope', 'ngDialog'];
 
-    function DrugUseItemDetailsController($scope, ngDialog, vmh, vm) {
+    function DrugUseItemDetailsController($scope, ngDialog) {
+        var vm = $scope.vm = {};
+        var vmh = $scope.ngDialogData.vmh;
+        var drugUseItem = $scope.ngDialogData.drugUseItem;
+        var fetchDrugUseItem = $scope.ngDialogData.fetchDrugUseItem
 
-        var vm = $scope.vm = vm;
         $scope.utils = vmh.utils.v;
+        vm.model = {};
+        vm.model.elderlyId = $scope.ngDialogData.elderlyId;
+        vm.model.elderly_name = $scope.ngDialogData.elderlyName;
+        vm.model.tenantId = $scope.ngDialogData.tenantId;
+
+        vm.selectBinding = {};
         init();
 
         function init() {
-
-            vm.init({ removeDialog: ngDialog });
+            vm.moduleTranslatePathRoot = $scope.ngDialogData.moduleTranslatePathRoot;
+            vm.viewTranslatePath = function (key) {
+                return vm.moduleTranslatePathRoot + '.' + key;
+            };
 
             vm.doSubmit = doSubmit;
-            // vm.queryElderlyPromise = queryElderly();
-            // vm.fetchElderlyColumnsPromise = [{ label: '入院登记号', name: 'enter_code', width: 100 }, { label: '姓名', name: 'name', width: 100 }];
-
+            vm.cancel = cancel;
             vm.queryDrugPromise = queryDrug();
-            vm.fetchDrugColumnsPromise = [{ label: '药品编码', name: 'drug_no', width: 100 }, { label: '药品全称', name: 'full_name', width: 100 }];
-            vm.selectElerlyForBackFiller = selectElerlyForBackFiller;
+            vm.fetchDrugColumnsPromise = [{ label: '药品条码', name: 'barcode', width: 200 }, { label: '药品全称', name: 'full_name', width: 100 }];
             vm.selectDrugForBackFiller = selectDrugForBackFiller;
-
             vm.initVoiceTemplate = initVoiceTemplate;
             vm.tab1 = { cid: 'contentTab1' };
 
             vmh.parallel([
-                vmh.shareService.tmp('T3001/psn-nursingLevel', 'name', vm.treeFilterObject),
                 vmh.shareService.d('D0103'),
                 vmh.shareService.d('D0104')
             ]).then(function (results) {
-                vm.selectBinding.nursingLevels = _.map(results[0], function (row) {
-                    return { id: row._id, name: row.name }
-                });
-                vm.selectBinding.repeatTypes = results[1];
-                vm.selectBinding.remindModes = results[2];
+                vm.selectBinding.repeatTypes = results[0];
+                vm.selectBinding.remindModes = results[1];
             });
 
-            vm.load().then(function () {
-                if (vm.model.repeat_values && vm.model.repeat_values.length > 0) {
-                    vm.repeat_values = vm.model.repeat_values.join();
+            if (drugUseItem) {
+                vm.readonly = true;
+                _.defaults(vm.model, drugUseItem);
+                if (drugUseItem.repeat_values && drugUseItem.repeat_values.length > 0) {
+                    vm.repeat_values = drugUseItem.repeat_values.join();
                 }
-                if (vm.model.elderlyId) {
-                    vm.selectedElderly = { _id: vm.model.elderlyId, name: vm.model.elderly_name };
-                    vm.selectedDrug = { _id: vm.model.drugId, name: vm.model.name };
-                }
-            });
+            }
         }
 
-        function queryElderly(keyword) {
-            return vmh.fetch(vmh.psnService.queryElderly(vm.tenantId, keyword, {
-                live_in_flag: true,
-                // begin_exit_flow: {'$in':[false,undefined]}
-            }, 'name enter_code'));
-        }
+
 
         function queryDrug(keyword) {
-            return vmh.fetch(vmh.psnService.queryDrug(vm.tenantId, keyword, {}, 'drug_no full_name'));
+            return vmh.fetch(vmh.psnService.queryDrug(vm.model.tenantId, keyword, {}, 'barcode full_name'));
         }
 
         function selectDrugForBackFiller(row) {
             if (row) {
                 vm.model.drugId = row.id;
-                vm.model.drug_no = row.drug_no;
+                vm.model.barcode = row.barcode;
                 vm.model.name = row.full_name;
-            }
-        }
-
-        function selectElerlyForBackFiller(row) {
-            if (row) {
-                vm.model.enter_code = row.enter_code;
-                vm.model.elderlyId = row.id;
-                vm.model.elderly_name = row.name;
             }
         }
 
@@ -184,29 +230,54 @@
                 }
             }
             if ($scope.theForm.$valid) {
-                vm.save();
-            } else {
-                if ($scope.utils.vtab(vm.tab1.cid)) {
-                    vm.tab1.active = true;
+                var data = {
+                    elderlyId: vm.model.elderlyId,
+                    elderly_name: vm.model.elderly_name,
+                    drugId: vm.model.drugId,
+                    barcode: vm.model.barcode,
+                    name: vm.model.name,
+                    description: vm.model.description,
+                    duration: vm.model.duration,
+                    repeat_type: vm.model.repeat_type,
+                    repeat_values: vm.model.repeat_values,
+                    repeat_start: vm.model.repeat_start,
+                    confirm_flag: vm.model.confirm_flag,
+                    remind_flag: vm.model.remind_flag,
+                    remind_mode: vm.model.remind_mode,
+                    fee_flag: vm.model.fee_flag,
+                    fee: vm.model.fee,
+                    remind_times: vm.model.remind_times,
+                    voice_template: vm.model.voice_template,
+                    tenantId: vm.model.tenantId,
                 }
+
+                vmh.psnService.drugUseItemSave(data).then(function (ret) {
+                    if (ret.success === true) {
+                        ngDialog.close("#drug-use-item.html");
+                        vmh.alertSuccess(ret.msg, false);
+                        fetchDrugUseItem();
+                    } else {
+                        vmh.alertSuccess('保存失败,请重试', false);
+                    }
+                })
             }
+        }
+
+        function cancel() {
+            ngDialog.close("#drug-use-item.html");
         }
         function initVoiceTemplate() {
             if (vm.model.repeat_type == "A0001") {
                 vm.model.voice_template = '';
                 vm.repeat_values = '';
                 vm.model.repeat_start = '*';
-                vm.voiceSwitch = true;
+                vm.switch = true;
                 vm.model.remind_flag = false;
-                vm.repeatValuesSwitch = true;
-                vm.repeatStartSwitch = true;
             } else {
                 vm.model.voice_template = "${老人姓名},您该服用${药品名称}了,请您依照${服用方法}服用哦";
                 vm.repeat_values = '';
                 vm.model.repeat_start = '';
-                vm.voiceSwitch = false;
-                vm.repeatValuesSwitch = false;
-                vm.repeatStartSwitch = false;
+                vm.switch = false;
             }
         }
     }

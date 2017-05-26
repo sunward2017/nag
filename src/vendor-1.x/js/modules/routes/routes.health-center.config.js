@@ -21,7 +21,7 @@
                 url: '/health-center',
                 abstract: true,
                 access_level: AUTH_ACCESS_LEVELS.USER,
-                template: '<div class="module-header-wrapper" data-ui-view="module-header"></div><div class="module-content-wrapper" data-ui-view="module-content"></div>',
+                template: '<div class="module-header-wrapper" data-ui-view="module-header"></div><div class="module-content-wrapper" data-ui-view="module-content"></div><div class="clearfix"></div>',
                 resolve: {
                     vmh: helper.buildVMHelper()
                     // , deps: helper.resolveFor2('subsystem.health-center')
@@ -57,7 +57,7 @@
                         controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER_FOR_TENANT
                     },
                     "module-content": {
-                        template: '<div class="data-ui-view"></div>'
+                        template: '<div class="data-ui-view"></div><div class="clearfix"></div>'
                     }
                 },
                 data:{
@@ -146,7 +146,7 @@
                         controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER_FOR_TENANT
                     },
                     "module-content": {
-                        template: '<div class="data-ui-view"></div>'
+                        template: '<div class="data-ui-view"></div><div class="clearfix"></div>'
                     }
                 },
                 data:{

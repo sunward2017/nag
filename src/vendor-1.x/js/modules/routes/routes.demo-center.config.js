@@ -21,7 +21,7 @@
                 url: '/demo',
                 abstract: true,
                 access_level: AUTH_ACCESS_LEVELS.ADMIN,
-                template: '<div class="module-header-wrapper" data-ui-view="module-header"></div><div class="module-content-wrapper" data-ui-view="module-content"></div>',
+                template: '<div class="module-header-wrapper" data-ui-view="module-header"></div><div class="module-content-wrapper" data-ui-view="module-content"></div><div class="clearfix"></div>',
                 resolve: {
                     vmh: helper.buildVMHelper()
                     , deps: helper.resolveFor2(MODEL_VARIABLES.RES_PREFIXS.DEMO_CENTER)
@@ -36,7 +36,7 @@
                         controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER
                     },
                     "module-content": {
-                        template: '<div class="data-ui-view"></div>'
+                        template: '<div class="data-ui-view"></div><div class="clearfix"></div>'
                     }
                 }
             })

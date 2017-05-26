@@ -20,17 +20,22 @@
 
         function init() {
             vm.pickOne = pickOne;
-
+            vm.search = $scope.ngDialogData.search;
             vm.translatePath = $scope.ngDialogData.translatePath;
             vm.title = $scope.ngDialogData.title;
             vm.rows = $scope.ngDialogData.rows;
             vm.columns = $scope.ngDialogData.columns;
+            vm.page = $scope.ngDialogData.page || {size: 5, no: 1};
 
-            vm.page =  {size: 5, no: 1};
+            $scope.ngDialogData.notify.reloadData = reloadData;
         }
 
         function pickOne(row) {
             $scope.closeThisDialog(row);
+        }
+
+        function reloadData(rows) {
+            vm.rows = rows;
         }
     }
 

@@ -22,7 +22,7 @@
                 abstract: true,
                 access_level: AUTH_ACCESS_LEVELS.ADMIN,
                 //template: '<div class="data-ui-view subsystem-wrapper"></div>',
-                template: '<div class="module-header-wrapper" data-ui-view="module-header"></div><div class="module-content-wrapper" data-ui-view="module-content"></div>',
+                template: '<div class="module-header-wrapper" data-ui-view="module-header"></div><div class="module-content-wrapper" data-ui-view="module-content"></div><div class="clearfix"></div>',
                 resolve: {
                     vmh: helper.buildVMHelper()
                     , deps: helper.resolveFor2(MODEL_VARIABLES.RES_PREFIXS.MANAGE_CENTER)
@@ -56,7 +56,7 @@
                         controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER
                     },
                     "module-content": {
-                        template: '<div class="data-ui-view"></div>'
+                        template: '<div class="data-ui-view"></div><div class="clearfix"></div>'
                     }
                 },
                 data: {
@@ -161,7 +161,7 @@
                         controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER
                     },
                     "module-content": {
-                        template: '<div class="data-ui-view"></div>'
+                        template: '<div class="data-ui-view"></div><div class="clearfix"></div>'
                     }
                 },
                 data: {
@@ -284,7 +284,7 @@
                         controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER
                     },
                     "module-content": {
-                        template: '<div class="data-ui-view"></div>'
+                        template: '<div class="data-ui-view"></div><div class="clearfix"></div>'
                     }
                 },
                 data: {
@@ -406,7 +406,7 @@
                         controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER
                     },
                     "module-content": {
-                        template: '<div class="data-ui-view"></div>'
+                        template: '<div class="data-ui-view"></div><div class="clearfix"></div>'
                     }
                 },
                 data: {
@@ -511,7 +511,7 @@
                         controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER
                     },
                     "module-content": {
-                        template: '<div class="data-ui-view"></div>'
+                        template: '<div class="data-ui-view"></div><div class="clearfix"></div>'
                     }
                 },
                 data: {
@@ -634,7 +634,7 @@
                         controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER
                     },
                     "module-content": {
-                        template: '<div class="data-ui-view"></div>'
+                        template: '<div class="data-ui-view"></div><div class="clearfix"></div>'
                     }
                 },
                 data: {
@@ -753,7 +753,7 @@
                         controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER
                     },
                     "module-content": {
-                        template: '<div class="data-ui-view"></div>'
+                        template: '<div class="data-ui-view"></div><div class="clearfix"></div>'
                     }
                 }
                 , resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.MANAGE_CENTER + 'job-status.js')
@@ -835,7 +835,7 @@
                         controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER
                     },
                     "module-content": {
-                        template: '<div class="data-ui-view"></div>'
+                        template: '<div class="data-ui-view"></div><div class="clearfix"></div>'
                     }
                 }
                 , resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.MANAGE_CENTER + 'tenant-user-manage.js')
@@ -945,7 +945,7 @@
                         controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER
                     },
                     "module-content": {
-                        template: '<div class="data-ui-view"></div>'
+                        template: '<div class="data-ui-view"></div><div class="clearfix"></div>'
                     }
                 }
                 , resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.MANAGE_CENTER + 'order-receipt-confirmation.js')
@@ -1043,7 +1043,7 @@
                         controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER
                     },
                     "module-content": {
-                        template: '<div class="data-ui-view"></div>'
+                        template: '<div class="data-ui-view"></div><div class="clearfix"></div>'
                     }
                 }
                 , resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.MANAGE_CENTER + 'order-refund-confirmation.js')
@@ -1141,7 +1141,7 @@
                         controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER
                     },
                     "module-content": {
-                        template: '<div class="data-ui-view"></div>'
+                        template: '<div class="data-ui-view"></div><div class="clearfix"></div>'
                     }
                 }
                 , resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.MANAGE_CENTER + 'app-serverside-update.js')
@@ -1228,7 +1228,7 @@
                         controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER
                     },
                     "module-content": {
-                        template: '<div class="data-ui-view"></div>'
+                        template: '<div class="data-ui-view"></div><div class="clearfix"></div>'
                     }
                 }
                 , resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.MANAGE_CENTER + 'app-clientside-update.js')
@@ -1329,7 +1329,7 @@
                         controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER
                     },
                     "module-content": {
-                        template: '<div class="data-ui-view"></div>'
+                        template: '<div class="data-ui-view"></div><div class="clearfix"></div>'
                     }
                 }
                 // , resolve: helper.resolveFor('subsystem.manage-center.device-access.js')
@@ -1410,7 +1410,7 @@
                         controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER
                     },
                     "module-content": {
-                        template: '<div class="data-ui-view"></div>'
+                        template: '<div class="data-ui-view"></div><div class="clearfix"></div>'
                     }
                 },
                 resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.MANAGE_CENTER + 'drug.js')

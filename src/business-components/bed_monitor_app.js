@@ -3,6 +3,7 @@
  */
 var co = require('co');
 var rp = require('request-promise-native');
+var _ = require('underscore');
 var externalSystemConfig = require('../pre-defined/external-system-config.json');
 var DIC = require('../pre-defined/dictionary-constants.json');
 var socketServerEvents = require('../pre-defined/socket-server-events.json');
@@ -242,7 +243,18 @@ module.exports = {
                         }
                     }
                 }
-
+                var new_aweekTimes = _.compact(aweekTimes);
+                var new_lightSleepTimes = _.compact(lightSleepTimes);
+                var new_deepSleepTimes = _.compact(deepSleepTimes);
+                var new_maxHearts = _.compact(maxHearts);
+                var new_minHearts = _.compact(minHearts);
+                if(new_aweekTimes.length==0&&new_lightSleepTimes==0&&new_deepSleepTimes==0&&new_maxHearts==0&&new_minHearts==0){
+                        aweekTimes = new_aweekTimes;
+                        lightSleepTimes =new_lightSleepTimes;
+                        deepSleepTimes =new_deepSleepTimes;
+                        maxHearts = new_maxHearts;
+                        minHearts = new_minHearts;
+                }
                 var weekdays = {
                     aweekTimes: aweekTimes,
                     lightSleepTimes: lightSleepTimes,

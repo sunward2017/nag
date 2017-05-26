@@ -23,6 +23,8 @@ module.exports = function(ctx,name) {
             status: {type: Number, min: 0, max: 1, default: 1},
             elderlyId: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'psn_elderly'},
             elderly_name: {type: String},
+            stop_flag: {type: Boolean, default: false},//停用标志
+            stoped_on: {type: Date},
             drugId:{type: mongoose.Schema.Types.ObjectId,required: true,ref:'psn_drugDirectory'},//关联药品
             drug_no:{type: String,},// 药品编码
             barcode:{type: String,},// 药品编码

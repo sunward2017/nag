@@ -63,40 +63,11 @@
                     row: vm.selectedRows[0],
                     moduleTranslatePathRoot: vm.viewTranslatePath()
                 }
+            }).closePromise.then(function (ret) {
+                if(ret.value!='$document' && ret.value!='$closeButton' && ret.value!='$escape' ) {
+                    vm.query();
+                }
             })
-        }
-    }
-
-    WorkItemCopyController.$inject = ['$scope', 'ngDialog', 'treeFactory'];
-    function WorkItemCopyController($scope, ngDialog, treeFactory) {
-        var vm = $scope.vm = {};
-        var vmh = $scope.ngDialogData.vmh;
-        var row = $scope.ngDialogData.row;
-        var query = $scope.ngDialogData.query;
-        vm.doSubmit = doSubmit;
-        vm.moduleTranslatePath = moduleTranslatePath
-        vm.cancel = cancel;
-        init();
-        function init() {
-            vm.nursingLevelPromise = vmh.shareService.tmp('T3001/psn-nursingLevel', 'name id', { "status": 1, "_id": { "$ne": row.nursingLevelId } })
-        }
-
-        var moduleTranslatePathRoot = $scope.ngDialogData.moduleTranslatePathRoot;
-        function moduleTranslatePath(key) {
-            return moduleTranslatePathRoot + '.' + key;
-        };
-
-        function doSubmit() {
-            ngDialog.close("#work-item-copy.html")
-            vmh.psnService.workItemCopy(vm.nursingLevelIds,row.id).then(function(ret){
-               if(ret.success){
-                    vmh.alertSuccess('复置成功', false);
-               }
-            })
-        }
-
-        function cancel() {
-           ngDialog.close("#work-item-copy.html")
         }
     }
 
@@ -187,6 +158,39 @@
                 vm.repeatValuesSwitch = false;
                 vm.repeatStartSwitch = false;
             }
+        }
+    }
+
+    WorkItemCopyController.$inject = ['$scope', 'ngDialog', 'treeFactory'];
+    function WorkItemCopyController($scope, ngDialog, treeFactory) {
+        var vm = $scope.vm = {};
+        var vmh = $scope.ngDialogData.vmh;
+        var row = $scope.ngDialogData.row;
+        vm.doSubmit = doSubmit;
+        vm.moduleTranslatePath = moduleTranslatePath
+        init();
+        function init() {
+            vm.nursingLevelPromise = vmh.shareService.tmp('T3001/psn-nursingLevel', 'name id', { "status": 1, tenantId: row.tenantId, "_id": { "$ne": row.nursingLevelId } })
+        }
+
+        var moduleTranslatePathRoot = $scope.ngDialogData.moduleTranslatePathRoot;
+        function moduleTranslatePath(key) {
+            return moduleTranslatePathRoot + '.' + key;
+        };
+
+        function doSubmit() {
+            var promise = ngDialog.openConfirm({
+                template: 'customConfirmDialog.html',
+                className: 'ngdialog-theme-default',
+                controller: ['$scope', function ($scopeConfirm) {
+                    $scopeConfirm.message = vm.moduleTranslatePath('DLG-COPY-WORK_ITEM')
+                }]
+            }).then(function () {
+                vmh.psnService.workItemCopy(vm.nursingLevelIds, row.id).then(function () {
+                    $scope.closeThisDialog();
+                    vmh.alertSuccess('notification.NORMAL-SUCCESS', true);
+                })
+            });
         }
     }
 

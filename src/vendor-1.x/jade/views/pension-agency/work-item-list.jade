@@ -62,8 +62,7 @@ script(type="text/ng-template", id="work-item-copy.html")
         | {{ vm.moduleTranslatePath('DLG-WORK-ITEM-TITLE') | translate }}
     .ngdialog-input
         .col-md-12
-            .tree.tree-basic(name='nursingLevelTree',s-tree, s-tree-data="vm.nursingLevelPromise",s-tree-height="450", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{mode:'check'}",ng-model="vm.nursingLevelIds",required='')
+            .tree.tree-basic(name='nursingLevelTree',s-tree, s-tree-data="vm.nursingLevelPromise",s-tree-height="420", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{mode:'check'}",ng-model="vm.nursingLevelIds",required='')
      .ngdialog-buttons
             .col-md-12.text-right
-                button.btn.btn-warning(type='button',ng-click="vm.cancel()") {{ "button.CANCEL" | translate}}
-                button.btn.btn-success(type='submit',ng-click="vm.doSubmit()") {{ "button.CONFIRM" | translate}}        
+                button.btn.btn-success(type='button',ng-click="vm.doSubmit()") {{ "button.CONFIRM" | translate}}

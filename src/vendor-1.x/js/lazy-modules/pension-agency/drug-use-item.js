@@ -88,6 +88,10 @@
         }
 
         function configDrugUseItem(drugUseItem) {
+            var addedDrugIds = _.map(vm.elderlyDrugUseItems, function (o) {
+               return o.drugId;
+            });
+            console.log('addedDrugIds:', addedDrugIds);
             ngDialog.open({
                 template: 'drug-use-item.html',
                 controller: 'DrugUseItemDetailsController',
@@ -99,6 +103,7 @@
                     elderlyName: vm.model.name,
                     tenantId: vm.model.tenantId,
                     drugUseItem: drugUseItem,
+                    addedDrugIds: addedDrugIds,
                     fetchDrugUseItem: vm.fetchDrugUseItem
                 }
             })
@@ -130,36 +135,32 @@
         }
 
         function removeElderlyDrugUseItem() {
-            vmh.fetch(vmh.psnService.drugUseItemRemove(vm.model._id, vm.model.tenantId, vm.drugUseItemIds)).then(function (ret) {
-                if (ret.success === true) {
-                    vmh.alertSuccess(ret.msg, false);
+
+            if (vm.drugUseItemIds.length == 0) {
+                vmh.alertWarning('notification.SELECT-NONE-WARNING',true);
+                return;
+            }
+
+            var promise = ngDialog.openConfirm({
+                template: 'removeConfirmDialog.html',
+                className: 'ngdialog-theme-default'
+            }).then(function () {
+                vmh.fetch(vmh.psnService.drugUseItemRemove(vm.model._id, vm.model.tenantId, vm.drugUseItemIds)).then(function () {
+                    vmh.alertSuccess('notification.REMOVE-SUCCESS', true);
                     vm.fetchDrugUseItem();
-                } else {
-                    vmh.alertSuccess('保存失败,请重试', false);
-                }
-            })
+                });
+            });
         }
     }
-
-
-
-
-
+    
     DrugUseItemDetailsController.$inject = ['$scope', 'ngDialog'];
 
     function DrugUseItemDetailsController($scope, ngDialog) {
         var vm = $scope.vm = {};
         var vmh = $scope.ngDialogData.vmh;
-        var drugUseItem = $scope.ngDialogData.drugUseItem;
-        var fetchDrugUseItem = $scope.ngDialogData.fetchDrugUseItem
-
         $scope.utils = vmh.utils.v;
-        vm.model = {};
-        vm.model.elderlyId = $scope.ngDialogData.elderlyId;
-        vm.model.elderly_name = $scope.ngDialogData.elderlyName;
-        vm.model.tenantId = $scope.ngDialogData.tenantId;
-
-        vm.selectBinding = {};
+        console.log('三三四四:',$scope.utils.vinput);
+        var fetchDrugUseItem = $scope.ngDialogData.fetchDrugUseItem;
         init();
 
         function init() {
@@ -170,10 +171,11 @@
 
             vm.doSubmit = doSubmit;
             vm.cancel = cancel;
-            vm.queryDrugPromise = queryDrug();
             vm.fetchDrugColumnsPromise = [{ label: '药品条码', name: 'barcode', width: 200 }, { label: '药品全称', name: 'full_name', width: 100 }];
             vm.selectDrugForBackFiller = selectDrugForBackFiller;
             vm.initVoiceTemplate = initVoiceTemplate;
+
+
             vm.tab1 = { cid: 'contentTab1' };
 
             vmh.parallel([
@@ -184,19 +186,24 @@
                 vm.selectBinding.remindModes = results[1];
             });
 
-            if (drugUseItem) {
+            vm.model = $scope.ngDialogData.drugUseItem || {elderlyId:$scope.ngDialogData.elderlyId, elderly_name: $scope.ngDialogData.elderlyName, tenantId: $scope.ngDialogData.tenantId};
+            vm.selectBinding = {};
+
+            if (vm.model._id) {
+                // 修改
                 vm.readonly = true;
-                _.defaults(vm.model, drugUseItem);
-                if (drugUseItem.repeat_values && drugUseItem.repeat_values.length > 0) {
-                    vm.repeat_values = drugUseItem.repeat_values.join();
+                if (vm.model.repeat_values && vm.model.repeat_values.length > 0) {
+                    vm.repeat_values = vm.model.repeat_values.join();
                 }
             }
+
+            vm.queryDrugPromise = queryDrug($scope.ngDialogData.addedDrugIds);
         }
 
 
 
-        function queryDrug(keyword) {
-            return vmh.fetch(vmh.psnService.queryDrug(vm.model.tenantId, keyword, {}, 'barcode full_name'));
+        function queryDrug(addedDrugIds, keyword) {
+            return vmh.fetch(vmh.psnService.queryDrug(vm.model.tenantId, keyword, {_id: {$nin: addedDrugIds}}, 'barcode full_name'));
         }
 
         function selectDrugForBackFiller(row) {
@@ -231,35 +238,10 @@
                 }
             }
             if ($scope.theForm.$valid) {
-                var data = {
-                    elderlyId: vm.model.elderlyId,
-                    elderly_name: vm.model.elderly_name,
-                    drugId: vm.model.drugId,
-                    barcode: vm.model.barcode,
-                    name: vm.model.name,
-                    description: vm.model.description,
-                    duration: vm.model.duration,
-                    repeat_type: vm.model.repeat_type,
-                    repeat_values: vm.model.repeat_values,
-                    repeat_start: vm.model.repeat_start,
-                    confirm_flag: vm.model.confirm_flag,
-                    remind_flag: vm.model.remind_flag,
-                    remind_mode: vm.model.remind_mode,
-                    fee_flag: vm.model.fee_flag,
-                    fee: vm.model.fee,
-                    remind_times: vm.model.remind_times,
-                    voice_template: vm.model.voice_template,
-                    tenantId: vm.model.tenantId,
-                }
-
-                vmh.psnService.drugUseItemSave(data).then(function (ret) {
-                    if (ret.success === true) {
-                        ngDialog.close("#drug-use-item.html");
-                        vmh.alertSuccess(ret.msg, false);
-                        fetchDrugUseItem();
-                    } else {
-                        vmh.alertSuccess('保存失败,请重试', false);
-                    }
+                vmh.psnService.drugUseItemSave(vm.model).then(function (ret) {
+                    ngDialog.close("#drug-use-item.html");
+                    vmh.alertSuccess();
+                    fetchDrugUseItem();
                 })
             }
         }

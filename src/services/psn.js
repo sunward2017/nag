@@ -4749,30 +4749,30 @@ module.exports = {
                 verb: 'post',
                 url: this.service_url_prefix + "/workItemCopy",
                 handler: function (app, options) {
-                    return function* (next) {
+                    return function*(next) {
                         try {
                             var nursingLevelIds = this.request.body.nursingLevelIds;
                             var workItemId = this.request.body.workItemId;
 
-                            var workItem = yield app.modelFactory().model_read(app.models['psn_workItem'],workItemId);
+                            var workItem = yield app.modelFactory().model_read(app.models['psn_workItem'], workItemId);
 
                             if (!workItem) {
-                                this.body = app.wrapper.res.error({ message: '无法找到工作项目!' });
+                                this.body = app.wrapper.res.error({message: '无法找到工作项目!'});
                                 yield next;
                                 return;
-                            }else{
-                               var row = workItem.toObject();
-                                    row.check_in_time = "undefined";
-                                    row._id= "undefined";
-                                    row.operated_on== "undefined";
-                                var workItems=[];
-                                for(var i=0,len=nursingLevelIds.length;i<len;i++){
-                                    row.nursingLevelId = nursingLevelIds[i];
-                                    workItems.push(row); 
-                                }
-                                yield app.modelFactory().model_bulkInsert(app.models['psn_workItem'],{rows:workItems});
                             }
-                           this.body = app.wrapper.res.rows({success:true}) 
+
+                            var row = workItem.toObject();
+                            row.check_in_time = undefined;
+                            row._id = undefined;
+                            row.operated_on = undefined;
+                            var workItems = [];
+                            for (var i = 0, len = nursingLevelIds.length; i < len; i++) {
+                                row.nursingLevelId = nursingLevelIds[i];
+                                workItems.push(app._.extend({}, row));
+                            }
+                            yield app.modelFactory().model_bulkInsert(app.models['psn_workItem'], {rows: workItems});
+                            this.body = app.wrapper.res.default();
                         } catch (e) {
                             self.logger.error(e.message);
                             this.body = app.wrapper.res.error(e);
@@ -4852,7 +4852,9 @@ module.exports = {
                                 var workItems = elderlyNursingPlan.work_items;
                                 var index = app._.findIndex(workItems, (o) => {
                                     var flag;
-                                    if(o.workItemId){
+                                    console.log('workerItem: ',o);
+                                    if(o.type == DIC.D3017.NURSING_ITEM){
+                                        console.log('------------------: ',o.workItemId);
                                         flag = (o.workItemId.toString() == toProcessWorkItemId);
                                     }else{
                                         flag = (o.drugUseItemId.toString() == toProcessWorkItemId);
@@ -4874,6 +4876,17 @@ module.exports = {
 
                                 yield elderlyNursingPlan.save();
                             }
+
+                            // added by zppro 2017-5-26
+                            console.log('如果是用药项目,则需要反向同步到用药');
+                            if(toProcessWorkItem.type == DIC.D3017.DRUG_USE_ITEM) {
+                                var drugUseItem = yield app.modelFactory().model_read(app.models['psn_drugUseItem'], toProcessWorkItem.drugUseItemId);
+                                if (drugUseItem) {
+                                    drugUseItem.stop_flag = isRemoved;
+                                    yield drugUseItem.save();
+                                }
+                            }
+
 
                             this.body = app.wrapper.res.default();
                         } catch (e) {
@@ -5434,6 +5447,7 @@ module.exports = {
                             var elderlyId = data.elderlyId;
                             var elderly_name = data.elderly_name;
                             var tenantId = data.tenantId;
+                            var drugUseItemId = data._id;
                             var elderlyNursingPlan = yield app.modelFactory().model_one(app.models['psn_nursingPlan'], {
                                 select: 'work_items',
                                 where: {
@@ -5442,56 +5456,86 @@ module.exports = {
                                     tenantId: tenantId
                                 }
                             });
-                            var drugUseItemstock = yield app.modelFactory().model_one(app.models['psn_drugUseItem'], {
-                                select: 'work_items',
-                                where: {
-                                    status: 1,
-                                    elderlyId: elderlyId,
-                                    tenantId: tenantId,
-                                    barcode: data.barcode,
-                                }
-                            });
-                            if (drugUseItemstock) {
-                                data.drugUseItemId = drugUseItemstock.id;
-                                yield app.modelFactory().model_update(app.models['psn_drugUseItem'], drugUseItemstock.id, data);
-                                var workItems = elderlyNursingPlan.work_items;
-                                var index = app._.findIndex(workItems, (o) => {
-                                    return o.drugUseItemId.toString() == data.drugUseItemId;
-                                });
+                            if(data.stop_flag) {
+                                data.stoped_on = app.moment();
+                            }
+                            var drugUseItem = data, workItem;
+                            console.log('drugUseItemId:', drugUseItemId);
+                            if(drugUseItemId) {
+                                // 修改老人的用药项目
+                                yield app.modelFactory().model_update(app.models['psn_drugUseItem'], drugUseItemId, drugUseItem);
 
-                                if (index != -1) {
-                                    workItems.splice(index, 1);
-                                }
-                                workItems.push(data)
-                                elderlyNursingPlan.work_items = workItems;
-                                yield elderlyNursingPlan.save();
-                                var msg = "更新成功"
-                                this.body = app.wrapper.res.ret({ success: true, exec: 201, msg: msg });
-                            } else {
-                                var useItem = yield app.modelFactory().model_create(app.models['psn_drugUseItem'], data);
-                                drugUseItem = useItem.toObject();
-                                var Id = drugUseItem.id;
-                                data.type = DIC.D3017.DRUG_USE_ITEM;
-                                data.drugUseItemId = Id;
+                                //更新老人照护计划中
 
                                 if (elderlyNursingPlan) {
-                                    elderlyNursingPlan.work_items.push(data);
-                                    elderlyNursingPlan.save()
+
+                                    var workItems = elderlyNursingPlan.work_items;
+                                    var index = app._.findIndex(workItems, (o) => {
+                                        return o.type == DIC.D3017.DRUG_USE_ITEM && o.drugUseItemId.toString() == drugUseItemId;
+                                    });
+                                    if (index != -1) {
+                                        console.log('找到照护计划中的用药项目...');
+                                        if(!drugUseItem.stop_flag) {
+                                            console.log('修改用药项目,同步到照护计划中');
+                                            workItems.splice(index, 1, drugUseItem);
+                                        } else {
+                                            console.log('修改用药项目,删除照护计划中的用药项目');
+                                            workItems.splice(index, 1);
+                                        }
+                                    } else {
+                                        console.log('没有找到照护计划中的用药项目...');
+                                        if(!drugUseItem.stop_flag) {
+                                            //添加到照护计划中
+                                            console.log('修改用药项目,添加用药项目到照护计划中');
+                                            drugUseItem.type = DIC.D3017.DRUG_USE_ITEM;
+                                            drugUseItem.drugUseItemId = drugUseItem._id;
+                                            workItems.push(drugUseItem);
+                                        } else {
+                                            this.body = app.wrapper.res.default();
+                                            return;
+                                        }
+                                    }
+
+                                    elderlyNursingPlan.work_items = workItems;
+                                    yield elderlyNursingPlan.save();
                                 } else {
+                                    drugUseItem.type = DIC.D3017.DRUG_USE_ITEM;
+                                    drugUseItem.drugUseItemId = drugUseItem._id;
+
                                     yield app.modelFactory().model_create(app.models['psn_nursingPlan'], {
                                         elderlyId: elderlyId,
                                         elderly_name: elderly_name,
-                                        work_items: [data],
+                                        work_items: [drugUseItem],
                                         tenantId: tenantId
                                     });
                                 }
-
-                                var msg = "新增成功"
-                                this.body = app.wrapper.res.ret({ success: true, exec: 200, msg: msg });
+                                
+                            } else {
+                                // 新增老人的用药项目
+                                drugUseItem = yield app.modelFactory().model_create(app.models['psn_drugUseItem'], drugUseItem);
+                                drugUseItem.type = DIC.D3017.DRUG_USE_ITEM;
+                                drugUseItem.drugUseItemId = drugUseItem._id;
+                                // 如果用药项目没有停用 更新老人照护计划中
+                                if(!drugUseItem.stop_flag) {
+                                    console.log('新增用药项目,添加用药项目到照护计划中');
+                                    workItem = drugUseItem.toObject();
+                                    if (elderlyNursingPlan) {
+                                        elderlyNursingPlan.work_items.push(drugUseItem);
+                                        yield elderlyNursingPlan.save();
+                                    } else {
+                                        yield app.modelFactory().model_create(app.models['psn_nursingPlan'], {
+                                            elderlyId: elderlyId,
+                                            elderly_name: elderly_name,
+                                            work_items: [drugUseItem],
+                                            tenantId: tenantId
+                                        });
+                                    }
+                                }
                             }
-
+                            this.body = app.wrapper.res.default();
 
                         } catch (e) {
+                            console.log(e);
                             self.logger.error(e.message);
                             this.body = app.wrapper.res.error(e);
                         }
@@ -5519,21 +5563,25 @@ module.exports = {
                                     tenantId: tenantId
                                 }
                             });
-                            var workItems = elderlyNursingPlan.work_items;
-                            for (var i = 0, len = drugUseItemIds.length; i < len; i++) {
-                                var Id = drugUseItemIds[i];
-                                yield app.modelFactory().model_delete(app.models['psn_drugUseItem'], Id);
-                                var inIndex = app._.findIndex(workItems, (o) => {
-                                    return o.drugUseItemId.toString() == Id;
-                                });
-                                if (inIndex != -1) {
-                                    workItems.splice(inIndex, 1);
+                            if(elderlyNursingPlan) {
+                                var workItems = elderlyNursingPlan.work_items;
+                                for (var i = 0, len = drugUseItemIds.length; i < len; i++) {
+                                    var Id = drugUseItemIds[i];
+
+                                    var inIndex = app._.findIndex(workItems, (o) => {
+                                        return o.type == DIC.D3017.DRUG_USE_ITEM && o.drugUseItemId.toString() == Id;
+                                    });
+                                    if (inIndex != -1) {
+                                        workItems.splice(inIndex, 1);
+                                    }
                                 }
+                                elderlyNursingPlan.work_items = workItems;
+                                yield elderlyNursingPlan.save();
                             }
-                            elderlyNursingPlan.work_items = workItems;
-                            yield elderlyNursingPlan.save();
-                            var msg = "删除成功"
-                            this.body = app.wrapper.res.ret({ success: true, exec: 200, msg: msg });
+
+                            yield app.modelFactory().model_remove(app.models['psn_drugUseItem'], {_id:{$in: drugUseItemIds}});
+
+                            this.body = app.wrapper.res.default();
                         } catch (e) {
                             self.logger.error(e.message);
                             this.body = app.wrapper.res.error(e);

@@ -4814,6 +4814,9 @@ module.exports = {
                                     yield next;
                                     return;
                                 }
+                                 toProcessWorkItem = workItem.toObject();
+                                 toProcessWorkItem.type = type;
+                                 toProcessWorkItem.workItemId = toProcessWorkItemId;
 
                             } else if (type == DIC.D3017.DRUG_USE_ITEM) {
                                 workItem = yield app.modelFactory().model_read(app.models['psn_drugUseItem'], toProcessWorkItemId);
@@ -4822,11 +4825,10 @@ module.exports = {
                                     yield next;
                                     return;
                                 }
-
+                                toProcessWorkItem = workItem.toObject();
+                                toProcessWorkItem.type = type;
+                                toProcessWorkItem.drugUseItemId = toProcessWorkItemId;
                             }
-                            toProcessWorkItem = workItem.toObject();
-                            toProcessWorkItem.type = type;
-                            toProcessWorkItem.workItemId = toProcessWorkItemId;
                             var isRemoved = !workItemCheckInfo.checked;
                             var elderlyNursingPlan = yield app.modelFactory().model_one(app.models['psn_nursingPlan'], {
                                 select: 'work_items',
@@ -4849,7 +4851,13 @@ module.exports = {
                             } else {
                                 var workItems = elderlyNursingPlan.work_items;
                                 var index = app._.findIndex(workItems, (o) => {
-                                    return o.workItemId.toString() == toProcessWorkItemId;
+                                    var flag;
+                                    if(o.workItemId){
+                                        flag = (o.workItemId.toString() == toProcessWorkItemId);
+                                    }else{
+                                        flag = (o.drugUseItemId.toString() == toProcessWorkItemId);
+                                    }
+                                    return flag;
                                 });
                                 if (!isRemoved) {
                                     // 加入
@@ -4939,7 +4947,7 @@ module.exports = {
                                         } else {
                                             var workItemObj = workItem.toObject();
                                             workItemObj.type = type;
-                                            workItemObj.workItemId = workItemId;
+                                            workItemObj.drugUseItemId = workItemId;
                                             workItemsByElderly.push(workItemObj);
                                         }
                                     }
@@ -4995,7 +5003,7 @@ module.exports = {
                                             } else {
                                                 var workItemObj = workItem.toObject();
                                                 workItemObj.type = type;
-                                                workItemObj.workItemId = workItemId;
+                                                workItemObj.drugUseItemId = workItemId;
                                                 baseWorkItems.push(workItemObj);
                                             }
                                         }

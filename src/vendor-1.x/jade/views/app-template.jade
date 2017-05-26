@@ -153,19 +153,25 @@ script(type='text/ng-template', id="dlg-backfiller-default-pick.html")
         | {{ vm.title }}
     .ngdialog-body.backfiller
         .search-form
-            .input-group.page-search
-                label.input-group-addon {{'grid.LABEL-SEARACH'|translate}}
-                input.form-control(type="text",ng-model="vm.filter.$")
+            .col-md-6
+            .col-md-5
+                .input-group.page-search
+                    label.input-group-addon {{'grid.LABEL-SEARACH'|translate}}
+                    input.form-control(type="text",ng-model="vm.keyword")
+            .col-md-1
+                a.btn.btn-primary.btn-sm(title="{{'button.SEARCH'|translate}}",ng-click="vm.search(vm.keyword)")
+                    i.glyphicon.glyphicon-search
+            .clearfix
         .search-content
-            .panel.panel-default.panel-grid
-                table.grid.table.table-bordered.table-hover.table-striped
+            .panel.panel-grid
+                table.grid.table.table-bordered.table-hover.table-striped.table-responsive
                     thead
+                        colgroup
+                            col.text-center(ng-repeat="column in vm.columns", width="{{column|width}}")
                         tr
-                            th.text-center(ng-repeat="column in vm.columns",width="{{column|width}}") {{column.label}}
+                            th.text-center(ng-repeat="column in vm.columns") {{column.label}}
                     tbody
                         tr(ng-repeat="row in vm.rows|filter:vm.filter|paging:vm", ng-dblclick="vm.pickOne(row)")
-                            td(ng-repeat="column in vm.columns", width="{{column|width}}") {{::row[column.name] }}
-                .panel-footer
-                    .row
-                        .col-md-12
-                            pagination.pagination-sm.pull-right(total-items="vm.page.totals",ng-model="vm.page.no",max-size="5",items-per-page="vm.page.size",boundary-links="true")
+                            td(ng-repeat="column in vm.columns") {{::row[column.name] }}
+        .col-md-12
+            pagination.pagination-sm.pull-right(total-items="vm.page.totals",ng-model="vm.page.no",max-size="5",items-per-page="vm.page.size",boundary-links="true")

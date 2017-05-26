@@ -47,7 +47,9 @@
     "CONFIG": "配置",
     "BEGIN-ASSESSMENT":"开始评估",
     "REPLACE": "替换",
-    "APPEND": "追加"
+    "APPEND": "追加",
+    "QUERY": "查询",
+    "SEARCH": "查询"
   },
   "label": {
     "NONE": "无",

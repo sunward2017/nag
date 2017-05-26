@@ -171,7 +171,14 @@
 
             vm.doSubmit = doSubmit;
             vm.cancel = cancel;
-            vm.fetchDrugColumnsPromise = [{ label: '药品条码', name: 'barcode', width: 200 }, { label: '药品全称', name: 'full_name', width: 100 }];
+            vm.fetchDrugColumnsPromise = [
+                { label: '药品条码', name: 'barcode', width: 150 },
+                { label: '药品全称', name: 'full_name', width: 300 },
+                { label: '药品简称', name: 'short_name', width: 100 },
+                { label: '剂型', name: 'dosage_form', width: 80 },
+                { label: '服用说明', name: 'usage'}
+            ];
+            vm.searchForBackFiller = searchForBackFiller;
             vm.selectDrugForBackFiller = selectDrugForBackFiller;
             vm.initVoiceTemplate = initVoiceTemplate;
 
@@ -197,13 +204,19 @@
                 }
             }
 
-            vm.queryDrugPromise = queryDrug($scope.ngDialogData.addedDrugIds);
+            vm.page = {size: 9, no: 1};
+            vm.queryDrugPromise = queryDrug($scope.ngDialogData.addedDrugIds, "");
         }
 
 
 
         function queryDrug(addedDrugIds, keyword) {
-            return vmh.fetch(vmh.psnService.queryDrug(vm.model.tenantId, keyword, {_id: {$nin: addedDrugIds}}, 'barcode full_name'));
+            return vmh.fetch(vmh.psnService.queryDrug(vm.model.tenantId, keyword, {_id: {$nin: addedDrugIds}}, 'barcode full_name short_name dosage_form'));
+        }
+
+        function searchForBackFiller (keyword) {
+            console.log('keyword:', keyword);
+            vm.queryDrugPromise = queryDrug($scope.ngDialogData.addedDrugIds, keyword);
         }
 
         function selectDrugForBackFiller(row) {

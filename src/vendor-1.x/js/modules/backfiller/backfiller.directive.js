@@ -18,7 +18,7 @@
             restrict: 'EA',
             templateUrl: 'backfiller-default-render.html',
             link: link,
-            scope: {readonly:'=', inputName:'@', pickerIcon: '@', pickerTitle: '@', pickerClass:'@', fetchColumns: '=', fetchRows: '=', onSelect: '&', onCompareEqual:'&', model: '=ngModel'}
+            scope: {readonly:'=', inputName:'@', onSearch:"&", page: "=", pickerIcon: '@', pickerTitle: '@', pickerClass:'@', fetchColumns: '=', fetchRows: '=', onSelect: '&', onCompareEqual:'&', model: '=ngModel'}
         };
         return directive;
 
@@ -50,10 +50,14 @@
 
             scope.$watch("fetchRows",function(newValue,oldValue) {
                 if (newValue != oldValue) {
+                    console.log('fetchRows newValue:' , newValue)
                     $timeout(function () {
                         $q.when(newValue).then(function (rows) {
                             scope.rows = rows;
                             setShowText();
+                            if(scope.notify.reloadData) {
+                                scope.notify.reloadData(rows);
+                            }
                             console.log('backfill reload data end');
                         });
                     }, 0);
@@ -68,7 +72,6 @@
                     setShowText();
                 }
             });
-
             // Send out changes from inside:
             //scope.$watch(attrs.ngModel, function(val) {
             //    scope.model = val;
@@ -77,6 +80,10 @@
             element.on('click', function (event) {
                 event.preventDefault();
             });
+
+            scope.notify = {
+                reloadData: null
+            }
 
             scope.pick = function () {
                 if(scope.readonly) {
@@ -92,6 +99,15 @@
                         title: title,
                         columns: columns,
                         rows: scope.rows,
+                        page: scope.page,
+                        search: function (keyword) {
+                            if (attrs.onSearch) {
+                                $timeout(function () {
+                                    scope.onSearch({keyword: keyword});
+                                }, 0);
+                            }
+                        },
+                        notify: scope.notify,
                         translatePath: function (key) {
                             return pickerUrl + '.' + key;
                         }

@@ -49,9 +49,9 @@ script(type="text/ng-template", id="nursing-worker-schedule-save-as-template.htm
         .ngdialog-message
             h3.mt0 {{ vm.moduleTranslatePath('DIALOG-SAVE-AS-TEMPLATE-TITLE') | translate}}
         .ngdialog-input
-            .col-md-12.cover-nursing-schedule-template-c
+            .col-md-12.cover-nursing-worker-schedule-template-c
                 .tree.tree-dropdown(name='nursingWorkerScheduleTemplateSelected',s-tree, s-tree-data="vm.fetchNursingWorkerScheduleTemplatesPromise",s-tree-height="400", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{layout:'dropdown',selectNodeFormat:'object'}",ng-model="vm.saveToSelected", on-select="vm.selectNuringWorkerScheduleTemplateToSave(selectedNode)")
-                .cover-nursing-schedule-template-tree
+                .cover-nursing-worker-schedule-template-tree
                     input.form-control(type='text', name='name',ng-model='vm.nursingWorkerScheduleTemplateName',placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-SAVE-TO-TEMPLATE_NAME")|translate}}')
         .ngdialog-buttons
             .col-md-12.text-right

@@ -710,6 +710,7 @@
             })
             .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'nursing-schedule', {
                 url: '/nursing-schedule',
+                title: '房间值班日程',
                 access_level: AUTH_ACCESS_LEVELS.USER,
                 views: {
                     "module-header": {
@@ -735,7 +736,7 @@
             })
             .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'nursing-schedule-template', {
                 url: '/nursing-schedule-template',
-                title: '照护排班模版',
+                title: '房间值班日程模版',
                 abstract: true,
                 views: {
                     "module-header": {
@@ -807,24 +808,7 @@
                     //, deps: helper.resolveFor2('ui.select')
                 }
             })
-            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'nursing-group', {
-                url: '/nursing-group',
-                title: '照护组管理',
-                abstract: true,
-                views: {
-                    "module-header": {
-                        templateUrl: helper.basepath(MODEL_VARIABLES.HEAD_TEMPLATES.PENSION_AGENCY),
-                        controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER_FOR_TENANT
-                    },
-                    "module-content": {
-                        template: '<div class="data-ui-view"></div><div class="clearfix"></div>'
-                    }
-                },
-                data: {
-                    func_id: MODEL_VARIABLES.BIZ_FUNC_PREFIXS.PENSION_AGENCY + 'NURSING-GROUP' //业务系统使用
-                },
-                resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.PENSION_AGENCY + 'nursing-group.js')
-            })
+
             .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'nursing-worker-schedule', {
                 url: '/nursing-worker-schedule',
                 access_level: AUTH_ACCESS_LEVELS.USER,
@@ -848,6 +832,99 @@
                     func_id: MODEL_VARIABLES.BIZ_FUNC_PREFIXS.PENSION_AGENCY + 'NURSING-WORKER-SCHEDULE' //业务系统使用
                 },
                 resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.PENSION_AGENCY + 'nursing-worker-schedule.js')
+            })
+
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'nursing-worker-schedule-template', {
+                url: '/nursing-worker-schedule-template',
+                title: '护工排班模版',
+                abstract: true,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath(MODEL_VARIABLES.HEAD_TEMPLATES.PENSION_AGENCY),
+                        controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER_FOR_TENANT
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div><div class="clearfix"></div>'
+                    }
+                },
+                data: {
+                    func_id: MODEL_VARIABLES.BIZ_FUNC_PREFIXS.PENSION_AGENCY + 'NURSING-WORKER-SCHEDULE-TEMPLATE' //业务系统使用
+                },
+                resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.PENSION_AGENCY + 'nursing-worker-schedule-template.js')
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'nursing-worker-schedule-template.list', {
+                url: '/list/:action',
+                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'nursing-worker-schedule-template-list.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'NursingWorkerScheduleTemplateGridController',
+                resolve: {
+                    entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'nursing-worker-schedule-template.list', {
+                        modelName: 'psn-nursingWorkerScheduleTemplate',
+                        searchForm: { "status": 1 },
+                        serverPaging: true,
+                        columns: [{
+                            label: '模版名称',
+                            name: 'name',
+                            type: 'string',
+                            width: 120,
+                            sortable: true
+                        }, {
+                            label: '类型',
+                            name: 'type_name',
+                            type: 'string',
+                            width: 80,
+                            sortable: true
+                        }, {
+                            label: '停用',
+                            name: 'stop_flag',
+                            type: 'bool',
+                            width: 80
+                        }, {
+                            label: '停用原因',
+                            name: 'stop_result_name',
+                            type: 'string',
+                            width: 120,
+                            sortable: true
+                        }, {
+                            label: '',
+                            name: 'actions',
+                            sortable: false,
+                            width: 60
+                        }]
+                    })
+                }
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'nursing-worker-schedule-template.details', {
+                url: '/details/:action/:_id',
+                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'nursing-worker-schedule-template-details.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'NursingWorkerScheduleTemplateDetailsController',
+                resolve: {
+                    entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'nursing-worker-schedule-template.details', {
+                        modelName: 'psn-nursingWorkerScheduleTemplate',
+                        model: { type: 'A0001' },
+                        blockUI: true
+                    })
+                    //, deps: helper.resolveFor2('ui.select')
+                }
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'nursing-group', {
+                url: '/nursing-group',
+                title: '照护组管理',
+                abstract: true,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath(MODEL_VARIABLES.HEAD_TEMPLATES.PENSION_AGENCY),
+                        controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER_FOR_TENANT
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div><div class="clearfix"></div>'
+                    }
+                },
+                data: {
+                    func_id: MODEL_VARIABLES.BIZ_FUNC_PREFIXS.PENSION_AGENCY + 'NURSING-GROUP' //业务系统使用
+                },
+                resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.PENSION_AGENCY + 'nursing-group.js')
             })
             .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'nursing-group.list', {
                 url: '/list/:action',

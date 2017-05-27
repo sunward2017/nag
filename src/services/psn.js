@@ -3974,7 +3974,8 @@ module.exports = {
                         yield next;
                     };
                 }
-            }, {
+            },
+            {
                 method: 'nursingScheduleSave',
                 verb: 'post',
                 url: this.service_url_prefix + "/nursingScheduleSave",
@@ -4103,7 +4104,8 @@ module.exports = {
                         yield next;
                     };
                 }
-            }, {
+            },
+            {
                 method: 'nursingScheduleRemove',
                 verb: 'post',
                 url: this.service_url_prefix + "/nursingScheduleRemove",
@@ -4207,7 +4209,8 @@ module.exports = {
                         yield next;
                     };
                 }
-            }, {
+            },
+            {
                 method: 'nursingScheduleTemplateImport',
                 verb: 'post',
                 url: this.service_url_prefix + "/nursingScheduleTemplateImport",
@@ -4219,7 +4222,7 @@ module.exports = {
                             var nursingScheduleTemplateId = this.request.body.nursingScheduleTemplateId;
                             nursingScheduleTemplate = yield app.modelFactory().model_read(app.models['psn_nursingScheduleTemplate'], nursingScheduleTemplateId);
                             if (!nursingScheduleTemplate || nursingScheduleTemplate.status == 0) {
-                                this.body = app.wrapper.res.error({ message: '无法找到照护模版!' });
+                                this.body = app.wrapper.res.error({ message: '无法找到房间值班日程模版!' });
                                 yield next;
                                 return;
                             }
@@ -4341,7 +4344,8 @@ module.exports = {
                         yield next;
                     };
                 }
-            }, {
+            },
+            {
                 method: 'nursingScheduleSaveAsTemplateWeekly',
                 verb: 'post',
                 url: this.service_url_prefix + "/nursingScheduleSaveAsTemplateWeekly",
@@ -4398,7 +4402,8 @@ module.exports = {
                         yield next;
                     };
                 }
-            }, {
+            },
+            {
                 method: 'nursingScheduleByElderlyDaily',
                 verb: 'post',
                 url: this.service_url_prefix + "/nursingScheduleByElderlyDaily", //按老人和天查找照护排班
@@ -4634,6 +4639,142 @@ module.exports = {
 
                             console.log('排班删除成功');
 
+                        } catch (e) {
+                            console.log(e);
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
+            {
+                method: 'nursingWorkerScheduleTemplateImport',
+                verb: 'post',
+                url: this.service_url_prefix + "/nursingWorkerScheduleTemplateImport",
+                handler: function (app, options) {
+                    return function* (next) {
+                        var nursingWorkerScheduleTemplate;
+                        try {
+                            //this.request.body
+                            var nursingWorkerScheduleTemplateId = this.request.body.nursingWorkerScheduleTemplateId;
+                            nursingWorkerScheduleTemplate = yield app.modelFactory().model_read(app.models['psn_nursingWorkerScheduleTemplate'], nursingWorkerScheduleTemplateId);
+                            if (!nursingWorkerScheduleTemplate || nursingWorkerScheduleTemplate.status == 0) {
+                                this.body = app.wrapper.res.error({ message: '无法找到护工排班模版!' });
+                                yield next;
+                                return;
+                            }
+
+                            var toImportXAxisRange = this.request.body.toImportXAxisRange;
+
+
+                            console.log('toImportXAxisRange:');
+                            console.log(toImportXAxisRange);
+
+                            var xAxisValue, xAxisDate;
+                            var xAxisDayDateMap = {};
+                            var xAxisRange = app._.map(toImportXAxisRange, (o) => {
+                                xAxisValue = app.moment(o);
+                                xAxisDate = xAxisValue.toDate();
+                                xAxisDayDateMap[xAxisValue.day()] = xAxisDate;
+                                return { 'x_axis': { '$gte': xAxisDate, '$lt': xAxisValue.add(1, 'days').toDate() } }
+                            });
+
+                            var templateItems = nursingWorkerScheduleTemplate.content;
+                            var yAxisRange = app._.uniq(app._.map(templateItems, (o) => {
+                                return o.y_axis;
+                            }));
+
+                            var removeWhere = {
+                                tenantId: nursingWorkerScheduleTemplate.tenantId,
+                                y_axis: { $in: yAxisRange },
+                                $or: xAxisRange
+                            };
+
+                            var toSaveRows = app._.map(templateItems, (o) => {
+                                var x_axis = xAxisDayDateMap[o.x_axis];
+                                return {
+                                    x_axis: x_axis,
+                                    y_axis: o.y_axis,
+                                    aggr_value: o.aggr_value,
+                                    tenantId: nursingWorkerScheduleTemplate.tenantId
+                                };
+                            });
+
+
+                            console.log('前置检查完成');
+
+                            var ret = yield app.modelFactory().model_bulkInsert(app.models['psn_nursingWorkerSchedule'], {
+                                rows: toSaveRows,
+                                removeWhere: removeWhere
+                            });
+
+                            console.log('护工模版导入成功');
+
+                            var groupedSaveRows = app._.groupBy(toSaveRows, (o) => {
+                                "use strict";
+                                return o.x_axis + '$' + o.y_axis + '$' + o.tenantId;
+                            });
+
+                            this.body = app.wrapper.res.default();
+                        } catch (e) {
+                            console.log(e);
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
+            {
+                method: 'nursingWorkerScheduleSaveAsTemplateWeekly',
+                verb: 'post',
+                url: this.service_url_prefix + "/nursingWorkerScheduleSaveAsTemplateWeekly",
+                handler: function (app, options) {
+                    return function* (next) {
+                        var tenant;
+                        try {
+                            //this.request.body
+                            var tenantId = this.request.body.tenantId;
+                            tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], tenantId);
+                            if (!tenant || tenant.status == 0) {
+                                this.body = app.wrapper.res.error({ message: '无法找到养老机构!' });
+                                yield next;
+                                return;
+                            }
+
+                            var nursingWorkerScheduleTemplateName = this.request.body.nursingWorkerScheduleTemplateName;
+                            var toSaveRows = this.request.body.toSaveRows;
+                            app._.each(toSaveRows, (o) => {
+                                o.tenantId = tenantId
+                            });
+
+                            console.log('toSaveRows:', toSaveRows);
+
+                            var nursingWorkerScheduleTemplate = yield app.modelFactory().model_one(app.models['psn_nursingWorkerScheduleTemplate'], {
+                                where: {
+                                    status: 1,
+                                    name: nursingWorkerScheduleTemplateName,
+                                    type: DIC.D3010.WEEKLY,
+                                    tenantId: tenantId
+                                }
+                            });
+
+                            console.log('前置检查完成');
+                            var isCreate = !nursingWorkerScheduleTemplate;
+                            if (isCreate) {
+                                yield app.modelFactory().model_create(app.models['psn_nursingWorkerScheduleTemplate'], {
+                                    name: nursingWorkerScheduleTemplateName,
+                                    type: DIC.D3010.WEEKLY,
+                                    content: toSaveRows,
+                                    tenantId: tenantId
+                                });
+                            } else {
+                                nursingWorkerScheduleTemplate.content = toSaveRows;
+                                yield nursingWorkerScheduleTemplate.save();
+                            }
+
+                            this.body = app.wrapper.res.ret(isCreate);
                         } catch (e) {
                             console.log(e);
                             self.logger.error(e.message);

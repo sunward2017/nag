@@ -38,7 +38,7 @@
             vm.saveAsTemplate = saveAsTemplate;
             vm.tab1 = {cid: 'contentTab1'};
 
-            fetchNursingScheduleTemplates();
+            fetchNursingWorkerScheduleTemplates();
             vm.aggrValuePromise = vmh.shareService.tmp('T3001/psn-nursingShift', 'name', {tenantId: vm.tenantId, status: 1, stop_flag: false}).then(function (nodes) {
                 vm.selectBinding.nursingShifts = nodes;
                 return nodes;
@@ -53,10 +53,10 @@
         }
 
 
-        function fetchNursingScheduleTemplates () {
-            // vmh.shareService.tmp('T3001/psn-nursingScheduleTemplate', 'name', {tenantId: vm.tenantId, status: 1, stop_flag: false}, true).then(function (treeNodes) {
-            //     vm.selectBinding.nursingScheduleTemplates = treeNodes;
-            // });
+        function fetchNursingWorkerScheduleTemplates () {
+            vmh.shareService.tmp('T3001/psn-nursingWorkerScheduleTemplate', 'name', {tenantId: vm.tenantId, status: 1, stop_flag: false}, true).then(function (treeNodes) {
+                vm.selectBinding.nursingWorkerScheduleTemplates = treeNodes;
+            });
         }
         
         function preWeek() {
@@ -88,7 +88,6 @@
             console.log('parse nursingWorkerScheduleItems');
             var nursingWorkerScheduleItems = nursingWorkerSchedule.items;
             console.log(nursingWorkerSchedule);
-            // vm.yAxisData = nursingSchedule.yAxisData;  ?  //The default nursing scheduling state is not selected
             var nursingShifts = vm.selectBinding.nursingShifts;
             vm.aggrData = {};
 
@@ -330,9 +329,7 @@
         }
         
         function importTemplate () {
-            console.log('selectedNursingScheduleTemplate')
-
-            if (!vm.selectedNursingScheduleTemplate) {
+            if (!vm.selectedNursingWorkerScheduleTemplate) {
                 vmh.alertWarning(vm.moduleTranslatePath('MSG-NO-PICK-NURSING_WORKER_SCHEDULE_TEMPLATE'), true);
                 return;
             }
@@ -345,8 +342,8 @@
                 }]
             }).then(function () {
                 var toImportXAxisRange = vm.xAxisData.map(function (o) {return o.value });
-                console.log(vm.selectedNursingScheduleTemplate._id);
-                vmh.psnService.nursingScheduleTemplateImport(vm.selectedNursingScheduleTemplate._id, toImportXAxisRange).then(function(){
+                console.log(vm.selectedNursingWorkerScheduleTemplate._id);
+                vmh.psnService.nursingWorkerScheduleTemplateImport(vm.selectedNursingWorkerScheduleTemplate._id, toImportXAxisRange).then(function(){
                     vmh.alertSuccess('notification.NORMAL-SUCCESS', true);
                     loadWeek();
                 });
@@ -379,22 +376,21 @@
             }
 
             ngDialog.open({
-                template: 'nursing-schedule-save-as-template.html',
-                controller: 'NursingScheduleSaveAsTemplateController',
-                className: 'ngdialog-theme-default ngdialog-nursing-schedule-save-as-template',
+                template: 'nursing-worker-schedule-save-as-template.html',
+                controller: 'NursingWorkerScheduleSaveAsTemplateController',
+                className: 'ngdialog-theme-default ngdialog-nursing-worker-schedule-save-as-template',
                 data: {
                     vmh: vmh,
                     moduleTranslatePathRoot: vm.moduleTranslatePath(),
                     tenantId: vm.tenantId,
-                    nursingScheduleTemplates: vm.selectBinding.nursingScheduleTemplates,
+                    nursingWorkerScheduleTemplates: vm.selectBinding.nursingWorkerScheduleTemplates,
                     toSaveRows: toSaveRows
                 }
             }).closePromise.then(function (ret) {
                 if(ret.value!='$document' && ret.value!='$closeButton' && ret.value!='$escape' ) {
                     console.log(ret.value)
                     if(ret.value === true){
-                        console.log('fetchNursingScheduleTemplates')
-                        fetchNursingScheduleTemplates();
+                        fetchNursingWorkerScheduleTemplates();
                     }
                 }
             });
@@ -418,7 +414,7 @@
                 return vm.moduleTranslatePathRoot + '.' + key;
             };
             vm.tenantId = $scope.ngDialogData.tenantId;
-            vm.fetchNursingScheduleTemplatesPromise = vmh.promiseWrapper($scope.ngDialogData.nursingScheduleTemplates);
+            vm.fetchNursingWorkerScheduleTemplatesPromise = vmh.promiseWrapper($scope.ngDialogData.nursingWorkerScheduleTemplates);
             vm.toSaveRows = $scope.ngDialogData.toSaveRows;
 
             vm.selectNuringScheduleTemplateToSave = selectNuringScheduleTemplateToSave;
@@ -429,7 +425,7 @@
         function selectNuringScheduleTemplateToSave(selectedNode) {
             console.log(selectedNode);
             vmh.timeout(function(){
-                vm.nursingScheduleTemplateName = selectedNode.name;
+                vm.nursingWorkerScheduleTemplateName = selectedNode.name;
             }, 25);
         }
 
@@ -446,7 +442,7 @@
                         $scopeConfirm.message = vm.moduleTranslatePath('CONFIRM-MESSAGE-SAVE-AS-TEMPLATE')
                     }]
                 }).then(function () {
-                    vmh.psnService.nursingScheduleSaveAsTemplateWeekly(vm.tenantId, vm.nursingScheduleTemplateName, vm.toSaveRows).then(function (isCreate) {
+                    vmh.psnService.nursingWorkerScheduleSaveAsTemplateWeekly(vm.tenantId, vm.nursingWorkerScheduleTemplateName, vm.toSaveRows).then(function (isCreate) {
                         $scope.closeThisDialog(isCreate);
                         vmh.alertSuccess();
                     });

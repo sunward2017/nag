@@ -53,6 +53,7 @@
             vm.doSubmit = doSubmit;
             vm.clearEndOn = clearEndOn;
             vm.queryElderly = queryElderly;
+            vm.searchForBackFiller = searchForBackFiller;
             vm.selectElerlyForBackFiller = selectElerlyForBackFiller;
             vm.selectElerly = selectElerly;
             vm.tab1 = {cid: 'contentTab1'};
@@ -63,16 +64,24 @@
             ]).then(function (results) {
                 vm.selectBinding.sex = results[0];
                 vm.selectBinding.relationsWithTheElderly = results[1];
+
+                vm.fetchElderlyColumnsPromise = [
+                    {label: '入院号',name: 'enter_code',width: 100, align:'center'},
+                    {label: '姓名',name: 'name',width: 80},
+                    {label: '性别',name: 'sex',width: 60, align:'center', filter: 'diFilter', format: vm.selectBinding.sex},
+                    {label: '年龄',name: 'birthday',width: 60, align:'center', filter: 'calcAge'},
+                    {label: '房间床位',name: 'room_summary',width: 300},
+                    {label: '照护情况',name: 'nursing_info',width: 300},
+                    {label: '',name: ''}
+                ];
             });
             vm.queryElderlyPromise = queryElderly();
-            vm.fetchElderlyColumnsPromise = [{label: '入院登记号',name: 'enter_code',width: 100}, {label: '姓名',name: 'name',width: 100}];
 
             vm.load().then(function(){
                 if(vm.model.elderlyId){
                     vm.selectedElderly = {_id: vm.model.elderlyId, name: vm.model.elderly_name};
                 }
             });
-
         }
 
         function clearEndOn() {
@@ -83,7 +92,11 @@
             return vmh.fetch(vmh.psnService.queryElderly(vm.tenantId, keyword, {
                 live_in_flag: true,
                 begin_exit_flow: {'$in':[false,undefined]}
-            }, 'name enter_code'));
+            }, 'name enter_code sex birthday room_summary nursing_info'));
+        }
+
+        function searchForBackFiller (keyword) {
+            vm.queryElderlyPromise = queryElderly(keyword);
         }
 
         function selectElerlyForBackFiller(row) {

@@ -25,16 +25,17 @@
             vm.title = $scope.ngDialogData.title;
             vm.rows = $scope.ngDialogData.rows;
             vm.columns = $scope.ngDialogData.columns;
-            vm.page = $scope.ngDialogData.page || {size: 5, no: 1};
+            vm.page = $scope.ngDialogData.page || {size: 10, no: 1};
 
-            $scope.ngDialogData.notify.reloadData = reloadData;
+            $scope.ngDialogData.notify.reloadRows = reloadRows;
+
         }
 
         function pickOne(row) {
             $scope.closeThisDialog(row);
         }
 
-        function reloadData(rows) {
+        function reloadRows(rows) {
             vm.rows = rows;
         }
     }

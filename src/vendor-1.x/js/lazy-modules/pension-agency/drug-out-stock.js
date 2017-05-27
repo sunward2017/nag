@@ -53,19 +53,38 @@
         function init() {
             vm.init({ removeDialog: ngDialog });
             vm.doSubmit = doSubmit;
+            vm.searchElderlyForBackFiller = searchElderlyForBackFiller;
             vm.queryElderlyPromise = queryElderly();
-            vm.fetchElderlyColumnsPromise = [{ label: '入院登记号', name: 'enter_code', width: 100 }, { label: '姓名', name: 'name', width: 100 }];
-
+            vm.searchDrugForBackFiller = searchDrugForBackFiller;
             vm.queryDrugPromise = queryDrug();
-            vm.fetchDrugColumnsPromise = [{ label: '药品编码', name: 'drug_no', width: 100 }, { label: '药品全称', name: 'full_name', width: 100 }];
+            vm.fetchDrugColumnsPromise = [
+                { label: '药品条码', name: 'barcode', width: 150 },
+                { label: '药品全称', name: 'full_name', width: 300 },
+                { label: '药品简称', name: 'short_name', width: 100 },
+                { label: '药品别名', name: 'alias', width: 100 },
+                { label: '生产厂商', name: 'vender', width: 300 },
+                { label: '剂型', name: 'dosage_form', width: 80 },
+                { label: '服用说明', name: 'usage'}
+            ];
             vm.selectElerlyForBackFiller = selectElerlyForBackFiller;
             vm.selectDrugForBackFiller = selectDrugForBackFiller;
             vm.tab1 = { cid: 'contentTab1' };
 
             vmh.parallel([
                 vmh.shareService.d('D3013'),
+                vmh.shareService.d('D1006')
             ]).then(function (results) {
                 vm.selectBinding.unit = results[0];
+
+                vm.fetchElderlyColumnsPromise = [
+                    {label: '入院号',name: 'enter_code',width: 100, align:'center'},
+                    {label: '姓名',name: 'name',width: 80},
+                    {label: '性别',name: 'sex',width: 60, align:'center', filter: 'diFilter', format: results[1]},
+                    {label: '年龄',name: 'birthday',width: 60, align:'center', filter: 'calcAge'},
+                    {label: '房间床位',name: 'room_summary',width: 300},
+                    {label: '照护情况',name: 'nursing_info',width: 300},
+                    {label: '',name: ''}
+                ];
             })
 
             vm.typePromise = vmh.shareService.d('D3014').then(function (types) {
@@ -83,13 +102,16 @@
         }
 
         function queryElderly(keyword) {
-            console.log('keyword', keyword)
             return vmh.fetch(vmh.psnService.queryElderly(vm.tenantId, keyword, {
                 live_in_flag: true,
-                // sbegin_exit_flow: {'$in':[false,undefined]}
-            }, 'name enter_code'));
+                begin_exit_flow: {'$in':[false,undefined]}
+            }, 'name enter_code sex birthday room_summary nursing_info'));
         }
 
+        function searchElderlyForBackFiller (keyword) {
+            vm.queryElderlyPromise = queryElderly(keyword);
+        }
+        
         function selectDrugForBackFiller(row) {
             if (row) {
                 vm.model.drugId = row.id;
@@ -107,42 +129,18 @@
         }
 
         function queryDrug(keyword) {
-            return vmh.fetch(vmh.psnService.queryDrug(vm.tenantId, keyword, {}, 'drug_no full_name'));
+            return vmh.fetch(vmh.psnService.queryDrug(vm.tenantId, keyword, {}, 'barcode full_name short_name dosage_form alias vender'));
         }
 
-
-
-
-
+        function searchDrugForBackFiller (keyword) {
+            vm.queryDrugPromise = queryDrug(keyword);
+        }
 
         function doSubmit() {
             if ($scope.theForm.$valid) {
-                // vm.model.in_out_type = 0;
-                // var nowDate = new Date();
-                // vm.model.in_out_no = 'out-' + nowDate.toLocaleDateString() + '-' +  Math.floor(Math.random() * (9999 - 1000) + 1000);
-                // vm.save(true).then(function(ret){
-                //     vmh.psnService.drugOutStock(vm.tenantId,vm.model.elderlyId,vm.model.drugId,vm.model.in_out_quantity,vm.model.type,vm.model.unit).then(function(ret) {
-                //             vmh.alertSuccess(vm.viewTranslatePath('SYNC_FAMILY_MEMBERS_SUCCESS'), true);
-                //             vm.returnBack();
-                //         });
-                // })
-
-                // vmh.psnService.drugOutStock(vm.tenantId,vm.model.elderlyId,vm.model.drugId,vm.model.in_out_quantity,vm.model.type,vm.model.unit).then(function(ret) {
-                //             vmh.alertSuccess(vm.viewTranslatePath('SYNC_FAMILY_MEMBERS_SUCCESS'), true);
-                //             vm.returnBack();
-                //         });
-
-                // function drugOutStock(){
-                //     vmh.psnService.drugOutStock(vm.tenantId,vm.model.elderlyId,vm.model.drugId,vm.model.in_out_quantity,vm.model.type,vm.model.unit).then(function(ret) {
-                //                                 vmh.alertSuccess(vm.viewTranslatePath('SYNC_FAMILY_MEMBERS_SUCCESS'), true);
-                //                                 vm.returnBack();
-                //                             });
-                // }
-
                 vmh.psnService.drugOutStock(vm.tenantId, vm.model.elderlyId, vm.model.drugId, vm.model.in_out_quantity, vm.model.type, vm.model.unit).then(function (ret) {
                     vm.returnBack();
                 });
-
             }
             else {
                 if ($scope.utils.vtab(vm.tab1.cid)) {

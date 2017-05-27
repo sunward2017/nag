@@ -1,6 +1,6 @@
 /**
- * district Created by zppro on 17-3-17.
- * Target:养老机构 房间值班日程模版
+ * district Created by zppro on 17-5-27.
+ * Target:养老机构 护工排班模版
  */
 
 (function() {
@@ -8,14 +8,14 @@
     
     angular
         .module('subsystem.pension-agency')
-        .controller('NursingScheduleTemplateGridController', NursingScheduleTemplateGridController)
-        .controller('NursingScheduleTemplateDetailsController', NursingScheduleTemplateDetailsController)
+        .controller('NursingWorkerScheduleTemplateGridController', NursingWorkerScheduleTemplateGridController)
+        .controller('NursingWorkerScheduleTemplateDetailsController', NursingWorkerScheduleTemplateDetailsController)
     ;
 
 
-    NursingScheduleTemplateGridController.$inject = ['$scope', 'ngDialog', 'vmh', 'entryVM'];
+    NursingWorkerScheduleTemplateGridController.$inject = ['$scope', 'ngDialog', 'vmh', 'entryVM'];
 
-    function NursingScheduleTemplateGridController($scope, ngDialog, vmh, vm) {
+    function NursingWorkerScheduleTemplateGridController($scope, ngDialog, vmh, vm) {
 
         $scope.vm = vm;
         $scope.utils = vmh.utils.g;
@@ -28,9 +28,9 @@
         }
     }
 
-    NursingScheduleTemplateDetailsController.$inject = ['$scope', 'ngDialog', 'vmh', 'entityVM'];
+    NursingWorkerScheduleTemplateDetailsController.$inject = ['$scope', 'ngDialog', 'vmh', 'entityVM'];
 
-    function NursingScheduleTemplateDetailsController($scope, ngDialog, vmh, vm) {
+    function NursingWorkerScheduleTemplateDetailsController($scope, ngDialog, vmh, vm) {
 
         var vm = $scope.vm = vm;
         $scope.utils = vmh.utils.v;
@@ -55,19 +55,14 @@
             vm.removeSelected = removeSelected;
             vm.tab1 = {cid: 'contentTab1'};
 
-            vmh.shareService.tmp('T3001/psn-nursingWorker', 'name', {tenantId: vm.tenantId, status: 1, stop_flag: false}).then(function (treeNodes) {
+            vm.aggrValuePromise = vmh.shareService.tmp('T3001/psn-nursingShift', 'name', {tenantId: vm.tenantId, status: 1, stop_flag: false}).then(function (treeNodes) {
                 vm.selectBinding.nursingWorkers = treeNodes;
+                return treeNodes;
             });
 
-            vm.aggrValuePromise = vmh.shareService.tmp('T3013', null, {tenantId:vm.tenantId}).then(function(nodes){
-                console.log('aggrValuePromise:', nodes);
-                return nodes;
-            });
-
-            vm.yAxisDataPromise = vmh.shareService.tmp('T3009', null, {tenantId:vm.tenantId}).then(function(nodes){
-                console.log('yAxisDataPromise:', nodes);
-                return nodes;
-            });
+            vm.yAxisDataPromise = vmh.shareService.tmp('T3001/psn-nursingWorker', null, {tenantId:vm.tenantId, status: 1, stop_flag: false});
+            
+            
             vm.load().then(function(){
                 vm.raw$stop_flag = !!vm.model.stop_flag;
                 //构造类型表格
@@ -236,7 +231,7 @@
         function saveSelected (isReplace) {
 
             if (!vm.selectedNursingWorkers || vm.selectedNursingWorkers.length == 0) {
-                vmh.alertWarning(vm.viewTranslatePath('MSG-NO-PICK-NURSING'), true);
+                vmh.alertWarning(vm.viewTranslatePath('MSG-NO-PICK-NURSING_SHIFT'), true);
                 return;
             }
             var selectedNursingWorkers = _.map(vm.selectedNursingWorkers, function (o) {
@@ -309,10 +304,6 @@
                         if(vm.aggrData[rowId]) {
                             for (var j=0, xlen = vm.xAxisData.length;j<xlen;j++) {
                                 var colId = vm.xAxisData[j]._id;
-                                // if (!vm.aggrData[rowId] || !vm.aggrData[rowId][colId]) {
-                                //     vmh.alertWarning(vm.viewTranslatePath('MSG-NO-NURSING-WORKER-FOR-ROOM'), true);
-                                //     return;
-                                // }
                                 if(vm.aggrData[rowId][colId]) {
                                     var assignedWorkers = vm.aggrData[rowId][colId];
                                     for(var k=0,zlen = assignedWorkers.length;k<zlen;k++) {
@@ -329,7 +320,7 @@
 
 
                 if(!findNursingWorkerToSaveTemplate) {
-                    vmh.alertWarning(vm.viewTranslatePath('MSG-NO-NURSING-WORKER-FOR-ROOM'), true);
+                    vmh.alertWarning(vm.viewTranslatePath('MSG-NO-NURSING_SHIFT-FOR-NURSING_WORKER'), true);
                     return;
                 }
 

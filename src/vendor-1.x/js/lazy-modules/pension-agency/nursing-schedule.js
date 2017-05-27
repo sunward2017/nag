@@ -10,6 +10,7 @@
         .module('subsystem.pension-agency')
         .controller('NursingScheduleController', NursingScheduleController)
         .controller('NursingScheduleSaveAsTemplateController', NursingScheduleSaveAsTemplateController)
+        .filter('nursingScheduleCellFilter', nursingScheduleCellFilter)
     ;
 
     NursingScheduleController.$inject = ['$scope', 'ngDialog', 'vmh', 'instanceVM'];
@@ -42,6 +43,11 @@
             fetchNursingScheduleTemplates();
             vmh.shareService.tmp('T3001/psn-nursingWorker', 'name', {tenantId: vm.tenantId, status: 1, stop_flag: false}).then(function (treeNodes) {
                 vm.selectBinding.nursingWorkers = treeNodes;
+            });
+
+            vmh.shareService.tmp('T3001/psn-nursingShift', 'code', {tenantId: vm.tenantId, status: 1, stop_flag: false}).then(function (nodes) {
+                vm.selectBinding.nursingShifts = nodes;
+                return nodes;
             });
 
             vm.aggrValuePromise = vmh.shareService.tmp('T3013', null, {tenantId:vm.tenantId}).then(function(nodes){
@@ -79,6 +85,7 @@
                     vm.cols[colId] = false;//selectedCol control variable
                 }
                 queryNursingSchedule();
+                queryNursingWorkerSchedule();
             }));
         }
         
@@ -86,6 +93,12 @@
             var start = vm.xAxisData[0].value;
             var end = vm.xAxisData[vm.xAxisData.length-1].value;
             var p3 = vmh.psnService.nursingScheduleWeekly(vm.tenantId, start, end).then(parseNursingSchedule);
+        }
+
+        function queryNursingWorkerSchedule () {
+            var start = vm.xAxisData[0].value;
+            var end = vm.xAxisData[vm.xAxisData.length-1].value;
+            vmh.psnService.nursingWorkerScheduleWeekly(vm.tenantId, start, end).then(parseNursingWorkerSchedule);
         }
 
         function parseNursingSchedule(nursingSchedule) {
@@ -113,12 +126,40 @@
                     if (!vm.aggrData[nursingScheduleItem.y_axis]) {
                         vm.aggrData[nursingScheduleItem.y_axis] = {};
                     }
+
                     if (!vm.aggrData[nursingScheduleItem.y_axis][nursingScheduleItem.x_axis_value]){
                         vm.aggrData[nursingScheduleItem.y_axis][nursingScheduleItem.x_axis_value] = [];
                     }
                     vm.aggrData[nursingScheduleItem.y_axis][nursingScheduleItem.x_axis_value].push(nursingWorkerObject);
                 }
             }
+        }
+
+        function parseNursingWorkerSchedule(nursingWorkerSchedule) {
+            console.log('parse nursingWorkerScheduleItems');
+            var nursingWorkerScheduleItems = nursingWorkerSchedule.items;
+            // vm.yAxisData = nursingSchedule.yAxisData;  ?  //The default nursing scheduling state is not selected
+            var nursingWorkers = vm.selectBinding.nursingWorkers;
+            var nursingShifts = vm.selectBinding.nursingShifts;
+            vm.aggrMapData = {};
+
+            for(var i=0,len=nursingWorkerScheduleItems.length;i<len;i++) {
+                var nursingWorkerScheduleItem = nursingWorkerScheduleItems[i];
+                var nursingShiftObject = _.find(nursingShifts, function(o){
+                    return o._id == nursingWorkerScheduleItem.aggr_value
+                });
+                if (nursingShiftObject) {
+                    if (!vm.aggrMapData[nursingWorkerScheduleItem.x_axis_value]) {
+                        vm.aggrMapData[nursingWorkerScheduleItem.x_axis_value] = {};
+                    }
+                    if (!vm.aggrMapData[nursingWorkerScheduleItem.x_axis_value][nursingWorkerScheduleItem.y_axis]) {
+                        vm.aggrMapData[nursingWorkerScheduleItem.x_axis_value][nursingWorkerScheduleItem.y_axis] = [];
+                    }
+                    vm.aggrMapData[nursingWorkerScheduleItem.x_axis_value][nursingWorkerScheduleItem.y_axis].push(nursingShiftObject.code);
+                }
+            }
+
+            console.log(vm.aggrMapData);
         }
         
         function onRoomChange () {
@@ -473,4 +514,20 @@
             }
         }
     }
+
+    function nursingScheduleCellFilter() {
+        return nursingScheduleCellFormatter;
+    }
+    function nursingScheduleCellFormatter(cellObject, key, workerScheduleOnXAxis) {
+        if (!cellObject || !angular.isArray(cellObject) || cellObject.length === 0)
+            return '';
+        return cellObject.map(function (o) {
+            if(workerScheduleOnXAxis[o['_id']]) {
+                return (o[key] || '') + '<span class="nursingWorkerScheduleInNursingScheduleCell">(' + workerScheduleOnXAxis[o['_id']].join() + ')</span>'
+            } else {
+                return (o[key] || '')
+            }
+        }).join('<br/>')
+    }
+    
 })();

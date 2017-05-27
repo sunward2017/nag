@@ -38,12 +38,18 @@
         padding:4px;
       }
       .search-content {
+        width:100%;
+        overflow: auto;
+        border: solid 1px #DDDDDD;
         thead {
-          display: block;
-          border-bottom: solid 1px #DDDDDD;
+          //display: block;
+          //border-bottom: solid 1px #DDDDDD;
         }
         tbody{
-          display: block;
+          th{
+            border-bottom: solid 3px #DDDDDD;
+          }
+          //display: block;
           overflow-y: auto;    /* Trigger vertical scroll    */
           overflow-x: auto;  /* Hide the horizontal scroll */
 

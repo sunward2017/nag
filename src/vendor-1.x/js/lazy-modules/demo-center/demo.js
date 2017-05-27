@@ -680,25 +680,21 @@
 
         function init() {
             vm.init();
-            vm.fetchRowsPromise = vmh.shareService.d('D1013').then(function(items){
-                //vm.period = items[2].value;
-                console.log('items:',items);
-                // vm.period = items[3];// for object defaultCompareEqual
-                return items;
-            });
+            vm.page = {size: 2, no: 1};
+            vm.searchForBackFiller = searchForBackFiller;
+            vm.fetchRowsPromise = fetchRows();
             vm.fetchColumnsPromise = [{label: '序号',name: 'order',width: 80},{label: '名称',name: 'name',width: 620},{label: '值',name: 'value',width: 80}];
             vm.period = 'A0005' // for string
+
             // vm.period = {value:'A0001'}; // for object customCompareEqual
 
 
-            vm.fetchRowsPromise2 = vmh.shareService.d('D1005').then(function(items){
-                //vm.period2 = items[2].value;
-                console.log('items:',items);
-                // vm.period2 = items[3];// for object defaultCompareEqual
-                return items;
-            });
+            // vm.page2 = {size: 5, no: 1};
+            vm.searchForBackFiller2 = searchForBackFiller2;
+            vm.fetchRowsPromise2 = fetchRows2();
             vm.fetchColumnsPromise2 = [{label: '序号',name: 'order',width: 80},{label: '名称',name: 'name',width: 620},{label: '值',name: 'value',width: 80}];
             vm.period2 = 'A1003' // for string
+
             // vm.period2 = {value:'A1001'}; // for object customCompareEqual
 
             vm.onSelect = onSelect;
@@ -707,6 +703,24 @@
             vm.makeEmpty2 = makeEmpty2;
             vm.onCompareEqual = onCompareEqual;
 
+        }
+
+        function fetchRows(keyword) {
+            return vmh.shareService.d('D1013');
+        }
+
+        function fetchRows2(keyword) {
+            return vmh.shareService.d('D1005');
+        }
+
+        function searchForBackFiller (keyword) {
+            console.log('keyword:', keyword);
+            vm.fetchRowsPromise = fetchRows(keyword);
+        }
+
+        function searchForBackFiller2 (keyword) {
+            console.log('keyword:', keyword);
+            vm.fetchRowsPromise2 = fetchRows2(keyword);
         }
 
         function onCompareEqual(one, other) {
@@ -739,19 +753,24 @@
         function init() {
             vm.pickOne = pickOne;
 
+            vm.search = $scope.ngDialogData.search;
             vm.translatePath = $scope.ngDialogData.translatePath;
             vm.title = $scope.ngDialogData.title;
             vm.rows = $scope.ngDialogData.rows;
             vm.columns = $scope.ngDialogData.columns;
+            vm.page = $scope.ngDialogData.page || {size: 10, no: 1};
+            $scope.ngDialogData.notify.reloadData = reloadData;
 
-            vm.page =  {size: 5, no: 1};
+            $scope.ngDialogData.notify.reloadRows = reloadRows;
         }
 
         function pickOne(row) {
             $scope.closeThisDialog(row);
         }
 
-
+        function reloadRows(rows) {
+            vm.rows = rows;
+        }
     }
 
     DemoBoxInputController.$inject = ['$scope','vmh', 'instanceVM'];

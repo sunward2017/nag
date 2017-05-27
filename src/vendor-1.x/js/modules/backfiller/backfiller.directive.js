@@ -24,12 +24,14 @@
 
         function link(scope, element, attrs) {
 
-            var data = scope.fetchRows;
-            if (!data) {
+            var rows = scope.fetchRows;
+            if (!rows) {
                 return;
             }
             var columns = scope.fetchColumns || [];
-            console.log('====================', columns);
+            if (!columns) {
+                return;
+            }
 
             var valueKey = scope.valueKey = attrs.valueKey || 'object';
             var textKey =  scope.textKey = attrs.textKey || 'name';
@@ -50,19 +52,30 @@
 
             scope.$watch("fetchRows",function(newValue,oldValue) {
                 if (newValue != oldValue) {
-                    console.log('fetchRows newValue:' , newValue)
                     $timeout(function () {
                         $q.when(newValue).then(function (rows) {
                             scope.rows = rows;
                             setShowText();
-                            if(scope.notify.reloadData) {
-                                scope.notify.reloadData(rows);
+                            if(scope.notify.reloadRows) {
+                                scope.notify.reloadRows(rows);
                             }
-                            console.log('backfill reload data end');
+                            console.log('backfill reload rows end');
+                        });
+                    }, 0);
+                }
+            }); 
+
+            scope.$watch("fetchColumns",function(newValue,oldValue) {
+                if (newValue != oldValue) {
+                    $timeout(function () {
+                        $q.when(newValue).then(function (columns) {
+                            scope.columns = columns;
+                            console.log('backfill reload columns end');
                         });
                     }, 0);
                 }
             });
+
 
             // Bring in changes from outside:
             scope.$watch('model', function(newValue,oldValue) {
@@ -82,12 +95,22 @@
             });
 
             scope.notify = {
-                reloadData: null
+                reloadRows: null
             }
 
             scope.pick = function () {
                 if(scope.readonly) {
                    return;
+                }
+
+                if(scope.keyword) {
+                    console.log('表明之前调用过keyword做过滤:', scope.keyword);
+                    if (attrs.onSearch) {
+                        $timeout(function () {
+                            scope.onSearch({keyword: ''});
+                            scope.keyword = '';
+                        }, 0);
+                    }
                 }
 
                 console.log('open pick dialog...');
@@ -97,13 +120,14 @@
                     className: 'ngdialog-theme-default ' + pickerDialogClass,
                     data: {
                         title: title,
-                        columns: columns,
+                        columns: scope.columns,
                         rows: scope.rows,
                         page: scope.page,
                         search: function (keyword) {
                             if (attrs.onSearch) {
                                 $timeout(function () {
                                     scope.onSearch({keyword: keyword});
+                                    scope.keyword = keyword;
                                 }, 0);
                             }
                         },
@@ -132,11 +156,14 @@
 
             };
 
-            $q.when(data).then(function (rows) {
+            $q.when(rows).then(function (rows) {
                 scope.rows = rows;
                 setShowText();
             });
 
+            $q.when(columns).then(function (columns) {
+                scope.columns = columns;
+            });
 
 
             function setShowText() {

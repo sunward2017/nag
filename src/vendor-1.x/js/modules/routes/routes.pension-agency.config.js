@@ -903,6 +903,149 @@
                     //, deps: helper.resolveFor2('ui.select')
                 }
             })
+             .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'overdue-workitem', {
+                url: '/overdue-workitem',
+                title: '过期项目',
+                abstract: true,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath(MODEL_VARIABLES.HEAD_TEMPLATES.PENSION_AGENCY),
+                        controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER_FOR_TENANT
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div><div class="clearfix"></div>'
+                    }
+                },
+                data: {
+                    func_id: MODEL_VARIABLES.BIZ_FUNC_PREFIXS.PENSION_AGENCY + 'OVERDUE-WORKITEM' //业务系统使用
+                },
+                resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.PENSION_AGENCY + 'overdue-work-item.js')
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'overdue-workitem.list', {
+                url: '/list/:action',
+                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'overdue-workitem-list.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'OverdueWorkItemGridController',
+                resolve: {
+                    entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'overdue-workitem.list', {
+                        modelName: 'psn-nursingRecord',
+                        searchForm: { "status": 1 },
+                        serverPaging: true,
+                        columns: [{
+                            label: '房间号',
+                            name: 'roomName',
+                            type: 'string',
+                            width: 60,
+                            sortable:false
+                        }, {
+                            label: '床号',
+                            name: 'bed_no',
+                            type: 'string',
+                            width: 40,
+                            sortable: false
+                        }, {
+                            label: '老人姓名',
+                            name: 'elderly_name',
+                            type: 'string',
+                            width: 50,
+                            sortable: false
+                        }, {
+                            label: '项目类别',
+                            name: 'category',
+                            type: 'string',
+                            width: 50,
+                            sortable: false,
+                            formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D3019/object')
+                        },{
+                            label: '项目名称',
+                            name: 'name',
+                            type: 'string',
+                            width: 80,
+                            sortable: false
+                        }, {
+                            label: '描述',
+                            name: 'description',
+                            type: 'string',
+                            sortable: false,
+                            width: 140
+                        },{
+                            label: '执行时间',
+                            name: 'exec_on',
+                            type: 'date',
+                            width: 70,
+                            sortable: false
+                        },{
+                            label: '确认时间',
+                            name: 'confirmed_on',
+                            type: 'date',
+                            width: 70,
+                            sortable: false
+                        }]
+                    })
+                }
+            })
+             .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'warning-group', {
+                url: '/warning-group',
+                title: '报警列表',
+                abstract: true,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath(MODEL_VARIABLES.HEAD_TEMPLATES.PENSION_AGENCY),
+                        controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER_FOR_TENANT
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div><div class="clearfix"></div>'
+                    }
+                },
+                data: {
+                    func_id: MODEL_VARIABLES.BIZ_FUNC_PREFIXS.PENSION_AGENCY + 'WARNING-GROUP' //业务系统使用
+                },
+                resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.PENSION_AGENCY + 'warning-group.js')
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'warning-group.list', {
+                url: '/list/:action',
+                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'warning-group-list.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'WarningGridController',
+                resolve: {
+                    entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'warning-group.list', {
+                        modelName: 'pub-alarm',
+                        searchForm: { "status": 1 },
+                        serverPaging: true,
+                        columns: [{
+                            label: '报警设备',
+                            name: 'subject_name',
+                            type: 'string',
+                            width: 80,
+                            sortable: true
+                        }, {
+                            label: '报警对象',
+                            name: 'object_name',
+                            type: 'string',
+                            width: 60,
+                            sortable: true
+                        }, {
+                            label: '报警原因',
+                            name: 'reason',
+                            type: 'string',
+                            width: 100,
+                            formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D3016/object')
+                        }, {
+                            label: '内容',
+                            name: 'content',
+                            type: 'string',
+                            width: 240,
+                            sortable: true
+                        }, {
+                            label: '处理标记',
+                            name: 'process_flag',
+                            type: 'bool',
+                            width: 50,
+                            sortable: true
+                        }]
+                    })
+                }
+            })
             .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'enter-payment', {
                 url: '/enter-payment',
                 title: '老人入院缴费',

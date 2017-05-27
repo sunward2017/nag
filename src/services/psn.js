@@ -4780,6 +4780,30 @@ module.exports = {
                         yield next;
                     };
                 }
+            },{
+                method: 'overdueWorkItem',
+                verb: 'post',
+                url: this.service_url_prefix + "/overdueWorkItem",
+                handler: function (app, options) {
+                    return function* (next) {
+                        var tenantId = this.request.body.tenantId;
+                        try {
+                            var rows = yield app.modelFactory().model_query(app.models['psn_nursingRecord'],{
+                               select: 'roomId bed_no elderly_name category name description exec_on confirmed_on', 
+                               where: {
+                                tenantId: tenantId,
+                                confirmed_flag: true
+                             }
+                            }).populate('roomId', 'name', 'psn_room');
+                            this.body = app.wrapper.res.rows(rows);
+                        } catch (e) {
+                            // console.log(e);
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                } 
             }, {
                 method: 'nursingPlanSaveNursingItem',
                 verb: 'post',

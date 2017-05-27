@@ -197,6 +197,8 @@
       "NURSING-WORKER-SCHEDULE": "护工排班",
       "NURSING-WORKER-SCHEDULE-TEMPLATE": "护工排班模版",
       "NURSING-GROUP": "照护组",
+      "OVERDUE-WORKITEM":"过期项目",
+      "WARNING-GROUP":"报警",
       "------------": "",
       "FINANCIAL": "财务管理",
       "ENTER-PAYMENT": "入院缴费",

@@ -35,7 +35,6 @@ module.exports = {
         var self = this;
         return co(function* () {
             try {
-                console.log("openid:", self.openid);
                 var psd = self.ctx.crypto.createHash('md5').update('123456').digest('hex');
                 var ret = yield rp({
                     method: 'POST',
@@ -52,7 +51,17 @@ module.exports = {
                 console.log(" sync regist success", ret);
                 if (ret.retCode == 'success') {
                     console.log(" sync regist success");
-                    var member = yield self.ctx.modelFactory().model_create(self.ctx.models['het_member'], {
+                    var member = yield self.ctx.modelFactory().model_one(self.ctx.models['het_member'], {
+                        where: {
+                            open_id: memberInfo.openid,
+                            status: 1,
+                            tenantId: memberInfo.tenantId
+                        }
+                    });
+                    if (member) {
+                        return self.ctx.wrapper.res.ret(member);
+                    }
+                    member= yield self.ctx.modelFactory().model_create(self.ctx.models['het_member'], {
                         open_id: memberInfo.openid,
                         name: memberInfo.nickName,
                         union_id: memberInfo.unionid,
@@ -62,7 +71,7 @@ module.exports = {
                         tenantId: memberInfo.tenantId,
                         sync_flag_hzfanweng: true,
                     });
-                    return self.ctx.wrapper.res.ret({ message: '注册成功' });
+                    return self.ctx.wrapper.res.ret(member);
                 } else if (ret.retValue == '0x8001') {
                     return self.ctx.wrapper.res.error({ message: '用户已经注册' })
                 }
@@ -76,23 +85,23 @@ module.exports = {
         }).catch(self.ctx.coOnError);
 
     },
-    login: function () {//uniqueId
+    login: function (member) {//uniqueId
         var self = this;
         return co(function* () {
             try {
                 console.log(getToken);
                 var ret = yield rp({
-                    url: externalSystemConfig.bed_monitor_status.api_url + '/ECSServer/userws/getToken.json?uniqueId=' + uniqueId,
+                    url: externalSystemConfig.bed_monitor_status.api_url + '/ECSServer/userws/getToken.json?uniqueId=' + member.open_id,
                     json: true
                 });
-                console.log(ret);
+                console.log("getToken:",ret);
                 console.log(ret.retCode);
                 if (ret.retCode == 'success') {
                     var ret = yield rp({
                         method: 'POST',
                         url: externalSystemConfig.bed_monitor_status.api_url + '/ECSServer/userws/userAuthenticate.json',
                         form: {
-                            token: token,
+                            token: ret.retValue,
                             userName: member.name,
                             encryptedName: member.name,
                             encryptedPwd: member.passhash,
@@ -107,20 +116,7 @@ module.exports = {
                         return self.ctx.wrapper.res.ret(ret.retValue.sessionId);
                     } else {
                         if (ret.retValue == '1') {//用户不存在 重新注册
-                            var memberInfo = {
-                                nickName: member.name
-                            }
-                            var regist_status = yield self._registByQinKeShi(member);
-                            console.log(regist_status);
-                            if (regist_status.ret.registStatus == 'success') {//成功 重新登陆
-                                if (authenticateTryTimes === 0) {
-                                    return self.ctx.wrapper.res.error({ message: 'regist fail again' });
-                                } else {
-                                    return self._userAuthenticate(member, token, 0);
-                                }
-                            } else {//失败 返回
-                                return self.ctx.wrapper.res.error({ message: 'regist fail' });
-                            }
+                                return self.ctx.wrapper.res.error({ message: '用户未注册' });                      
                         }
 
                     }
@@ -147,7 +143,7 @@ module.exports = {
                 //console.log("endTime", endTime);
                 //console.log("startTime", startTime);
                 sessionId = sessionIdRet.ret
-                console.log("data from wx:", sessionId);
+                console.log("data from wx:", info);
                 var week = self.ctx.moment().format('dddd');
                 var day = self.ctx.moment().day();
                 var startTime = self.ctx.moment(startDay);
@@ -155,6 +151,13 @@ module.exports = {
                 var dayNum = endTime.diff(startTime,'day');
                 console.log("data sunday wx:", startTime.format('YYYY-MM-DD'));
                 console.log("data sunday wx:", dayNum);
+                  var device = yield self.ctx.modelFactory().model_one(self.ctx.models['pub_bedMonitor'], {
+                    where: {
+                        name: info.deviceName,
+                        status: 1,
+                        tenantId: info.tenantId
+                    }
+                });
                 var member = yield self.ctx.modelFactory().model_one(self.ctx.models['het_member'], {
                     where: {
                         open_id: openid,
@@ -167,9 +170,10 @@ module.exports = {
                     where: {
                         care_by: member._id,
                         status: 1,
+                        bedMonitorId:device._id,
                         tenantId: info.tenantId
                     }
-                }).populate('bedMonitorId', 'name');;
+                });
                 //判断关心时间与最后时间是否一致，以关心时间为首要条件
                 if (startTime.isSame(self.ctx.moment(memberCarePerson.check_in_time), 'day')) {
                     startTime = startTime;
@@ -591,6 +595,7 @@ module.exports = {
                         console.log('sssss:', ret);
                         var token = yield self.getToken(member.open_id);
                         var ret = yield self._userAuthenticate(member, token);
+                       // var ret = yield self.login(member);
                         console.log('sssss:', ret);
                         return ret
                     }

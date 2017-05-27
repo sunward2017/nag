@@ -273,6 +273,7 @@ module.exports = {
                         care_by: member._id,
                         birthYear: birthYear,
                         bedMonitorId: device._id,
+                        status:1,
                         tenantId: tenantId
                     });
                     var setUserConcernPersonJson = {
@@ -343,6 +344,7 @@ module.exports = {
                     care_by: member._id,
                     birthYear: birthYear,
                     bedMonitorId: device._id,
+                    status:1,
                     tenantId: tenantId
                 });
                 var ret = {
@@ -1536,7 +1538,8 @@ module.exports = {
                 var local_statisticsReports = statisticsReports;
                 //远程不足五条
                 if (statisticsReports == "no_day_report" || statisticsReports == "unknown_device" || statisticsReports == "err_date_invalid" || statisticsReports == "err_day_params" || statisticsReports == "bad param" || statisticsReports == "0x8005") {
-                    return self.ctx.wrapper.res.error({ message: 'get statistics reports fail' });
+                   return self.ctx.wrapper.res.error({ message: '当前暂无数据' });
+                  // return;
                 } else {
                     while (statisticsReports.length < 5) {
                         cont++;

@@ -172,6 +172,16 @@ script(type='text/ng-template', id="dlg-backfiller-default-pick.html")
                             th.text-center(ng-repeat="column in vm.columns") {{column.label}}
                     tbody
                         tr(ng-repeat="row in vm.rows|filter:vm.filter|paging:vm", ng-dblclick="vm.pickOne(row)")
-                            td(ng-repeat="column in vm.columns") {{::row[column.name] }}
+                            td(ng-repeat="column in vm.columns", ng-class='{"text-left": !column.align || column.align == "left", "text-center": column.align == "center", "text-right": column.align == "right"}')
+                                span(ng-if="!column.filter") {{::row[column.name]}}
+                                span(ng-if="column.filter == 'date' ") {{::row[column.name] | date: column.format||'yyyy-MM-dd'}}
+                                span(ng-if="column.filter == 'boolFilter' ") {{::row[column.name] | boolFilter}}
+                                span(ng-if="column.filter == 'diFilter' ") {{::row[column.name] | diFilter: column.format}}
+                                span(ng-if="column.filter == 'currency' ") {{::row[column.name] | currency}}
+                                span(ng-if="column.filter == 'populateFilter' ") {{::row[column.name] | populateFilter: column.format}}
+                                span(ng-if="column.filter == 'safeArrayMember' ") {{::row[column.name] | safeArrayMember: column.format}}
+                                span(ng-if="column.filter == 'populateFilter' ") {{::row[column.name] | populateFilter: column.format}}
+                                span(ng-if="column.filter == 'calcAge' ") {{::row[column.name] | calcAge}}
+
         .col-md-12
             pagination.pagination-sm.pull-right(total-items="vm.page.totals",ng-model="vm.page.no",max-size="5",items-per-page="vm.page.size",boundary-links="true")

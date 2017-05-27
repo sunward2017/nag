@@ -100,7 +100,7 @@ script(type="text/ng-template", id="drug-use-item.html")
                     <!--药品目录-->
                     label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-DRUG-NAME') | translate}}:
                     .col-md-10(ng-if="!vm.readonly && vm._action_!='edit' ")
-                        .backfiller(backfiller,ng-model="vm.selectedDrug", page="vm.page" , text-key="full_name", input-name="drug", fetch-rows="vm.queryDrugPromise", fetch-columns="vm.fetchDrugColumnsPromise", picker-title="挑选药品" on-select="vm.selectDrugForBackFiller(row)", on-search="vm.searchForBackFiller(keyword)")
+                        .backfiller(backfiller,ng-model="vm.selectedDrug", text-key="full_name", input-name="drug", fetch-rows="vm.queryDrugPromise", fetch-columns="vm.fetchDrugColumnsPromise", picker-title="挑选药品" on-select="vm.selectDrugForBackFiller(row)", on-search="vm.searchForBackFiller(keyword)")
                         span.text-danger(ng-show="utils.vinput(theForm,'drug','autocomplete-required')") {{ "validator.REQUIRED" | translate}}
                     .col-md-10(ng-if="vm.readonly || vm._action_=='edit'")
                         .form-readable {{vm.model.name}}

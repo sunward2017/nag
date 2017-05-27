@@ -39,9 +39,13 @@ module.exports = {
                                 status: 1,
                                 tenantId: tenantId
                             });
-
+                            
                             if (keyword) {
-                                data.where.name = new RegExp(keyword);
+                                var keywordReg = new RegExp(keyword);
+                                data.where.$or = [
+                                    { name : keywordReg },
+                                    { enter_code : keywordReg }
+                                ]
                             }
                             console.log(data);
                             var rows = yield app.modelFactory().model_query(app.models['psn_elderly'], data);
@@ -5378,7 +5382,14 @@ module.exports = {
                             });
 
                             if (keyword) {
-                                data.where.full_name = new RegExp(keyword);
+                                var keywordReg = new RegExp(keyword);
+                                data.where.$or = [
+                                    { full_name : keywordReg },
+                                    { $and : [ {short_name: { $exists : true }}, { short_name : keywordReg } ] },
+                                    { $and : [ {alias: { $exists : true }}, { alias : keywordReg } ] },
+                                    { $and : [ {vender: { $exists : true }}, { vender : keywordReg } ] }
+                                ]
+                                // data.where.full_name = new RegExp(keyword);
                             }
                             var rows = yield app.modelFactory().model_query(app.models['psn_drugDirectory'], data);
                             this.body = app.wrapper.res.rows(rows);

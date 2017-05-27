@@ -46,7 +46,7 @@
                     td.text-center(title="{{vm.moduleTranslatePath('TITLE-ROW')|translate}}",ng-click="vm.selectGridRow(row._id)")
                         | {{::row.name}}
                     td.text-center(ng-repeat="col in vm.xAxisData",width="100", ng-class='{"grid-cell-selected": vm.cells[row._id][col._id] }',ng-click="vm.selectGridCell(row._id,col._id)" )
-                        span {{(vm.aggrData[row._id][col._id]) | safeArrayMember:'name' }}
+                        span(ng-bind-html="(vm.aggrData[row._id][col._id]) | nursingScheduleCellFilter:'name':vm.aggrMapData[col._id]")
                 tr(ng-if="vm.yAxisData.length==0")
                     td.text-center(colspan="{{vm.xAxisData.length + 1}}") {{ 'grid.NO-RESULTS' | translate}}
 

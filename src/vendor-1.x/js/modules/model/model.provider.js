@@ -554,7 +554,9 @@
                     getLatestSmbPerMinuteRecord:getLatestSmbPerMinuteRecord,
                     nursingWorkerScheduleWeekly: nursingWorkerScheduleWeekly,
                     nursingWorkerScheduleSave: nursingWorkerScheduleSave,
-                    nursingWorkerScheduleRemove: nursingWorkerScheduleRemove
+                    nursingWorkerScheduleRemove: nursingWorkerScheduleRemove,
+                    nursingWorkerScheduleTemplateImport: nursingWorkerScheduleTemplateImport,
+                    nursingWorkerScheduleSaveAsTemplateWeekly: nursingWorkerScheduleSaveAsTemplateWeekly,
                 };
 
                 function roomStatusInfo(tenantId) {
@@ -860,6 +862,14 @@
 
                 function nursingWorkerScheduleRemove(tenantId, toRemoveRows) {
                     return $http.post(baseUrl + 'nursingWorkerScheduleRemove', { tenantId: tenantId, toRemoveRows: toRemoveRows });
+                }
+
+                function nursingWorkerScheduleTemplateImport(nursingWorkerScheduleTemplateId, toImportXAxisRange) {
+                    return $http.post(baseUrl + 'nursingWorkerScheduleTemplateImport', { nursingWorkerScheduleTemplateId: nursingWorkerScheduleTemplateId, toImportXAxisRange: toImportXAxisRange });
+                }
+
+                function nursingWorkerScheduleSaveAsTemplateWeekly(tenantId, nursingWorkerScheduleTemplateName, toSaveRows) {
+                    return $http.post(baseUrl + 'nursingWorkerScheduleSaveAsTemplateWeekly', { tenantId: tenantId, nursingWorkerScheduleTemplateName: nursingWorkerScheduleTemplateName, toSaveRows: toSaveRows });
                 }
             }]
         };

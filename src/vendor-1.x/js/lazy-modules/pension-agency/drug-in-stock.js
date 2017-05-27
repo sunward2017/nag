@@ -57,8 +57,8 @@
             vm.init({ removeDialog: ngDialog });
             vm.doSubmit = doSubmit;
             vm.showDrug = showDrug;
+            vm.searchForBackFiller = searchForBackFiller;
             vm.queryElderlyPromise = queryElderly();
-            vm.fetchElderlyColumnsPromise = [{ label: '入院登记号', name: 'enter_code', width: 100 }, { label: '姓名', name: 'name', width: 100 }];
 
             vm.selectElerlyForBackFiller = selectElerlyForBackFiller;
 
@@ -67,8 +67,19 @@
 
             vmh.parallel([
                 vmh.shareService.d('D3013'),
+                vmh.shareService.d('D1006')
             ]).then(function (results) {
                 vm.selectBinding.unit = results[0];
+
+                vm.fetchElderlyColumnsPromise = [
+                    {label: '入院号',name: 'enter_code',width: 100, align:'center'},
+                    {label: '姓名',name: 'name',width: 80},
+                    {label: '性别',name: 'sex',width: 60, align:'center', filter: 'diFilter', format: results[1]},
+                    {label: '年龄',name: 'birthday',width: 60, align:'center', filter: 'calcAge'},
+                    {label: '房间床位',name: 'room_summary',width: 300},
+                    {label: '照护情况',name: 'nursing_info',width: 300},
+                    {label: '',name: ''}
+                ];
             })
 
             vm.typePromise = vmh.shareService.d('D3014').then(function (hobbies) {
@@ -87,11 +98,13 @@
         function queryElderly(keyword) {
             return vmh.fetch(vmh.psnService.queryElderly(vm.tenantId, keyword, {
                 live_in_flag: true,
-                // sbegin_exit_flow: {'$in':[false,undefined]}
-            }, 'name enter_code'));
+                begin_exit_flow: {'$in':[false,undefined]}
+            }, 'name enter_code sex birthday room_summary nursing_info'));
         }
 
-
+        function searchForBackFiller (keyword) {
+            vm.queryElderlyPromise = queryElderly(keyword);
+        }
 
         function showDrug() {
            vmh.fetch(vmh.psnService.drugQueryAll(vm.tenantId,vm.model.barcode))

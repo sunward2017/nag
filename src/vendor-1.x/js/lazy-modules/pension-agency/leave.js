@@ -70,8 +70,8 @@
                     {label: '姓名',name: 'name',width: 80},
                     {label: '性别',name: 'sex',width: 60, align:'center', filter: 'diFilter', format: vm.selectBinding.sex},
                     {label: '年龄',name: 'birthday',width: 60, align:'center', filter: 'calcAge'},
-                    {label: '房间床位',name: 'room_summary',width: 200},
-                    {label: '照护情况',name: 'nursing_info',width: 200},
+                    {label: '房间床位',name: 'room_summary',width: 300},
+                    {label: '照护情况',name: 'nursing_info',width: 300},
                     {label: '',name: ''}
                 ];
             });
@@ -92,7 +92,7 @@
             return vmh.fetch(vmh.psnService.queryElderly(vm.tenantId, keyword, {
                 live_in_flag: true,
                 begin_exit_flow: {'$in':[false,undefined]}
-            }, 'name enter_code sex birthday room_summary'));
+            }, 'name enter_code sex birthday room_summary nursing_info'));
         }
 
         function searchForBackFiller (keyword) {

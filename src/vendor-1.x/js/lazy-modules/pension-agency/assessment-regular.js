@@ -104,9 +104,9 @@
             vm.doSubmit = doSubmit;
             vm.beginAssessment = beginAssessment;
             vm.setNursingLevel = setNursingLevel;
+            vm.searchForBackFiller = searchForBackFiller;
             vm.selectElerlyForBackFiller = selectElerlyForBackFiller;
             vm.queryElderlyPromise = queryElderly();
-            vm.fetchElderlyColumnsPromise = [{ label: '入院登记号', name: 'enter_code', width: 100 }, { label: '姓名', name: 'name', width: 100 }];
             // vm.queryElderly = queryElderly;
             vm.selectElerly = selectElerly;
             vm.isAddNew = globalIsAddNew;
@@ -118,13 +118,22 @@
                 vmh.shareService.d('D3024'),
                 vmh.psnService.nursingLevels(vm.tenantId),
                 vmh.shareService.d('D3015'),
+                vmh.shareService.d('D1006')
             ]).then(function(results){
                 vm.disease_evaluation_array= results[0];
                 vm.adl_array = results[1];
                 vm.selectBinding.nursing_levels = results[2];
                 vm.assessment_grades = results[3];
-                console.log('result3===');
-                console.log(vm.assessment_grades);
+
+                vm.fetchElderlyColumnsPromise = [
+                    {label: '入院号',name: 'enter_code',width: 100, align:'center'},
+                    {label: '姓名',name: 'name',width: 80},
+                    {label: '性别',name: 'sex',width: 60, align:'center', filter: 'diFilter', format: results[4]},
+                    {label: '年龄',name: 'birthday',width: 60, align:'center', filter: 'calcAge'},
+                    {label: '房间床位',name: 'room_summary',width: 300},
+                    {label: '照护情况',name: 'nursing_info',width: 300},
+                    {label: '',name: ''}
+                ];
             })  
 
             vm.disease_evaluation = vmh.shareService.d('D3022').then(function (results) {
@@ -249,9 +258,12 @@
             return vmh.fetch(vmh.psnService.queryElderly(vm.tenantId, keyword, {
                 live_in_flag: true,
                 begin_exit_flow: {'$in':[false,undefined]}
-            }, 'name enter_code'));
+            }, 'name enter_code sex birthday room_summary nursing_info'));
         }
 
+       function searchForBackFiller (keyword) {
+           vm.queryElderlyPromise = queryElderly(keyword);
+       }
         function selectElerlyForBackFiller(row) {
             if(row){
                 vm.model.enter_code = row.enter_code;

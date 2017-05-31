@@ -507,6 +507,16 @@
         "NOT-SET-LEADER": "没有设置组长"
       }
     },
+     "overdue-workitem": {
+      "list": {
+        "TITLE": "养老机构-照护管理-过期工作项目-列表"
+      } 
+    },
+     "warning-group": {
+      "list": {
+        "TITLE": "养老机构-照护管理-报警-列表"
+      }
+    },
     "enter-payment": {
       "list": {
         "TITLE": "养老机构-财务管理-入院缴费-列表"

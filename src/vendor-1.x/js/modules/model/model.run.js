@@ -35,6 +35,7 @@
         modelNode.factory('psn-nursingWorkerScheduleTemplate');
         modelNode.factory('psn-nursingGroup');
         modelNode.factory('psn-recharge');
+        modelNode.factory('psn-nursingRecord');
         modelNode.factory('psn-drugUseItem');
         modelNode.factory('psn-drugDirectory');
         modelNode.factory('psn-drugStock');
@@ -65,6 +66,7 @@
         modelNode.factory('pub-tenantChargeItemCustomized');
         modelNode.factory('pub-user');
         modelNode.factory('pub-func');
+        modelNode.factory('pub-alarm');
         modelNode.factory('pub-order');
         modelNode.factory('pub-appServerSideUpdateHistory');
         modelNode.factory('pub-appClientSideUpdateHistory');

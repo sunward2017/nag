@@ -5636,7 +5636,9 @@ module.exports = {
                                 data.stoped_on = app.moment();
                             }
                             var drugUseItem = data, workItem;
-                            console.log('drugUseItemId:', drugUseItemId);
+                                drugUseItem.type = DIC.D3017.DRUG_USE_ITEM;
+                                drugUseItem.drugUseItemId = drugUseItem._id;
+                                console.log('drugUseItemId:', drugUseItemId);
                             if(drugUseItemId) {
                                 // 修改老人的用药项目
                                 yield app.modelFactory().model_update(app.models['psn_drugUseItem'], drugUseItemId, drugUseItem);
@@ -5663,8 +5665,6 @@ module.exports = {
                                         if(!drugUseItem.stop_flag) {
                                             //添加到照护计划中
                                             console.log('修改用药项目,添加用药项目到照护计划中');
-                                            drugUseItem.type = DIC.D3017.DRUG_USE_ITEM;
-                                            drugUseItem.drugUseItemId = drugUseItem._id;
                                             workItems.push(drugUseItem);
                                         } else {
                                             this.body = app.wrapper.res.default();
@@ -5689,12 +5689,12 @@ module.exports = {
                             } else {
                                 // 新增老人的用药项目
                                 drugUseItem = yield app.modelFactory().model_create(app.models['psn_drugUseItem'], drugUseItem);
+                                drugUseItem = drugUseItem.toObject();
                                 drugUseItem.type = DIC.D3017.DRUG_USE_ITEM;
                                 drugUseItem.drugUseItemId = drugUseItem._id;
                                 // 如果用药项目没有停用 更新老人照护计划中
                                 if(!drugUseItem.stop_flag) {
                                     console.log('新增用药项目,添加用药项目到照护计划中');
-                                    workItem = drugUseItem.toObject();
                                     if (elderlyNursingPlan) {
                                         elderlyNursingPlan.work_items.push(drugUseItem);
                                         yield elderlyNursingPlan.save();

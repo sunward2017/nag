@@ -1,0 +1,17 @@
+[
+  {
+    "_id": "robot_code",
+    "name": "编号",
+    "width": "50"
+  },
+  {
+    "_id": "robot_name",
+    "name": "名称",
+    "width": "40"
+  },
+  {
+    "_id": "state",
+    "name": "状态",
+    "width": "50"
+  }  
+]

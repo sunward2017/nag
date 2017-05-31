@@ -37,6 +37,7 @@
         modelNode.factory('psn-recharge');
         modelNode.factory('psn-nursingRecord');
         modelNode.factory('psn-drugUseItem');
+        modelNode.factory('psn-drugUseTemplate');
         modelNode.factory('psn-drugDirectory');
         modelNode.factory('psn-drugStock');
         modelNode.factory('psn-drugInOutStock');

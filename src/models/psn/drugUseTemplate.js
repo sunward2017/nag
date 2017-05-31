@@ -1,6 +1,6 @@
 /**
- * Created by zppro on 17-4-7.
- * 养老机构 用药项目
+ * Created by zppro on 17-5-31.
+ * 养老机构 用药模版
  */
 var mongoose = require('mongoose');
 var D0103 = require('../../pre-defined/dictionary.json')['D0103'];
@@ -17,18 +17,11 @@ module.exports = function(ctx,name) {
     else {
         module.isloaded = true;
 
-        var drugUseItemSchema = new mongoose.Schema({
+        var drugUseTemplateSchema = new mongoose.Schema({
             check_in_time: {type: Date, default: Date.now},
             operated_on: {type: Date, default: Date.now},
             status: {type: Number, min: 0, max: 1, default: 1},
-            elderlyId: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'psn_elderly'},
-            elderly_name: {type: String},
-            stop_flag: {type: Boolean, default: false},//停用标志
-            stoped_on: {type: Date},
-            drugId:{type: mongoose.Schema.Types.ObjectId,required: true,ref:'psn_drugDirectory'},//关联药品
-            drug_no:{type: String,},// 药品编码
-            barcode:{type: String,},// 药品编码
-            name:{type: String},
+            name:{type: String, required: true},
             description:{type: String},
             duration: {type: Number, default: 0}, // 完成时长 单为分
             repeat_type: {type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D0103"])},
@@ -38,8 +31,6 @@ module.exports = function(ctx,name) {
             remind_flag: {type: Boolean, default: false}, // 需要提醒标识
             remind_mode: {type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D0104"])},
             remind_times: {type: Number}, // 提醒次数
-            fee_flag: {type: Boolean, default: false}, // 是否需要收费
-            fee: {type: Number}, // 费用
             voice_template:{type:String,maxlength:400},
             tenantId: {type: mongoose.Schema.Types.ObjectId}
         }, {
@@ -51,29 +42,29 @@ module.exports = function(ctx,name) {
             }
         });
 
-        drugUseItemSchema.virtual('repeat_type_name').get(function () {
+        drugUseTemplateSchema.virtual('repeat_type_name').get(function () {
             if (this.repeat_type) {
                 return D0103[this.repeat_type].name;
             }
             return '';
         });
 
-        drugUseItemSchema.virtual('remind_mode_name').get(function () {
+        drugUseTemplateSchema.virtual('remind_mode_name').get(function () {
             if (this.remind_mode) {
                 return D0104[this.remind_mode].name;
             }
             return '';
         });
-        drugUseItemSchema.virtual('work_item_category').get(function () {
+        drugUseTemplateSchema.virtual('work_item_category').get(function () {
             return DIC.D3019.TAKE_DRUG;
         });
 
 
-        drugUseItemSchema.pre('update', function (next) {
+        drugUseTemplateSchema.pre('update', function (next) {
             this.update({}, {$set: {operated_on: new Date()}});
             next();
         });
 
-        return mongoose.model(name, drugUseItemSchema, name);
+        return mongoose.model(name, drugUseTemplateSchema, name);
     }
 }

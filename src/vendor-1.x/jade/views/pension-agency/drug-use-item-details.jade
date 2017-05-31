@@ -36,57 +36,57 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='')
                         .col-md-10
                             .tree.tree-dropdown(name='medical_histories',s-tree,s-tree-data="vm.medical_historiesPromise",s-tree-height="200", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{mode:'check',layout:'dropdown',readonly:{{vm.readonly}} }",ng-model="vm.model.medical_histories",required='')
                     fieldset: .form-group
-                    .panel.panel-default.panel-grid
-                        .panel-heading-normal
-                            a {{ vm.viewTranslatePath('TAB1-LABEL-DRUG-LIST') | translate}}
-                        table.grid.table.table-bordered.table-hover.table-striped
-                            thead
-                                tr
-                                    th.text-center(ng-if="!vm.readonly",check-all,width="30")
-                                        .checkbox.c-checkbox(data-toggle="tooltip",data-title="Check All")
-                                            label
-                                                input(type='checkbox' ng-model="vm.all" ng-change="vm.selectAll()")
-                                                span.fa.fa-check
-                                    th.text-center(width="60")
-                                        | {{ vm.viewTranslatePath('TAB1-LABEL-DRUG-NAME') | translate}}
-                                    th.text-center(width="60")
-                                        | {{ vm.viewTranslatePath('TAB1-LABEL-BARCODE') | translate}}
-                                    th.text-center(width="80")
-                                        | {{ vm.viewTranslatePath('TAB1-LABEL-REPEAT_VALUES') | translate}}
-                                    th.text-center(width="100")
-                                        | {{ vm.viewTranslatePath('TAB1-LABEL-DESCRIPTION') | translate}}
-                                    th.text-center(width="40")
-                                        | {{ vm.viewTranslatePath('TAB1-LABEL-STOP_FLAG') | translate}}
-                                    th.text-center(width="50",ng-if="!vm.readonly")
-                            tbody
-                                tr(ng-repeat="row in vm.elderlyDrugUseItems|orderBy:'-check_in_time'" )
-                                    td.text-center(ng-if="!vm.readonly")
-                                        .checkbox.c-checkbox(ng-if="!row.$editing")
-                                            label
-                                                input(type='checkbox',ng-model="row.checked" ng-change="vm.addRowIds(row)")
-                                                span.fa.fa-check
-                                    td.text-center {{::row.name}}
-                                    td.text-center {{::row.barcode}}
-                                    td.text-center {{::row.repeat_type_name }}{{row.repeat_values | repeatInfoCombo: row.repeat_start}}
-                                    td.text-center {{::row.description}}
-                                    td.text-center {{::row.stop_flag|boolFilter}}
-                                    td.text-center                             
-                                        .btn-group                                 
-                                            a.btn.btn-primary.btn-xs(title="{{'button.EDIT'|translate}}",ng-click="vm.configDrugUseItem(row)")                                     
-                                                i.glyphicon.glyphicon-pencil
-                                tr(ng-if="vm.paged.length==0")
-                                    td(colspan="{{utils.noResultsColspan(vm)}}") {{ 'grid.NO-RESULTS' | translate}}               
-                        .panel-footer
-                            .row
-                                .col-md-4.text-left
-                                    .btn-toolbar(ng-if="!vm.readonly")
-                                        .btn-group
-                                            a.btn.btn-primary.btn-sm(title="{{'button.ADD'|translate}}",ng-click="vm.configDrugUseItem()")
-                                                i.glyphicon.glyphicon-plus
-                                            a.btn.btn-primary.btn-sm(title="{{'button.REMOVE'|translate}}",ng-click="vm.removeElderlyDrugUseItem()")
-                                                i.glyphicon.glyphicon-minus
-                                //-  .col-md-8
-                                //-     pagination.pagination-sm.pull-right(total-items="vm.page.totals",ng-model="vm.page.no",max-size="5",items-per-page="vm.page.size",boundary-links="true" ,ng-change="vm.paging()")               
+                        .panel.panel-default.panel-grid
+                            .panel-heading-normal
+                                a {{ vm.viewTranslatePath('TAB1-LABEL-DRUG-LIST') | translate}}
+                            table.grid.table.table-bordered.table-hover.table-striped
+                                thead
+                                    tr
+                                        th.text-center(ng-if="!vm.readonly",check-all,width="30")
+                                            .checkbox.c-checkbox(data-toggle="tooltip",data-title="Check All")
+                                                label
+                                                    input(type='checkbox' ng-model="vm.all" ng-change="vm.selectAll()")
+                                                    span.fa.fa-check
+                                        th.text-center(width="60")
+                                            | {{ vm.viewTranslatePath('TAB1-LABEL-DRUG-NAME') | translate}}
+                                        th.text-center(width="60")
+                                            | {{ vm.viewTranslatePath('TAB1-LABEL-BARCODE') | translate}}
+                                        th.text-center(width="80")
+                                            | {{ vm.viewTranslatePath('TAB1-LABEL-REPEAT_VALUES') | translate}}
+                                        th.text-center(width="100")
+                                            | {{ vm.viewTranslatePath('TAB1-LABEL-DESCRIPTION') | translate}}
+                                        th.text-center(width="40")
+                                            | {{ vm.viewTranslatePath('TAB1-LABEL-STOP_FLAG') | translate}}
+                                        th.text-center(width="50",ng-if="!vm.readonly")
+                                tbody
+                                    tr(ng-repeat="row in vm.elderlyDrugUseItems|orderBy:'-check_in_time'" )
+                                        td.text-center(ng-if="!vm.readonly")
+                                            .checkbox.c-checkbox(ng-if="!row.$editing")
+                                                label
+                                                    input(type='checkbox',ng-model="row.checked" ng-change="vm.addRowIds(row)")
+                                                    span.fa.fa-check
+                                        td.text-center {{::row.name}}
+                                        td.text-center {{::row.barcode}}
+                                        td.text-center {{::row.repeat_type_name }}{{row.repeat_values | repeatInfoCombo: row.repeat_start}}
+                                        td.text-center {{::row.description}}
+                                        td.text-center {{::row.stop_flag|boolFilter}}
+                                        td.text-center
+                                            .btn-group
+                                                a.btn.btn-primary.btn-xs(title="{{'button.EDIT'|translate}}",ng-click="vm.configDrugUseItem(row)")
+                                                    i.glyphicon.glyphicon-pencil
+                                    tr(ng-if="vm.paged.length==0")
+                                        td(colspan="{{utils.noResultsColspan(vm)}}") {{ 'grid.NO-RESULTS' | translate}}
+                            .panel-footer
+                                .row
+                                    .col-md-4.text-left
+                                        .btn-toolbar(ng-if="!vm.readonly")
+                                            .btn-group
+                                                a.btn.btn-primary.btn-sm(title="{{'button.ADD'|translate}}",ng-click="vm.configDrugUseItem()")
+                                                    i.glyphicon.glyphicon-plus
+                                                a.btn.btn-primary.btn-sm(title="{{'button.REMOVE'|translate}}",ng-click="vm.removeElderlyDrugUseItem()")
+                                                    i.glyphicon.glyphicon-minus
+                                    //-  .col-md-8
+                                    //-     pagination.pagination-sm.pull-right(total-items="vm.page.totals",ng-model="vm.page.no",max-size="5",items-per-page="vm.page.size",boundary-links="true" ,ng-change="vm.paging()")
     .text-right.mt-lg
         button.btn.btn-primary(type="button",ng-click="vm.toListView()") {{'button.RETURN'|translate}}
 script(type="text/ng-template", id="drug-use-item.html")
@@ -109,6 +109,11 @@ script(type="text/ng-template", id="drug-use-item.html")
                     label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-DESCRIPTION') | translate}}:
                     .col-md-10
                         input.form-control(name='description',ng-model='vm.model.description',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-DESCRIPTION")|translate}}',maxlength="400")
+                label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-REMIND_MODE') | translate}}:
+                    <!--模版-->
+                    .col-md-10
+                        .btn-group
+                            .btn.btn-primary(name='drugUseTemplate',ng-repeat='drugUseTemplate in vm.selectBinding.drugUseTemplates',ng-model='vm.model.drugUseTemplateId',btn-radio="drugUseTemplate.id",required='') {{drugUseTemplate.name}}
                 fieldset: .form-group
                     <!--时长(分)-->
                     label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-DURATION') | translate}}:

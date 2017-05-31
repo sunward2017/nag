@@ -50,15 +50,14 @@
             vm.tab1 = { cid: 'contentTab1' };
 
             vmh.parallel([
-                vmh.shareService.tmp('T3001/psn-nursingLevel', 'name', vm.treeFilterObject),
+                vmh.shareService.tmp('T3001/psn-drugUseTemplate', 'name'),
                 vmh.shareService.d('D0103'),
                 vmh.shareService.d('D0104'),
                 vmh.shareService.d('D3019')
             ]).then(function (results) {
-                vm.selectBinding.nursingLevels = _.map(results[0], function (row) { return { id: row._id, name: row.name } });
+                vm.selectBinding.drugUseTemplates = _.map(results[0], function (row) { return { id: row._id, name: row.name } });
                 vm.selectBinding.repeatTypes = results[1];
                 vm.selectBinding.remindModes = results[2];
-                vm.selectBinding.workItemFlags = results[3].slice(0, results[3].length - 1);
             });
 
             vm.load().then(function () {

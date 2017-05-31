@@ -158,6 +158,11 @@
         "sref": "app.pension-agency.drug-use-item.list"
       },
       {
+        "_id": "menu.pension-agency.DRUG-USE-TEMPLATE",
+        "name": "用药模版",
+        "sref": "app.pension-agency.drug-use-template.list"
+      },
+      {
         "_id": "menu.pension-agency.DRUG-DIRECTORY",
         "name": "药品目录",
         "sref": "app.pension-agency.drug-directory.list"

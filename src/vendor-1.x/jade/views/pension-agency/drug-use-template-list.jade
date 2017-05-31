@@ -1,8 +1,4 @@
-.col-xs-2(ng-if="vm.switches.leftTree")
-    .tree.tree-basic#tree1(ng-style="{height:vm.size.h-15}")
-        ul
-            li.repeat-modify(ng-repeat='node in vm.trees[0].treeData',ng-include="'tree-basic-renderer.html'",ng-init="tIndex=0;nIndex = $index")
-.text-center(ng-class='{"col-xs-10":vm.switches.leftTree,"col-xs-12":!vm.switches.leftTree}')
+.col-xs-12.text-center
     .row
         form.form-search
             .input-group.pull-right.page-search
@@ -29,7 +25,6 @@
                                 label
                                     input(type='checkbox' data="trBubble" ng-model="row.checked" )
                                     span.fa.fa-check(data="trBubble")
-                        td {{::row.nursingLevelId.name}}
                         td {{::row.name}}
                         td {{::row.repeat_type_name }}{{row.repeat_values | repeatInfoCombo: row.repeat_start}}
                         td {{::row.duration}}
@@ -52,17 +47,5 @@
                                     i.glyphicon.glyphicon-plus
                                 a.btn.btn-primary.btn-sm(title="{{'button.REMOVE'|translate}}",ng-click="vm.disable()")
                                     i.glyphicon.glyphicon-minus
-                            .btn-group       
-                                a.btn.btn-primary.btn-sm(title="{{'button.COPY'|translate}}",ng-click="vm.copyWorkItems()") {{ vm.viewTranslatePath('LABEL-COPY') | translate}}
                     .col-md-8
                         pagination.pagination-sm.pull-right(total-items="vm.page.totals",ng-model="vm.page.no",max-size="5",items-per-page="vm.page.size",boundary-links="true" ,ng-change="vm.paging()")
-script(type="text/ng-template", id="work-item-copy.html")
-    .ngdialog-title
-        i.glyphicon.glyphicon-info-sign
-        | {{ vm.moduleTranslatePath('DLG-WORK-ITEM-TITLE') | translate }}
-    .ngdialog-input
-        .col-md-12
-            .tree.tree-basic(name='nursingLevelTree',s-tree, s-tree-data="vm.nursingLevelPromise",s-tree-height="420", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{mode:'check'}",ng-model="vm.nursingLevelIds",required='')
-     .ngdialog-buttons
-            .col-md-12.text-right
-                button.btn.btn-success(type='button',ng-click="vm.doSubmit()") {{ "button.CONFIRM" | translate}}

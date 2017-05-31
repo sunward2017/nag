@@ -38,6 +38,14 @@
     "NURSING_ITEM":"A0001",
     "DRUG_USE_ITEM":"A0003"
   },
+  "D3019":{
+    "PUBLIC_HEALTH":"A0001",
+    "INDIVIDUAL_HEALTH":"A0002",
+    "DIET": "A0003",
+    "REHABILITATION": "A0004",
+    "CARE": "A0005",
+    "TAKE_DRUG": "A0006"
+  },
   "TRV00": {
     "FEELING": "A0001",
     "ROUTE": "A0003"

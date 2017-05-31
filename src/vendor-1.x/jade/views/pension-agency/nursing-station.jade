@@ -81,15 +81,17 @@ script(type="text/ng-template", id="nursing-station-elderly.html")
                     .tab-content-block#content-nursing_records_today
                         table.grid.table.table-bordered.table-hover.table-striped
                             thead
+                                colgroup
+                                    col(width="160")
+                                    col(width="365")
+                                    col(width="304")
+                                    col(width="100")
+                                    col
                                 tr
-                                    th.text-center(width="160")
-                                        | {{ vm.moduleTranslatePath('DLG-ELDERLY-TH-EXEC_ON') | translate}}
-                                    th.text-center(width="365")
-                                        | {{ vm.moduleTranslatePath('DLG-ELDERLY-TH-NAME') | translate}}
-                                    th.text-center(width="304")
-                                        | {{ vm.moduleTranslatePath('DLG-ELDERLY-TH-ASSIGNED_WORKER') | translate}}
-                                    th.text-center(width="100")
-                                        | {{ vm.moduleTranslatePath('DLG-ELDERLY-TH-CONFIRM_FLAG') | translate}}
+                                    th.text-center {{ vm.moduleTranslatePath('DLG-ELDERLY-TH-EXEC_ON') | translate}}
+                                    th.text-center {{ vm.moduleTranslatePath('DLG-ELDERLY-TH-NAME') | translate}}
+                                    th.text-center {{ vm.moduleTranslatePath('DLG-ELDERLY-TH-ASSIGNED_WORKER') | translate}}
+                                    th.text-center {{ vm.moduleTranslatePath('DLG-ELDERLY-TH-CONFIRM_FLAG') | translate}}
                                     th
                             tbody
                                 tr(ng-repeat="row in vm.nursingRecords")

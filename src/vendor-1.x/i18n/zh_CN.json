@@ -210,6 +210,7 @@
       "------------": "",
       "DRUG": "药品管理",
       "DRUG-USE-ITEM":"用药管理",
+      "DRUG-USE-TEMPLATE":"用药模版",
       "DRUG-DIRECTORY": "药品目录",
       "DRUG-STOCK": "药品库存",
       "DRUG-IN-STOCK": "药品入库",

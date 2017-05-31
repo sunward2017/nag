@@ -497,7 +497,6 @@
                     deps: helper.resolveFor2('angucomplete-alt')
                 }
             })
-
             .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'assessment-enter', {
                 url: '/assessment-enter',
                 title: '入院评估管理',
@@ -808,7 +807,6 @@
                     //, deps: helper.resolveFor2('ui.select')
                 }
             })
-
             .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'nursing-worker-schedule', {
                 url: '/nursing-worker-schedule',
                 access_level: AUTH_ACCESS_LEVELS.USER,
@@ -833,7 +831,6 @@
                 },
                 resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.PENSION_AGENCY + 'nursing-worker-schedule.js')
             })
-
             .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'nursing-worker-schedule-template', {
                 url: '/nursing-worker-schedule-template',
                 title: '护工排班模版',
@@ -980,7 +977,7 @@
                     //, deps: helper.resolveFor2('ui.select')
                 }
             })
-             .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'overdue-workitem', {
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'overdue-workitem', {
                 url: '/overdue-workitem',
                 title: '过期项目',
                 abstract: true,
@@ -1061,7 +1058,7 @@
                     })
                 }
             })
-             .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'warning-group', {
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'warning-group', {
                 url: '/warning-group',
                 title: '报警列表',
                 abstract: true,
@@ -1684,8 +1681,98 @@
                 resolve: {
                     entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'drug-use-item.details', {
                         modelName: 'psn-elderly',
-                        blockUI: true,
-
+                        blockUI: true
+                    })
+                }
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'drug-use-template', {
+                url: '/drug-use-template',
+                title: '用药模版',
+                abstract: true,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath(MODEL_VARIABLES.HEAD_TEMPLATES.PENSION_AGENCY),
+                        controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER_FOR_TENANT
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div><div class="clearfix"></div>'
+                    }
+                },
+                data: {
+                    treeFilterObject: { "status": 1 }, //使用tmp时的过滤
+                    func_id: MODEL_VARIABLES.BIZ_FUNC_PREFIXS.PENSION_AGENCY + 'DRUG-USE-TEMPLATE'//业务系统使用
+                }
+                , resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.PENSION_AGENCY + 'drug-use-template.js')
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'drug-use-template.list', {
+                url: '/list/:action',
+                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'drug-use-template-list.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'DrugUseTemplateGridController',
+                resolve: {
+                    entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'drug-use-template.list', {
+                        modelName: 'psn-drugUseTemplate',
+                        searchForm: { "status": 1},
+                        serverPaging: true,
+                        columns: [{
+                            label: '模版名称',
+                            name: 'name',
+                            type: 'string',
+                            width: 100,
+                            sortable: true
+                        }, {
+                            label: '重复',
+                            name: 'repeat',
+                            type: 'string',
+                            width: 100,
+                            sortable: true
+                        }, {
+                            label: '时长(分)',
+                            name: 'duration',
+                            type: 'string',
+                            width: 60,
+                            sortable: true
+                        }, {
+                            label: '护工确认',
+                            name: 'confirm_flag',
+                            type: 'bool',
+                            width: 80
+                        }, {
+                            label: '提醒',
+                            name: 'remind_flag',
+                            type: 'bool',
+                            width: 80
+                        }, {
+                            label: '提醒方式',
+                            name: 'remind_mode',
+                            type: 'bool',
+                            width: 80
+                        }, {
+                            label: '提醒次数',
+                            name: 'remind_times',
+                            type: 'number',
+                            width: 80
+                        }, {
+                            label: '',
+                            name: 'actions',
+                            sortable: false,
+                            width: 60
+                        }]
+                    })
+                }
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'drug-use-template.details', {
+                url: '/details/:action/:_id',
+                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'drug-use-template-details.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'DrugUseTemplateDetailsController',
+                resolve: {
+                    entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'drug-use-template.details', {
+                        modelName: 'psn-drugUseTemplate',
+                        model: {
+                            duration: 30
+                        },
+                        blockUI: true
                     })
                 }
             })

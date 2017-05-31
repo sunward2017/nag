@@ -590,6 +590,8 @@
         "TAB1-PLACEHOLDER-NAME": "喂早餐..",
         "TAB1-LABEL-DESCRIPTION": "服用方法",
         "TAB1-PLACEHOLDER-DESCRIPTION": "每日三次...",
+        "TAB1-LABEL-DRUG_USE_TEMPLATE": "用药模版",
+        "TAB1-BTN-REMOVE_DRUG_USE_TEMPLATE": "不使用模版",
         "TAB1-LABEL-DURATION": "时长(分)",
         "TAB1-PLACEHOLDER-DURATION": "10..",
         "TAB1-LABEL-REPEAT_TYPE": "重复类型",

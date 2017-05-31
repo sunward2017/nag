@@ -82,8 +82,32 @@
                 status:1,
                 elderlyId: vm.model._id,
                 tenantId: vm.model.tenantId
-            }).$promise.then(function (rows) {
-                vm.elderlyDrugUseItems = rows
+            },null,null, [{path: 'drugUseTemplateId', select: '_id name'}]).$promise.then(function (rows) {
+                var groupObject = _.groupBy(rows, function(o){
+                   if(o.drugUseTemplateId){
+                       return o.drugUseTemplateId._id;
+                   } else {
+                       return o._id;
+                   }
+                });
+                var elderlyDrugUseItems = [], groupValue, row;
+                for(var key in groupObject) {
+                    groupValue = groupObject[key];
+                    for (var i = 0, len = groupValue.length; i < len; i++) {
+                        row = groupValue[i];
+                        if (len > 1) {
+                            if (i == len - 1) {
+                                row.row_span = len;
+                            }
+                            elderlyDrugUseItems.push(row)
+                        } else {
+                            row.row_span = 1;
+                            elderlyDrugUseItems.push(row)
+                        }
+                    }
+                }
+                console.log('elderlyDrugUseItems:', elderlyDrugUseItems);
+                vm.elderlyDrugUseItems = elderlyDrugUseItems
             });
         }
 
@@ -167,6 +191,7 @@
             vm.viewTranslatePath = function (key) {
                 return vm.moduleTranslatePathRoot + '.' + key;
             };
+            vm.tenantId = $scope.ngDialogData.tenantId;
 
             vm.doSubmit = doSubmit;
             vm.cancel = cancel;
@@ -182,9 +207,15 @@
             vm.searchForBackFiller = searchForBackFiller;
             vm.selectDrugForBackFiller = selectDrugForBackFiller;
             vm.initVoiceTemplate = initVoiceTemplate;
+            vm.selectDrugUseTemplate = selectDrugUseTemplate;
 
 
             vm.tab1 = { cid: 'contentTab1' };
+
+            vm.drugUseTemplatePromise = vmh.shareService.tmp('T3001/psn-drugUseTemplate', 'name duration repeat_type repeat_values repeat_start confirm_flag remind_flag remind_mode remind_times voice_template', {tenantId: vm.tenantId, status: 1}).then(function(nodes){
+               console.log('drugUseTemplatePromise nodes:', nodes);
+                return nodes;
+            });
 
             vmh.parallel([
                 vmh.shareService.d('D0103'),
@@ -208,6 +239,36 @@
             vm.queryDrugPromise = queryDrug('', $scope.ngDialogData.addedDrugIds);
         }
 
+
+        function selectDrugUseTemplate (selectedNode) {
+            if (selectedNode) {
+                vm.model.drugUseTemplateId = selectedNode.id;
+                vm.model.duration = selectedNode.duration;
+                vm.model.repeat_type = selectedNode.repeat_type;
+                vm.model.repeat_values = selectedNode.repeat_values;
+                if (vm.model.repeat_values && vm.model.repeat_values.length > 0) {
+                    vm.repeat_values = vm.model.repeat_values.join();
+                }
+                vm.model.repeat_start = selectedNode.repeat_start;
+                vm.model.confirm_flag = selectedNode.confirm_flag;
+                vm.model.remind_flag = selectedNode.remind_flag;
+                vm.model.remind_mode = selectedNode.remind_mode;
+                vm.model.remind_times = selectedNode.remind_times;
+                vm.model.voice_template = selectedNode.voice_template;
+            } else {
+                vm.model.drugUseTemplateId = undefined;
+                vm.model.duration = undefined;
+                vm.model.repeat_type = undefined;
+                vm.model.repeat_values = [];
+                vm.model.repeat_start = undefined;
+                vm.model.confirm_flag = false;
+                vm.model.remind_flag = false;
+                vm.model.remind_mode = undefined;
+                vm.model.remind_times = undefined;
+                vm.model.voice_template = undefined;
+            }
+
+        }
 
 
         function queryDrug(keyword, addedDrugIds) {

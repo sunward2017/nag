@@ -522,7 +522,7 @@
         if (!cellObject || !angular.isArray(cellObject) || cellObject.length === 0)
             return '';
         return cellObject.map(function (o) {
-            if(workerScheduleOnXAxis[o['_id']]) {
+            if(workerScheduleOnXAxis && workerScheduleOnXAxis[o['_id']]) {
                 return (o[key] || '') + '<span class="nursingWorkerScheduleInNursingScheduleCell">(' + workerScheduleOnXAxis[o['_id']].join() + ')</span>'
             } else {
                 return (o[key] || '')

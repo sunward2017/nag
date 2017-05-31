@@ -1094,7 +1094,8 @@
                             name: 'subject_name',
                             type: 'string',
                             width: 80,
-                            sortable: true
+                            sortable: false,
+                            formatter: { type: 'populate', options: { path: 'subjectId', select: '-_id name code' } } 
                         }, {
                             label: '报警对象',
                             name: 'object_name',
@@ -1114,7 +1115,7 @@
                             width: 240,
                             sortable: true
                         }, {
-                            label: '处理标记',
+                            label: '处理',
                             name: 'process_flag',
                             type: 'bool',
                             width: 50,

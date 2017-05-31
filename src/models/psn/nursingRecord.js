@@ -27,8 +27,8 @@ module.exports = function(ctx, name) {
             gen_batch_no: { type: String, required: true, minlength: 10, maxlength: 10 },
             workItemId: { type: mongoose.Schema.Types.ObjectId }, //根据type 分别是workitemId和drugUseItemId
             category: { type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3019"]) },
-            name: { type: String, required: true, maxlength: 100 },
-            description: { type: String, maxLength: 400 },
+            name: { type: String, required: true }, // 支持同个分组的护理计划用药项目合并为一条看护记录
+            description: { type: String }, // 支持同个分组的护理计划用药项目合并为一条看护记录
             remark: { type: String, maxLength: 200 },
             duration: { type: Number, default: 0 }, // 完成时长 单为分
             exec_on: { type: Date, required: true },

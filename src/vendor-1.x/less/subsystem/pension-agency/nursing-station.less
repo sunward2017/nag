@@ -301,16 +301,19 @@
       .elderly-more-info {
         clear: both;
         margin-top: 10px;
+        .tab-content{
+          height:480px;
+          overflow-y: auto;
+          overflow-x: hidden;
+        }
         .tab-content-block{
           height:450px;
         }
         thead {
-          display: block;
-          border-bottom: solid 1px #DDDDDD;
+          border: solid 1px #DDDDDD;
         }
         tbody{
-          display: block;
-          max-height:420px;
+          max-height:390px;
           overflow-y: auto;    /* Trigger vertical scroll    */
           overflow-x: hidden;  /* Hide the horizontal scroll */
           .drug-use-item-icon{

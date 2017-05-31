@@ -1012,7 +1012,7 @@
                             label: '房间号',
                             name: 'roomName',
                             type: 'string',
-                            width: 60,
+                            width: 40,
                             sortable:false
                         }, {
                             label: '床号',
@@ -1030,7 +1030,7 @@
                             label: '项目类别',
                             name: 'category',
                             type: 'string',
-                            width: 50,
+                            width: 70,
                             sortable: false,
                             formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D3019/object')
                         },{
@@ -1048,12 +1048,6 @@
                         },{
                             label: '执行时间',
                             name: 'exec_on',
-                            type: 'date',
-                            width: 70,
-                            sortable: false
-                        },{
-                            label: '确认时间',
-                            name: 'confirmed_on',
                             type: 'date',
                             width: 70,
                             sortable: false

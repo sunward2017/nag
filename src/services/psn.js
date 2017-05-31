@@ -4932,15 +4932,29 @@ module.exports = {
                 handler: function (app, options) {
                     return function* (next) {
                         var tenantId = this.request.body.tenantId;
+                        var begin = app.moment(app.moment().format('YYYY-MM-DD'));
+                        // var end = app.moment(begin).add(1, 'days');
+                         var now = app.moment();
                         try {
                             var rows = yield app.modelFactory().model_query(app.models['psn_nursingRecord'],{
-                               select: 'roomId bed_no elderly_name category name description exec_on confirmed_on', 
+                               select: 'roomId bed_no elderly_name category name description exec_on confirmed_on duration', 
                                where: {
-                                tenantId: tenantId,
-                                confirmed_flag: true
+                                  tenantId: tenantId,
+                                //   exec_on: {"$gte": begin, "$lt": end},
+                                  exec_on: {"$gte": begin},
+                                  confirmed_flag: false
                              }
-                            }).populate('roomId', 'name', 'psn_room');
-                            this.body = app.wrapper.res.rows(rows);
+                            }).populate('roomId', 'name', 'psn_room').populate("assigned_workers","name");
+                           
+                            var overdueWorkItem = app._.filter(rows, (o)=> { 
+                                    if (o.expire_on_ts) {
+                                        return o.expire_on_ts.isBefore();
+                                    } else {
+                                        return false;
+                                    }
+                                })
+                                
+                            this.body = app.wrapper.res.rows(overdueWorkItem);
                         } catch (e) {
                             // console.log(e);
                             self.logger.error(e.message);

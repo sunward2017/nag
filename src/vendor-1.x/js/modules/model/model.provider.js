@@ -547,6 +547,7 @@
                     workItemQuery: workItemQuery,
                     workItemCopy: workItemCopy,
                     robotQuery:robotQuery,
+                    robotImport:robotImport,
                     overdueWorkItem: overdueWorkItem, 
                     elderlysByDistrictFloors: elderlysByDistrictFloors,
                     nursingStationCloseBedMonitorAlarm: nursingStationCloseBedMonitorAlarm,
@@ -829,6 +830,10 @@
                 
                 function robotQuery(tenantId){
                     return $http.post(baseUrl + 'robotQuery',{tenantId:tenantId});
+                }
+
+                function robotImport(tenantId,robotIds){
+                    return $http.post(baseUrl + 'robotImport',{tenantId:tenantId,robotIds:robotIds});
                 }
 
                 function overdueWorkItem(tenantId){

@@ -56,10 +56,7 @@
         vm.moduleTranslatePath = moduleTranslatePath
         init();
         function init() {
-            // vm.robotPromise = vmh.shareService.tmp('T3001/psn-nursingLevel', 'name id', { "status": 1, tenantId: tenantId})
-            vm.robotPromise = vmh.psnService.robotQuery(tenantId)
-            console.log(vm.robotPromise);
-            // console.log(vm.robotPromis);
+            vm.robotPromise = vmh.psnService.robotQuery(tenantId);
         }
 
         var moduleTranslatePathRoot = $scope.ngDialogData.moduleTranslatePathRoot;
@@ -75,11 +72,10 @@
                     $scopeConfirm.message = vm.moduleTranslatePath('DLG-IMPORT-ROBOT')
                 }]
             }).then(function () {
-                console.log(vm.robotIds);
-                // vmh.psnService.workItemCopy(vm.nursingLevelIds, row.id).then(function () {
-                //     $scope.closeThisDialog();
-                //     vmh.alertSuccess('notification.NORMAL-SUCCESS', true);
-                // })
+                vmh.psnService.robotImport(tenantId,vm.robotIds).then(function () {
+                    $scope.closeThisDialog();
+                    vmh.alertSuccess('notification.NORMAL-SUCCESS', true);
+                })
             });
         }
     }

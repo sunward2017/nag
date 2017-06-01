@@ -4975,7 +4975,7 @@ module.exports = {
                             var rows=[];
                             for(var j=0,l=remoteRobots.length;j<l;j++){
                                 var obj = {};
-                                obj._id= remoteRobots[j].robotId+'_'+remoteRobots[j].robotName ;
+                                obj._id= remoteRobots[j].robotId+'_'+remoteRobots[j].robotName+'_'+remoteRobots[j].onlineFlag;
                                 obj.id = remoteRobots[j].robotId+'_'+remoteRobots[j].robotName ;
                                 obj.name = remoteRobots[j].robotId+'_'+remoteRobots[j].robotName+'('+(remoteRobots[j].onlineFlag==1?"在线)":"离线)");
                                 rows.push(obj);
@@ -4991,6 +4991,44 @@ module.exports = {
                     };
                 } 
 
+            },{
+                method: 'robotImport',
+                verb: 'post',
+                url: this.service_url_prefix + "/robotImport",
+                handler: function (app, options) {
+                    return function* (next) {
+                        try {
+                            var tenantId = this.request.body.tenantId;
+                            var robotIds = this.request.body.robotIds;
+                                // console.log(tenantId);
+                                // console.log(robotIds);
+                            var robotRows =[];
+                            app._.each(robotIds,function(o){
+                                var robot = o.split('_');
+                                var obj={};
+                                    obj.code=robot[0];
+                                    obj.tenantId = tenantId
+                                    obj.name=robot[1];
+                                    if(robot[2]=="1"){
+                                      obj.robot_status="A0001"
+                                    }else{
+                                      obj.robot_status="A0003"
+                                    };
+                                    robotRows.push(obj)
+                            })
+                            // console.log(robotRows); 
+                            var ret = yield app.modelFactory().model_bulkInsert(app.models['pub_robot'], {
+                                rows: robotRows, 
+                            }); 
+                            this.body = app.wrapper.res.default();   
+                        } catch (e) {
+                            // console.log(e);
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }  
             },{
                 method: 'nursingPlanSaveNursingItem',
                 verb: 'post',

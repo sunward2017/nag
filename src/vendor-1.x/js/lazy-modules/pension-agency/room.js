@@ -383,11 +383,11 @@
             vm.checkForbidden = checkForbidden;
             vm.tab1 = {cid: 'contentTab1'};
 
-            vm.treeDataPromiseOfRobots = vmh.shareService.tmp('T3005', 'name', {tenantId:vm.tenantId, roomId: vm.getParam('_id')}, true).then(function(nodes){
+            vm.treeDataPromiseOfRobots = vmh.shareService.tmp('T3005', 'name', {tenantId:vm.tenantId, roomId: vm.getParam('_id')}, null, true).then(function(nodes){
                 return nodes;
             });
 
-            vm.treeDataPromiseOfBedMonitors = vmh.shareService.tmp('T3007', 'code name', {tenantId:vm.tenantId, roomId: vm.getParam('_id')}, true).then(function(nodes){
+            vm.treeDataPromiseOfBedMonitors = vmh.shareService.tmp('T3007', 'code name', {tenantId:vm.tenantId, roomId: vm.getParam('_id')},null, true).then(function(nodes){
                 console.log(nodes);
                 return nodes;
             });

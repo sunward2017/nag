@@ -20,6 +20,14 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                             textarea.form-control(name='description',ng-model='vm.model.description',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-DESCRIPTION")|translate}}',maxlength="400")
                     fieldset: .form-group
                         <!--时长(分)-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-ORDER_NO') | translate}}:
+                        .col-md-10
+                            input.form-control(type='number',name='order_no' ,ng-model='vm.model.order_no',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-ORDER_NO")|translate}}', required='' ui-validate="'$value>=0'" )
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'order_no','required')") {{ "validator.REQUIRED" | translate}}
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'order_no','number')") {{ "validator.NUMBER" | translate}}
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'order_no','validator')") {{ "validator.MIN" | translate:{min:0} }}
+                    fieldset: .form-group
+                        <!--时长(分)-->
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-DURATION') | translate}}:
                         .col-md-10
                             input.form-control(type='number',name='duration' ,ng-model='vm.model.duration',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-DURATION")|translate}}', required='' ui-validate="'$value>=0'" )

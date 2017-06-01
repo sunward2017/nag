@@ -217,7 +217,7 @@
                             return clone;
                         }) : promise;
                     },
-                    tmp: function (id, select, where, forceRefresh) {//tmg 本地过滤
+                    tmp: function (id, select, where, populates, forceRefresh) {//tmg 本地过滤
                         var promise;
                         var cacheKey = 'post-' + id + objectHash(where);
                         if (forceRefresh || angular.isUndefined(this.shareTree[cacheKey])) {
@@ -227,7 +227,8 @@
                             }
                             promise = $http.post(baseUrl + 'tree/' + id, {
                                 where: where,
-                                select: select
+                                select: select,
+                                populates: populates
                             }).then(function (nodes) {
                                 self.shareTree[cacheKey] = nodes;
                                 return self.shareTree[cacheKey];

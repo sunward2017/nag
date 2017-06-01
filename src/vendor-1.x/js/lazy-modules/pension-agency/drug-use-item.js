@@ -25,23 +25,21 @@
         vm.yAxisDataPromise = vmh.shareService.tmp('T3009', null, { tenantId: vm.tenantId }).then(function (nodes) {
             return nodes;
         });
-        fetchElderly()
-        function fetchElderly() {
-            vmh.psnService.nursingPlansByRoom(vm.tenantId, ['name', 'sex', 'birthday', 'enter_code', 'nursing_info', 'begin_exit_flow'], ['elderlyId']).then(function (ret) {
-                vm.aggrData = ret;
-            })
+
+        function fetchElderly(roomIds) {
+            vmh.shareService.tmp('T3001/psn-elderly', 'name sex birthday enter_code room_summary nursing_info',
+                {
+                    tenantId: vm.tenantId, status: 1,
+                    live_in_flag: true,
+                    begin_exit_flow: {$in: [false, undefined]},
+                    "room_value.roomId": {$in: roomIds}
+                }
+            ).then(function (nodes) {
+                vm.elderlys = nodes;
+            });
         }
         function onRoomChange() {
-            var yAxisDataFlatten = [];
-            _.each(vm.yAxisData, function (o) {
-                for (var i = 1, len = o.capacity; i <= len; i++) {
-                    if (_.contains(o.forbiddens, i)) continue;
-                    var trackedKey = o._id + '$' + i;
-                    yAxisDataFlatten.push(_.extend({ trackedKey: trackedKey, bed_no: i }, o));
-                }
-            });
-            vm.yAxisDataFlatten = yAxisDataFlatten;
-            // console.log('yAxisDataFlatten:',vm.yAxisDataFlatten);
+            fetchElderly(_.map(vm.yAxisData, function(o){return o._id}));
         }
     }
 
@@ -82,7 +80,7 @@
                 status:1,
                 elderlyId: vm.model._id,
                 tenantId: vm.model.tenantId
-            },null,null, [{path: 'drugUseTemplateId', select: '_id name'}]).$promise.then(function (rows) {
+            },null,null, [{path: 'drugUseTemplateId', select: '_id name order_no'}, {path: 'drugId', select: '_id full_name short_name'}]).$promise.then(function (rows) {
                 console.log('elderlyDrugUseItems:', elderlyDrugUseItems);
                 var groupObject = _.groupBy(rows, function(o){
                    if(o.drugUseTemplateId){
@@ -96,8 +94,13 @@
                     groupValue = groupObject[key];
                     for (var i = 0, len = groupValue.length; i < len; i++) {
                         row = groupValue[i];
+                        if (row.drugUseTemplateId) {
+                           row.group_order = row.drugUseTemplateId.order_no;
+                        } else {
+                            row.group_order = 99999;
+                        }
                         if (len > 1) {
-                            if (i == len - 1) {
+                            if (i == 0) {
                                 row.row_span = len;
                             }
                             elderlyDrugUseItems.push(row)
@@ -113,10 +116,6 @@
         }
 
         function configDrugUseItem(drugUseItem) {
-            var addedDrugIds = _.map(vm.elderlyDrugUseItems, function (o) {
-               return o.drugId;
-            });
-            console.log('addedDrugIds:', addedDrugIds);
             ngDialog.open({
                 template: 'drug-use-item.html',
                 controller: 'DrugUseItemDetailsController',
@@ -128,7 +127,7 @@
                     elderlyName: vm.model.name,
                     tenantId: vm.model.tenantId,
                     drugUseItem: drugUseItem,
-                    addedDrugIds: addedDrugIds,
+                    elderlyDrugUseItems: vm.elderlyDrugUseItems,
                     fetchDrugUseItem: vm.fetchDrugUseItem
                 }
             })
@@ -235,9 +234,9 @@
                 if (vm.model.repeat_values && vm.model.repeat_values.length > 0) {
                     vm.repeat_values = vm.model.repeat_values.join();
                 }
+            } else {
+                vm.queryDrugPromise = queryDrug('');
             }
-
-            vm.queryDrugPromise = queryDrug('', $scope.ngDialogData.addedDrugIds);
         }
 
 
@@ -269,27 +268,66 @@
                 vm.model.voice_template = undefined;
             }
 
+            checkSameDrug(vm.model.drugId)
         }
 
 
-        function queryDrug(keyword, addedDrugIds) {
-            return vmh.fetch(vmh.psnService.queryDrug(vm.model.tenantId, keyword, {_id: {$nin: addedDrugIds}}, 'barcode full_name short_name dosage_form alias vender'));
+        function queryDrug(keyword) {
+            // 过滤已选的药,此处不在弹出列表中过滤,因为业务上可以在不同的用药模版中选择相同的药
+            //return vmh.fetch(vmh.psnService.queryDrug(vm.model.tenantId, keyword, {_id: {$nin: addedDrugIds}}, 'barcode full_name short_name dosage_form alias vender'));
+            return vmh.fetch(vmh.psnService.queryDrug(vm.model.tenantId, keyword, null, 'barcode full_name short_name dosage_form alias vender'));
         }
 
         function searchForBackFiller (keyword) {
             console.log('keyword:', keyword);
-            vm.queryDrugPromise = queryDrug(keyword, $scope.ngDialogData.addedDrugIds);
+            vm.queryDrugPromise = queryDrug(keyword);
         }
 
         function selectDrugForBackFiller(row) {
             if (row) {
+                checkSameDrug(row.id)
                 vm.model.drugId = row.id;
                 vm.model.barcode = row.barcode;
-                vm.model.name = row.full_name;
+                if (row.short_name) {
+                    vm.model.name = row.short_name;
+                } else {
+                    vm.model.name = row.full_name;
+                }
             }
         }
 
+        function checkSameDrug(drugId) {
+
+            var drugUseItem = _.find($scope.ngDialogData.elderlyDrugUseItems, function (o) {
+                return o.drugId._id == drugId;
+            });
+
+            if(drugUseItem) {
+                if (vm.model.drugUseTemplateId) {
+                    if (drugUseItem.drugUseTemplateId && drugUseItem.drugUseTemplateId._id == vm.model.drugUseTemplateId) {
+                        console.log('该药品已经存在于同一个模版内');
+                        vm.alertMessage = vm.viewTranslatePath('WARNING-SAME-DRUG-IN-TEMPLATE');
+                        vmh.alertWarning(vm.alertMessage, true);
+                        return;
+                    }
+                } else {
+                    console.log('该药品没有设置模版,但是已经存在');
+                    if (!drugUseItem.drugUseTemplateId || !drugUseItem.drugUseTemplateId._id) {
+                        vm.alertMessage = vm.viewTranslatePath('WARNING-SAME-DRUG-NO-TEMPLATE');
+                        vmh.alertWarning(vm.alertMessage, true);
+                        return;
+                    }
+                }
+            }
+            vm.alertMessage = undefined;
+            return;
+        }
+
         function doSubmit() {
+            if(vm.alertMessage) {
+                vmh.alertWarning(vm.alertMessage, true);
+                return;
+            }
             vm.model.repeat_values = vm.repeat_values ? vm.repeat_values.split(",") : [];
             if (vm.model.voice_template) {
                 var reg = /\${[^}]+}/g;

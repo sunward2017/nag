@@ -51,10 +51,10 @@
 
             vmh.parallel([
                 vmh.clientData.getJson('nursingPlanAxis'),
-                vmh.shareService.tmp('T3001/psn-nursingLevel', 'name short_name nursing_assessment_grade', null),
-                vmh.shareService.tmp('T3001/psn-workItem', 'name elderlyId sourceId nursingLevelId', null),
-                vmh.shareService.tmp('T3001/psn-drugUseItem', 'drugId name elderlyId', null),
-                vmh.shareService.d('D3015'),
+                vmh.shareService.tmp('T3001/psn-nursingLevel', 'name short_name nursing_assessment_grade', {tenantId: vm.tenantId, status: 1}),
+                vmh.shareService.tmp('T3001/psn-workItem', 'name elderlyId sourceId nursingLevelId', {tenantId: vm.tenantId, status: 1}),
+                vmh.shareService.tmp('T3001/psn-drugUseItem', 'drugId name elderlyId drugUseTemplateId', {tenantId: vm.tenantId, status: 1}, [{path: 'drugUseTemplateId', select: '_id name order_no' }]),
+                // vmh.shareService.d('D3015'),
 
             ]).then(function (results) {
                 vm.xAxisData = results[0];
@@ -63,20 +63,20 @@
                 var nursingLevels = _.map(results[1], function (row) {
                     return { id: row._id, name: row.name, short_name: row.short_name, nursing_assessment_grade: row.nursing_assessment_grade }
                 });
-                // console.log(nursingLevels)
-                var nursingAssessmentGrades = _.map(results[4], function (row) {
-                    return { grade: row.value };
-                })
-                var nursingLevelsByElderly = {};
-                for (var n = 0, g = nursingAssessmentGrades.length; n < g; n++) {
-                    var nursing_assessment_grade = nursingAssessmentGrades[n].grade;
-
-                    nursingLevelsByElderly[nursing_assessment_grade] = _.filter(nursingLevels, function (o) {
-                        return o.nursing_assessment_grade === nursing_assessment_grade;
-                    })
-                }
-                // console.log("filterNursingLevels", nursingLevelsByElderly)
-                vm.$nursingLevels = nursingLevelsByElderly;
+                // // console.log(nursingLevels)
+                // var nursingAssessmentGrades = _.map(results[4], function (row) {
+                //     return { grade: row.value };
+                // })
+                // var nursingLevelsByElderly = {};
+                // for (var n = 0, g = nursingAssessmentGrades.length; n < g; n++) {
+                //     var nursing_assessment_grade = nursingAssessmentGrades[n].grade;
+                //
+                //     nursingLevelsByElderly[nursing_assessment_grade] = _.filter(nursingLevels, function (o) {
+                //         return o.nursing_assessment_grade === nursing_assessment_grade;
+                //     })
+                // }
+                // // console.log("filterNursingLevels", nursingLevelsByElderly)
+                // vm.$nursingLevels = nursingLevelsByElderly;
 
                 var nursingLevelMap = {};
                 _.reduce(nursingLevels, function (o, nursingLevel) {
@@ -85,9 +85,7 @@
                 }, nursingLevelMap);
                 vm.nursingLevelMap = nursingLevelMap;
 
-                var workItems = _.map(results[2], function (row) {
-                    return { id: row._id, name: row.name, sourceId: row.sourceId, elderlyId: row.elderlyId, nursingLevelId: row.nursingLevelId }
-                });
+                var workItems = results[2];
                 var workItemMap = {};
                 for (var i = 0, len = nursingLevels.length; i < len; i++) {
                     var nursingLevelId = nursingLevels[i].id;
@@ -96,9 +94,7 @@
                     });
                 }
                 
-                var drugUseItems = _.map(results[3], function (row) {
-                    return { id: row._id, name: row.name, drugId: row.drugId, elderlyId: row.elderlyId }
-                });
+                var drugUseItems = results[3];
                 var drugUseItemMap = {},
                     elderlys = [];
                 _.each(drugUseItems, function (v) {
@@ -106,11 +102,45 @@
                 })
                 elderlys = _.uniq(elderlys);
 
+
+                var noGroupTemplate = {id:'noDrugUseTemplate', name:'未分组', order_no: 99999};
                 for (var j = 0, l = elderlys.length; j < l; j++) {
                     var elderlyId = elderlys[j];
-                    drugUseItemMap[elderlyId] = _.filter(drugUseItems, function (o) {
+                    var drugUseItemsOfElderly = _.filter(drugUseItems, function (o) {
                         return o.elderlyId === elderlyId;
                     });
+
+
+                    var grouped = _.groupBy(drugUseItemsOfElderly, function(o){
+                        if(o.drugUseTemplateId){
+                            return o.drugUseTemplateId.id;
+                        } else {
+                            return noGroupTemplate.id;
+                        }
+                    });
+                    if(vmh.utils.v.getPropertyCount(grouped) > 1) {
+                        console.log('存在分组');
+
+                        // console.log('grouped:',grouped);
+                        var drugUseItemTemplates = [];
+                        for (var k in grouped) {
+                            if(k === noGroupTemplate.id) {
+                                drugUseItemTemplates.push({template: noGroupTemplate, order_no: noGroupTemplate.order_no, drugUseItems: grouped[k]})
+                            } else {
+                                drugUseItemTemplates.push({template: grouped[k][0].drugUseTemplateId, order_no: grouped[k][0].drugUseTemplateId.order_no, drugUseItems: grouped[k]})
+                            }
+                        }
+
+                        console.log('drugUseItemTemplates:', drugUseItemTemplates);
+
+                        drugUseItemMap[elderlyId] = {grouped: true, drugUseItemTemplates: drugUseItemTemplates};
+                    } else {
+                        console.log('不存在分组');
+                        drugUseItemMap[elderlyId] = {grouped: false, drugUseItems: drugUseItemsOfElderly};
+                    }
+
+                    // drugUseItemMap[elderlyId] = drugUseItemsOfElderly;
+
                 }
 
                 // console.log("workItemMap", workItemMap)
@@ -127,13 +157,13 @@
             vm.work_items = { "A0001": {}, "A0003": {} };
             fetchNursingPlan();
         }
-
+        
 
         function fetchNursingPlan() {
             vmh.psnService.nursingPlansByRoom(vm.tenantId, ['name', 'sex', 'nursingLevelId', 'nursing_assessment_grade'], ['elderlyId', 'work_items', 'remark']).then(function (data) {
                 vm.aggrData = data;
                 // tarnckedKey room + bed ;
-                console.log("data", data)
+                // console.log("data", data)
                 for (var trackedKey in vm.aggrData) {
                     vm.$editings[trackedKey] = {};
                     vm.$selectAll[trackedKey] = {};
@@ -185,15 +215,17 @@
             // console.log('onRoomChange: ', vm.yAxisData);
             var yAxisDataFlatten = [];
             _.each(vm.yAxisData, function (o) {
-                console.log('o is:' + o);
+                console.log('o is:', o);
                 for (var i = 1, len = o.capacity; i <= len; i++) {
                     if (_.contains(o.forbiddens, i)) continue;
                     var trackedKey = o._id + '$' + i;
-                    yAxisDataFlatten.push(_.extend({ trackedKey: trackedKey, bed_no: i }, o));
+                    if (vm.aggrData[trackedKey]['elderly']['id']) {
+                        yAxisDataFlatten.push(_.extend({trackedKey: trackedKey, bed_no: i}, o));
+                    }
                 }
             });
             vm.yAxisDataFlatten = yAxisDataFlatten;
-            // console.log('yAxisDataFlatten:',vm.yAxisDataFlatten);
+            console.log('yAxisDataFlatten:',vm.yAxisDataFlatten);
         }
 
         function addElderlyNursingLevel(trackedKey) {
@@ -351,7 +383,7 @@
         function refreshWorkItem() {
             vmh.parallel([
                 vmh.shareService.tmp('T3001/psn-nursingLevel', 'name short_name nursing_assessment_grade', null),
-                vmh.shareService.tmp('T3001/psn-workItem', 'name elderlyId sourceId nursingLevelId', null, true),
+                vmh.shareService.tmp('T3001/psn-workItem', 'name elderlyId sourceId nursingLevelId', null,null,true),
             ]).then(function (results) {
 
                 var nursingLevels = _.map(results[0], function (row) {

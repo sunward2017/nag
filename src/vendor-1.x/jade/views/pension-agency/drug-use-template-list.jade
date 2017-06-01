@@ -26,6 +26,7 @@
                                     input(type='checkbox' data="trBubble" ng-model="row.checked" )
                                     span.fa.fa-check(data="trBubble")
                         td {{::row.name}}
+                        td {{::row.order_no}}
                         td {{::row.repeat_type_name }}{{row.repeat_values | repeatInfoCombo: row.repeat_start}}
                         td {{::row.duration}}
                         td {{::row.confirm_flag|boolFilter}}

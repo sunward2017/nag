@@ -177,7 +177,21 @@ module.exports = {
                                 data.where = {status: 1};
                             if (!data.select)
                                 data.select = '_id name';
-                            this.body = app.wrapper.res.rows(yield app.modelFactory().model_query(app.models[modelOption.model_name], data));
+
+                            var rows  = app.modelFactory().model_query(app.models[modelOption.model_name], data);
+                            var populates = data.populates;
+                            if (populates) {
+                                console.log('populates:');
+                                console.log(populates);
+                                if (app._.isArray(populates)) {
+                                    app._.each(populates, function (p) {
+                                        rows = rows.populate(p);
+                                    });
+                                } else {
+                                    rows = rows.populate(populates);
+                                }
+                            }
+                            this.body = app.wrapper.res.rows(yield rows);
                         } catch (e) {
                             self.logger.error(e.message);
                             this.body = app.wrapper.res.error(e);

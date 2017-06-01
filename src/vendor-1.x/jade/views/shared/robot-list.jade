@@ -55,40 +55,7 @@ script(type="text/ng-template", id="robot-list.html")
         | {{ vm.moduleTranslatePath('DLG-ROBOT-LIST-TITLE') | translate }}
     .ngdialog-input
         .col-md-12
-            .panel.panel-default.panel-grid
-            table.grid.table.table-bordered.table-hover.table-striped
-                thead
-                    tr
-                        th.text-center(check-all,width="30")
-                            .checkbox.c-checkbox(data-toggle="tooltip",data-title="Check All")
-                                label(ng-click="vm.selectAll($event)")
-                                    input(type='checkbox')
-                                    span.fa.fa-check
-                        th.text-center(ng-repeat="col in vm.xAxisData",width="{{col.width}}") {{::col.name}}               
-                         
-                tbody
-                    tr(ng-repeat="row in vm.rows|filter:vm.filter|orderBy:vm.sort.column:vm.sort.direction===-1|paging:vm" , ng-click="vm.selectRow($event,row)",ng-dblclick="vm.dblclickRow(row.id)")
-                        td
-                            .checkbox.c-checkbox
-                                label
-                                    input(type='checkbox' data="trBubble" ng-model="row.checked" )
-                                    span.fa.fa-check(data="trBubble")
-                        td {{::row.code}}
-                        td {{::row.name}}
-                        td {{::row.robot_status_name}}
-                        td.text-right {{::row.power}}%
-                        td {{::row.stop_flag|boolFilter}}
-                        td
-                            .btn-group
-                                a.btn.btn-primary.btn-xs(title="{{'button.EDIT'|translate}}",ng-click="vm.edit(row._id)")
-                                    i.glyphicon.glyphicon-pencil
-                    tr(ng-if="vm.paged.length==0")
-                        td(colspan="{{utils.noResultsColspan(vm)}}") {{ 'grid.NO-RESULTS' | translate}}
-            .panel-footer
-                .row
-                    .col-md-4        
-                    .col-md-8
-                        pagination.pagination-sm.pull-right(total-items="vm.page.totals",ng-model="vm.page.no",max-size="5",items-per-page="vm.page.size",boundary-links="true" ,ng-change="vm.paging()") 
+            .tree.tree-basic(name='robotTree',s-tree, s-tree-data="vm.robotPromise",s-tree-height="420", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{mode:'check'}",ng-model="vm.robotIds",required='')
     .ngdialog-buttons
             .col-md-12.text-right
-                button.btn.btn-success(type='button',ng-click="vm.doSubmit()") {{ "button.CONFIRM" | translate}}                        
+                button.btn.btn-success(type='button',ng-click="vm.doSubmit()") {{ "button.CONFIRM" | translate}}                       

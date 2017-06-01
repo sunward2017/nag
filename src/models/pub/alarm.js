@@ -21,7 +21,7 @@ module.exports = function(ctx,name) {
             operated_on: {type: Date, default: Date.now},
             status: {type: Number, min: 0, max: 1, default: 1},
             subject: {type: String, required: true}, // pub_bedMonitor 报警设备
-            subjectId: {type: mongoose.Schema.Types.ObjectId, required: true,ref:'pub_bedMonitor'}, //报警设备编号
+            subjectId: {type: mongoose.Schema.Types.ObjectId, required: true}, //报警设备编号
             subject_name: {type: String, required: true, maxlength: 100}, //报警设备名称
             object: {type: String, required: true}, // psn_elderly 报警对象
             objectId: {type: mongoose.Schema.Types.ObjectId, required: true}, //报警对象编号

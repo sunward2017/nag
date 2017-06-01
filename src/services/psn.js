@@ -4958,7 +4958,87 @@ module.exports = {
                         yield next;
                     };
                 } 
-            }, {
+            },{
+                method: 'robotQuery',
+                verb: 'post',
+                url: this.service_url_prefix + "/robotQuery",
+                handler: function (app, options) {
+                    return function* (next) {
+                        try {
+                            var tenantId = this.request.body.tenantId;
+                               
+                            var localRobots = yield app.modelFactory().model_query(app.models['pub_robot'],{where:{tenantId: tenantId}}); 
+                            var remoteRobots = yield app.robot_service.getRobotList();
+                            // console.log("remoterobpots",remoteRobots)
+                        
+                            for(var i=0,len=localRobots.length;i<len;i++){
+                                var code = localRobots[i].code;
+                                var index = app._.findIndex(remoteRobots,function(o){
+                                    return o.robotId === code;
+                                })
+                                if(index!=-1){
+                                   remoteRobots.splice(index,1);  
+                                }
+                            }
+                            // console.log("remoterobpots",remoteRobots)
+                            var rows=[];
+                            for(var j=0,l=remoteRobots.length;j<l;j++){
+                                var obj = {};
+                                obj._id= remoteRobots[j].robotId+'_'+remoteRobots[j].robotName+'_'+remoteRobots[j].onlineFlag;
+                                obj.id = remoteRobots[j].robotId+'_'+remoteRobots[j].robotName ;
+                                obj.name = remoteRobots[j].robotId+'_'+remoteRobots[j].robotName+'('+(remoteRobots[j].onlineFlag==1?"在线)":"离线)");
+                                rows.push(obj);
+                            }
+
+                            this.body = app.wrapper.res.rows(rows);
+                        } catch (e) {
+                            console.log(e);
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                } 
+
+            },{
+                method: 'robotImport',
+                verb: 'post',
+                url: this.service_url_prefix + "/robotImport",
+                handler: function (app, options) {
+                    return function* (next) {
+                        try {
+                            var tenantId = this.request.body.tenantId;
+                            var robotIds = this.request.body.robotIds;
+                                // console.log(tenantId);
+                                // console.log(robotIds);
+                            var robotRows =[];
+                            app._.each(robotIds,function(o){
+                                var robot = o.split('_');
+                                var obj={};
+                                    obj.code=robot[0];
+                                    obj.tenantId = tenantId
+                                    obj.name=robot[1];
+                                    if(robot[2]=="1"){
+                                      obj.robot_status="A0001"
+                                    }else{
+                                      obj.robot_status="A0003"
+                                    };
+                                    robotRows.push(obj)
+                            })
+                            // console.log(robotRows); 
+                            var ret = yield app.modelFactory().model_bulkInsert(app.models['pub_robot'], {
+                                rows: robotRows, 
+                            }); 
+                            this.body = app.wrapper.res.default();   
+                        } catch (e) {
+                            // console.log(e);
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }  
+            },{
                 method: 'nursingPlanSaveNursingItem',
                 verb: 'post',
                 url: this.service_url_prefix + "/nursingPlanSaveNursingItem", //为老人保存一条照护类目
@@ -6094,7 +6174,7 @@ module.exports = {
                         } catch (e) {
                             console.log(e);
                             self.logger.error(e.message);
-                            this.body = app.wrapper.res.error(e);
+                            this.body = app.wrapper.res.error(e);var ret = yield app.bed_monitor_status.checkSessionAndGetLatestSmbPerMinuteRecord(this.request.body.devId, this.request.body.openId);
                         }
                         yield next;
                     };

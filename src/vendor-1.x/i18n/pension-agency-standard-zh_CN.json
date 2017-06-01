@@ -826,7 +826,8 @@
       "list": {
         "TITLE": "养老机构-基础设置-机器人-列表",
         "ROBOT-IMPORT":"机器人导入",
-        "DLG-ROBOT-LIST-TITLE":"机器人列表"
+        "DLG-ROBOT-LIST-TITLE":"机器人列表",
+        "DLG-IMPORT-ROBOT":"你确定要导入选中的机器人吗"
       },
       "details": {
         "TITLE": "养老机构-基础设置-机器人-详情",

@@ -762,8 +762,7 @@ module.exports = {
                 self.logger.error(e.message);
             }
 
-        }).catch(self.ctx.coOnError);
-
+        }).catch(self.ctx.coOnError)
     },
     autoRegistLogin: function () {
         var self = this;

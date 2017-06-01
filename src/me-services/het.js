@@ -385,6 +385,65 @@
                          yield next;
                      };
                  }
+             },
+              {
+                 method: 'bedMonitor$isAttach',
+                 verb: 'post',
+                 url: this.service_url_prefix + "/bedMonitor/isAttach",
+                 handler: function (app, options) {
+                     return function *(next) {
+                         try {
+                             console.log("body:");
+                             console.log(this.request.body)
+                             var ret = yield app.bed_monitor_app.checkIsAttach(this.openid || this.request.body.openid, this.request.body.deviceId, this.request.body.tenantId);
+                             console.log("isAttach:", ret);
+                             this.body =  app.wrapper.res.ret({isAttach:ret});
+                         } catch (e) {
+                             self.logger.error(e.message);
+                             this.body = app.wrapper.res.error(e);
+                         }
+                         yield next;
+                     };
+                 }
+             },
+             {
+                 method: 'bedMonitor$removeDevice',
+                 verb: 'post',
+                 url: this.service_url_prefix + "/bedMonitor/removeDevice",
+                 handler: function (app, options) {
+                     return function *(next) {
+                         try {
+                             console.log("body:");
+                             console.log(this.request.body)
+                             var ret = yield app.bed_monitor_app.removeDevice(this.openid || this.request.body.openid, this.request.body.deviceId, this.request.body.tenantId);
+                             console.log("ret++++:", ret);
+                             this.body = app.wrapper.res.ret(ret);
+                         } catch (e) {
+                             self.logger.error(e.message);
+                             this.body = app.wrapper.res.error(e);
+                         }
+                         yield next;
+                     };
+                 }
+             },
+             {
+                 method: 'bedMonitor$getAttachDevice',
+                 verb: 'post',
+                 url: this.service_url_prefix + "/bedMonitor/getAttachDevice",
+                 handler: function (app, options) {
+                     return function *(next) {
+                         try {
+                             console.log("body:");
+                             console.log(this.request.body);
+                             self.logger.info('this.request.body:', this.openid);
+                             this.body = yield app.bed_monitor_app.getAttachDevice(this.openid || this.request.body.openid,this.request.body.tenantId);
+                         } catch (e) {
+                             self.logger.error(e.message);
+                             this.body = app.wrapper.res.error(e);
+                         }
+                         yield next;
+                     };
+                 }
              }
          ];
          return this;

@@ -43,9 +43,15 @@ module.exports = {
                             if (keyword) {
                                 var keywordReg = new RegExp(keyword);
                                 data.where.$or = [
-                                    { name : keywordReg },
-                                    { enter_code : keywordReg }
+                                    {name: keywordReg},
+                                    {enter_code: keywordReg}
                                 ]
+                                if (!data.where.live_in_flag) {
+                                    data.where.live_in_flag = true;
+                                }
+                                if (!data.where.begin_exit_flow) {
+                                    data.where.begin_exit_flow = {$in: [false, undefined]};
+                                }
                             }
                             console.log(data);
                             var rows = yield app.modelFactory().model_query(app.models['psn_elderly'], data);
@@ -4820,6 +4826,7 @@ module.exports = {
                                 where: {
                                     status: 1,
                                     live_in_flag: true,
+                                    begin_exit_flow: {$in: [false, undefined]},
                                     tenantId: tenantId
                                 }
                             });

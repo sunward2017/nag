@@ -10,6 +10,7 @@
         .module('app.utils')
         .filter('unescapeHTML', unescapeHTMLFilter)
         .filter('safeArrayMember', safeArrayMember)
+        .filter('defaultValue', defaultValue)
     ;
 
 
@@ -23,6 +24,10 @@
 
     function safeArrayMember(ViewUtils) {
         return ViewUtils.safeArrayMember;
+    }
+
+    function defaultValue(ViewUtils) {
+        return ViewUtils.defaultValue;
     }
 
 })();

@@ -202,6 +202,7 @@
                 function alertWarning(message, needTranslate, translateObject) {
                     if (needTranslate) {
                         $translate(message, translateObject).then(function (ret) {
+                            console.log('alertWarning',ret)
                             Notify.alert('<div class="text-center"><em class="fa fa-warning"></em> ' + ret + '</div>', 'warning');
                         });
                     }

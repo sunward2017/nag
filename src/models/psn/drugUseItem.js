@@ -28,7 +28,7 @@ module.exports = function(ctx,name) {
             drugId:{type: mongoose.Schema.Types.ObjectId,required: true,ref:'psn_drugDirectory'},//关联药品
             drug_no:{type: String,},// 药品编码
             barcode:{type: String,},// 药品编码
-            name:{type: String},
+            name:{type: String}, //因为药品名称在实际使用中通常会用简称代替,因此此冗余已经无用
             description:{type: String},
             drugUseTemplateId:{type: mongoose.Schema.Types.ObjectId,ref:'psn_drugUseTemplate'},//关联用药模版
             duration: {type: Number, default: 0}, // 完成时长 单为分

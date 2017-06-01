@@ -32,6 +32,7 @@ module.exports = function(ctx,name) {
             remind_mode: {type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D0104"])},
             remind_times: {type: Number}, // 提醒次数
             voice_template:{type:String,maxlength:400},
+            order_no:  {type: Number, default: 0}, // 提醒次数
             tenantId: {type: mongoose.Schema.Types.ObjectId}
         }, {
             toObject: {

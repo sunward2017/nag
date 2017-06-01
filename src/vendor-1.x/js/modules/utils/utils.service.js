@@ -252,7 +252,8 @@
             unescapeHTML: unescapeHTML,
             safeArrayMember: safeArrayMember,
             indexObj: indexObj,
-            getPropery: getPropery
+            getPropery: getPropery,
+            defaultValue: defaultValue
         };
 
         function now(){
@@ -324,8 +325,6 @@
         }
 
         function indexObj(obj,k) {
-            console.log(k)
-            console.log(obj)
             return obj[k]
         }
 
@@ -335,6 +334,11 @@
             } else {
                 return indexObj(obj, k);
             }
+        }
+        
+        function defaultValue(v, dv) {
+            if (v) return v;
+            return dv;
         }
     }
 

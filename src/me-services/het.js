@@ -348,13 +348,36 @@
                  handler: function (app, options) {
                      return function *(next) {
                          try {
-                             var ret = yield app.bed_monitor_status.regist(this.openid || this.request.body.openid, this.request.body.userInfo, this.request.body.tenantId);
+                             var registRet = yield app.bed_monitor_app.regist(this.openid || this.request.body.openid, this.request.body);
                              console.log("regist reback");		
-				             console.log("member:",ret);	
-                             if (ret.success) {
+				             console.log("member:",registRet);	
+                             if (registRet.success) {
                                  console.log("自动登陆");
-                                 this.body = yield app.bed_monitor_status.userAuthenticate(member, token);
+                                 this.body = yield app.bed_monitor_app.login(registRet.ret);
                              }
+                         } catch (e) {
+                             self.logger.error(e.message);
+                             this.body = app.wrapper.res.error(e);
+                         }
+                         yield next;
+                     };
+                 }
+             },
+             {
+                
+                 method: 'bedMonitor$addDevice',
+                 verb: 'post',
+                 url: this.service_url_prefix + "/bedMonitor/addDevice",
+                 handler: function (app, options) {
+                     return function *(next) {
+                         try {
+                             console.log("body:");
+                             console.log(this.request.body);
+                             var ret = yield app.bed_monitor_app.addDevice(this.request.body, this.openid || this.request.body.openid);
+                             console.log("add device back");
+                             // console(ret);
+                             console.log("-------------------------");
+                             this.body = app.wrapper.res.ret(ret);
                          } catch (e) {
                              self.logger.error(e.message);
                              this.body = app.wrapper.res.error(e);

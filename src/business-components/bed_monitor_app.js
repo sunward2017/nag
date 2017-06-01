@@ -31,7 +31,7 @@ module.exports = {
     },
 
 
-    regist: function (memberInfo) {//member:{openid,unionid,nickName,avatarUrl,tenantId}
+    regist: function (openId,requestInfo) {//member:{openid,unionid,nickName,avatarUrl,tenantId}
         var self = this;
         return co(function* () {
             try {
@@ -40,8 +40,8 @@ module.exports = {
                     method: 'POST',
                     url: externalSystemConfig.bed_monitor_status.api_url + '/ECSServer/userws/userRegister.json',
                     form: {
-                        userName: memberInfo.nickName,
-                        encryptedName: memberInfo.nickName,
+                        userName: requestInfo.userInfo.nickName,
+                        encryptedName: requestInfo.userInfo.nickName,
                         encryptedPwd: psd,
                         userType: "zjwsy"
                     }
@@ -49,31 +49,34 @@ module.exports = {
                 });
                 ret = JSON.parse(ret);
                 console.log(" sync regist success", ret);
-                if (ret.retCode == 'success') {
-                    console.log(" sync regist success");
-                    var member = yield self.ctx.modelFactory().model_one(self.ctx.models['het_member'], {
+                var member = yield self.ctx.modelFactory().model_one(self.ctx.models['het_member'], {
                         where: {
-                            open_id: memberInfo.openid,
+                            open_id: openId,
                             status: 1,
-                            tenantId: memberInfo.tenantId
+                            tenantId:  requestInfo.userInfo.tenantId
                         }
                     });
+                if (ret.retCode == 'success') {
+                    console.log(" sync regist success");
                     if (member) {
                         return self.ctx.wrapper.res.ret(member);
                     }
                     member= yield self.ctx.modelFactory().model_create(self.ctx.models['het_member'], {
-                        open_id: memberInfo.openid,
-                        name: memberInfo.nickName,
-                        union_id: memberInfo.unionid,
-                        phone: memberInfo.phone,
+                        open_id: openId,
+                        name:  requestInfo.userInfo.nickName,
+                        union_id:  requestInfo.userInfo.unionid,
+                        phone:  requestInfo.userInfo.phone,
                         passhash: psd,
-                        head_portrait: memberInfo.avatarUrl,
-                        tenantId: memberInfo.tenantId,
+                        head_portrait:  requestInfo.userInfo.avatarUrl,
+                        tenantId:  requestInfo.userInfo.tenantId,
                         sync_flag_hzfanweng: true,
                     });
                     return self.ctx.wrapper.res.ret(member);
                 } else if (ret.retValue == '0x8001') {
-                    return self.ctx.wrapper.res.error({ message: '用户已经注册' })
+                    if (member) {
+                        return self.ctx.wrapper.res.ret(member);
+                    }
+                   return self.ctx.wrapper.res.error({ message: '注册失败' })
                 }
                 return self.ctx.wrapper.res.error({ message: '注册失败' })
 
@@ -89,7 +92,7 @@ module.exports = {
         var self = this;
         return co(function* () {
             try {
-                console.log(getToken);
+                console.log("getToken");
                 var ret = yield rp({
                     url: externalSystemConfig.bed_monitor_status.api_url + '/ECSServer/userws/getToken.json?uniqueId=' + member.open_id,
                     json: true
@@ -113,6 +116,7 @@ module.exports = {
                         self.logger.info('setSession:', member.open_id, ret.retValue);
                         var key = self.CACHE_MODULE + self.CACHE_ITEM_SESSION + '@' + member.open_id;
                         self.ctx.cache.put(key, ret.retValue.sessionId);
+                        yield self.ctx.modelFactory().model_update(self.ctx.models['het_member'],member._id, {session_id_hzfanweng:ret.retValue.sessionId});
                         return self.ctx.wrapper.res.ret(ret.retValue.sessionId);
                     } else {
                         if (ret.retValue == '1') {//用户不存在 重新注册
@@ -142,7 +146,7 @@ module.exports = {
                 }
                 //console.log("endTime", endTime);
                 //console.log("startTime", startTime);
-                sessionId = sessionIdRet.ret
+                var sessionId = sessionIdRet.ret
                 console.log("data from wx:", info);
                 var week = self.ctx.moment().format('dddd');
                 var day = self.ctx.moment().day();
@@ -282,7 +286,358 @@ module.exports = {
 
         }).catch(self.ctx.coOnError);
     },
-    checkIsRegist: function (code) {
+    addDevice:function(deviceInfo,openid){//deviceInfo, openid, tenantId
+        var self = this;
+        return co(function* () {
+            try {
+                 var sessionIdRet = yield self._ensuresessionIdIsEffective(openid);
+                if (!sessionIdRet.success) {
+                    return sessionIdRet
+                }
+                //console.log("startTime", startTime);
+                var sessionId = sessionIdRet.ret
+                var cpNewGender = null;
+                var sex = null;
+                var myDate = new Date();
+                var nowYear = myDate.getFullYear();
+                var birthYear;
+                var age = deviceInfo.deviceInfo.cpNewAge;
+                var carePerson;
+                var member;
+                if (deviceInfo.deviceInfo.sex == "男") {
+                    cpNewGender = 0;
+                    sex = DIC.D1006.MALE;
+                } else {
+                    cpNewGender = 1;
+                    sex = DIC.D1006.FEMALE;
+                }
+                if (age == null || age == "") {
+                    birthYear = 0;
+                } else {
+                    birthYear = nowYear - Number(age);
+                }
+                var device = yield self.ctx.modelFactory().model_one(self.ctx.models['pub_bedMonitor'], {
+                    where: {
+                        name: deviceInfo.deviceInfo.devId,
+                        status: 1,
+                        tenantId: deviceInfo.deviceInfo.tenantId
+                    }
+                });
+                if (device) { //device existed
+                     console.log("device existed");
+                    member = yield self.ctx.modelFactory().model_one(self.ctx.models['het_member'], {
+                        where: {
+                            open_id: openid,
+                            status: 1,
+                            tenantId: deviceInfo.deviceInfo.tenantId
+                        }
+                    });
+                    var setUserConcernPersonJson = {
+                        sessionId: sessionId,
+                        cpNewName: deviceInfo.deviceInfo.cpNewName,
+                        cpNewAge: Math.round(Math.random() * 120),
+                        cpNewGender: cpNewGender,
+                        operation: deviceInfo.deviceInfo.operator
+                    };
+                    setUserConcernPersonJson = JSON.stringify(setUserConcernPersonJson);
+                    var cpInfo = {
+                        setUserConcernPersonJson: setUserConcernPersonJson
+                    };
+                    var retCp = yield self._updateConcernPerson(cpInfo);//第三方 add user concern person
+                    console.log("绑定关心的人:",retCp);
+                    if(retCp.success){
+                        console.log('attach back:',retCp.success);
+                        carePerson = yield self.ctx.modelFactory().model_create(self.ctx.models['het_memberCarePerson'], {
+                            name: deviceInfo.deviceInfo.cpNewName,
+                            sex: sex,
+                            care_by: member._id,
+                            birthYear: birthYear,
+                            bedMonitorId: device._id,
+                            status:1,
+                            cid_hz_hzfanweng:retCp.ret.cid,
+                            tenantId: deviceInfo.deviceInfo.tenantId
+                        });
+                        var updateDeviceAttachState = {
+                            sessionId:sessionId,
+                            cpId:retCp.ret.cid,
+                            cpName:deviceInfo.deviceInfo.cpNewName,
+                            devIdTypeMapJson:JSON.stringify([{"devId":deviceInfo.deviceInfo.devId,"devType":"Mattress"}]),
+                            operator:"attach"
+                        };
+                        var attachRet = yield self._updateDeviceAttachState(updateDeviceAttachState);
+                        console.log('attach back:',attachRet);
+                        if(attachRet.success){
+                            return attachRet;
+                        }
+                        return self.ctx.wrapper.res.error({ message: '绑定失败' });
+                    }
+                    return self.ctx.wrapper.res.error({ message: '绑定失败' });       
+                }
+
+                devInfo = {
+                    devId: deviceInfo.deviceInfo.devId,
+                    name: "睡眠监测仪"
+                };
+                devInfo = JSON.stringify(devInfo);
+                var sendData = {
+                    sessionId: sessionId,
+                    type: deviceInfo.deviceInfo.type,
+                    operator: deviceInfo.deviceInfo.operator,
+                    device: devInfo
+                };
+                var retDevice = yield self._updateDevice(sendData);//第三方 add device
+                if(retDevice.success){
+                    var setUserConcernPersonJson = {
+                        sessionId: sessionId,
+                        cpNewName: deviceInfo.deviceInfo.cpNewName,
+                        cpNewAge: Math.round(Math.random() * 120),
+                        cpNewGender: cpNewGender,
+                        operation: deviceInfo.deviceInfo.operator
+                    };
+                    setUserConcernPersonJson = JSON.stringify(setUserConcernPersonJson);
+                    var cpInfo = {
+                        setUserConcernPersonJson: setUserConcernPersonJson
+                    };
+                    var retCp = yield self._updateConcernPerson(cpInfo);//第三方 add user concern person
+                    if(retCp.success){
+                        device = yield self.ctx.modelFactory().model_create(self.ctx.models['pub_bedMonitor'], {
+                            code: deviceInfo.deviceInfo.deviceMac,
+                            name: deviceInfo.deviceInfo.devId,
+                            tenantId: deviceInfo.deviceInfo.tenantId
+                        });
+                        member = yield self.ctx.modelFactory().model_one(self.ctx.models['het_member'], {
+                            where: {
+                                open_id: openid,
+                                tenantId: deviceInfo.deviceInfo.tenantId
+                            }
+                        });
+                        member_json = member.toObject();
+                        var row_bindingBedMonitors = [];
+                        var row_bindingBedMonitors = self.ctx.clone(member_json.bindingBedMonitors);
+                        row_bindingBedMonitors.push(device._id);
+                        member.bindingBedMonitors = row_bindingBedMonitors;
+                        yield member.save();
+                        carePerson = yield self.ctx.modelFactory().model_create(self.ctx.models['het_memberCarePerson'], {
+                            name: deviceInfo.deviceInfo.cpNewName,
+                            sex: sex,
+                            care_by: member._id,
+                            birthYear: birthYear,
+                            bedMonitorId: device._id,
+                            status:1,
+                            cid_hz_hzfanweng:retCp.ret.cid,
+                            tenantId: deviceInfo.deviceInfo.tenantId
+                        });
+                        var updateDeviceAttachState = {
+                                sessionId:sessionId,
+                                cpId:retCp.ret.cid,
+                                cpName:deviceInfo.deviceInfo.cpNewName,
+                                devIdTypeMapJson:JSON.stringify([{"devId":deviceInfo.deviceInfo.devId,"devType":"Mattress"}]),
+                                operator:"attach"
+                            };
+                            var attachRet = yield self._updateDeviceAttachState(updateDeviceAttachState);
+                            console.log('attach back:',attachRet);
+                            if(attachRet.success){
+                                return attachRet;
+                            }
+                            return self.ctx.wrapper.res.error({ message: '绑定失败' });
+                    }
+                    return self.ctx.wrapper.res.error({ message: '绑定失败' });
+                }
+                return retDevice;
+            }
+            catch (e) {
+                console.log(e);
+                self.logger.error(e.message);
+            }
+        }).catch(self.ctx.coOnError);
+    },
+    checkIsAttach: function (openId, deviceId, tenantId) {
+        var self = this;
+        return co(function* () {
+            try {
+                var member = yield self.ctx.modelFactory().model_one(self.ctx.models['het_member'], {
+                    where: {
+                        open_id: openId,
+                        status: 1
+                    }
+                });
+                console.log('member:', member)
+                var device = yield self.ctx.modelFactory().model_one(self.ctx.models['pub_bedMonitor'], {
+                    where: {
+                        name: deviceId,
+                        status: 1,
+                        tenantId: tenantId
+                    }
+                });
+                console.log('device:', device);
+                if (!device) {
+                    return false;
+                }
+                var carePerson = yield self.ctx.modelFactory().model_one(self.ctx.models['het_memberCarePerson'], {
+                    where: {
+                        status: 1,
+                        care_by: member._id,
+                        bedMonitorId: device._id,
+                        tenantId: tenantId
+                    }
+                });
+                console.log(carePerson);
+                if (carePerson) {
+                    return true;
+                }
+                return false;
+
+            }
+            catch (e) {
+                console.log(e);
+                self.logger.error(e.message);
+            }
+        }).catch(self.ctx.coOnError);
+    },
+    removeDevice: function (openid, devId, tenantId) {
+        var self = this;
+        return co(function* () {
+            var sessionIdRet = yield self._ensuresessionIdIsEffective(openid);
+                if (!sessionIdRet.success) {
+                    return sessionIdRet
+            }
+            var sessionId = sessionIdRet.ret
+            var member = yield self.ctx.modelFactory().model_one(self.ctx.models['het_member'], {
+                where: {
+                    status: 1,
+                    open_id: openid,
+                    tenantId: tenantId
+                }
+            });
+            console.log(member);
+            var device = yield self.ctx.modelFactory().model_one(self.ctx.models['pub_bedMonitor'], {
+                where: {
+                    status: 1,
+                    name: devId,
+                    tenantId: tenantId,
+                }
+            });
+            console.log(device);
+             var memberCarePerson = yield self.ctx.modelFactory().model_one(self.ctx.models['het_memberCarePerson'], {
+                where: {
+                    status: 1,
+                    care_by: member._id,
+                    bedMonitorId: device._id,
+                    tenantId: tenantId
+                }
+            });
+            var updateDeviceAttachState = {
+                sessionId:sessionId,
+                cpId:memberCarePerson.cid_hz_hzfanweng,
+                devIdTypeMapJson:JSON.stringify([{"devId":devId,"devType":"Mattress"}]),
+                operator:"deattach"
+            };
+            var attachRet = yield self._updateDeviceAttachState(updateDeviceAttachState);
+            console.log('attach back:',attachRet);
+            if(attachRet.success){
+                memberCarePerson.status = 0;
+                yield memberCarePerson.save();
+                return attachRet;
+            }
+            return attachRet;
+        }).catch(self.ctx.coOnError);
+    },
+    getAttachDevice: function (openid, tenantId) {
+        var self = this;
+        return co(function* () {
+            try {
+                var carePersons = [];
+                var dateReport;
+                var nowYear = self.ctx.moment().format('YYYY');
+                var endTime = self.ctx.moment(self.ctx.moment().format('YYYY-MM-DD 12:00:00'));
+                var startTime = self.ctx.moment(endTime.subtract(1,'day').format('YYYY-MM-DD 12:00:00'));
+                console.log("endTime:", endTime);
+                console.log("startTime:", startTime);
+                self.logger.info('openid:', openid);
+                var sessionIdRet = yield self._ensuresessionIdIsEffective(openid);
+                if (!sessionIdRet.success) {
+                    return sessionIdRet
+                }
+                var sessionId = sessionIdRet.ret
+                var member = yield self.ctx.modelFactory().model_one(self.ctx.models['het_member'], {
+                    where: {
+                        status: 1,
+                        open_id: openid,
+                        tenantId: tenantId
+                    }
+                });
+                console.log(member);
+                var memberCarePersons = yield self.ctx.modelFactory().model_query(self.ctx.models['het_memberCarePerson'], {
+                    where: {
+                        status: 1,
+                        care_by: member._id,
+                    }
+                }).populate('bedMonitorId', 'name');
+                console.log('memberCarePersons:', memberCarePersons);
+                self.logger.info('memberCarePersons:', memberCarePersons);
+                for (var i = 0, len = memberCarePersons.length, memberCarePerson; i < len; i++) {
+                    var memberCarePerson = memberCarePersons[i];
+                    self.logger.info('device name:' + memberCarePerson.bedMonitorId.name);
+                    self.logger.info('getDeviceInfo sessionId:' + (sessionId || 'null or undefined'));
+                    if (memberCarePerson.bedMonitorId.name) {
+                        var reportRet = yield self._getSleepBriefReport(sessionId, memberCarePerson.bedMonitorId.name, tenantId, endTime, startTime);
+                        if(reportRet){
+                            yield self._setDateReport( memberCarePerson.bedMonitorId.name, tenantId, reportRet,endTime, startTime);
+                            var evalution = reportRet.evalution;
+                            if (reportRet.fallAsleepTime != '0') {
+                                var fallAsleepTime = self.ctx.moment(reportRet.fallAsleepTime);
+                                var awakeTime = self.ctx.moment(reportRet.awakeTime);
+                                var bedTime = self.ctx.moment(reportRet.bedTime);
+                                var wakeUpTime = self.ctx.moment(reportRet.wakeUpTime);
+                                var sleepTime = awakeTime.diff(fallAsleepTime, 'hours');      
+                                var newAweekTime = self.ctx.moment.duration(Number(awakeTime.diff(fallAsleepTime)) - Number(reportRet.lightSleepTime) - Number(reportRet.deepSleepTime)).asHours();
+                                // var deepSleepTime = self.ctx.moment.unix(value.deepSleepTime).format('HH:MM:SS');
+                                var deepSleepTime = self.ctx.moment.duration(reportRet.deepSleepTime).asHours();
+                                var lightSleepTime = self.ctx.moment.duration(reportRet.lightSleepTime).asHours();
+                                var sleepTime = parseFloat(deepSleepTime) + parseFloat(lightSleepTime);
+                                var maxHeartRate = reportRet.maxHeartRate;
+                                var minHeartRate = reportRet.minHeartRate;
+                                var heartTime = Number(maxHeartRate + minHeartRate) / 2
+                                evalution = (Number(sleepTime) * 8.5 + Number(deepSleepTime) * 8.5 - (Number(reportRet.offBedFrequency) / 5) * 8.5 + (Number(sleepTime) - Number(deepSleepTime) - Number(lightSleepTime)) * 8.5).toFixed(0);
+                                dateReport = {
+                                    fallAsleepTime: self.ctx.moment(fallAsleepTime).format('HH:mm'),
+                                    awakeTime: self.ctx.moment(awakeTime).format('HH:mm'),
+                                    sleepTime: sleepTime,
+                                    deepSleepTime: deepSleepTime.toFixed(1),
+                                    lightSleepTime: lightSleepTime.toFixed(1),
+                                    evalution: evalution,
+                                    turn_over_frequency: reportRet.turnOverFrequency,
+                                    off_bed_frequency: reportRet.offBedFrequency,
+                                    bodyMoveFrequency: reportRet.bodyMoveFrequency,
+                                    heartTime: heartTime,
+                                    bed_time: self.ctx.moment(bedTime).format('HH:mm'),
+                                    wakeup_time: self.ctx.moment(wakeUpTime).format('HH:mm')
+                                }
+                            }
+
+                            var memberCarePerson = {
+                                deviceName: memberCarePerson.bedMonitorId.name,
+                                carePersonId: memberCarePerson._id,
+                                carePersonName: memberCarePerson.name,
+                                sex: memberCarePerson.sex,
+                                age: Number(nowYear) - Number(memberCarePerson.birthYear),
+                                sleepStatus: dateReport,
+                                portraitUrl: memberCarePerson.portrait
+                            }
+                            carePersons.push(memberCarePerson);
+                        }
+                    }
+                }
+                console.log('memberCarePersons:', carePersons);
+                return self.ctx.wrapper.res.rows(carePersons);
+            } catch (e) {
+                console.log(e);
+                self.logger.error(e);
+                self.isExecuting = false;
+            }
+        }).catch(self.ctx.coOnError);
+    },
+    _checkIsRegist: function (code) {
         var self = this;
         return co(function* () {
             try {
@@ -300,114 +655,6 @@ module.exports = {
             }
         }).catch(self.ctx.coOnError);
     },
-    _registByQinKeShi: function (userInfo) {//亲可视注册
-        var self = this;
-        return co(function* () {
-            try {
-                var member = yield self.ctx.modelFactory().model_one(self.ctx.models['het_member'], {
-                    where: {
-                        open_id: userInfo.open_id,
-                        status: 1
-                    }
-                });
-                var ret = yield rp({
-                    method: 'POST',
-                    url: externalSystemConfig.bed_monitor_status.api_url + '/ECSServer/userws/userRegister.json',
-                    form: {
-                        userName: userInfo.name,
-                        encryptedName: userInfo.name,
-                        encryptedPwd: userInfo.passhash,
-                        userType: "zjwsy"
-                    }
-                });
-                ret = JSON.parse(ret);
-                if (ret.retCode == 'success') {//注册成功
-                    console.log(" sync regist success");
-                    member.sync_flag_hzfanweng = true;
-                    yield member.save();
-                    return self.ctx.wrapper.res.ret({ registStatus: 'success' });
-                } else {//注册失败
-                    return self.ctx.wrapper.res.error({ message: ret.retValue });
-                }
-
-            }
-            catch (e) {
-                console.log(e);
-                self.logger.error(e.message);
-            }
-
-        }).catch(self.ctx.coOnError);
-    },
-    _getToken: function (uniqueId) {//亲可视token获取
-        var self = this;
-        return co(function* () {
-            try {
-                console.log(uniqueId);
-                var ret = yield rp({
-                    url: externalSystemConfig.bed_monitor_status.api_url + '/ECSServer/userws/getToken.json?uniqueId=' + uniqueId,
-                    json: true
-                });
-                console.log(ret);
-                console.log(ret.retCode);
-                return ret.retValue;
-            }
-            catch (e) {
-                console.log(e);
-                self.logger.error(e.message);
-            }
-        }).catch(self.ctx.coOnError);
-    },
-    _userAuthenticate: function (member, token, authenticateTryTimes) {//亲可视认证登陆 返回session
-        var self = this;
-        authenticateTryTimes = authenticateTryTimes === undefined ? 1 : authenticateTryTimes;
-        return co(function* () {
-            try {
-                self.logger.info('userAuthenticate');
-                var ret = yield rp({
-                    method: 'POST',
-                    url: externalSystemConfig.bed_monitor_status.api_url + '/ECSServer/userws/userAuthenticate.json',
-                    form: {
-                        token: token,
-                        userName: member.name,
-                        encryptedName: member.name,
-                        encryptedPwd: member.passhash,
-                        userType: "zjwsy"
-                    }
-                });
-                ret = JSON.parse(ret);
-                if (ret.retCode == 'success') {//成功返回session
-                    self.logger.info('setSession:', member.open_id, ret.retValue);
-                    var key = self.CACHE_MODULE + self.CACHE_ITEM_SESSION + '@' + member.open_id;
-                    self.ctx.cache.put(key, ret.retValue.sessionId);
-                    return self.ctx.wrapper.res.ret(ret.retValue.sessionId);
-                } else {
-                    if (ret.retValue == '1') {//用户不存在 重新注册
-                        var memberInfo = {
-                            nickName: member.name
-                        }
-                        var regist_status = yield self._registByQinKeShi(member);
-                        console.log(regist_status);
-                        if (regist_status.ret.registStatus == 'success') {//成功 重新登陆
-                            if (authenticateTryTimes === 0) {
-                                return self.ctx.wrapper.res.error({ message: 'regist fail again' });
-                            } else {
-                                return self._userAuthenticate(member, token, 0);
-                            }
-                        } else {//失败 返回
-                            return self.ctx.wrapper.res.error({ message: 'regist fail' });
-                        }
-                    }
-                    ;
-                }
-            }
-            catch (e) {
-                console.log(e);
-                self.logger.error(e.message);
-            }
-
-        }).catch(self.ctx.coOnError);
-
-    },
     _getSleepBriefReport: function (sessionId, devId, tenantId, endTime, startTime) {//报表
         var self = this;
         return co(function* () {
@@ -415,12 +662,13 @@ module.exports = {
                 // var endTime = self.ctx.moment(self.ctx.moment().format('YYYY-MM-DD 12:00:00'));
                 // var startTime = self.ctx.moment(endTime).subtract(1, 'days');
                 // var ti = self.ctx.moment(startTime.format('YYYY-MM-DD  HH:MM:SS'));
-                var dateReport;
+               console.log("_getSleepBriefReport");
                 var ret = yield rp({
                     method: 'POST',
                     url: externalSystemConfig.bed_monitor_status.api_url + '/ECSServer/devicews/getSleepBriefReport.json',
                     form: { sessionId: sessionId, devId: devId, startTime: startTime.unix() * 1000, endTime: endTime.unix() * 1000 }
                 });
+                console.log(ret);
                 ret = JSON.parse(ret);
                 console.log(typeof (ret.retValue));
                 return ret.retValue;
@@ -431,9 +679,8 @@ module.exports = {
             }
         }).catch(self.ctx.coOnError);
     },
-    _updateDevice: function (sendData, updateDevicetryTimes) {//亲可视设备增删改
+    _updateDevice: function (sendData) {//亲可视设备增删改
         var self = this;
-        updateDevicetryTimes = updateDevicetryTimes === undefined ? 1 : updateDevicetryTimes;
         return co(function* () {
             try {
                 console.log(sendData);
@@ -444,22 +691,11 @@ module.exports = {
                 });
                 ret = JSON.parse(ret);
                 console.log(ret.retValue);
-                if (ret.retValue == '0x8005') {//登陆过期
-                    console.log(ret.retValue);
-                    console.log(sendData.openId);
-                    var sessionId = yield self.insureLoginSuccess(sendData.openId);
-                    sendData.sessionId = sessionId;
-                    console.log(sendData);
-                    if (updateDevicetryTimes === 0) {
-                        return self.ctx.wrapper.res.error({ message: 'sessionId overdue' });
-                    } else {
-                        return self.updateDevice(sendData, 0);
-                    }
-                } else if (ret.retValue == '"unknown_device"') {
-                    return self.ctx.wrapper.res.error({ message: 'unknown device' });
+                if (ret.retCode == 'success') {//绑定成功
+                   return self.ctx.wrapper.res.ret(ret.retValue); 
+                } else{
+                    return self.ctx.wrapper.res.error({ message: ret.retValue });
                 }
-                console.log(ret);
-                return self.ctx.wrapper.res.default();
             }
             catch (e) {
                 console.log(e);
@@ -469,9 +705,8 @@ module.exports = {
         }).catch(self.ctx.coOnError);
 
     },
-    _updateConcernPerson: function (sendData, tryTimes) {//亲可视关心的的人添加
+    _updateConcernPerson: function (sendData) {//亲可视关心的的人添加
         var self = this;
-        tryTimes = tryTimes === undefined ? 1 : tryTimes;
         return co(function* () {
             try {
                 var ret = yield rp({
@@ -480,21 +715,11 @@ module.exports = {
                     form: sendData
                 });
                 ret = JSON.parse(ret);
-                if (ret.retValue == "0x8005") {//登陆失败 session过期
-                    var sessionId = yield self.insureLoginSuccess(sendData.openId);
-                    var setUserConcernPersonJson = JSON.parse(sendData.setUserConcernPersonJson);
-                    setUserConcernPersonJson.sessionId = sessionId;
-                    sendData.setUserConcernPersonJson = JSON.stringify(setUserConcernPersonJson);
-                    if (tryTimes === 0) {
-                        return self.ctx.wrapper.res.error({ message: 'sessionId overdue' });
-                    } else {
-                        return self.updateConcernPerson(sendData, 0);
-                    }
+                if (ret.retCode == "success") {//添加成功
+                    return self.ctx.wrapper.res.ret(ret.retValue);
                 } else if (ret.retValue == 'bad param') {
                     return self.ctx.wrapper.res.error({ message: 'bad param' });
                 }
-                console.log(ret);
-                return self.ctx.wrapper.res.default();
             }
             catch (e) {
                 console.log(e);
@@ -514,11 +739,12 @@ module.exports = {
                     form: sendData,
                     json: true
                 });
+                console.log("attach qinkeshi:",ret);
+                console.log(typeof ret);
                 if (ret.retCode == 'success') {
                     return self.ctx.wrapper.res.default();
                 }
-                console.log(ret);
-                return self.ctx.wrapper.res.error({ msg: 'attach fail' })
+                return self.ctx.wrapper.res.error({ msg: '操作失败' })
             }
             catch (e) {
                 console.log(e);
@@ -562,7 +788,8 @@ module.exports = {
                     var member = yield self.ctx.modelFactory().model_one(self.ctx.models['het_member'], {
                         select: 'session_id_hzfanweng',
                         where: {
-                            open_id: openid
+                            open_id: openid,
+                            status:1
                         }
                     });
                     if (member.session_id_hzfanweng) {
@@ -572,7 +799,6 @@ module.exports = {
                         return self.ctx.wrapper.res.error({ message: '用户不存在' })
                     }
                 }
-
                 var effectiveValue = yield rp({//是否过期
                     method: 'POST',
                     url: externalSystemConfig.bed_monitor_status.api_url + '/ECSServer/userws/sessionIsExpired.json',
@@ -593,9 +819,9 @@ module.exports = {
                     console.log('member:', member);
                     if (member) {
                         console.log('sssss:', ret);
-                        var token = yield self.getToken(member.open_id);
-                        var ret = yield self._userAuthenticate(member, token);
-                       // var ret = yield self.login(member);
+                        //var token = yield self.getToken(member.open_id);
+                        //var ret = yield self._userAuthenticate(member, token);
+                       var ret = yield self.login(member);
                         console.log('sssss:', ret);
                         return ret
                     }

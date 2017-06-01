@@ -354,6 +354,7 @@
                              if (registRet.success) {
                                  console.log("自动登陆");
                                  this.body = yield app.bed_monitor_app.login(registRet.ret);
+
                              }
                          } catch (e) {
                              self.logger.error(e.message);
@@ -444,6 +445,7 @@
                          yield next;
                      };
                  }
+
              }
          ];
          return this;

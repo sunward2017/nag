@@ -36,7 +36,8 @@
                 className: 'ngdialog-theme-default ngdialog-robot-list',
                 data: {
                     vmh: vmh,
-                    moduleTranslatePathRoot: vm.viewTranslatePath()
+                    moduleTranslatePathRoot: vm.viewTranslatePath(),
+                    tenantId: vm.tenantId
                 }
             }).closePromise.then(function (ret) {
                 if(ret.value!='$document' && ret.value!='$closeButton' && ret.value!='$escape' ) {
@@ -50,15 +51,15 @@
     function RobotListController($scope,ngDialog){
         var vm = $scope.vm = {};
         var vmh = $scope.ngDialogData.vmh;
+        var tenantId = $scope.ngDialogData.tenantId;
         vm.doSubmit = doSubmit;
         vm.moduleTranslatePath = moduleTranslatePath
         init();
         function init() {
-            vmh.parallel([
-                vmh.clientData.getJson('robotList'),
-            ]).then(function(ret){
-                vm.xAxisData = ret[0];
-            })        
+            // vm.robotPromise = vmh.shareService.tmp('T3001/psn-nursingLevel', 'name id', { "status": 1, tenantId: tenantId})
+            vm.robotPromise = vmh.psnService.robotQuery(tenantId)
+            console.log(vm.robotPromise);
+            // console.log(vm.robotPromis);
         }
 
         var moduleTranslatePathRoot = $scope.ngDialogData.moduleTranslatePathRoot;
@@ -71,13 +72,14 @@
                 template: 'customConfirmDialog.html',
                 className: 'ngdialog-theme-default',
                 controller: ['$scope', function ($scopeConfirm) {
-                    $scopeConfirm.message = vm.moduleTranslatePath('DLG-COPY-WORK_ITEM')
+                    $scopeConfirm.message = vm.moduleTranslatePath('DLG-IMPORT-ROBOT')
                 }]
             }).then(function () {
-                vmh.psnService.workItemCopy(vm.nursingLevelIds, row.id).then(function () {
-                    $scope.closeThisDialog();
-                    vmh.alertSuccess('notification.NORMAL-SUCCESS', true);
-                })
+                console.log(vm.robotIds);
+                // vmh.psnService.workItemCopy(vm.nursingLevelIds, row.id).then(function () {
+                //     $scope.closeThisDialog();
+                //     vmh.alertSuccess('notification.NORMAL-SUCCESS', true);
+                // })
             });
         }
     }

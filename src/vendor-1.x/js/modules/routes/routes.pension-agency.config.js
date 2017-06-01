@@ -1086,7 +1086,7 @@
                             type: 'string',
                             width: 80,
                             sortable: false,
-                            formatter: { type: 'populate', options: { path: 'subjectId', select: '-_id name code' } } 
+                            formatter: { type: 'populate', options: { path: 'subjectId', select: '-_id name code',model:'pub_bedMonitor'} } 
                         }, {
                             label: '报警对象',
                             name: 'object_name',

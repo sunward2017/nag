@@ -546,6 +546,7 @@
                     nursingRecordsByElderlyToday: nursingRecordsByElderlyToday,
                     workItemQuery: workItemQuery,
                     workItemCopy: workItemCopy,
+                    robotQuery:robotQuery,
                     overdueWorkItem: overdueWorkItem, 
                     elderlysByDistrictFloors: elderlysByDistrictFloors,
                     nursingStationCloseBedMonitorAlarm: nursingStationCloseBedMonitorAlarm,
@@ -824,6 +825,10 @@
                 
                 function workItemCopy(nursingLevelIds,workItemId) {
                     return $http.post(baseUrl + 'workItemCopy', { workItemId: workItemId,nursingLevelIds:nursingLevelIds });
+                }
+                
+                function robotQuery(tenantId){
+                    return $http.post(baseUrl + 'robotQuery',{tenantId:tenantId});
                 }
 
                 function overdueWorkItem(tenantId){

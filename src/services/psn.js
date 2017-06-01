@@ -5021,8 +5021,9 @@ module.exports = {
                                 var workItems = elderlyNursingPlan.work_items;
                                 var index = app._.findIndex(workItems, (o) => {
                                     var flag;
-                                    console.log('workerItem: ',o);
                                     if(o.type == DIC.D3017.NURSING_ITEM){
+
+                                        console.log('workerItem: ',o);
                                         console.log('------------------: ',o.workItemId);
                                         flag = (o.workItemId.toString() == toProcessWorkItemId);
                                     }else{
@@ -5141,7 +5142,6 @@ module.exports = {
                                     work_items: workItemsByElderly,
                                     tenantId: tenantId
                                 });
-
                             } else {
                                 workItems = elderlyNursingPlan.work_items;
                                 // console.log("******",workItems);
@@ -5189,6 +5189,8 @@ module.exports = {
                                                 baseWorkItems.push(workItemObj);
                                             }
                                         }
+
+
                                     }
                                     workItemsByElderly = baseWorkItems;
                                     // console.log("workItemsofdrug",workItemsByElderly) 
@@ -5196,6 +5198,15 @@ module.exports = {
                                 elderlyNursingPlan.work_items = workItemsByElderly;
                                 //  console.log("workItemsByElderly",workItemsByElderly) 
                                 yield elderlyNursingPlan.save();
+
+                                if(type == DIC.D3017.DRUG_USE_ITEM) {
+                                    console.log('如果是用药项目,则需要反向同步到用药');
+                                    var drugUseItemsToSync = yield app.modelFactory().model_bulkUpdate(app.models['psn_drugUseItem'], {
+                                        conditions: {_id: {$in: workItemIds}},
+                                        batchModel: {stop_flag: !checked}
+                                    });
+                                }
+
                             }
                             this.body = app.wrapper.res.default();
                         } catch (e) {
@@ -5642,9 +5653,9 @@ module.exports = {
                                 yield app.modelFactory().model_update(app.models['psn_drugUseItem'], drugUseItemId, drugUseItem);
 
                                 //更新老人照护计划中
-
+                                drugUseItem.type = DIC.D3017.DRUG_USE_ITEM;
+                                drugUseItem.drugUseItemId = drugUseItem._id;
                                 if (elderlyNursingPlan) {
-
                                     var workItems = elderlyNursingPlan.work_items;
                                     var index = app._.findIndex(workItems, (o) => {
                                         return o.type == DIC.D3017.DRUG_USE_ITEM && o.drugUseItemId.toString() == drugUseItemId;
@@ -5675,9 +5686,6 @@ module.exports = {
                                     elderlyNursingPlan.work_items = workItems;
                                     yield elderlyNursingPlan.save();
                                 } else {
-                                    drugUseItem.type = DIC.D3017.DRUG_USE_ITEM;
-                                    drugUseItem.drugUseItemId = drugUseItem._id;
-
                                     yield app.modelFactory().model_create(app.models['psn_nursingPlan'], {
                                         elderlyId: elderlyId,
                                         elderly_name: elderly_name,
@@ -5685,16 +5693,17 @@ module.exports = {
                                         tenantId: tenantId
                                     });
                                 }
-                                
                             } else {
                                 // 新增老人的用药项目
                                 drugUseItem = yield app.modelFactory().model_create(app.models['psn_drugUseItem'], drugUseItem);
+                                drugUseItem = drugUseItem.toObject();
                                 drugUseItem.type = DIC.D3017.DRUG_USE_ITEM;
                                 drugUseItem.drugUseItemId = drugUseItem._id;
+                                console.log('drugUseItem:',drugUseItem);
                                 // 如果用药项目没有停用 更新老人照护计划中
                                 if(!drugUseItem.stop_flag) {
                                     console.log('新增用药项目,添加用药项目到照护计划中');
-                                    workItem = drugUseItem.toObject();
+
                                     if (elderlyNursingPlan) {
                                         elderlyNursingPlan.work_items.push(drugUseItem);
                                         yield elderlyNursingPlan.save();

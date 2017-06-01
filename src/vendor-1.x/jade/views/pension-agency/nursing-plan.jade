@@ -54,22 +54,21 @@
                                 label(ng-dblclick="vm.customizedWorkItem(workItem.id,vm.aggrData[row.trackedKey]['elderly']['id'],row.trackedKey,workItem.Id)") {{ workItem.name }}
                         <!--用药-->        
                         td
-                            //- .btn-group(ng-if="vm.aggrData[row.trackedKey]['elderly']['id']")
-                            //-     a.btn.btn-primary.btn-sm(ng-click="vm.switchReadonlyDrugUseItems(row.trackedKey)" ng-class="{'btn-primary': !vm.$editings[row.trackedKey]['drugUseItems'], 'btn-warning': vm.$editings[row.trackedKey]['drugUseItems']}")
-                            //-         i.glyphicon.glyphicon-pencil
-                            //-         span.ml-sm {{ vm.$editings[row.trackedKey]['drugUseItems'] ? vm.moduleTranslatePath('BTN-DO-READONLY-WORK-ITEMS') : vm.moduleTranslatePath('BTN-CANCEL-READONLY-WORK-ITEMS') | translate}}
-                            //- .btn-group(ng-if="vm.aggrData[row.trackedKey]['elderly']['id']") 
-                            //-     .checkbox.c-checkbox
-                            //-         label
-                            //-             input(id="{{row.trackedKey + '$alldrug'}}",type='checkbox',ng-disabled="!vm.$editings[row.trackedKey]['drugUseItems']", ng-checked="vm.$selectAll[row.trackedKey]['drugUseItems']" ng-click="vm.alldrugUseItemChecked(row.trackedKey)")
-                            //-             span.fa.fa-check
-                            //-     label(for="{{row.trackedKey + '$alldrug'}}",) {{vm.moduleTranslatePath('ALL-SELECTED') | translate}}
-                            //- .split
-                            
+                            .btn-group(ng-if="vm.aggrData[row.trackedKey]['elderly']['id']")
+                                a.btn.btn-primary.btn-sm(ng-click="vm.switchReadonlyDrugUseItems(row.trackedKey)" ng-class="{'btn-primary': !vm.$editings[row.trackedKey]['drugUseItems'], 'btn-warning': vm.$editings[row.trackedKey]['drugUseItems']}")
+                                    i.glyphicon.glyphicon-pencil
+                                    span.ml-sm {{ vm.$editings[row.trackedKey]['drugUseItems'] ? vm.moduleTranslatePath('BTN-DO-READONLY-WORK-ITEMS') : vm.moduleTranslatePath('BTN-CANCEL-READONLY-WORK-ITEMS') | translate}}
+                            .btn-group(ng-if="vm.aggrData[row.trackedKey]['elderly']['id']")
+                                .checkbox.c-checkbox
+                                    label
+                                        input(id="{{row.trackedKey + '$alldrug'}}",type='checkbox',ng-disabled="!vm.$editings[row.trackedKey]['drugUseItems']", ng-checked="vm.$selectAll[row.trackedKey]['drugUseItems']" ng-click="vm.alldrugUseItemChecked(row.trackedKey)")
+                                        span.fa.fa-check
+                                label(for="{{row.trackedKey + '$alldrug'}}",) {{vm.moduleTranslatePath('ALL-SELECTED') | translate}}
+                            .split
                             .btn-group.drug-use-item(ng-if="vm.aggrData[row.trackedKey]['elderly']['id']", ng-repeat="drugUseItem in vm.drugUseItemMap[vm.aggrData[row.trackedKey]['elderly']['id']]")
                                 .checkbox.c-checkbox
                                     label
-                                        input(id="{{row.trackedKey + '$' +drugUseItem.id}}",type='checkbox', ng-disabled="vm.$editings[row.trackedKey]['drugUseItems']", ng-model="vm.work_items['A0003'][row.trackedKey + '$' + vm.aggrData[row.trackedKey]['elderly']['id']][drugUseItem.id]" ng-change="vm.drugUseItemChecked(row.trackedKey,drugUseItem.id)")
+                                        input(id="{{row.trackedKey + '$' +drugUseItem.id}}",type='checkbox', ng-disabled="!vm.$editings[row.trackedKey]['drugUseItems']", ng-model="vm.work_items['A0003'][row.trackedKey + '$' + vm.aggrData[row.trackedKey]['elderly']['id']][drugUseItem.id]" ng-change="vm.drugUseItemChecked(row.trackedKey,drugUseItem.id)")
                                         span.fa.fa-check 
                                 label {{ drugUseItem.name }}
                         td.text-center 

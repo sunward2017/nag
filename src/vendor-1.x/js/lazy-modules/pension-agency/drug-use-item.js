@@ -83,6 +83,7 @@
                 elderlyId: vm.model._id,
                 tenantId: vm.model.tenantId
             },null,null, [{path: 'drugUseTemplateId', select: '_id name'}]).$promise.then(function (rows) {
+                console.log('elderlyDrugUseItems:', elderlyDrugUseItems);
                 var groupObject = _.groupBy(rows, function(o){
                    if(o.drugUseTemplateId){
                        return o.drugUseTemplateId._id;

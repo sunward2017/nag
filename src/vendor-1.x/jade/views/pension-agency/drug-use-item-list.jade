@@ -14,19 +14,17 @@
                             | {{column.label}}
                             i.glyphicon(ng-if="column.name === vm.sort.column && vm.sort.direction",ng-class="vm.sort.direction|orderClass")
                 tbody
-                    tr(ng-repeat="row in vm.yAxisDataFlatten track by row.trackedKey" ng-if="vm.aggrData[row.trackedKey]['elderly']['name']")
-                        td.text-center {{vm.aggrData[row.trackedKey]['room_name']}}
-                        td.text-center {{vm.aggrData[row.trackedKey]['bed_no']}}
-                        td.text-center {{vm.aggrData[row.trackedKey]['elderly']['name']}}
-                        td.text-center {{vm.aggrData[row.trackedKey]['elderly']['sex']|formatter:'sex':vm.columns}}
-                        td.text-center {{vm.aggrData[row.trackedKey]['elderly']['birthday']|calcAge}}
-                        td.text-center {{vm.aggrData[row.trackedKey]['elderly']['enter_code']}}
-                        td.text-center {{vm.aggrData[row.trackedKey]['elderly']['nursing_info']}}
-                        td.text-center {{vm.aggrData[row.trackedKey]['elderly']['begin_exit_flow']|formatter:'begin_exit_flow':vm.columns}} 
+                    tr(ng-repeat="row in vm.elderlys")
+                        td.text-center {{::row.name}}
+                        td.text-center {{::row.sex|formatter:'sex':vm.columns}}
+                        td.text-center {{::row.birthday|calcAge}}
+                        td.text-center {{::row.enter_code}}
+                        td.text-center {{::row.room_summary}}
+                        td.text-center {{::row.nursing_info}}
                         td.text-center
                             .btn-group
-                                a.btn.btn-primary.btn-xs(title="{{'button.ADD'|translate}}",ng-click="vm.edit(vm.aggrData[row.trackedKey]['elderly']['_id'])")
-                                     i.glyphicon.glyphicon-plus
+                                a.btn.btn-primary.btn-xs(title="{{'button.CONFIG'|translate}}",ng-click="vm.edit(row._id)")
+                                     i.glyphicon.glyphicon-cog
                     tr(ng-if="vm.paged.length==0")
                         td(colspan="{{utils.noResultsColspan(vm)}}") {{ 'grid.NO-RESULTS' | translate}}
             .panel-footer

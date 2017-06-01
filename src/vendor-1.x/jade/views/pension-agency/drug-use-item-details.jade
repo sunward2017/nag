@@ -49,26 +49,26 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='')
                                                     span.fa.fa-check
                                         th.text-center(width="50")
                                             | {{ vm.viewTranslatePath('TAB1-LABEL-DRUG_USE_TEMPLATE') | translate}}
-                                        th.text-center(width="70")
+                                        th.text-center(width="80")
                                             | {{ vm.viewTranslatePath('TAB1-LABEL-DRUG-NAME') | translate}}
-                                        th.text-center(width="60")
+                                        th.text-center(width="50")
                                             | {{ vm.viewTranslatePath('TAB1-LABEL-BARCODE') | translate}}
                                         th.text-center(width="40")
                                             | {{ vm.viewTranslatePath('TAB1-LABEL-REPEAT_VALUES') | translate}}
                                         th.text-center(width="40")
                                             | {{ vm.viewTranslatePath('TAB1-LABEL-DESCRIPTION') | translate}}
-                                        th.text-center(width="40")
+                                        th.text-center(width="20")
                                             | {{ vm.viewTranslatePath('TAB1-LABEL-STOP_FLAG') | translate}}
-                                        th.text-center(width="40",ng-if="!vm.readonly")
+                                        th.text-center(width="20",ng-if="!vm.readonly")
                                 tbody
-                                    tr(ng-repeat="row in vm.elderlyDrugUseItems|orderBy:'drugUseTemplateId -check_in_time'" )
+                                    tr(ng-repeat="row in vm.elderlyDrugUseItems|orderBy:'group_order' " )
                                         td.text-center(ng-if="!vm.readonly")
                                             .checkbox.c-checkbox(ng-if="!row.$editing")
                                                 label
                                                     input(type='checkbox',ng-model="row.checked" ng-change="vm.addRowIds(row)")
                                                     span.fa.fa-check
                                         td.text-center(ng-if="row.row_span", rowspan="{{row.row_span}}") {{::row.drugUseTemplateId.name}}
-                                        td.text-center {{::row.name}}
+                                        td.text-center {{::row.drugId.short_name | defaultValue:row.drugId.full_name }}
                                         td.text-center {{::row.barcode}}
                                         td.text-center {{::row.repeat_type_name }}{{row.repeat_values | repeatInfoCombo: row.repeat_start}}
                                         td.text-center {{::row.description}}
@@ -100,6 +100,13 @@ script(type="text/ng-template", id="drug-use-item.html")
         .ngdialog-input
             .col-md-12
                 fieldset: .form-group
+                    label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-DRUG_USE_TEMPLATE') | translate}}:
+                    <!--模版-->
+                    .col-md-6
+                        .tree.tree-dropdown(name='drugUseTemplateTree',s-tree, s-tree-data="vm.drugUseTemplatePromise",s-tree-height="320", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{layout:'dropdown'}",ng-model="vm.model.drugUseTemplateId", on-select="vm.selectDrugUseTemplate(selectedNode)")
+                    .col-md-4
+                        a.btn.btn-primary.pull-left(ng-if="!!vm.model.drugUseTemplateId",ng-click="vm.selectDrugUseTemplate()") {{ vm.viewTranslatePath('TAB1-BTN-REMOVE_DRUG_USE_TEMPLATE') | translate}}
+                fieldset: .form-group
                     <!--药品目录-->
                     label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-DRUG-NAME') | translate}}:
                     .col-md-10(ng-if="!vm.readonly && vm._action_!='edit' ")
@@ -112,13 +119,6 @@ script(type="text/ng-template", id="drug-use-item.html")
                     label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-DESCRIPTION') | translate}}:
                     .col-md-10
                         input.form-control(name='description',ng-model='vm.model.description',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-DESCRIPTION")|translate}}',maxlength="400")
-                fieldset: .form-group
-                    label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-DRUG_USE_TEMPLATE') | translate}}:
-                    <!--模版-->
-                    .col-md-6
-                        .tree.tree-dropdown(name='drugUseTemplateTree',s-tree, s-tree-data="vm.drugUseTemplatePromise",s-tree-height="320", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{layout:'dropdown'}",ng-model="vm.model.drugUseTemplateId", on-select="vm.selectDrugUseTemplate(selectedNode)")
-                    .col-md-4
-                        a.btn.btn-primary.pull-left(ng-if="!!vm.model.drugUseTemplateId",ng-click="vm.selectDrugUseTemplate()") {{ vm.viewTranslatePath('TAB1-BTN-REMOVE_DRUG_USE_TEMPLATE') | translate}}
                 fieldset: .form-group
                     <!--时长(分)-->
                     label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-DURATION') | translate}}:

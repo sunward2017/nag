@@ -252,8 +252,11 @@
             unescapeHTML: unescapeHTML,
             safeArrayMember: safeArrayMember,
             indexObj: indexObj,
-            getPropery: getPropery
+            getPropertyCount: getPropertyCount,
+            getPropery: getPropery,
+            defaultValue: defaultValue
         };
+
 
         function now(){
             return moment();
@@ -324,17 +327,30 @@
         }
 
         function indexObj(obj,k) {
-            console.log(k)
-            console.log(obj)
             return obj[k]
         }
 
+        function getPropertyCount(o){
+            var n, count = 0;
+            for(n in o){
+                if(o.hasOwnProperty(n)){
+                    count++;
+                }
+            }
+            return count;
+        }
+        
         function getPropery(obj, k) {
             if (k.indexOf('.') != -1) {
                 return k.split('.').reduce(indexObj, obj)
             } else {
                 return indexObj(obj, k);
             }
+        }
+        
+        function defaultValue(v, dv) {
+            if (v) return v;
+            return dv;
         }
     }
 

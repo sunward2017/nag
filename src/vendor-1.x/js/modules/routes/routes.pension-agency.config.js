@@ -1613,20 +1613,10 @@
                         },
                         serverPaging: true,
                         columns: [{
-                            label: '房间',
-                            name: 'room_name',
-                            type: 'string',
-                            width: 120
-                        }, {
-                            label: '床号',
-                            name: 'bed_no',
-                            type: 'string',
-                            width: 80
-                        }, {
                             label: '老人',
                             name: 'name',
                             type: 'string',
-                            width: 80,
+                            width: 60,
                             sortable: true
                         }, {
                             label: '性别',
@@ -1644,26 +1634,23 @@
                             label: '入院登记号',
                             name: 'enter_code',
                             type: 'string',
-                            width: 80,
+                            width: 60,
                             sortable: true
                         },  {
-                            label: '照护信息',
-                            name: 'nursing_info',
+                            label: '房间床位',
+                            name: 'room_summary',
                             type: 'string',
                             width: 120
                         }, {
-                            label: '状态',
-                            name: 'begin_exit_flow',
+                            label: '照护信息',
+                            name: 'nursing_info',
                             type: 'string',
-                            width: 80,
-                            formatter: function () {
-                                return { "true": "正在出院", "false": "在院", "undefined": "在院" }
-                            }
+                            width: 150
                         }, {
                             label: '',
                             name: 'actions',
                             sortable: false,
-                            width: 60
+                            width: 30
                         }]
                     }) 
                 }
@@ -1709,11 +1696,19 @@
                         modelName: 'psn-drugUseTemplate',
                         searchForm: { "status": 1},
                         serverPaging: true,
+                        sortColumn: 'order_no',
+                        sortDirection: 1,
                         columns: [{
                             label: '模版名称',
                             name: 'name',
                             type: 'string',
                             width: 100,
+                            sortable: true
+                        }, {
+                            label: '排序号',
+                            name: 'order_no',
+                            type: 'number',
+                            width: 60,
                             sortable: true
                         }, {
                             label: '重复',

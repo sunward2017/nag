@@ -64,7 +64,7 @@
 
 
         function fetchNursingScheduleTemplates () {
-            vmh.shareService.tmp('T3001/psn-nursingScheduleTemplate', 'name', {tenantId: vm.tenantId, status: 1, stop_flag: false}, true).then(function (treeNodes) {
+            vmh.shareService.tmp('T3001/psn-nursingScheduleTemplate', 'name', {tenantId: vm.tenantId, status: 1, stop_flag: false}, null, true).then(function (treeNodes) {
                 vm.selectBinding.nursingScheduleTemplates = treeNodes;
             });
         }
@@ -77,7 +77,7 @@
         }
         function loadWeek(delta) {
             vm.baseWeek += delta || 0;
-            return vmh.blocking(vmh.shareService.tmp('T0100', null, {delta: vm.baseWeek}, true).then(function (treeNodes) {
+            return vmh.blocking(vmh.shareService.tmp('T0100', null, {delta: vm.baseWeek}, null, true).then(function (treeNodes) {
                 vm.xAxisData = treeNodes;
                 vm.cols = {};
                 for (var j=0, xlen = vm.xAxisData.length;j<xlen;j++) {

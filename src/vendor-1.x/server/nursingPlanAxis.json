@@ -1,13 +1,8 @@
 [
   {
-    "_id": "room_name",
-    "name": "房间",
-    "width": "50"
-  },
-  {
-    "_id": "bed_no",
-    "name": "床位",
-    "width": "40"
+    "_id": "room_info",
+    "name": "房间床位",
+    "width": "60"
   },
   {
     "_id": "name",
@@ -22,17 +17,17 @@
   {
     "_id": "nursing_workitems_standard",
     "name": "照护项目",
-    "width": "300"
+    "width": "215"
   },
   {
     "_id": "nursing_workitems_customized",
-    "name": "用药项目",
-    "width": "130"
+    "name": "用药",
+    "width": "215"
   },
   {
     "_id":"generate_nursing_content",
-     "name": "生成照护记录",
-    "width": "80"
+     "name": "照护记录",
+    "width": "60"
   }
    
 ]

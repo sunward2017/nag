@@ -47,7 +47,7 @@
 
             vm.tab1 = {cid: 'contentTab1'};
 
-            vm.treeDataPromiseOfNursingWorkers = vmh.shareService.tmp('T3011', 'name', {tenantId:vm.tenantId, groupId: vm.getParam('_id')}, true).then(function(nodes){
+            vm.treeDataPromiseOfNursingWorkers = vmh.shareService.tmp('T3011', 'name', {tenantId:vm.tenantId, groupId: vm.getParam('_id')}, null, true).then(function(nodes){
                 console.log(nodes);
                 return nodes;
             });

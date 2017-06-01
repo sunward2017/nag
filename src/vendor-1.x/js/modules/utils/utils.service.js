@@ -252,9 +252,11 @@
             unescapeHTML: unescapeHTML,
             safeArrayMember: safeArrayMember,
             indexObj: indexObj,
+            getPropertyCount: getPropertyCount,
             getPropery: getPropery,
             defaultValue: defaultValue
         };
+
 
         function now(){
             return moment();
@@ -328,6 +330,16 @@
             return obj[k]
         }
 
+        function getPropertyCount(o){
+            var n, count = 0;
+            for(n in o){
+                if(o.hasOwnProperty(n)){
+                    count++;
+                }
+            }
+            return count;
+        }
+        
         function getPropery(obj, k) {
             if (k.indexOf('.') != -1) {
                 return k.split('.').reduce(indexObj, obj)

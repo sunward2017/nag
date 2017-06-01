@@ -4826,7 +4826,7 @@ module.exports = {
                                 where: {
                                     status: 1,
                                     live_in_flag: true,
-                                    begin_exit_flow: {$in: [false, undefined]},
+                                    begin_exit_flow: {$ne: true},
                                     tenantId: tenantId
                                 }
                             });
@@ -4838,7 +4838,7 @@ module.exports = {
                                     status: 1,
                                     tenantId: tenantId
                                 }
-                            });
+                            }).populate('work_items.drugUseTemplateId', 'name order_no');
 
                             var nursingPlansByRoom = {};
                             app._.each(rooms, function (o) {
@@ -4862,6 +4862,8 @@ module.exports = {
                                     };
                                 }
                             });
+
+                            console.log('nursingPlansByRoom:',nursingPlansByRoom);
 
                             this.body = app.wrapper.res.ret(nursingPlansByRoom);
                         } catch (e) {

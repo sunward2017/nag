@@ -25,6 +25,7 @@ module.exports = function(ctx, name) {
                 workItemId: { type: mongoose.Schema.Types.ObjectId, ref: 'psn_workItem' },
                 drugUseItemId: { type: mongoose.Schema.Types.ObjectId, ref: 'psn_drugUseItem' },
                 /*drugId: { type: mongoose.Schema.Types.ObjectId, ref: 'psn_drugUseItem' },*/
+                drugUseTemplateId: { type: mongoose.Schema.Types.ObjectId, ref: 'psn_drugUseTemplate' },
                 check_in_time: { type: Date, default: Date.now },
                 customize_flag: { type: Boolean, default: false }, // 自定义标识,一旦确定无法修改
                 name: { type: String, maxlength: 100 },

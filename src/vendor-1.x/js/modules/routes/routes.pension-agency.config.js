@@ -1009,7 +1009,7 @@
                             label: '房间号',
                             name: 'roomName',
                             type: 'string',
-                            width: 60,
+                            width: 40,
                             sortable:false
                         }, {
                             label: '床号',
@@ -1027,7 +1027,7 @@
                             label: '项目类别',
                             name: 'category',
                             type: 'string',
-                            width: 50,
+                            width: 70,
                             sortable: false,
                             formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D3019/object')
                         },{
@@ -1045,12 +1045,6 @@
                         },{
                             label: '执行时间',
                             name: 'exec_on',
-                            type: 'date',
-                            width: 70,
-                            sortable: false
-                        },{
-                            label: '确认时间',
-                            name: 'confirmed_on',
                             type: 'date',
                             width: 70,
                             sortable: false
@@ -1091,7 +1085,8 @@
                             name: 'subject_name',
                             type: 'string',
                             width: 80,
-                            sortable: true
+                            sortable: false,
+                            formatter: { type: 'populate', options: { path: 'subjectId', select: '-_id name code' } } 
                         }, {
                             label: '报警对象',
                             name: 'object_name',
@@ -1111,7 +1106,7 @@
                             width: 240,
                             sortable: true
                         }, {
-                            label: '处理标记',
+                            label: '处理',
                             name: 'process_flag',
                             type: 'bool',
                             width: 50,

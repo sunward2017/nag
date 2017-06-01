@@ -63,6 +63,6 @@ script(type="text/ng-template", id="work-item-copy.html")
     .ngdialog-input
         .col-md-12
             .tree.tree-basic(name='nursingLevelTree',s-tree, s-tree-data="vm.nursingLevelPromise",s-tree-height="420", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{mode:'check'}",ng-model="vm.nursingLevelIds",required='')
-     .ngdialog-buttons
+    .ngdialog-buttons
             .col-md-12.text-right
                 button.btn.btn-success(type='button',ng-click="vm.doSubmit()") {{ "button.CONFIRM" | translate}}

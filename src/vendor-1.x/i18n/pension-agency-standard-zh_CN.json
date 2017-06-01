@@ -509,12 +509,12 @@
     },
      "overdue-workitem": {
       "list": {
-        "TITLE": "养老机构-照护管理-过期工作项目-列表"
+        "TITLE": "养老机构-照护管理-照护异常记录-列表"
       } 
     },
      "warning-group": {
       "list": {
-        "TITLE": "养老机构-照护管理-报警-列表"
+        "TITLE": "养老机构-照护管理-报警目录-列表"
       }
     },
     "enter-payment": {
@@ -820,7 +820,9 @@
     },
     "robot": {
       "list": {
-        "TITLE": "养老机构-基础设置-机器人-列表"
+        "TITLE": "养老机构-基础设置-机器人-列表",
+        "ROBOT-IMPORT":"机器人导入",
+        "DLG-ROBOT-LIST-TITLE":"机器人列表"
       },
       "details": {
         "TITLE": "养老机构-基础设置-机器人-详情",

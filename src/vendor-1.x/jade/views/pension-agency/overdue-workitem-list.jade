@@ -34,7 +34,7 @@
                         td.text-center {{::row.name}}
                         td.text-left {{::row.description}}
                         td.text-center {{::row.exec_on|date: 'MM-dd  HH:mm'}}
-                        td.text-center {{::confirmed_on|date:'MM-dd  HH:mm'}}
+                        //- td.text-center {{::confirmed_on|date:'MM-dd  HH:mm'}}
                     tr(ng-if="vm.paged.length==0")
                         td(colspan="{{utils.noResultsColspan(vm)}}") {{ 'grid.NO-RESULTS' | translate}}
             .panel-footer

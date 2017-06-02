@@ -24,6 +24,7 @@ module.exports = function(ctx,name) {
             current_step: {type: String,  minlength: 5, maxlength: 5,required: true, enum: ctx._.rest(ctx.dictionary.keys["D3004"])},
             enter_code: {type: String, required: true, minlength: 6, maxlength: 6},
             enter_on: {type: Date},
+            cause: {type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3025"])},//出院原因
             elderlyId:{type: mongoose.Schema.Types.ObjectId, required: true,ref:'pub_elderly'},
             elderly_name: {type: String, required: true, maxlength: 20},
             elderly_id_no: {type: String, required: true, minlength: 15, maxlength: 18},

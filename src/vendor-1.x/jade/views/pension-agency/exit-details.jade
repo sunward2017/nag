@@ -27,6 +27,13 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-ENTER_ON') | translate}}:
                         .col-md-2
                             .form-readable {{vm.model.enter_on|date}}
+                     fieldset: .form-group
+                        <!--出院原因-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-EXIT-CAUSE') | translate}}:
+                        .col-md-10
+                            .btn-group
+                                .btn.btn-primary(name='cause',ng-repeat='item in vm.selectBinding.cause',ng-model='vm.model.cause',btn-radio="item.value",required='') {{item.name}}
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'cause','required')") {{ "validator.REQUIRED" | translate}}        
                     fieldset: .form-group
                         <!--申请代理人/陪同出院人 姓名-->
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-AGENT_INFO-NAME') | translate}}:

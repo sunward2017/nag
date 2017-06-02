@@ -170,8 +170,8 @@ module.exports = {
                             this.body = app.wrapper.res.error({ message: '无效的服务项目记录' });
                             return;
                         } else if (nursingRecord.confirmed_flag) {
-                            this.body = app.wrapper.res.error({ message: '服务项目记录已签到' });
-                            return;
+                            // this.body = app.wrapper.res.error({ message: '服务项目记录已签到' });
+                            // return;
                         }
 
                         nursingRecord.confirmed_flag = true;

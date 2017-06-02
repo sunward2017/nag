@@ -1,6 +1,6 @@
 {
   "name": "nag",
-  "version": "1.0.26",
+  "version": "1.1.0",
   "description": "",
   "main": "src/app.js",
   "scripts": {
@@ -82,7 +82,7 @@
     "rand-token": "0.2.1",
     "request": "^2.76.0",
     "request-promise-native": "^1.0.3",
-    "rfcore": "^0.1.16",
+    "rfcore": "^0.1.17",
     "soap": "^0.17.0",
     "socket.io": "^1.7.2",
     "thunkify": "^2.1.2",

@@ -240,8 +240,12 @@
 
                         return promise;
                     },
-                    notifyDataChange: function (item, id) {
-                        return $http.post(baseUrl + 'api/notifyDataChange', {item: item, id: id});
+                    notifyDataChange: function (item, id, params) {
+                        var bodyParam = {item: item, id: id};
+                        if(params) {
+                            bodyParam = _.extend({}, params, bodyParam);
+                        }
+                        return $http.post(baseUrl + 'api/notifyDataChange', bodyParam);
                     }
                 };
             }]

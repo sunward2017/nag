@@ -590,6 +590,13 @@ co(function*() {
     // console.dir(worksheets[0].data[0]);
     // console.dir(worksheets[0].data[1]);
 
+    // var rooms = yield app.modelFactory().model_query(app.models['psn_room'], {
+    //     select: 'name',
+    //     where: {
+    //         robots: {$elemMatch: {$eq: '58fd721e8ef00320ddda341b' }}
+    //     }
+    // });
+
 
 }).catch(app.coOnError);
 

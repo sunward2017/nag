@@ -2417,6 +2417,7 @@
                         modelName: 'pub-robot',
                         searchForm: { "status": 1 },
                         serverPaging: true,
+                        notifyRowDisabled: 'pub$robot$$disabled',
                         columns: [{
                             label: '机器人编号',
                             name: 'code',

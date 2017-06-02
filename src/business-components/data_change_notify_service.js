@@ -119,5 +119,39 @@ module.exports = {
                 self.logger.error(e.message);
             }
         }).catch(self.ctx.coOnError);
+    },
+    pub$robot$$disabled: function (id, params) {
+        var self = this;
+        return co(function *() {
+            try {
+                // console.log('id:', id);
+                // console.log('params:', params);
+                var rooms = yield self.ctx.modelFactory().model_query(self.ctx.models['psn_room'], {
+                    select: 'robots',
+                    where: {
+                        tenantId: params.tenantId,
+                        robots: {$elemMatch: {$eq: id }}
+                    }
+                });
+
+                console.log('rooms:', rooms);
+
+                var room, robots, index;
+                for(var i=0,len = rooms.length;i<len;i++) {
+                    room = rooms[i], robots = room.robots;
+                    index = self.ctx._.findIndex(robots, (o)=> {
+                        return o.toString() == id;
+                    });
+                    robots.splice(index,1);
+                    yield room.save();
+                }
+
+
+            }
+            catch (e) {
+                console.log(e);
+                self.logger.error(e.message);
+            }
+        }).catch(self.ctx.coOnError);
     }
 };

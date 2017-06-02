@@ -85,7 +85,8 @@
 
             vmh.parallel([
                 vmh.shareService.d('D1006'),
-                vmh.shareService.d('D1012')
+                vmh.shareService.d('D1012'),
+                vmh.shareService.d('D3025'),
             ]).then(function (results) {
                 vm.selectBinding.sex = results[0];
                 vm.selectBinding.relationsWithTheElderly = results[1];
@@ -93,6 +94,7 @@
                     name: 'button.AUDIT-TRUE',
                     value: true
                 }, {name: 'button.AUDIT-FALSE', value: false}];
+                vm.selectBinding.cause = results[2];
             });
 
             vm.currentStepReadonly = true;

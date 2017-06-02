@@ -45,5 +45,17 @@
                                     i.glyphicon.glyphicon-plus
                                 a.btn.btn-primary.btn-sm(title="{{'button.REMOVE'|translate}}",ng-click="vm.disable()")
                                     i.glyphicon.glyphicon-minus
+                             .btn-group
+                                a.btn.btn-warning.btn-sm(ng-click="vm.importRobot()") {{ vm.viewTranslatePath('ROBOT-IMPORT') | translate}}       
                     .col-md-8
                         pagination.pagination-sm.pull-right(total-items="vm.page.totals",ng-model="vm.page.no",max-size="5",items-per-page="vm.page.size",boundary-links="true" ,ng-change="vm.paging()")
+script(type="text/ng-template", id="robot-list.html")
+    .ngdialog-title
+        i.glyphicon.glyphicon-info-sign
+        | {{ vm.moduleTranslatePath('DLG-ROBOT-LIST-TITLE') | translate }}
+    .ngdialog-input
+        .col-md-12
+            .tree.tree-basic(name='robotTree',s-tree, s-tree-data="vm.robotPromise",s-tree-height="420", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{mode:'check'}",ng-model="vm.robotIds",required='')
+    .ngdialog-buttons
+            .col-md-12.text-right
+                button.btn.btn-success(type='button',ng-click="vm.doSubmit()") {{ "button.CONFIRM" | translate}}                       

@@ -7,5 +7,8 @@
   },
   "bed_monitor_status": {
     "api_url": "http://www.qinkeshi.com:8080"
+  },
+  "robot_repository_java": {
+    "api_url": "http://120.55.240.188:8093"
   }
 }

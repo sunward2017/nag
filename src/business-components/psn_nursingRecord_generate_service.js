@@ -56,12 +56,13 @@ module.exports = {
         var self = this;
         return co(function*() {
 
-            var tenant, elderly, elderlyIds, elderlyRoomValue, roomId, nursingPlanItems, nursingPlanItem, workItems, workOrDrugUseItem,
+            var tenant, elderly, elderlyIds, elderlyRoomValue, roomId, nursingPlanItems, nursingPlanItem, workOrDrugUseItem,
                 nursingRecord, now, gen_batch_no, nursingWorkerScheduleItems, exec_date, exec_on, exec_date_string, remind_on;
             var elderlyMapRoom = {},
                 nursingRecordsToSave = [],
                 nursingRecordToSave, work_item_repeat_values, allEdlerlyIds, allElderly, nursingRecordExist,
                 remind_max, remind_step, remind_start, exec_start, exec_end, warningMsg;
+            var workItems = [], grouped, groupedWorkItems, firstItem;
             try {
 
                 if (nursingRecordId && !tenantId) {
@@ -88,10 +89,31 @@ module.exports = {
                     var workItemIdOfCurrentNursingRecord = nursingRecord.workItemId.toString();
                     var workItemsInNursingPlanItem = nursingPlanItem.toObject().work_items;
                     workOrDrugUseItem = self.ctx._.find(workItemsInNursingPlanItem, (o)=> {
-                        return o.workItemId == workItemIdOfCurrentNursingRecord;
+                        return o._id == workItemIdOfCurrentNursingRecord;
                     });
                     if (!workOrDrugUseItem) {
                         return self.ctx.wrapper.res.error({message: '所属项目已经不在照护计划中!'});
+                    }
+                    if(workOrDrugUseItem.drugUseTemplateId) {
+                        console.log('属于分组,需要将所属分组下的所有计划项目合并生成记录');
+
+                        var workItemsInSameGroup = self.ctx._.filter(workItemsInNursingPlanItem, (o)=>{
+                            return o.drugUseTemplateId &&  workOrDrugUseItem.drugUseTemplateId == o.drugUseTemplateId.toString();
+                        });
+
+                        // console.log('workItemsInSameGroup:', workItemsInSameGroup);
+
+                        var nameJoin = self.ctx._.map(workItemsInSameGroup, (o)=> {
+                            return o.name;
+                        }).join();
+                        workOrDrugUseItem.name = nameJoin;
+
+                        var descriptionJoin = self.ctx._.map(workItemsInSameGroup, (o)=> {
+                            return o.description;
+                        }).join();
+                        workOrDrugUseItem.description = descriptionJoin;
+
+                        // console.log('workOrDrugUseItem:', workOrDrugUseItem);
                     }
 
                     //房间床位检查
@@ -105,7 +127,7 @@ module.exports = {
                         bed_no: elderlyRoomValue.bed_no,
                         gen_batch_no: gen_batch_no,
                         tenantId: tenantId,
-                        workItemId: workOrDrugUseItem.workItemId,
+                        workItemId: workOrDrugUseItem._id,
                         name: workOrDrugUseItem.name,
                         description: workOrDrugUseItem.description,
                         remark: workOrDrugUseItem.remark,
@@ -255,7 +277,8 @@ module.exports = {
                         yield self.ctx.modelFactory().model_create(self.ctx.models['psn_nursingRecord'], nursingRecordToSave);
                     }
                     return self.ctx.wrapper.res.default(warningMsg);
-                } else if (!nursingRecordId && tenantId) {
+                }
+                else if (!nursingRecordId && tenantId) {
                     // 生成当前机构今天的照护记录
                     tenant = yield self.ctx.modelFactory().model_read(self.ctx.models['pub_tenant'], tenantId);
                     if (!tenant || tenant.status == 0) {
@@ -330,7 +353,40 @@ module.exports = {
                                 gen_batch_no: gen_batch_no,
                                 tenantId: tenantId
                             }
-                            workItems = nursingPlanItem.work_items;
+
+                            grouped = self.ctx._.groupBy(nursingPlanItem.work_items, (o)=>{
+                                if (o.drugUseTemplateId) {
+                                    return o.drugUseTemplateId;
+                                } else {
+                                    return 'none'
+                                }
+                            });
+
+                            for(var key in grouped) {
+                                groupedWorkItems = grouped[key];
+                                if(key == 'none') {
+                                    workItems = workItems.concat(groupedWorkItems);
+                                } else {
+                                    console.log('合并分组');
+                                    if (groupedWorkItems.length == 1) {
+                                        workItems = workItems.concat(groupedWorkItems);
+                                    } else {
+                                        firstItem = grouped[key][0];
+                                        var nameJoin = self.ctx._.map(groupedWorkItems, (o)=> {
+                                            return o.name;
+                                        }).join();
+                                        firstItem.name = nameJoin;
+
+                                        var descriptionJoin = self.ctx._.map(groupedWorkItems, (o)=> {
+                                            return o.description;
+                                        }).join();
+                                        firstItem.description = descriptionJoin;
+
+                                        workItems.push(firstItem);
+                                    }
+                                }
+                            }
+                            
                             // console.log("workItems", workItems)
                             for (var j = 0, len2 = workItems.length; j < len2; j++) {
                                 workOrDrugUseItem = workItems[j];
@@ -339,7 +395,7 @@ module.exports = {
                                 // console.log('remind_max: ', remind_max);
                                 // console.log('remind_step: ', remind_step);
 
-                                nursingRecord.workItemId = workOrDrugUseItem._id
+                                nursingRecord.workItemId = workOrDrugUseItem._id;//包含照护和用药了
                                 nursingRecord.name = workOrDrugUseItem.name;
                                 nursingRecord.description = workOrDrugUseItem.description;
                                 nursingRecord.remark = workOrDrugUseItem.remark;

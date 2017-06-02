@@ -28,7 +28,7 @@
                  handler: function (app, options) {
                      return function *(next) {
                          try {
-                             var member = yield app.bed_monitor_status.regist(this.openid, this.request.body.userInfo, this.request.body.tenantId);
+                             var member = yield app.bed_monitor_status.regist(this.openid || this.request.body.openid, this.request.body.userInfo, this.request.body.tenantId);
                              console.log("regist reback");		
 				    console.log("member:",member);	
                              if (member) {
@@ -54,7 +54,7 @@
                          try {
                              console.log("body:");
                              console.log(this.request.body);
-                             var ret = yield app.bed_monitor_status.addDevice(this.request.body.deviceInfo, this.openid, this.request.body.tenantId);
+                             var ret = yield app.bed_monitor_status.addDevice(this.request.body.deviceInfo, this.openid || this.request.body.openid, this.request.body.tenantId);
                              console.log("add device back");
                              // console(ret);
                              console.log("-------------------------");
@@ -77,7 +77,7 @@
                              console.log("body:");
                              console.log(this.request.body);
                              self.logger.info('this.request.body:', this.openid);
-                             this.body = yield app.bed_monitor_status.getDeviceInfo(this.openid,this.request.body.tenantId);
+                             this.body = yield app.bed_monitor_status.getDeviceInfo(this.openid || this.request.body.openid,this.request.body.tenantId);
                          } catch (e) {
                              self.logger.error(e.message);
                              this.body = app.wrapper.res.error(e);
@@ -95,7 +95,7 @@
                          try {
                              console.log("body:");
                              console.log(this.request.body)
-                             var ret = yield app.bed_monitor_status.removeDevice(this.openid, this.request.body.deviceId, this.request.body.tenantId);
+                             var ret = yield app.bed_monitor_status.removeDevice(this.openid || this.request.body.openid, this.request.body.deviceId, this.request.body.tenantId);
                              console.log("ret++++:", ret);
                              this.body = app.wrapper.res.ret(ret);
                          } catch (e) {
@@ -115,7 +115,7 @@
                          try {
                              console.log("body:");
                              console.log(this.request.body)
-                             var ret = yield app.bed_monitor_status.getDeviceDetails(this.openid, this.request.body.devId, this.request.body.tenantId);
+                             var ret = yield app.bed_monitor_status.getDeviceDetails(this.openid || this.request.body.openid, this.request.body.devId, this.request.body.tenantId);
                              console.log("ret++++:", ret);
                              this.body = app.wrapper.res.ret(ret);
                          } catch (e) {
@@ -135,7 +135,7 @@
                          try {
                              console.log("body:");
                              console.log(this.request.body)
-                             var ret = yield app.bed_monitor_status.changeCarePersonInfo(this.openid, this.request.body.memberCarePersonInfo, this.request.body.tenantId);
+                             var ret = yield app.bed_monitor_status.changeCarePersonInfo(this.openid || this.request.body.openid, this.request.body.memberCarePersonInfo, this.request.body.tenantId);
                              console.log("ret++++:", ret);
                              this.body = app.wrapper.res.ret(ret);
                          } catch (e) {
@@ -155,7 +155,7 @@
                          try {
                              console.log("body:");
                              console.log(this.request.body)
-                             var ret = yield app.bed_monitor_status.checkIsAttach(this.openid, this.request.body.deviceId, this.request.body.tenantId);
+                             var ret = yield app.bed_monitor_status.checkIsAttach(this.openid || this.request.body.openid, this.request.body.deviceId, this.request.body.tenantId);
                              console.log("isAttach:", ret);
                              this.body =  app.wrapper.res.ret({isAttach:ret});
                          } catch (e) {
@@ -268,7 +268,7 @@
                          try {
                              console.log("body:");
                              console.log(this.request.body)
-                             this.body =  yield app.bed_monitor_status.getDateReport(this.openid,this.request.body.devId,this.request.body.tenantId,this.request.body.skip,this.request.body.lastDate);
+                             this.body =  yield app.bed_monitor_status.getDateReport(this.openid || this.request.body.openid,this.request.body.devId,this.request.body.tenantId,this.request.body.skip,this.request.body.lastDate);
                             
                          } catch (e) {
                              self.logger.error(e.message);
@@ -287,7 +287,7 @@
                          try {
                              console.log("body:");
                              console.log(this.request.body)
-                            var ret =  yield app.bed_monitor_status.getTodayReport(this.openid,this.request.body.devId,this.request.body.tenantId);
+                            var ret =  yield app.bed_monitor_status.getTodayReport(this.openid || this.request.body.openid,this.request.body.devId,this.request.body.tenantId);
                              console.log('返回的数据日报：',ret);
                              this.body = ret;
                          } catch (e) {
@@ -330,7 +330,7 @@
                             //console.log("test:",this.openid);
                              var deviceId = 'A1200006';
                               var tenantId = '58f5e9add2b7261ba8af97b8';
-                             var ret = yield app.bed_monitor_app.getWeekDatas(this.openid,this.request.body.info,this.request.body.endTime,this.request.body.startTime);
+                             var ret = yield app.bed_monitor_app.getWeekDatas(this.openid || this.request.body.openid,this.request.body.info,this.request.body.endTime,this.request.body.startTime);
                              console.log("test recall:", ret);
                              this.body = ret;
                          } catch (e) {
@@ -340,6 +340,112 @@
                          yield next;
                      };
                  }
+             },
+             {
+                 method: 'bedMonitor$regist',//regist useing
+                 verb: 'post',
+                 url: this.service_url_prefix + "/bedMonitor/regist",
+                 handler: function (app, options) {
+                     return function *(next) {
+                         try {
+                             var registRet = yield app.bed_monitor_app.regist(this.openid || this.request.body.openid, this.request.body);
+                             console.log("regist reback");		
+				             console.log("member:",registRet);	
+                             if (registRet.success) {
+                                 console.log("自动登陆");
+                                 this.body = yield app.bed_monitor_app.login(registRet.ret);
+
+                             }
+                         } catch (e) {
+                             self.logger.error(e.message);
+                             this.body = app.wrapper.res.error(e);
+                         }
+                         yield next;
+                     };
+                 }
+             },
+             {
+                
+                 method: 'bedMonitor$addDevice',
+                 verb: 'post',
+                 url: this.service_url_prefix + "/bedMonitor/addDevice",
+                 handler: function (app, options) {
+                     return function *(next) {
+                         try {
+                             console.log("body:");
+                             console.log(this.request.body);
+                             var ret = yield app.bed_monitor_app.addDevice(this.request.body, this.openid || this.request.body.openid);
+                             console.log("add device back");
+                             // console(ret);
+                             console.log("-------------------------");
+                             this.body = app.wrapper.res.ret(ret);
+                         } catch (e) {
+                             self.logger.error(e.message);
+                             this.body = app.wrapper.res.error(e);
+                         }
+                         yield next;
+                     };
+                 }
+             },
+              {
+                 method: 'bedMonitor$isAttach',
+                 verb: 'post',
+                 url: this.service_url_prefix + "/bedMonitor/isAttach",
+                 handler: function (app, options) {
+                     return function *(next) {
+                         try {
+                             console.log("body:");
+                             console.log(this.request.body)
+                             var ret = yield app.bed_monitor_app.checkIsAttach(this.openid || this.request.body.openid, this.request.body.deviceId, this.request.body.tenantId);
+                             console.log("isAttach:", ret);
+                             this.body =  app.wrapper.res.ret({isAttach:ret});
+                         } catch (e) {
+                             self.logger.error(e.message);
+                             this.body = app.wrapper.res.error(e);
+                         }
+                         yield next;
+                     };
+                 }
+             },
+             {
+                 method: 'bedMonitor$removeDevice',
+                 verb: 'post',
+                 url: this.service_url_prefix + "/bedMonitor/removeDevice",
+                 handler: function (app, options) {
+                     return function *(next) {
+                         try {
+                             console.log("body:");
+                             console.log(this.request.body)
+                             var ret = yield app.bed_monitor_app.removeDevice(this.openid || this.request.body.openid, this.request.body.deviceId, this.request.body.tenantId);
+                             console.log("ret++++:", ret);
+                             this.body = app.wrapper.res.ret(ret);
+                         } catch (e) {
+                             self.logger.error(e.message);
+                             this.body = app.wrapper.res.error(e);
+                         }
+                         yield next;
+                     };
+                 }
+             },
+             {
+                 method: 'bedMonitor$getAttachDevice',
+                 verb: 'post',
+                 url: this.service_url_prefix + "/bedMonitor/getAttachDevice",
+                 handler: function (app, options) {
+                     return function *(next) {
+                         try {
+                             console.log("body:");
+                             console.log(this.request.body);
+                             self.logger.info('this.request.body:', this.openid);
+                             this.body = yield app.bed_monitor_app.getAttachDevice(this.openid || this.request.body.openid,this.request.body.tenantId);
+                         } catch (e) {
+                             self.logger.error(e.message);
+                             this.body = app.wrapper.res.error(e);
+                         }
+                         yield next;
+                     };
+                 }
+
              }
          ];
          return this;

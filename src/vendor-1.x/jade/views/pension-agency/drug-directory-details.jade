@@ -11,17 +11,14 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-DRUG_NO') | translate}}:
                         .col-md-10
                             input.form-control(type='text', name='drug_no',ng-model='vm.model.drug_no', placeholder='{{ vm.viewTranslatePath("TAB1-PLACEHOLDER-DRUG_NO") | translate}}' )
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'drug_no','required')") {{ "validator.REQUIRED" | translate}}
                     fieldset: .form-group
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-BARCODE') | translate}}:
                         .col-md-10
                             input.form-control(type='text', name='barcode',ng-model='vm.model.barcode', placeholder='{{ vm.viewTranslatePath("TAB1-PLACEHOLDER-BARCODE") | translate}}' )
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'barcode','required')") {{ "validator.REQUIRED" | translate}}
                     fieldset: .form-group
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-VENDER') | translate}}:
                         .col-md-10
                             input.form-control(type='text', name='vender',ng-model='vm.model.vender', placeholder='{{ vm.viewTranslatePath("TAB1-PLACEHOLDER-VENDER") | translate}}' )
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'vender','required')") {{ "validator.REQUIRED" | translate}}                
                     fieldset: .form-group
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-FULL_NAME') | translate}}:
                         .col-md-10
@@ -31,22 +28,24 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-SHORT_NAME') | translate}}:
                         .col-md-10
                             input.form-control(type='text', name='short_name',ng-model='vm.model.short_name',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-MODEL")|translate}}' ,)
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'short_name','required')") {{ "validator.REQUIRED" | translate}}
                     fieldset: .form-group
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-ALIAS') | translate}}:
                         .col-md-10
                             input.form-control(type='text', name='alias',ng-model='vm.model.alias',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-MODEL")|translate}}' ,)
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'alias','required')") {{ "validator.REQUIRED" | translate}}
                     fieldset: .form-group
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-ENGLISH_NAME') | translate}}:
                         .col-md-10
                             input.form-control(type='text', name='english_name',ng-model='vm.model.english_name',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-MODEL")|translate}}' )
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'english_name','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset: .form-group
+                        <!--最小消耗单位-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-MINI_UNIT') | translate}}:
+                        .col-md-10
+                            .btn-group
+                                .btn.btn-primary(name='mini_unit',ng-repeat='mini_unit in vm.selectBinding.mini_units',ng-model='vm.model.mini_unit',btn-radio="mini_unit.value") {{mini_unit.name}}
                     fieldset: .form-group
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-FUNCTION') | translate}}:
                         .col-md-10
                             input.form-control(type='text', name='indications_function',ng-model='vm.model.indications_function',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-MODEL")|translate}}' )
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'indications_function','required')") {{ "validator.REQUIRED" | translate}}
                     fieldset: .form-group
                         <!--otc标志-->
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-OTC_FLAG') | translate}}:
@@ -69,28 +68,23 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-USAGE') | translate}}:
                         .col-md-10
                             input.form-control(type='text', name='usage',ng-model='vm.model.usage',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-USAGE")|translate}}' ,)
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'usage','required')") {{ "validator.REQUIRED" | translate}}
                     fieldset: .form-group
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-PRICE') | translate}}:
                         .col-md-10
                             input.form-control(type='text', name='price',ng-model='vm.model.price',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-PRICE")|translate}}' ,)
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'price','required')") {{ "validator.REQUIRED" | translate}}
                     fieldset: .form-group
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-SPECIFICATION') | translate}}:
                         .col-md-10
                             input.form-control(type='text', name='specification',ng-model='vm.model.specification',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-SPECIFICATION")|translate}}')
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'specification','required')") {{ "validator.REQUIRED" | translate}}
                     <!--剂型-->
                     fieldset: .form-group
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-DOSAGE_FORM') | translate}}:
                         .col-md-10
                             input.form-control(type='text', name='dosage_form',ng-model='vm.model.dosage_form',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-MODEL")|translate}}' ,)
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'dosage_form','required')") {{ "validator.REQUIRED" | translate}}         
                     fieldset: .form-group
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-SPECIAL_INDIVIDUALS') | translate}}:
                         .col-md-10
                             input.form-control(type='text', name='special_individuals',ng-model='vm.model.special_individuals', placeholder='{{ vm.viewTranslatePath("TAB1-PLACEHOLDER-MODEL") | translate}}' )
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'special_individuals','required')") {{ "validator.REQUIRED" | translate}}   
     .text-right.mt-lg
         button.btn.btn-warning(type="button",ng-click="vm.cancel()") {{'button.CANCEL'|translate}}
         button.btn.btn-success(type="submit") {{'button.SAVE'|translate}}

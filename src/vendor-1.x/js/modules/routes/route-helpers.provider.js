@@ -278,7 +278,7 @@
         function buildEntryVM(name, option) {
             option = option || {};
             var arrNames = name.split('.');
-            return ['$rootScope', '$state', '$stateParams', '$window', '$q', '$translate', '$timeout', '$http', 'blockUI', 'Auth', 'modelNode', 'Notify', 'GridDemoModelSerivce', function ($rootScope, $state, $stateParams, $window, $q, $translate, $timeout, $http, blockUI, Auth, modelNode, Notify, GridDemoModelSerivce) {
+            return ['$rootScope', '$state', '$stateParams', '$window', '$q', '$translate', '$timeout', '$http', 'blockUI', 'Auth', 'modelNode', 'shareNode', 'Notify', 'GridDemoModelSerivce', function ($rootScope, $state, $stateParams, $window, $q, $translate, $timeout, $http, blockUI, Auth, modelNode, shareNode, Notify, GridDemoModelSerivce) {
                 var modelService = option.modelName ? modelNode.services[option.modelName] : GridDemoModelSerivce;
 
                 function getParam(name) {
@@ -380,6 +380,10 @@
 
                 }
 
+                function notifyDataChange (item, id, param) {
+                    return shareNode.notifyDataChange(item, id, param);
+                }
+
                 function add() {
                     // $state.go(this.moduleRoute('details'), _.defaults({
                     //     action: 'add',
@@ -475,7 +479,7 @@
                                 else {
                                     actionPromise = $q.when(true);
                                 }
-                                actionPromise.then(function(ret) {
+                                var promiseRemoved = actionPromise.then(function(ret) {
                                     modelService[method](row._id).$promise.then(function () {
                                         var index = _.indexOf(self.rows, row);
                                         if (index != -1) {
@@ -483,6 +487,17 @@
                                         }
                                     });
                                 });
+                                console.log('self.notifyRowDisabled:', self.notifyRowDisabled);
+                                if(self.notifyRowDisabled) {
+                                    promiseRemoved.then(function () {
+                                        self.notifyDataChange(self.notifyRowDisabled, row._id, row);
+                                    })
+                                }
+                                if(self.notifyRowRemoved) {
+                                    promiseRemoved.then(function () {
+                                        self.notifyDataChange(self.notifyRowRemoved, row._id, row);
+                                    })
+                                }
                                 return actionPromise;
                             })
                         }
@@ -641,6 +656,9 @@
                     removeDialog: ['ngDialog', function (ngDialog) {
                         return ngDialog;
                     }],
+                    notifyRowDisabled: option.notifyRowDisabled,
+                    notifyRowRemoved: option.notifyRowRemoved,
+                    notifyDataChange: notifyDataChange,
                     add: add,
                     setOrder: setOrder,
                     edit: edit,

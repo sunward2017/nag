@@ -1819,8 +1819,8 @@
                             width: 40,
                             sortable: true
                         }, {
-                            label: '价格',
-                            name: 'price',
+                            label: '最小消耗单位',
+                            name: 'mini_unit_name',
                             type: 'string',
                             width: 50,
                             sortable: true
@@ -2417,6 +2417,7 @@
                         modelName: 'pub-robot',
                         searchForm: { "status": 1 },
                         serverPaging: true,
+                        notifyRowDisabled: 'pub$robot$$disabled',
                         columns: [{
                             label: '机器人编号',
                             name: 'code',

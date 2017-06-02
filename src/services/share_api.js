@@ -30,7 +30,7 @@ module.exports = {
                         try {
                             var item = this.request.body.item;
                             var id = this.request.body.id;
-                            yield app.data_change_notify_service[item](id);
+                            yield app.data_change_notify_service[item](id, app._.omit(this.request.body, 'item', 'id'));
                             this.body = app.wrapper.res.default();
                         } catch (e) {
                             self.logger.error(e.message);

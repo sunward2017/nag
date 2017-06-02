@@ -1819,8 +1819,8 @@
                             width: 40,
                             sortable: true
                         }, {
-                            label: '价格',
-                            name: 'price',
+                            label: '最小消耗单位',
+                            name: 'mini_unit_name',
                             type: 'string',
                             width: 50,
                             sortable: true

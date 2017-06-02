@@ -44,6 +44,12 @@
             vm.doSubmit = doSubmit;
             vm.tab1 = {cid: 'contentTab1'};
 
+            vmh.parallel([
+                vmh.shareService.d('D3026')
+            ]).then(function (results) {
+                vm.selectBinding.mini_units = results[0];
+            });
+            
             vm.load();
 
         }

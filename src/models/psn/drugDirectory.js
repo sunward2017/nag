@@ -3,6 +3,8 @@
  * 养老机构 药品实体
  */
 var mongoose = require('mongoose');
+var D3026 = require('../../pre-defined/dictionary.json')['D3026'];
+
 module.isloaded = false;
 
 
@@ -32,6 +34,7 @@ module.exports = function(ctx,name) {
             vender:{type: String},//厂家 added by zppro 2017.5.12
             dosage_form:{type: String}, //剂型 added by zppro 2017.5.12
             special_individuals:{type: String}, //特殊人群用药 added by zppro 2017.5.12
+            mini_unit: {type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3026"])}, //added by zppro 2017-6-2 最小消耗单位 计算库存使用
             drugSourceId: {type: mongoose.Schema.Types.ObjectId,ref:'pub_drug'},//关联公共的药品库
             tenantId: {type: mongoose.Schema.Types.ObjectId,required: true,ref:'pub_tenant'}//关联机构
         }, {
@@ -46,6 +49,13 @@ module.exports = function(ctx,name) {
         drugDirectorySchema.pre('update', function (next) {
             this.update({}, {$set: {operated_on: new Date()}});
             next();
+        });
+
+        drugDirectorySchema.virtual('mini_unit_name').get(function () {
+            if (this.mini_unit) {
+                return D3026[this.mini_unit].name;
+            }
+            return '';
         });
 
         return mongoose.model(name, drugDirectorySchema, name);

@@ -155,7 +155,7 @@ module.exports = {
             {
                 method: 'floor$fetch',
                 verb: 'post',
-                url: this.service_url_prefix + "/floors/fetch",
+                url: this.service_url_prefix + "/floor/fetch",
                 handler: function (app, options) {
                     return function * (next) {
                         try {
@@ -206,7 +206,7 @@ module.exports = {
                                 where: {
                                     status: 1,
                                     districtId: districtId,
-                                    floor: floorId,
+                                    floor: floor,
                                     tenantId: tenantId
                                 }
                             });
@@ -239,7 +239,7 @@ module.exports = {
                             });
                             console.log('filter:', filter);
 
-                            var elderly = yield app.modelFactory().model_query(app.models['psn_room'], {
+                            var elderly = yield app.modelFactory().model_query(app.models['psn_elderly'], {
                                 select: 'name room_summary avatar',
                                 where: filter
                             });

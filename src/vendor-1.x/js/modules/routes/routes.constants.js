@@ -30,6 +30,8 @@
                 WXACONFIG_GRID: 'Shared_wxaConfigGridController',
                 WXACONFIG_DETAILS: 'Shared_wxaConfigDetailsController',
                 INTERFACE_ACCOUNT_INDEX: 'Shared_interfaceAccountIndexController',
+                INTERFACE_ACCOUNT_MINGZHONG_GRID: 'Shared_InterfaceAccountMingZhongGridController',
+                INTERFACE_ACCOUNT_MINGZHONG_DETAILS: "Shared_InterfaceAccountMingZhongDetailsController",
                 OTHERCONFIG_GRID: 'Shared_OtherConfigGridController',
                 OTHERCONFIG_DETAILS: 'Shared_OtherConfigDetailsController'
             },

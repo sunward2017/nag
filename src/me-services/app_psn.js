@@ -229,15 +229,48 @@ module.exports = {
                     return function *(next) {
                         try {
                             var tenantId = this.request.body.tenantId;
-                            var filter = this.request.body.filter;
+                            var districtId = this.request.body.districtId;
+                            var floorId = this.request.body.floorId;
+                            var roomId = this.request.body.roomId;
 
-                            app._.extend(filter, {
+                            var dynamicFilter = {};
+                            if(districtId) {
+                                dynamicFilter['room_value.districtId'] = districtId;
+                            }
+                            if(floorId) {
+                                //需要按照
+                                var arrFloorParsed = floorId.split('$');
+                                dynamicFilter['room_value.districtId'] = arrFloorParsed[0];
+
+                                var floor = arrFloorParsed[1];
+                                var rooms = yield app.modelFactory().model_query(app.models['psn_room'], {
+                                    select: '_id',
+                                    where: {
+                                        status: 1,
+                                        floor: floor,
+                                        tenantId: tenantId
+                                    }
+                                });
+
+                                var roomIds = app._.map(rooms, (o)=> {
+                                    return o._id;
+                                })
+
+                                dynamicFilter['room_value.roomId'] = {$in: roomIds};
+                            }
+                            
+                            if(roomId) {
+                                dynamicFilter['room_value.roomId'] = roomId;
+                            }
+
+                            app._.extend(dynamicFilter, {
                                 status: 1,
                                 tenantId: tenantId,
                                 live_in_flag: true,
                                 begin_exit_flow: {$in: [false, undefined]}
                             });
-                            console.log('filter:', filter);
+
+                            console.log('dynamicFilter:', dynamicFilter);
 
                             var elderly = yield app.modelFactory().model_query(app.models['psn_elderly'], {
                                 select: 'name room_summary avatar',

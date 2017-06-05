@@ -565,6 +565,7 @@
                     nursingWorkerScheduleRemove: nursingWorkerScheduleRemove,
                     nursingWorkerScheduleTemplateImport: nursingWorkerScheduleTemplateImport,
                     nursingWorkerScheduleSaveAsTemplateWeekly: nursingWorkerScheduleSaveAsTemplateWeekly,
+                    vitalSign$MingZhong$updateElderlyUsers: vitalSign$MingZhong$updateElderlyUsers
                 };
 
                 function roomStatusInfo(tenantId) {
@@ -890,6 +891,10 @@
 
                 function nursingWorkerScheduleSaveAsTemplateWeekly(tenantId, nursingWorkerScheduleTemplateName, toSaveRows) {
                     return $http.post(baseUrl + 'nursingWorkerScheduleSaveAsTemplateWeekly', { tenantId: tenantId, nursingWorkerScheduleTemplateName: nursingWorkerScheduleTemplateName, toSaveRows: toSaveRows });
+                }
+
+                function vitalSign$MingZhong$updateElderlyUsers(tenantId, doctAccountId) {
+                    return $http.post(baseUrl + 'vitalSign$MingZhong$updateElderlyUsers', { tenantId: tenantId, doctAccountId: doctAccountId});
                 }
             }]
         };

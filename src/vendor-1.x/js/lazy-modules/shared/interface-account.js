@@ -39,7 +39,15 @@
         function init() {
             vm.init({removeDialog: ngDialog});
 
+            vm.updateElderlyUsers = updateElderlyUsers;
             vm.query();
+        }
+        
+        function updateElderlyUsers(id) {
+            vmh.psnService.vitalSign$MingZhong$updateElderlyUsers(vm.tenantId, id).then(function () {
+                vmh.alertSuccess('notification.SYNC-SUCCESS', true);
+                vm.query();
+            });
         }
     }
 
@@ -63,7 +71,7 @@
 
             vm.load();
         }
-
+        
 
         function doSubmit() {
 

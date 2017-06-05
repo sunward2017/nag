@@ -3106,23 +3106,33 @@
                 resolve: {
                     entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'interface-account.mingzhong$list', {
                         modelName: 'het-doctorAccountOfMingZhong',
-                        searchForm: { "status": 1 },
+                        searchForm: {"status": 1},
                         serverPaging: true,
                         blockUI: true,
                         transTo: {
                             "mingzhong$details": MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'interface-account.mingzhong$details'
                         },
-                        columns: [{
-                            label: '医生账号',
-                            name: 'name',
-                            sortable: false,
-                            width: 120
-                        }, {
-                            label: '',
-                            name: 'actions',
-                            sortable: false,
-                            width: 60
-                        }]
+                        columns: [
+                            {
+                                label: '医生账号',
+                                name: 'name',
+                                sortable: false,
+                                width: 120
+                            },
+                            {
+                                label: '老人列表',
+                                name: 'elderly_users',
+                                type: 'string',
+                                width: 80,
+                                sortable: false
+                            },
+                            {
+                                label: '',
+                                name: 'actions',
+                                sortable: false,
+                                width: 60
+                            }
+                        ]
                     })
                 }
             })

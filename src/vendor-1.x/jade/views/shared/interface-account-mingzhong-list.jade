@@ -26,11 +26,16 @@
                                 label
                                     input(type='checkbox' data="trBubble" ng-model="row.checked" )
                                     span.fa.fa-check(data="trBubble")
-                        td.text-left {{::row.name}}
+                        td {{::row.name}}
+                        td.text-left {{::row.elderly_users|safeArrayMember: 'nickname'}}
                         td
                             .btn-group
                                 a.btn.btn-primary.btn-xs(title="{{'button.EDIT'|translate}}",ng-click="$state.go(vm.transTo.mingzhong$details,{action: 'edit', _id:row._id})")
                                     i.glyphicon.glyphicon-pencil
+                            .btn-group
+                                a.btn.btn-primary.btn-xs(title="{{vm.viewTranslatePath('TITLE-UPDATE-ELDERLY-USERS')|translate}}",ng-click="vm.updateElderlyUsers(row._id)")
+                                    i.glyphicon.glyphicon-refresh
+                                    | {{vm.viewTranslatePath('BTN-UPDATE-ELDERLY-USERS')|translate}}
                     tr(ng-if="vm.paged.length==0")
                         td(colspan="{{utils.noResultsColspan(vm)}}") {{ 'grid.NO-RESULTS' | translate}}
             .panel-footer

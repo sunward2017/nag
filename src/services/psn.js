@@ -6196,6 +6196,26 @@ module.exports = {
                         yield next;
                     };
                 }
+            },
+            /**********************生命体征-铭众医疗*****************************/
+            {
+                method: 'vitalSign$MingZhong$updateElderlyUsers',
+                verb: 'post',
+                url: this.service_url_prefix + "/vitalSign$MingZhong$updateElderlyUsers",
+                handler: function (app, options) {
+                    return function *(next) {
+                        try {
+                            var tenantId = this.request.body.tenantId;
+                            var doctorAccountId = this.request.body.doctorAccountId;
+                            yield app.vital_sign_status.mingzhong$update_elderly_users(tenantId, doctorAccountId);
+                            this.body = app.wrapper.res.default();
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
             }
             /**********************其他*****************************/
 

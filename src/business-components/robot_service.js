@@ -31,7 +31,6 @@ module.exports = {
         var self = this;
         return co(function* () {
             try {
-                var self = this;
                 var ret = yield rp({
                     method: 'POST',
                     url: externalSystemConfig.robot_repository_java.api_url + '/getRobotLogs.do?callback=?',

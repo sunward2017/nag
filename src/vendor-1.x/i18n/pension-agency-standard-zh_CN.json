@@ -1013,7 +1013,9 @@
         "MING_ZHONG_HEALTH_CARE": "铭众医疗"
       },
       "mingzhong$list": {
-        "TITLE": "养老机构-接口账号-铭众医疗-列表"
+        "TITLE": "养老机构-接口账号-铭众医疗-列表",
+        "TITLE-UPDATE-ELDERLY-USERS": "更新该账号管理的老人列表",
+        "BTN-UPDATE-ELDERLY-USERS": "更新老人列表"
       },
       "mingzhong$details": {
         "TITLE": "养老机构-接口账号-铭众医疗-详情",

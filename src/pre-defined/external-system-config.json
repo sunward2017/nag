@@ -10,5 +10,8 @@
   },
   "robot_repository_java": {
     "api_url": "http://120.55.240.188:8093"
+  },
+  "vital_sign_of_minzhong": {
+    "api_url": "http://v23.mcloudlife.com"
   }
 }

@@ -29,6 +29,7 @@
                 USER_MANAGE_DETAILS: 'Shared_UserManageDetailsController',
                 WXACONFIG_GRID: 'Shared_wxaConfigGridController',
                 WXACONFIG_DETAILS: 'Shared_wxaConfigDetailsController',
+                INTERFACE_ACCOUNT_INDEX: 'Shared_interfaceAccountIndexController',
                 OTHERCONFIG_GRID: 'Shared_OtherConfigGridController',
                 OTHERCONFIG_DETAILS: 'Shared_OtherConfigDetailsController'
             },

@@ -130,7 +130,7 @@ module.exports = {
             },
             {
                 method: 'district$fetch',
-                verb: 'get',
+                verb: 'post',
                 url: this.service_url_prefix + "/district/fetch",
                 handler: function (app, options) {
                     return function *(next) {
@@ -154,7 +154,7 @@ module.exports = {
             },
             {
                 method: 'floor$fetch',
-                verb: 'get',
+                verb: 'post',
                 url: this.service_url_prefix + "/floors/fetch",
                 handler: function (app, options) {
                     return function * (next) {
@@ -190,7 +190,7 @@ module.exports = {
             },
             {
                 method: 'room$fetch',
-                verb: 'get',
+                verb: 'post',
                 url: this.service_url_prefix + "/room/fetch",
                 handler: function (app, options) {
                     return function * (next) {
@@ -223,7 +223,7 @@ module.exports = {
             },
             {
                 method: 'elderly$fetch',
-                verb: 'get',
+                verb: 'post',
                 url: this.service_url_prefix + "/elderly/fetch",
                 handler: function (app, options) {
                     return function *(next) {

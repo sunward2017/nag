@@ -3067,6 +3067,33 @@
                     deps: helper.resolveFor2('qiniu', 'qiniu-ng')
                 }
             })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'interface-account', {
+                url: '/interface-account',
+                title: '第三方接口账号',
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                data: {
+                    func_id: MODEL_VARIABLES.BIZ_FUNC_PREFIXS.PENSION_AGENCY + 'INTERFACE-ACCOUNT' //业务系统使用
+                },
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath(MODEL_VARIABLES.HEAD_TEMPLATES.PENSION_AGENCY),
+                        controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER_FOR_TENANT
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div><div class="clearfix"></div>'
+                    }
+                },
+                resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.SHARED + 'interface-account.js')
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'interface-account.index', {
+                url: '/index',
+                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.SHARED + 'interface-account-index.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: MODEL_VARIABLES.CONTROLLER_NAMES.INTERFACE_ACCOUNT_INDEX,
+                resolve: {
+                    instanceVM: helper.buildInstanceVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'interface-account.index')
+                }
+            })
             .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'other-config', {
                 url: '/other-config',
                 title: '其它配置',

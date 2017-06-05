@@ -313,6 +313,11 @@
         "sref": "app.pension-agency.wxa-config.list"
       },
       {
+        "_id": "menu.pension-agency.INTERFACE-ACCOUNT",
+        "name": "接口账号",
+        "sref": "app.pension-agency.interface-account.index"
+      },
+      {
         "_id": "menu.pension-agency.OTHER-CONFIG",
         "name": "其它配置",
         "sref": "app.pension-agency.other-config"

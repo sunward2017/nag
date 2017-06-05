@@ -13,7 +13,7 @@ module.exports = function(ctx,name) {
     else {
         module.isloaded = true;
 
-        var doctorAccountOfMinZhongSchema = new mongoose.Schema({
+        var doctorAccountOfMingZhongSchema = new mongoose.Schema({
             check_in_time: {type: Date, default: Date.now},
             operated_on: {type: Date, default: Date.now},
             status: {type: Number, min: 0, max: 1, default: 1},
@@ -23,11 +23,11 @@ module.exports = function(ctx,name) {
             tenantId: {type: mongoose.Schema.Types.ObjectId}
         });
 
-        doctorAccountOfMinZhongSchema.pre('update', function (next) {
+        doctorAccountOfMingZhongSchema.pre('update', function (next) {
             this.update({}, {$set: {last_check_in_time: new Date()}});
             next();
         });
 
-        return mongoose.model(name, doctorAccountOfMinZhongSchema, name);
+        return mongoose.model(name, doctorAccountOfMingZhongSchema, name);
     }
 }

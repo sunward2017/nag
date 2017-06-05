@@ -7,12 +7,12 @@
 
     angular
         .module('subsystem.pension-agency')
-        .controller('InterfaceAccountController', InterfaceAccountController)
+        .controller('Shared_interfaceAccountIndexController', Shared_interfaceAccountIndexController)
         ;
 
-    InterfaceAccountController.$inject = ['$scope', 'vmh', 'instanceVM'];
+    Shared_interfaceAccountIndexController.$inject = ['$scope', 'vmh', 'instanceVM'];
 
-    function InterfaceAccountController($scope, vmh, vm) {
+    function Shared_interfaceAccountIndexController($scope, vmh, vm) {
         $scope.vm = vm;
 
         init();

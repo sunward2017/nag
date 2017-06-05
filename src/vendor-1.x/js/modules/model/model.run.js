@@ -79,6 +79,8 @@
 
         //het
         modelNode.factory('het-member');
+        modelNode.factory('het-doctorAccountOfMingZhong');
+
     }
 
 })();

@@ -20,6 +20,11 @@ module.exports = function(ctx,name) {
             name: {type: String, required: true}, // 对外部的member_name
             password: {type: String, required: true}, //暂时不hash
             access_token: {type: String}, //
+            elderly_users:[{
+                syncid: {type: String},
+                nickname: {type: String},
+                phone: {type: String}
+            }],
             tenantId: {type: mongoose.Schema.Types.ObjectId}
         });
 

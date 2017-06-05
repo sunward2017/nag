@@ -377,6 +377,7 @@
                         return v && _.contains(self.toDetails, k);
                     });
 
+                    console.log('12121212')
 
                 }
 
@@ -1117,6 +1118,7 @@
 
                     //需要的对象传入，2 通过init(option)传入到entry
                     initOption && (this.removeDialog = initOption.removeDialog);
+
                 }
 
 

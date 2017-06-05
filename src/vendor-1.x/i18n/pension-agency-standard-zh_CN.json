@@ -1011,6 +1011,18 @@
       "index": {
         "TITLE": "养老机构-接口账号",
         "MING_ZHONG_HEALTH_CARE": "铭众医疗"
+      },
+      "mingzhong$list": {
+        "TITLE": "养老机构-接口账号-铭众医疗-列表",
+        "TITLE-UPDATE-ELDERLY-USERS": "更新该账号管理的老人列表",
+        "BTN-UPDATE-ELDERLY-USERS": "更新老人列表"
+      },
+      "mingzhong$details": {
+        "TITLE": "养老机构-接口账号-铭众医疗-详情",
+        "TAB1": "基本信息",
+        "TAB1-LABEL-NAME": "账号名称",
+        "TAB1-PLACEHOLDER-NAME": "13757150212..",
+        "TAB1-LABEL-PASSWORD": "账号密码"
       }
     },
     "other-config": {

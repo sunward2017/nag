@@ -3091,7 +3091,64 @@
                 access_level: AUTH_ACCESS_LEVELS.USER,
                 controller: MODEL_VARIABLES.CONTROLLER_NAMES.INTERFACE_ACCOUNT_INDEX,
                 resolve: {
-                    instanceVM: helper.buildInstanceVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'interface-account.index')
+                    instanceVM: helper.buildInstanceVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'interface-account.index', {
+                        transTo: {
+                            "mingzhong$list": MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'interface-account.mingzhong$list'
+                        }
+                    })
+                }
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'interface-account.mingzhong$list', {
+                url: '/mingzhong$list/:action',
+                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.SHARED + 'interface-account-mingzhong-list.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: MODEL_VARIABLES.CONTROLLER_NAMES.INTERFACE_ACCOUNT_MINGZHONG_GRID,
+                resolve: {
+                    entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'interface-account.mingzhong$list', {
+                        modelName: 'het-doctorAccountOfMingZhong',
+                        searchForm: {"status": 1},
+                        serverPaging: true,
+                        blockUI: true,
+                        transTo: {
+                            "mingzhong$details": MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'interface-account.mingzhong$details'
+                        },
+                        columns: [
+                            {
+                                label: '医生账号',
+                                name: 'name',
+                                sortable: false,
+                                width: 120
+                            },
+                            {
+                                label: '老人列表',
+                                name: 'elderly_users',
+                                type: 'string',
+                                width: 80,
+                                sortable: false
+                            },
+                            {
+                                label: '',
+                                name: 'actions',
+                                sortable: false,
+                                width: 60
+                            }
+                        ]
+                    })
+                }
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'interface-account.mingzhong$details', {
+                url: '/mingzhong$details/:action/:_id',
+                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.SHARED + 'interface-account-mingzhong-details.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: MODEL_VARIABLES.CONTROLLER_NAMES.INTERFACE_ACCOUNT_MINGZHONG_DETAILS,
+                resolve: {
+                    entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'interface-account.mingzhong$details', {
+                        modelName: 'het-doctorAccountOfMingZhong',//18657504708
+                        blockUI: true,
+                        transTo: {
+                            "mingzhong$list": MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'interface-account.mingzhong$list'
+                        }
+                    })
                 }
             })
             .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'other-config', {

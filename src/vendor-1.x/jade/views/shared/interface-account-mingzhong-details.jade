@@ -1,0 +1,24 @@
+form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="vm.doSubmit()")
+    .panel
+        tabset(justified="true")
+            tab(active="vm.tab1.active")
+                tab-heading
+                    | {{ vm.viewTranslatePath('TAB1') | translate}}
+                    span.text-danger(title="{{'validator.FIELD-INVALID'|translate}}" , ng-show="utils.vtab('contentTab1')")
+                        i.glyphicon.glyphicon-minus-sign
+                div#contentTab1
+                    fieldset: .form-group
+                        <!--名称-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-NAME') | translate}}:
+                        .col-md-10
+                            input.form-control(type='text', name='name',ng-model='vm.model.name',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-NAME")|translate}}' ,required='')
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'name','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset: .form-group
+                        <!--密码-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-PASSWORD') | translate}}:
+                        .col-md-10
+                            input.form-control(type='password', name='password',ng-model='vm.model.password',required='')
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'password','required')") {{ "validator.REQUIRED" | translate}}
+    .text-right.mt-lg
+        button.btn.btn-warning(type="button",ng-click="$state.go(vm.transTo.mingzhong$list)") {{'button.CANCEL'|translate}}
+        button.btn.btn-success(type="submit") {{'button.SAVE'|translate}}

@@ -118,8 +118,16 @@ module.exports = {
                 handler: function (app, options) {
                     return function *(next) {
                         try {
-                            var values = app.dictionary.pairs['D3026'];
-                            this.body = app.wrapper.res.rows(values);
+                            // var values = app.dictionary.pairs['D3026'];
+
+                            var rows = [];
+                            app._.each(app.dictionary.pairs['D3026'], function (v, k) {
+                                if (k != 'name') {
+                                    rows.push(app._.defaults(v, {value: k}));
+                                }
+                            });
+
+                            this.body = app.wrapper.res.rows(rows);
                         } catch (e) {
                             self.logger.error(e.message);
                             this.body = app.wrapper.res.error(e);

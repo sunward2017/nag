@@ -37,5 +37,13 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                         .col-md-10
                             input.form-control(type='number',name='pub_assessment_regular_period',ng-model='vm.other_configs.pub_assessment_regular_period',placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-ASSESSMENT_REGULAR_PERIOD")|translate}}',ui-validate="'$value>=1'")
                             span.text-danger(ng-show="utils.vinput(this.theForm,'pub_assessment_regular_period','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset: .form-group
+                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-FLAG-COLLECTION') | translate}}:
+                        .col-md-2
+                            .checkbox.c-checkbox
+                                label
+                                    input#drugInStockExpireDateCheckFlag(type='checkbox',ng-model='vm.other_configs.psn_drug_in_stock_expire_date_check_flag')
+                                    span.fa.fa-check
+                            label(for="drugInStockExpireDateCheckFlag") {{ vm.moduleTranslatePath('TAB1-LABEL-PSN_DRUG_IN_STOCK_EXPIRE_DATE_CHECK_FLAG') | translate}}
     .text-right.mt-lg
         button.btn.btn-success(type="submit") {{'button.SAVE'|translate}}

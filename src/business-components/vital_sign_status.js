@@ -90,14 +90,14 @@ module.exports = {
                 if(!accessToken) {
                     accessToken = yield self._mingzhong$doctor$getAccessToken(account_name);
                 }
-                console.log('-------------333345')
+                // console.log('-------------333345')
                 var ret = yield rp({
                     method: 'POST',
                     url: externalSystemConfig.vital_sign_of_minzhong.api_url + '/doctor/serviceList',
                     form: {access_token: accessToken}
                 });
                 var rows = JSON.parse(ret);
-                console.log('_mingzhong$doctor$serviceList:',rows);
+                // console.log('_mingzhong$doctor$serviceList:',rows);
                 if (rows.errcode) {
                     throw new Error(rows.errcode + ':' + rows.errmsg);
                 }
@@ -130,6 +130,11 @@ module.exports = {
                     if (rows.errcode) {
                         throw new Error(rows.errcode + ':' + rows.errmsg);
                     }
+                    // for(var j=0, jLen = rows.length;j<jLen;j++) {
+                    //     if(rows[j].nickname == '吴铁飞'){
+                    //         console.log(rows[j]);
+                    //     }
+                    // }
                     elderlyUsers = elderlyUsers.concat(rows);
                 }
                 return elderlyUsers;

@@ -50,7 +50,7 @@ module.exports = {
                                     data.where.live_in_flag = true;
                                 }
                                 if (!data.where.begin_exit_flow) {
-                                    data.where.begin_exit_flow = {$in: [false, undefined]};
+                                    data.where.begin_exit_flow = {$ne: true};
                                 }
                             }
                             console.log(data);
@@ -5960,7 +5960,8 @@ module.exports = {
                         yield next;
                     };
                 }
-            }, {
+            },
+            {
                 method: 'inStockAbolish',
                 verb: 'get',
                 url: this.service_url_prefix + "/inStockAbolish/:_id", //:select需要提取的字段域用逗号分割 e.g. name,type
@@ -6003,7 +6004,8 @@ module.exports = {
                         yield next;
                     };
                 }
-            }, {
+            },
+            {
                 method: 'outStock',
                 verb: 'post',
                 url: this.service_url_prefix + "/outStock",
@@ -6097,7 +6099,8 @@ module.exports = {
                         yield next;
                     };
                 }
-            }, {
+            },
+            {
                 method: 'drugOutStockInvalid',
                 verb: 'post',
                 url: this.service_url_prefix + "/drugOutStockInvalid",
@@ -6137,7 +6140,8 @@ module.exports = {
                         yield next;
                     };
                 }
-            }, {
+            },
+            {
                 method: 'drugStockEditLogInsert',
                 verb: 'post',
                 url: this.service_url_prefix + "/drugStockEditLogInsert",
@@ -6179,7 +6183,9 @@ module.exports = {
                         yield next;
                     };
                 }
-            }, {
+            },
+            /**********************生命体征-上海万沣 睡眠带*****************************/
+            {
                 method: 'getLatestSmbPerMinuteRecord',
                 verb: 'post',
                 url: this.service_url_prefix + "/getLatestSmbPerMinuteRecord",
@@ -6197,7 +6203,7 @@ module.exports = {
                     };
                 }
             },
-            /**********************生命体征-铭众医疗*****************************/
+            /**********************生命体征-铭众医疗 一体机*****************************/
             {
                 method: 'vitalSign$MingZhong$updateElderlyUsers',
                 verb: 'post',

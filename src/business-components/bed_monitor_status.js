@@ -48,21 +48,22 @@ module.exports = {
         return co(function* () {
             try {
                 var key = self.CACHE_MODULE + self.CACHE_ITEM_SESSION + '@' + gen_session_key;
-                console.log("getToken1");
+                // console.log("getToken1");
                 if (!self.ctx.cache.get(key)) {
-                    console.log("getToken2");
+                    // console.log("getToken2");
                     var member = yield self.ctx.modelFactory().model_one(self.ctx.models['het_member'], {
-                        select: 'session_id_hzfanweng',
+                        select: 'open_id session_id_hzfanweng',
                         where: {
                             open_id: gen_session_key
                         }
                     });
                     if (member) {
-                        console.log('member exist ', member.session_id_hzfanweng);
+                        console.log('member------------------ ', member);
+                        // console.log('member exist ', member.session_id_hzfanweng);
                         self.ctx.cache.put(key, member.session_id_hzfanweng);
                         return member.session_id_hzfanweng;
                     }
-                    console.log(1234);
+                    // console.log(1234);
                     return null;
                 }
                 return self.ctx.cache.get(key);
@@ -633,6 +634,7 @@ module.exports = {
         return co(function* () {
             try {
                 self.logger.info('userAuthenticate');
+                console.log('userAuthenticate1:', member, token);
                 var ret = yield rp({
                     method: 'POST',
                     url: externalSystemConfig.bed_monitor_status.api_url + '/ECSServer/userws/userAuthenticate.json',
@@ -645,6 +647,7 @@ module.exports = {
                     }
                 });
                 ret = JSON.parse(ret);
+                console.log('userAuthenticate2:', ret);
                 if (ret.retCode == 'success') {
                     self.logger.info('setSession:', member.open_id, ret.retValue);
                     self.setSession(member.open_id, ret.retValue.sessionId);
@@ -815,6 +818,7 @@ module.exports = {
         var channelName = 'psn$bed_monitor_status';
         return co(function* () {
             try {
+                var sessionId;
                 if (self.isExecuting) {
                     console.log('back');
                     return;
@@ -837,13 +841,26 @@ module.exports = {
                 });
 
                 // 保证各个tenant作为member的session
-                var tenantId;
+                var tenantId, tenantMember;
                 for (var i = 0, len = tenantIds.length; i < len; i++) {
                     tenantId = tenantIds[i];
                     var isRegist = yield self.checkIsRegist(tenantId);
                     if (!isRegist) {
-                        var tenantMember = yield self.registByTenatId(tenantId);
+                        tenantMember = yield self.registByTenatId(tenantId);
                         if (tenantMember) {
+                            var token = yield self.getToken(tenantMember.open_id);
+                            yield self.userAuthenticate(tenantMember, token);
+                        }
+                    } else {
+                        tenantMember = yield self.ctx.modelFactory().model_one(self.ctx.models['het_member'], {
+                            where: {
+                                status: 1,
+                                open_id: tenantId
+                            }
+                        });
+
+                        if(tenantMember && !tenantMember.session_id_hzfanweng) {
+                            console.log('tenantMember no session_id_hzfanweng')
                             var token = yield self.getToken(tenantMember.open_id);
                             yield self.userAuthenticate(tenantMember, token);
                         }
@@ -872,7 +889,8 @@ module.exports = {
                 var beginTime, endTime, endDay, beginMoment, endMoment;//定义报警范围的一些变量,20170421,by yrm
 
                 for (var i = 0; i < bedMonitors.length; i++) {
-                    var bedMonitor = bedMonitors[i], key, oldBedStatus, bedStatus, sessionId, tenant, elderly, room;
+                    var bedMonitor = bedMonitors[i], key, oldBedStatus, bedStatus, tenant, elderly, room;
+                    sessionId = yield self.getSession(tenantId);
                     self.ctx.clog.log(self.logger, '>>>>> 睡眠带 >>>>> ' + bedMonitor.name);
 
                     var ret = yield self.getLatestSmbPerMinuteRecord(sessionId, bedMonitor.name);

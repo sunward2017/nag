@@ -31,6 +31,13 @@ module.exports = function(ctx,name) {
                 bedMonitorName: {type: String}
             }],
             tenantId: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'pub_tenant'}
+        }, {
+            toObject: {
+                virtuals: true
+            }
+            , toJSON: {
+                virtuals: true
+            }
         });
 
         roomSchema.pre('update', function (next) {

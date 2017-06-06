@@ -235,9 +235,11 @@ module.exports = {
 
                             var dynamicFilter = {};
                             if(districtId) {
+                                console.log('districtId...')
                                 dynamicFilter['room_value.districtId'] = districtId;
                             }
                             if(floorId) {
+                                console.log('floorId...')
                                 //需要按照
                                 var arrFloorParsed = floorId.split('$');
                                 dynamicFilter['room_value.districtId'] = arrFloorParsed[0];
@@ -248,6 +250,7 @@ module.exports = {
                                     where: {
                                         status: 1,
                                         floor: floor,
+                                        districtId: arrFloorParsed[0],
                                         tenantId: tenantId
                                     }
                                 });
@@ -260,21 +263,22 @@ module.exports = {
                             }
                             
                             if(roomId) {
+                                console.log('roomId...')
                                 dynamicFilter['room_value.roomId'] = roomId;
                             }
-
+                            console.log('dynamicFilter:', dynamicFilter);
                             app._.extend(dynamicFilter, {
                                 status: 1,
                                 tenantId: tenantId,
                                 live_in_flag: true,
-                                begin_exit_flow: {$in: [false, undefined]}
+                                begin_exit_flow: {$ne: true}
                             });
 
                             console.log('dynamicFilter:', dynamicFilter);
 
                             var elderly = yield app.modelFactory().model_query(app.models['psn_elderly'], {
                                 select: 'name room_summary avatar',
-                                where: filter
+                                where: dynamicFilter
                             });
 
                             this.body = app.wrapper.res.rows(elderly);
@@ -406,6 +410,27 @@ module.exports = {
                 }
             },
             {
+                method: 'drug$stock$in',
+                verb: 'post',
+                url: this.service_url_prefix + "/drug/stock/in",
+                handler: function (app, options) {
+                    return function*(next) {
+                        try {
+                            var tenantId = this.request.body.tenantId;
+
+                            console.log("body", this.request.body);
+
+                            this.body = yield app.psn_drug_stock_service.inStock(tenantId, this.request.body);
+
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    }
+                }
+            },
+            {
                 method: 'user$auth',
                 verb: 'post',
                 url: this.service_url_prefix + "/user/auth",
@@ -426,8 +451,13 @@ module.exports = {
                                 return;
                             } else {
                                 var tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], user.tenantId);
-                                var rows = {name: user.name, tenantId: tenant.id, tenantName: tenant.name};
-                                this.body = app.wrapper.res.rows(rows);
+                                var ret = {name: user.name, tenantId: tenant.id, tenant_name: tenant.name };
+                                if(tenant.other_config) {
+                                    ret.drug_in_stock_expire_date_check_flag = !!tenant.other_config.psn_drug_in_stock_expire_date_check_flag;
+                                } else {
+                                    ret.drug_in_stock_expire_date_check_flag = false;
+                                }
+                                this.body = app.wrapper.res.ret(ret);
                             }
 
                         } catch (e) {

@@ -293,6 +293,13 @@
         "TAB1-LABEL-CLASS_TWO": "二类",
         "TAB1-PLACEHOLDER-CLASS_TWO": "儿止咳化痰.."
       }
+    },
+    "data-clear": {
+      "TITLE": "管理中心-平台-数据清理",
+      "LABEL-CLEAR-ELDERLY": "清空某个老人及其相关数据",
+      "PLACEHOLDER-CLEAR-ELDERLY": "老人的_id",
+      "MSG-INVALID-ELDERLYID": "老人_id为空或者是无效的老人格式",
+      "MSG-CLEAR-ELDERLY" : "点击后将清空老人相关的所有数据,是否需要继续?"
     }
   }
 }

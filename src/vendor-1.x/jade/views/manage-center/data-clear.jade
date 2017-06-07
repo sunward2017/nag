@@ -1,0 +1,11 @@
+//
+   Created by zppro on 16-12-2.
+.col-xs-12.text-center
+    .row
+        .col-md-8
+            .input-group.page-search
+                label.input-group-addon {{vm.moduleTranslatePath("LABEL-CLEAR-ELDERLY")|translate}}
+                input.form-control(type="text",placeholder='{{vm.moduleTranslatePath("PLACEHOLDER-CLEAR-ELDERLY")|translate}}' ng-model="vm.clearElderlyId")
+        .col-md-1
+            .btn-group
+                a.btn.btn-danger(ng-click="vm.clearElderly()") {{'button.CLEAR'|translate}}

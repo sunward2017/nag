@@ -279,7 +279,8 @@
                     upgradeAppServerSide: upgradeAppServerSide,
                     upgradeAppClientSide: upgradeAppClientSide,
                     importDrug: importDrug,
-                    syncDrugToTenants: syncDrugToTenants
+                    syncDrugToTenants: syncDrugToTenants,
+                    clearElderly: clearElderly
                 };
 
                 function tenantInfo(tenantId, select) {
@@ -343,6 +344,10 @@
                 
                 function syncDrugToTenants(tenantIds, drugIds) {
                     return $http.post(baseUrl + 'syncDrugToTenants', { tenantIds: tenantIds, drugIds: drugIds });
+                }
+
+                function clearElderly(elderlyId) {
+                    return $http.post(baseUrl + 'clearElderly', { elderlyId: elderlyId});
                 }
             }]
         };

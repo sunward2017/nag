@@ -715,6 +715,24 @@ module.exports = {
                         yield next;
                     };
                 }
+            },
+            {
+                method: 'clearElderly',
+                verb: 'post',
+                url: this.service_url_prefix + "/clearElderly",
+                handler: function (app, options) {
+                    return function *(next) {
+                        try {
+                            var elderlyId = this.request.body.elderlyId;
+                            this.body = yield app.system_helper.clearDataWithElderly(elderlyId);
+                        } catch (e) {
+                            console.log(e);
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
             }
 
         ];

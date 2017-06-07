@@ -144,7 +144,7 @@ module.exports = {
                     return function *(next) {
                         try {
                             var tenantId = this.request.body.tenantId;
-                            var districts = yield app.modelFactory().model_one(app.models['psn_district'], {
+                            var districts = yield app.modelFactory().model_query(app.models['psn_district'], {
                                 select: 'name',
                                 where: {
                                     status: 1,
@@ -322,7 +322,7 @@ module.exports = {
                             if (!psnDrug) {
                                 var pubDrug_json = yield app.modelFactory().model_one(app.models['pub_drug'], {where: {barcode: barcode}});
                                 if (pubDrug_json) {
-                                    var rows = {
+                                    psnDrug = {
                                         barcode: pubDrug_json.barcode, //条形码 added by zppro 2017.5.12
                                         // drug_no: pubDrug_json.approval_no,// 药品编码
                                         full_name: pubDrug_json.name,
@@ -341,8 +341,7 @@ module.exports = {
                                         // drugSourceId: pubDrug_json.id,//关联公共的药品库
                                         tenantId: tenantId //关联机构
                                     };
-                                    // console.log("<<<<<<<", rows)
-                                    this.body = app.wrapper.res.ret(rows);
+                                    this.body = app.wrapper.res.ret(psnDrug);
                                 } else {
                                     this.body = app.wrapper.res.default();
                                 }

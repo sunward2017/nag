@@ -1482,6 +1482,24 @@
                     })
                 }
             })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.MANAGE_CENTER + 'data-clear', {
+                url: '/data-clear',
+                access_level: AUTH_ACCESS_LEVELS.ADMIN,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath(MODEL_VARIABLES.HEAD_TEMPLATES.MANAGE_CENTER),
+                        controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER
+                    },
+                    "module-content": {
+                        templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.MANAGE_CENTER + 'data-clear.html'),
+                        controller: 'DataClearController',
+                        resolve: {
+                            instanceVM: helper.buildInstanceVM(MODEL_VARIABLES.VM_PREFIXS.MANAGE_CENTER + 'data-clear')
+                        }
+                    }
+                }
+                , resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.MANAGE_CENTER + 'data-clear.js')
+            })
             .state('app.manage-center.metadata-dictionary-manage', {
                 url: '/metadata-dictionary-manage',
                 title: '字典管理',

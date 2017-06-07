@@ -109,8 +109,13 @@
     "children": [
       {
         "_id": "menu.manage-center.DRUG",
-        "name": "药品",
+        "name": "药品库",
         "sref": "app.manage-center.drug.list"
+      },
+      {
+        "_id": "menu.manage-center.DATA-CLEAR",
+        "name": "数据清理",
+        "sref": "app.manage-center.data-clear"
       }
     ]
   }

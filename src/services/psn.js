@@ -5874,83 +5874,87 @@ module.exports = {
                         var tenant, elderly, drug;
                         try {
                             var tenantId = this.request.body.tenantId;
-                            var elderlyId = this.request.body.elderlyId;
-                            var elderly_name = this.request.body.elderly_name;
-                            var in_out_quantity = this.request.body.in_out_quantity;
-                            var unit = this.request.body.unit;
-                            var type = this.request.body.type;
-                            var period_validity = this.request.body.period_validity;
+                            var operated_by = this.request.body.operated_by;
+                            var inStockData = this.request.body.inStockData;
+                            this.body = yield app.psn_drug_stock_service.inStock(tenantId, this.request.body);
 
-
-                            var barcode = this.request.body.barcode;
-                            var drug_full_name = this.request.body.drug_full_name;
-                            var vender = this.request.body.vender;
-                            var sourceId = this.request.sourceId;
-
-                            var psnDrug = yield app.modelFactory().model_one(app.models['psn_drugDirectory'], {
-                                where: {
-                                    status: 1,
-                                    tenantId: tenantId,
-                                    barcode: barcode
-                                }
-                            });
-
-                            if (!psnDrug) {
-                                var pubDrug_json = yield app.modelFactory().model_one(app.models['pub_drug'], { where: { barcode: barcode } });
-                                if (pubDrug_json) {
-                                    drug = {
-                                        barcode: pubDrug_json.barcode, //条形码 added by zppro 2017.5.12
-                                        full_name: pubDrug_json.name,
-                                        vender: pubDrug_json.vender,//厂家 added by zppro 2017.5.12
-                                        drugSourceId: pubDrug_json.id,//关联公共的药品库
-                                        tenantId: tenantId //关联机构   
-                                    };
-
-                                    yield app.modelFactory().model_create(app.models['psn_drugDirectory'], drug);
-                                } else {
-                                    drug = {
-                                        barcode: barcode, //条形码 added by zppro 2017.5.12
-                                        name: drug_full_name,
-                                        vender: vender,//厂家 added by zppro 2017.5.12
-                                        tenantId: tenantId //关联机构   
-                                    };
-                                    var pubDrug = yield app.modelFactory().model_create(app.models['pub_drug'], drug);
-                                    drug.drugSourceId = pubDrug.id;
-                                    drug.full_name = drug_full_name;
-                                    yield app.modelFactory().model_create(app.models['psn_drugDirectory'], drug);
-                                }
-                            }
-
-                            var drugStock = yield app.modelFactory().model_one(app.models['psn_drugStock'], {
-                                where: {
-                                    status: 1,
-                                    elderlyId: elderlyId,
-                                    barcode: barcode,
-                                    tenantId: tenantId,
-                                    unit: unit,
-                                    period_validity: { $eq: period_validity },
-                                }
-                            });
-
-
-                            if (!drugStock) {
-
-                                yield app.modelFactory().model_create(app.models['psn_drugStock'], {
-                                    elderlyId: elderlyId,
-                                    elderly_name: elderly_name,
-                                    tenantId: tenantId,
-                                    barcode: barcode,
-                                    period_validity: period_validity,
-                                    drug_full_name: drug_full_name,
-                                    current_quantity: in_out_quantity,
-                                    type: type,
-                                    unit: unit
-                                });
-
-                            } else {
-                                drugStock.current_quantity = parseInt(drugStock.current_quantity) + parseInt(in_out_quantity);
-                                yield drugStock.save();
-                            }
+                            // var elderlyId = this.request.body.elderlyId;
+                            // var elderly_name = this.request.body.elderly_name;
+                            // var in_out_quantity = this.request.body.in_out_quantity;
+                            // var unit = this.request.body.unit;
+                            // var type = this.request.body.type;
+                            // var period_validity = this.request.body.period_validity;
+                            //
+                            //
+                            // var barcode = this.request.body.barcode;
+                            // var drug_full_name = this.request.body.drug_full_name;
+                            // var vender = this.request.body.vender;
+                            // var sourceId = this.request.sourceId;
+                            //
+                            // var psnDrug = yield app.modelFactory().model_one(app.models['psn_drugDirectory'], {
+                            //     where: {
+                            //         status: 1,
+                            //         tenantId: tenantId,
+                            //         barcode: barcode
+                            //     }
+                            // });
+                            //
+                            // if (!psnDrug) {
+                            //     var pubDrug_json = yield app.modelFactory().model_one(app.models['pub_drug'], { where: { barcode: barcode } });
+                            //     if (pubDrug_json) {
+                            //         drug = {
+                            //             barcode: pubDrug_json.barcode, //条形码 added by zppro 2017.5.12
+                            //             full_name: pubDrug_json.name,
+                            //             vender: pubDrug_json.vender,//厂家 added by zppro 2017.5.12
+                            //             drugSourceId: pubDrug_json.id,//关联公共的药品库
+                            //             tenantId: tenantId //关联机构
+                            //         };
+                            //
+                            //         yield app.modelFactory().model_create(app.models['psn_drugDirectory'], drug);
+                            //     } else {
+                            //         drug = {
+                            //             barcode: barcode, //条形码 added by zppro 2017.5.12
+                            //             name: drug_full_name,
+                            //             vender: vender,//厂家 added by zppro 2017.5.12
+                            //             tenantId: tenantId //关联机构
+                            //         };
+                            //         var pubDrug = yield app.modelFactory().model_create(app.models['pub_drug'], drug);
+                            //         drug.drugSourceId = pubDrug.id;
+                            //         drug.full_name = drug_full_name;
+                            //         yield app.modelFactory().model_create(app.models['psn_drugDirectory'], drug);
+                            //     }
+                            // }
+                            //
+                            // var drugStock = yield app.modelFactory().model_one(app.models['psn_drugStock'], {
+                            //     where: {
+                            //         status: 1,
+                            //         elderlyId: elderlyId,
+                            //         barcode: barcode,
+                            //         tenantId: tenantId,
+                            //         unit: unit,
+                            //         period_validity: { $eq: period_validity },
+                            //     }
+                            // });
+                            //
+                            //
+                            // if (!drugStock) {
+                            //
+                            //     yield app.modelFactory().model_create(app.models['psn_drugStock'], {
+                            //         elderlyId: elderlyId,
+                            //         elderly_name: elderly_name,
+                            //         tenantId: tenantId,
+                            //         barcode: barcode,
+                            //         period_validity: period_validity,
+                            //         drug_full_name: drug_full_name,
+                            //         current_quantity: in_out_quantity,
+                            //         type: type,
+                            //         unit: unit
+                            //     });
+                            //
+                            // } else {
+                            //     drugStock.current_quantity = parseInt(drugStock.current_quantity) + parseInt(in_out_quantity);
+                            //     yield drugStock.save();
+                            // }
                             this.body = app.wrapper.res.default();
                         } catch (e) {
                             console.log(e);

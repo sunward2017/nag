@@ -11,7 +11,9 @@
     "CODE_OF_NURSING_RECORD": "psn_nursingRecord$code",
     "BOOKING_TO_TENANT": "booking$tenant",
     "SCENICSPOT": "scenerySpot$code",
-    "ASSESSMENT":"psn_assessment$code"
+    "ASSESSMENT":"psn_assessment$code",
+    "STOCK_IN_CODE":"psn_drugInOutStock$InCode",
+    "STOCK_OUT_CODE":"psn_drugInOutStock$OutCode"
   },
   "KEYS":{
     "SHIPPING_FEE": "shipping_fee"

@@ -23,19 +23,15 @@ module.exports = {
 
         return this;
     },
-    inStock: function (tenantId, inStockData) {
+    inStock: function (tenantId, inStockData, operated_by, open_id) {
         var self = this;
         return co(function *() {
             try {
-                var tenant, drug, elderly;
+                var tenant, drugData, drugObject, elderly;
                 
                 tenant = yield self.ctx.modelFactory().model_read(self.ctx.models['pub_tenant'], tenantId);
                 if (!tenant || tenant.status == 0) {
                     return self.ctx.wrapper.res.error({ message: '无法找到养老机构' });
-                }
-                drug = yield self.ctx.modelFactory().model_read(self.ctx.models['psn_drugDirectory'], inStockData.drugId);
-                if (!drug || drug.status == 0) {
-                    return self.ctx.wrapper.res.error({ message: '无效的入库药品' });
                 }
                 elderly = yield self.ctx.modelFactory().model_read(self.ctx.models['psn_elderly'], inStockData.elderlyId);
                 if (!elderly || elderly.status == 0) {
@@ -44,56 +40,101 @@ module.exports = {
                 if (!elderly.live_in_flag || elderly.begin_exit_flow) {
                     return self.ctx.wrapper.res.error({ message: '当前老人不在院或正在办理出院手续，无法入库' });
                 }
-                
-                //设置最小使用单位
-                console.log('检查最小使用单位...');
-                if (!drug.mini_unit) {
-                    console.log('没有设置最小使用单位,入库时设置')
-                    drug.mini_unit = inStockData.mini_unit;
-                    yield drug.save();
-                } else {
-                    if (drug.mini_unit != inStockData.mini_unit) {
-                        return self.ctx.wrapper.res.error({ message: '入库药品的最小使用单位与药品库不一致，无法入库' });
+                var drugs = inStockData.drugs;
+                if(!drugs | drugs.length == 0) {
+                    return self.ctx.wrapper.res.error({ message: '无法提供入库药品数据' });
+                }
+                var drugIds = self.ctx._.map(drugs, (o) => {
+                    return o.drugId;
+                });
+                var drugObjects = yield self.ctx.modelFactory().model_query(self.ctx.models['psn_drugDirectory'], {
+                    select: 'full_name short_name',
+                    where: {
+                        status: 1,
+                        _id: {$in: drugIds}
                     }
+                });
+
+                if(drugs.length != drugObjects.length) {
+                    return self.ctx.wrapper.res.error({ message: '入库药品中包含无效的药品记录' });
                 }
 
                 var expire_date_check_flag = false;
                 if(tenant.other_config) {
                     expire_date_check_flag = !!tenant.other_config.psn_drug_in_stock_expire_date_check_flag;
                 }
-                if(expire_date_check_flag) {
-                    console.log('需要检查效期...');
-                    if (!inStockData.expire_in) {
-                        return self.ctx.wrapper.res.error({ message: '入库药品的需要输入有效期，无法入库' });
+
+                console.log('新增入库记录...');
+                for (var i=0,len=drugs.length;i<len;i++) {
+                    drugData = drugs[i];
+                    drugObject = self.ctx._.find(drugObjects, (o)=>{
+                        return o.id == drugData.drugId;
+                    });
+
+                    if (expire_date_check_flag) {
+                        drugData.expires_in = expire_date_check_flag ? self.ctx.moment(drugData.expire_in) : undefined;
+                    }
+
+                    console.log('设置药品...',i);
+                    drugData.drug_name = drugObject.short_name || drugObject.full_name;
+
+                    if(expire_date_check_flag) {
+                        console.log('需要检查效期...');
+                        if (!drugData.expire_in) {
+                            return self.ctx.wrapper.res.error({ message: '入库药品的需要输入有效期，无法入库' });
+                        }
+                    }
+
+                    console.log('检查最小使用单位...',i);
+                    if (!drugObject.mini_unit) {
+                        console.log('没有设置最小使用单位,入库时设置')
+                        drugObject.mini_unit = drugData.mini_unit;
+                        yield drugObject.save();
+                    } else {
+                        if (drugObject.mini_unit != drugData.mini_unit) {
+                            return self.ctx.wrapper.res.error({message: '入库药品的最小使用单位与药品库不一致，无法入库:' + drugData.drug_name});
+                        }
+                    }
+
+                    console.log('检查数量...',i);
+                    if (drugData.quantity == 0) {
+                        return self.ctx.wrapper.res.error({message: '入库药品的数量为0，无法入库:' + drugData.drug_name});
                     }
                 }
 
-
-                console.log('新增入库记录...');
                 var drugInStock = yield self.ctx.modelFactory().model_create(self.ctx.models['psn_drugInOutStock'], {
+                    code: self.ctx.modelVariables.SERVER_GEN,
+                    operated_by: operated_by,
+                    mode: inStockData.mode,
                     type: inStockData.type,
                     elderlyId: inStockData.elderlyId,
                     elderly_name: elderly.name,
-                    drugId: inStockData.drugId,
-                    drug_name: drug.short_name || drug.full_name,
-                    quantity: inStockData.quantity,
-                    mini_unit: inStockData.mini_unit,
-                    expire_in: expire_date_check_flag ? self.ctx.moment(inStockData.expire_in) : undefined,
+                    drugs: drugs,
+                    open_id: open_id,
                     tenantId: tenantId
                 });
 
                 console.log('更新库存...');
-                var drugStock = yield self.ctx.modelFactory().model_create(self.ctx.models['psn_drugStock'], {
-                    elderlyId: drugInStock.elderlyId,
-                    elderly_name: drugInStock.elderly_name,
-                    drugId: drugInStock.drugId,
-                    drug_name: drugInStock.drug_name,
-                    quantity: drugInStock.quantity,
-                    mini_unit: drugInStock.mini_unit,
-                    expire_in: drugInStock.expire_in,
-                    drugInStockId: drugInStock._id,
-                    tenantId: tenantId
+                var drugStockRows = [], drug;
+                for(var i=0,len=drugInStock.drugs.length;i<len;i++) {
+                    drug = drugInStock.drugs[i];
+                    drugStockRows.push({
+                        elderlyId: drugInStock.elderlyId,
+                        elderly_name: drugInStock.elderly_name,
+                        drugId: drug.drugId,
+                        drug_name: drug.drug_name,
+                        quantity: drug.quantity,
+                        mini_unit: drug.mini_unit,
+                        expire_in: drug.expire_in,
+                        drugInStockId: drugInStock._id,
+                        tenantId: tenantId
+                    })
+                }
+
+                yield self.ctx.modelFactory().model_bulkInsert(self.ctx.models['psn_drugStock'], {
+                    rows: drugStockRows
                 });
+
                 return self.ctx.wrapper.res.default();
             }
             catch (e) {

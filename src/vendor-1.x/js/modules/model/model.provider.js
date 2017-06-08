@@ -734,8 +734,8 @@
                     return $http.post(baseUrl + 'leaveAccompanierSyncElderlyFamilyMembers/' + leaveId);
                 }
 
-                function drugInStock(data) {
-                    return $http.post(baseUrl + 'inStock', data);
+                function drugInStock(tenantId, operated_by, inStockData) {
+                    return $http.post(baseUrl + 'inStock', inStockData);
                 }
                 function drugOutStock(tenantId, elderlyId, drugId, in_out_quantity, type, unit) {
                     return $http.post(baseUrl + 'outStock', { tenantId: tenantId, elderlyId: elderlyId, drugId: drugId, in_out_quantity: in_out_quantity, type: type, unit: unit });

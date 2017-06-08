@@ -367,47 +367,39 @@ module.exports = {
                             // console.log("request", this.request.body.drug);
                             var drug = this.request.body.drug;
                             var barcode = drug.barcode;
-                            var stock = yield app.modelFactory().model_one(app.models['psn_drugDirectory'], {where: {barcode: barcode}});
-                            var pubDrug = yield app.modelFactory().model_one(app.models['pub_drug'], {where: {barcode: barcode}});
-                            if (!pubDrug) {
-                                yield app.modelFactory().model_create(app.models['pub_drug'], {
-                                    barcode: drug.barcode,
-                                    img: drug.img,
-                                    name: drug.full_name,
-                                    reference_price: drug.price,
-                                    vender: drug.vender,
-                                    dosage_form: drug.dosage_form,
-                                    short_name: drug.short_name,
-                                    alias: drug.alias,
-                                    english_name: drug.english_name,
-                                    specification: drug.special_individuals,
-                                    usage: drug.usage,
-                                    indications_function: drug.indications_function,
-                                    otc_flag: drug.otc_flag,
-                                    medical_insurance_flag: drug.health_care_flag
-                                });
-                            }
+                            var drugDirectory = yield app.modelFactory().model_one(app.models['psn_drugDirectory'], {where: {barcode: barcode}});
 
-                            var img = drug.img;
-                            if (img) {
-                                if (pubDrug) {
-                                    pubDrug.img = img;
-                                    yield pubDrug.save();
+                            if(!drugDirectory) {
+                                //本地库不存在
+                                var pubDrug = yield app.modelFactory().model_one(app.models['pub_drug'], {where: {barcode: barcode}});
+                                if (!pubDrug) {
+                                    pubDrug = yield app.modelFactory().model_create(app.models['pub_drug'], {
+                                        barcode: drug.barcode,
+                                        img: drug.img,
+                                        name: drug.full_name,
+                                        reference_price: drug.price,
+                                        vender: drug.vender,
+                                        dosage_form: drug.dosage_form,
+                                        short_name: drug.short_name,
+                                        alias: drug.alias,
+                                        english_name: drug.english_name,
+                                        specification: drug.special_individuals,
+                                        usage: drug.usage,
+                                        indications_function: drug.indications_function,
+                                        otc_flag: drug.otc_flag,
+                                        medical_insurance_flag: drug.health_care_flag
+                                    });
                                 }
-                            }
-
-                            if (stock) {
-                                yield app.modelFactory().model_update(app.models['psn_drugDirectory'], stock.id, drug);
-                                var msg = "药品入库更新成功"
-                                this.body = app.wrapper.res.ret({success: true, exec: 201, msg: msg});
-
+                                drug.drugSourceId = pubDrug._id;
+                                drugDirectory = yield app.modelFactory().model_create(app.models['psn_drugDirectory'], drug);
                             } else {
-                                yield app.modelFactory().model_create(app.models['psn_drugDirectory'], drug);
-                                var msg = "药品入库新增成功"
-                                this.body = app.wrapper.res.ret({success: true, exec: 200, msg: msg});
+                                yield app.modelFactory().model_update(app.models['psn_drugDirectory'], drugDirectory.id, drug);
                             }
-
-
+                            if(drug.img) {
+                                pubDrug.img = drug.img;
+                                yield pubDrug.save();
+                            }
+                            this.body = app.wrapper.res.ret(drugDirectory._id);
                         } catch (e) {
                             self.logger.error(e.message);
                             this.body = app.wrapper.res.error(e);
@@ -424,10 +416,48 @@ module.exports = {
                     return function*(next) {
                         try {
                             var tenantId = this.request.body.tenantId;
+                            var operated_by = this.request.body.userId;
+                            var openid = this.openid;
+                            var inStockData = this.request.body.inStockData;
 
                             console.log("body", this.request.body);
 
-                            this.body = yield app.psn_drug_stock_service.inStock(tenantId, this.request.body);
+                            this.body = yield app.psn_drug_stock_service.inStock(tenantId, inStockData, operated_by, openid);
+
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    }
+                }
+            },
+            {
+                method: 'drug$stockin$fetch',
+                verb: 'post',
+                url: this.service_url_prefix + "/drug/stockin/fetch",
+                handler: function (app, options) {
+                    return function*(next) {
+                        try {
+                            var tenantId = this.request.body.tenantId;
+                            var operated_by = this.request.body.userId;
+                            var openid = this.openid;
+                            var page = this.request.body.page;
+
+                            var drugInOutStocks = yield app.modelFactory().model_query(app.models['psn_drugInOutStock'], {
+                                select: 'check_in_time code drugId drug_name elderly_name quantity mini_unit',
+                                where: {
+                                    status: 1,
+                                    tenantId: tenantId,
+                                    operated_by: operated_by,
+                                    open_id: openid
+                                },
+                                sort:{
+                                    check_in_time: -1
+                                }
+                            }, {skip: page.skip, limit: page.size}).populate('drugId', 'img');
+
+                            this.body = app.wrapper.res.rows(drugInOutStocks);
 
                         } catch (e) {
                             self.logger.error(e.message);
@@ -458,7 +488,7 @@ module.exports = {
                                 return;
                             } else {
                                 var tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], user.tenantId);
-                                var ret = {name: user.name, tenantId: tenant.id, tenant_name: tenant.name };
+                                var ret = {id: user._id, name: user.name, tenantId: tenant.id, tenant_name: tenant.name };
                                 if(tenant.other_config) {
                                     ret.drug_in_stock_expire_date_check_flag = !!tenant.other_config.psn_drug_in_stock_expire_date_check_flag;
                                 } else {

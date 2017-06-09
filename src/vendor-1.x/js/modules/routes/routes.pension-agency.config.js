@@ -1968,11 +1968,11 @@
                 resolve: {
                     entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'drug-in-stock.list', {
                         modelName: 'psn-drugInOutStock',
-                        searchForm: { "status": 1, "in_out_type": 1 },
+                        searchForm: { "status": 1, "type": {$in: ['A0001', 'A0003', 'A0005', 'A0099']} },
                         serverPaging: true,
                         columns: [{
                             label: '出入库单',
-                            name: 'in_out_no',
+                            name: 'code',
                             type: 'string',
                             width: 60,
                             sortable: true
@@ -1983,41 +1983,21 @@
                             width: 60,
                             sortable: true
                         }, {
-                            label: '药品条形码',
-                            name: 'barcode',
+                            label: '药品',
+                            name: 'drugs',
                             type: 'string',
-                            width: 80,
+                            width: 120,
                             sortable: true
                         }, {
-                            label: '药品名称',
-                            name: 'drug_full_name',
+                            label: '入库类别',
+                            name: 'type_name',
                             type: 'string',
                             width: 60,
-                            sortable: true
-                        }, {
-                            label: '药品来源',
-                            name: 'type',
-                            type: 'string',
-                            width: 100,
-                            formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D3014/object'),
                             sortable: false
                         }, {
-                            label: '入库数量',
-                            name: 'in_out_quantity',
-                            type: 'number',
-                            width: 80,
-                            sortable: true
-                        }, {
-                            label: '最小包装',
-                            name: 'unit',
+                            label: '入库方式',
+                            name: 'mode_name',
                             type: 'string',
-                            width: 60,
-                            formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D3013/object'),
-                            sortable: false
-                        }, {
-                            label: '是否有效',
-                            name: 'valid_flag',
-                            type: 'bool',
                             width: 60,
                             sortable: false
                         }, {
@@ -2038,10 +2018,9 @@
                 resolve: {
                     entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'drug-in-stock.details', {
                         modelName: 'psn-drugInOutStock',
-                        model: {},
+                        model: {type: 'A0003', mode: 'A0003', drugs: []},
                         blockUI: true
-                    }),
-                    deps: helper.resolveFor2('angucomplete-alt')
+                    })
                 }
             })
             .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'drug-out-stock', {

@@ -89,7 +89,8 @@ module.exports = {
 
             var arrLiveIns = yield  self.ctx.modelFactory().model_totals(self.ctx.models['psn_roomOccupancyChangeHistory'], {
                 tenantId: tenant._id,
-                in_flag: true
+                in_flag: true,
+                check_out_time: {$exists: false}
             });
             var liveins = arrLiveIns.length;
 

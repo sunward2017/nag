@@ -18,7 +18,7 @@
             restrict: 'EA',
             templateUrl: 'backfiller-default-render.html',
             link: link,
-            scope: {readonly:'=', inputName:'@', onSearch:"&", page: "=", pickerIcon: '@', pickerTitle: '@', pickerClass:'@', fetchColumns: '=', fetchRows: '=', onSelect: '&', onCompareEqual:'&', model: '=ngModel'}
+            scope: {readonly:'=', inputName:'@', onSearch:"&", page: "=", required:"=", pickerIcon: '@', pickerTitle: '@', pickerClass:'@', fetchColumns: '=', fetchRows: '=', onSelect: '&', onCompareEqual:'&', model: '=ngModel'}
         };
         return directive;
 
@@ -49,6 +49,7 @@
             console.log('pickerDialogClass:', pickerDialogClass)
 
             console.log('pickerController', pickerController);
+            console.log('required:', scope.required);
 
             scope.$watch("fetchRows",function(newValue,oldValue) {
                 if (newValue != oldValue) {

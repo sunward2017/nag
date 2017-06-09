@@ -522,6 +522,8 @@
                     drugUseItemRemove:drugUseItemRemove,
                     drugQueryAll: drugQueryAll,
                     drugInStock: drugInStock,
+                    stockInRecordCheck: stockInRecordCheck,
+                    updateInStock: updateInStock,
                     drugOutStock: drugOutStock,
                     drugOutStockInvalid: drugOutStockInvalid,
                     drugStockEditLogInsert: drugStockEditLogInsert,
@@ -734,9 +736,25 @@
                     return $http.post(baseUrl + 'leaveAccompanierSyncElderlyFamilyMembers/' + leaveId);
                 }
 
-                function drugInStock(data) {
-                    return $http.post(baseUrl + 'inStock', data);
+                function drugInStock(tenantId, operated_by, inStockData) {
+                    return $http.post(baseUrl + 'inStock', {tenantId: tenantId, operated_by: operated_by, inStockData: inStockData});
                 }
+
+                function stockInRecordCheck(tenantId, drugInOutStockId) {
+                    return $http.post(baseUrl + 'stockInRecordCheck', {tenantId: tenantId, drugInOutStockId: drugInOutStockId});
+                }
+
+                function updateInStock(tenantId, drugInOutStockId, operated_by, model, drugs_to_remove) {
+                    var inStockData;
+                    if(drugs_to_remove.length>0){
+                        inStockData = _.extend({}, model);
+                        inStockData.drugs = inStockData.drugs.concat(drugs_to_remove);
+                    } else {
+                        inStockData = model;
+                    }
+                    return $http.post(baseUrl + 'updateInStock', {tenantId: tenantId, drugInOutStockId: drugInOutStockId, operated_by: operated_by, inStockData: inStockData});
+                }
+
                 function drugOutStock(tenantId, elderlyId, drugId, in_out_quantity, type, unit) {
                     return $http.post(baseUrl + 'outStock', { tenantId: tenantId, elderlyId: elderlyId, drugId: drugId, in_out_quantity: in_out_quantity, type: type, unit: unit });
                 }

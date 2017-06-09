@@ -251,6 +251,7 @@
             changeProperyName: changeProperyName,
             unescapeHTML: unescapeHTML,
             safeArrayMember: safeArrayMember,
+            safeArrayTemplate: safeArrayTemplate,
             indexObj: indexObj,
             getPropertyCount: getPropertyCount,
             getPropery: getPropery,
@@ -324,6 +325,19 @@
             return arr.map(function (o) {
                 return o[key] || ''
             }).join()
+        }
+
+        /// templateStr = '{drug_name} x {quantity} {mini_unit_name}'
+        function safeArrayTemplate(arr, templateStr) {
+            if (!arr || !angular.isArray(arr) || arr.length === 0)
+                return '';
+
+            var keyRegex = /\{([^}|\s]+)\}/gi;
+            return arr.map(function (o, index) {
+                return templateStr.replace(keyRegex, function (match, p) {
+                        return o[p];
+                    });
+            }).join('<br/>')
         }
 
         function indexObj(obj,k) {

@@ -14,7 +14,7 @@
 
     function backfillerRun($templateCache) {
         var templateContent = '<div class="input-group">\
-            <input type="text" name="{{formName}}" class="form-control" ng-model="text"/>\
+            <input type="text" name="{{formName}}" class="form-control" ng-model="text"  ng-required="{{required}}" />\
             <span class="input-group-btn"><button type="button" class="btn btn-primary" ng-click="pick()" >\
             <i class="glyphicon " ng-class="icon"></i></button></span></div>';
         $templateCache.put("backfiller-default-render.html",templateContent);

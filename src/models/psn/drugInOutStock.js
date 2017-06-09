@@ -24,13 +24,6 @@ module.exports = function(ctx,name) {
             quantity:{type:Number, required: true},//最小使用单位 出入库数量
             mini_unit: {type: String, minlength: 5, maxlength: 5, required: true, enum: ctx._.rest(ctx.dictionary.keys["D3026"])},
             expire_in: {type: Date}, //效期 入库记录根据配置使用,出库记录为undefined
-        });
-
-        drugInSubDocSchema.virtual('mini_unit_name').get(function () {
-            if (this.mini_unit) {
-                return D3026[this.mini_unit].name;
-            }
-            return '';
         }, {
             toObject: {
                 virtuals: true
@@ -38,6 +31,13 @@ module.exports = function(ctx,name) {
             , toJSON: {
                 virtuals: true
             }
+        });
+
+        drugInSubDocSchema.virtual('mini_unit_name').get(function () {
+            if (this.mini_unit) {
+                return D3026[this.mini_unit].name;
+            }
+            return '';
         });
 
         var drugInOutStockSchema = new mongoose.Schema({

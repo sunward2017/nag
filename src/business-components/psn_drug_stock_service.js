@@ -144,6 +144,150 @@ module.exports = {
             }
         }).catch(self.ctx.coOnError);
     },
+    stockInRecordCheck: function (tenantId, drugInOutStockId) {
+        var self = this;
+        return co(function *() {
+            try {
+
+                var drugInOutStock = yield self.ctx.modelFactory().model_read(self.ctx.models['psn_drugInOutStock'], drugInOutStockId);
+                if (!drugInOutStock || drugInOutStock.status == 0) {
+                    return self.ctx.wrapper.res.error({ message: '入库记录不存在或已失效' });
+                }
+                var drugsInStock = yield self.ctx.modelFactory().model_query(self.ctx.models['psn_drugStock'], {
+                    select: 'drugId drug_name quantity mini_unit expire_in',
+                    where: {
+                        status: 1,
+                        drugInStockId: drugInOutStockId,
+                        tenantId: tenantId
+                    }
+                });
+
+                var drugsStockStatus = {}, drugsInRecord = drugInOutStock.drugs, drugInRecord, drugInStock;
+                for (var i=0,len = drugsInRecord.length;i<len;i++) {
+                    drugInRecord = drugsInRecord[i];
+                    drugInStock = self.ctx._.find(drugsInStock, (o)=>{return o.drugId.toString() == drugInRecord.drugId.toString();});
+                    if(!drugInStock){
+                        drugsStockStatus[drugInRecord.drugId] = false;
+                    } else {
+                        drugsStockStatus[drugInRecord.drugId] = drugInRecord.quantity == drugInStock.quantity;
+                    }
+                }
+
+                return self.ctx.wrapper.res.ret(drugsStockStatus);
+            }
+            catch (e) {
+                console.log(e);
+                self.logger.error(e.message);
+                return self.ctx.wrapper.res.error(e.message);
+            }
+        }).catch(self.ctx.coOnError);
+    },
+    updateInStock: function (tenantId, drugInOutStockId, inStockData, operated_by) {
+        var self = this;
+        return co(function *() {
+            try {
+
+                var drugInOutStock = yield self.ctx.modelFactory().model_read(self.ctx.models['psn_drugInOutStock'], drugInOutStockId);
+                if (!drugInOutStock || drugInOutStock.status == 0) {
+                    return self.ctx.wrapper.res.error({ message: '入库记录不存在或已失效' });
+                }
+
+                drugInOutStock.type = inStockData.type;
+                drugInOutStock.mode = inStockData.mode;
+                if(operated_by) {
+                    drugInOutStock.operated_by = operated_by;
+                }
+
+                var drugsInStock = yield self.ctx.modelFactory().model_query(self.ctx.models['psn_drugStock'], {
+                    select: 'drugId drug_name quantity mini_unit expire_in',
+                    where: {
+                        status: 1,
+                        drugInStockId: drugInOutStockId,
+                        tenantId: tenantId
+                    }
+                });
+
+                var drugsInRecord = drugInOutStock.drugs, drugs = inStockData.drugs, drugInRecordIndex, drug, drugInStockIndex, drugInStock;
+                var toAddStockDrugs = [], toModifyStockDrugs = [], toRemoveStockDrugIds = [];
+                for (var i=0,len = drugs.length;i<len;i++) {
+                    drug = drugs[i];
+                    drugInRecordIndex = self.ctx._.findIndex(drugsInRecord, (o)=>{
+                        return o.drugId.toString() == drug.drugId;
+                    });
+                    drugInStockIndex = self.ctx._.findIndex(drugsInStock, (o)=>{return o.drugId.toString() == drug.drugId;});
+                    if(drug.to_action == 'a') {
+                        console.log('药品新增进入库记录', drug.drug_name);
+                        if(drugInRecordIndex == -1) {
+                            drugsInRecord.push(drug);
+                        }
+                        if(drugInStockIndex == -1) {
+                            drugInStock = self.ctx._.extend({
+                                elderlyId: drugInOutStock.elderlyId,
+                                elderly_name: drugInOutStock.elderly_name,
+                                drugInStockId: drugInOutStockId,
+                                tenantId: tenantId}, drug);
+                            toAddStockDrugs.push(drugInStock);
+                        }
+                    } else if(drug.to_action == 'm') {
+                        console.log('在入库记录中的药品信息修改', drug.drug_name);
+                        if(drugInRecordIndex != -1) {
+                            drugsInRecord[drugInRecordIndex].quantity = drug.quantity;
+                            drugsInRecord[drugInRecordIndex].mint_unit = drug.mint_unit;
+                            drugsInRecord[drugInRecordIndex].expire_in = drug.expire_in;
+                        }
+
+                        if(drugInStockIndex != -1) {
+                            drugsInStock[drugInStockIndex].quantity = drug.quantity;
+                            drugsInStock[drugInStockIndex].mint_unit = drug.mint_unit;
+                            drugsInStock[drugInStockIndex].expire_in = drug.expire_in;
+                            toModifyStockDrugs.push(drugsInStock[drugInStockIndex]);
+                        }
+
+                    } else if(drug.to_action == 'r') {
+                        console.log('从入库记录中将药品信息删除', drug.drug_name);
+                        if(drugInRecordIndex != -1) {
+                            drugsInRecord.splice(drugInRecordIndex, 1);
+                        }
+                        if (drugInStockIndex != -1) {
+                            toRemoveStockDrugIds.push(drug.drugId);
+                        }
+                    }
+                }
+
+                console.log('drugInOutStock.drugs:', drugInOutStock.drugs);
+                console.log('修改入库记录...');
+                yield drugInOutStock.save();
+
+                console.log('更新库存(增加)...');
+                if(toAddStockDrugs.length> 0) {
+                    yield self.ctx.modelFactory().model_bulkInsert(self.ctx.models['psn_drugStock'], {
+                        rows: toAddStockDrugs
+                    })
+                }
+
+                console.log('更新库存(修改)...');
+                for (var i=0, len=toModifyStockDrugs.length;i<len;i++) {
+                    yield toModifyStockDrugs[i].save();
+                }
+
+                console.log('更新库存(删除)...');
+                if(toRemoveStockDrugIds.length > 0) {
+                    yield self.ctx.modelFactory().model_bulkDelete(self.ctx.models['psn_drugStock'],  {
+                        drugId: {$in: toRemoveStockDrugIds},
+                        drugInStockId: drugInOutStockId,
+                        tenantId: tenantId
+                    });
+                }
+                
+                return self.ctx.wrapper.res.default();
+            }
+            catch (e) {
+                console.log(e);
+                self.logger.error(e.message);
+                return self.ctx.wrapper.res.error(e.message);
+            }
+        }).catch(self.ctx.coOnError);
+    },
     outStock: function (tenantId, outStockData) {
         var self = this;
         return co(function *() {

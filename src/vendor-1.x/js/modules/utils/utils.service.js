@@ -332,14 +332,12 @@
             if (!arr || !angular.isArray(arr) || arr.length === 0)
                 return '';
 
-            var keys = [];
-            var keyRegex = /\{([^}|\s]+)\}/;
-            // var groups = templateStr.match(keyRegex);
-            // console.log()
-
-            return arr.map(function (o) {
-                return templateStr.replace(/\{([^}|\s]+)\}/gi, '$1');
-            }).join()
+            var keyRegex = /\{([^}|\s]+)\}/gi;
+            return arr.map(function (o, index) {
+                return templateStr.replace(keyRegex, function (match, p) {
+                        return o[p];
+                    });
+            }).join('<br/>')
         }
 
         function indexObj(obj,k) {

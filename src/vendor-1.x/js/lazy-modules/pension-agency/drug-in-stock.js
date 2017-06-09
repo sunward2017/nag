@@ -19,28 +19,12 @@
 
         $scope.vm = vm;
         $scope.utils = vmh.utils.g;
-        vm.abolish = abolish;
 
         init();
 
         function init() {
             vm.init({ removeDialog: ngDialog });
             vm.query();
-        }
-
-        function abolish(row) {
-            if (!row.valid_flag) return;
-            vm.removeDialog.openConfirm({
-                template: 'normalConfirmDialog.html',
-                className: 'ngdialog-theme-default'
-            }).then(function () {
-
-                vmh.psnService.instockAbolish(row._id)
-                    .then(function (ret) {
-                        vmh.alertSuccess(vm.viewTranslatePath('SYNC_FAMILY_MEMBERS_SUCCESS'), true);
-                        vm.query();
-                    });
-            })
         }
     }
     DrugInstockDetailsController.$inject = ['$scope', 'ngDialog', 'vmh', 'entityVM'];
@@ -60,13 +44,17 @@
             vm.doSubmit = doSubmit;
             vm.addDrugInStock = addDrugInStock;
             vm.editDrugInStock = editDrugInStock;
-
+            vm.removeDrugInStock = removeDrugInStock;
+            vm.selectAll = selectAll;
+            vm.checkDrugsListChanged = checkDrugsListChanged;
 
             vm.searchElderlyForBackFiller = searchElderlyForBackFiller;
             vm.selectElderlyForBackFiller = selectElderlyForBackFiller;
             vm.queryElderlyPromise = queryElderly();
 
             vm.tab1 = { cid: 'contentTab1' };
+
+            vm.drugs_to_remove = [];
 
             vmh.parallel([
                 vmh.shareService.d('D1006'),
@@ -87,13 +75,19 @@
 
                 vm.selectBinding.types = _.filter(results[1], function(o){ return o.value.substr(0,1) == 'A';});
                 vm.selectBinding.mini_units = results[2];
-                vm.selectBinding.modes =  _.filter(results[3], function(o){ return o.value == 'A0003';});
+                vm.selectBinding.modes =  results[3];
 
             })
 
             vm.load().then(function () {
                 if (vm.model.elderlyId) {
                     vm.selectedElderly = { _id: vm.model.elderlyId, name: vm.model.elderly_name };
+                }
+
+                if(vm.model.id) {
+                    vmh.psnService.stockInRecordCheck(vm.tenantId, vm.model.id).then(function(ret) {
+                        vm.drugsStockStatus = ret;
+                    });
                 }
             });
 
@@ -117,23 +111,75 @@
                 }
             }).closePromise.then(function (ret) {
                 if(ret.value!='$document' && ret.value!='$closeButton' && ret.value!='$escape' ) {
-                    addDrugToList(ret.value);
+                    if (vm._action_ == 'add') {
+                        syncToDrugListWhenAdd(ret.value);
+                    } else {
+                        syncToDrugListWhenEdit(ret.value);
+                    }
                 }
             });
         }
         
-        function addDrugToList(drug) {
+        function selectAll() {
+            var drugs = vm.model.drugs;
+            for(var i=0,len=drugs.length;i<len;i++) {
+                drugs[i].checked = vm.all;
+            }
+        }
+
+        function removeDrugInStock() {
+            console.log('removeDrugInStock:');
+            var drugs = vm.model.drugs;
+            var selectedDrugs = _.filter(drugs, function (o) {
+               return o.checked;
+            });
+            if (selectedDrugs.length == 0) {
+                vmh.alertWarning('notification.SELECT-NONE-WARNING', true);
+                return;
+            }
+ 
+            _.each(selectedDrugs, function (drug) {
+                console.log('drug:', drug);
+                if(drug.id) {
+                    drug.to_action = 'r';
+                    vm.drugs_to_remove.push(drug);
+                }
+                var index = _.indexOf(drugs, drug);
+                if (index != -1) {
+                    drugs.splice(index, 1);
+                }
+            });
+        }
+        
+        function checkDrugsListChanged () {
+            return vm.drugs_to_remove.length > 0 || _.filter(vm.model.drugs, function(o){
+               return !!o.to_action;
+            }).length > 0;
+        }
+        
+        function syncToDrugListWhenAdd(drug) {
+            var drugs = vm.model.drugs;
+            var drugExist = _.find(drugs, function (o) {
+                return o.drugId == drug.drugId;
+            });
+            if (!drugExist) {
+                vm.model.drugs.push(drug);
+            }
+        }
+        function syncToDrugListWhenEdit(drug) {
             var drugs = vm.model.drugs;
             var drugExist = _.find(drugs, function (o) {
                 return o.drugId == drug.drugId;
             });
             if (drugExist) {
-                drugExist.quantity = drug.quantity;
+                if(drugExist.id){
+                    drugExist.to_action = 'm';
+                }
             } else {
+                drug.to_action = 'a';
                 vm.model.drugs.push(drug);
             }
         }
-
 
         function queryElderly(keyword) {
             return vmh.fetch(vmh.psnService.queryElderly(vm.tenantId, keyword, {
@@ -156,10 +202,17 @@
 
         function doSubmit() {
             if ($scope.theForm.$valid) {
-                vmh.psnService.drugInStock(vm.tenantId, vm.operated_by, vm.model).then(function () {
-                    vmh.alertSuccess();
-                    vm.returnBack();
-                });
+                if (vm._action_ == 'add') {
+                    vmh.psnService.drugInStock(vm.tenantId, vm.operated_by, vm.model).then(function () {
+                        vmh.alertSuccess();
+                        vm.returnBack();
+                    });
+                } else {
+                    vmh.psnService.updateInStock(vm.tenantId, vm.model._id, vm.operated_by, vm.model, vm.drugs_to_remove).then(function () {
+                        vmh.alertSuccess();
+                        vm.returnBack();
+                    });
+                }
             }
             else {
                 if ($scope.utils.vtab(vm.tab1.cid)) {
@@ -207,7 +260,7 @@
             vm.model = $scope.ngDialogData.drug || {};
 
 
-            if (vm.model._id) {
+            if (vm.model.drugId) {
                 // 修改
                 vm.readonly = true;
             } else {

@@ -28,14 +28,14 @@
                                     input(type='checkbox' data="trBubble" ng-model="row.checked" )
                                     span.fa.fa-check(data="trBubble")
                         td.text-center {{::row.code}}
-                        td.text-center {{::row.elderly_name}}
-                        td {{::row.drugs | safeArrayMember: 'drug_name' }}
-                        td.text-center {{::row.type_name}}
-                        td.text-center {{::row.mode_name}}
+                        td {{::row.elderly_name}}
+                        td.text-left(ng-bind-html="::row.drugs | safeArrayTemplate: '{drug_name} x {quantity} ({mini_unit_name})'")
+                        td {{::row.type_name}}
+                        td {{::row.mode_name}}
                         td
                             .btn-group
-                                a.btn.btn-primary.btn-xs(title="{{'button.ABOLISH'|translate}}",ng-click="vm.abolish(row)")
-                                    i.glyphicon.glyphicon-ban-circle
+                                a.btn.btn-primary.btn-xs(title="{{'button.EDIT'|translate}}", ng-click="vm.edit(row._id)")
+                                    i.glyphicon.glyphicon-pencil
                     tr(ng-if="vm.paged.length==0")
                         td(colspan="{{utils.noResultsColspan(vm)}}") {{ 'grid.NO-RESULTS' | translate}}
             .panel-footer

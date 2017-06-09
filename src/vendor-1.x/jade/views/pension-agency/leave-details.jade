@@ -26,7 +26,7 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-ELDERLY') | translate}}:
                         .col-md-10(ng-if="!vm.readonly && vm._action_!='edit' ")
                             //div#elderly(angucomplete-alt,input-name="elderly",minlength="1",field-required="true",text-searching='{{"label.TEXT-SEARCHING"|translate}}',text-no-results='{{"label.TEXT-NO-RESULTS"|translate}}',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-ELDERLY")|translate}}',pause="400",selected-object="vm.selectElerly",remote-api-handler="vm.queryElderly",title-field="name",initial-value="vm.selectedElderly",input-class="form-control form-control-small")
-                            .backfiller(backfiller,ng-model="vm.selectedElderly", input-name="elderly", fetch-rows="vm.queryElderlyPromise", fetch-columns="vm.fetchElderlyColumnsPromise", picker-title="挑选老人", on-select="vm.selectElerlyForBackFiller(row)", on-search="vm.searchForBackFiller(keyword)") //string
+                            .backfiller(backfiller,ng-model="vm.selectedElderly", input-name="elderly", required="true", fetch-rows="vm.queryElderlyPromise", fetch-columns="vm.fetchElderlyColumnsPromise", picker-title="挑选老人", on-select="vm.selectElerlyForBackFiller(row)", on-search="vm.searchForBackFiller(keyword)") //string
                             span.text-danger(ng-show="utils.vinput(this.theForm,'elderly','autocomplete-required')") {{ "validator.REQUIRED" | translate}}
                         .col-md-10(ng-if="vm.readonly || vm._action_=='edit'")
                             .form-readable {{vm.model.elderly_name}}

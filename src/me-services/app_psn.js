@@ -445,7 +445,7 @@ module.exports = {
                             var page = this.request.body.page;
 
                             var drugInOutStocks = yield app.modelFactory().model_query(app.models['psn_drugInOutStock'], {
-                                select: 'check_in_time code drugId drug_name elderly_name quantity mini_unit',
+                                select: 'check_in_time code drugs elderly_name',
                                 where: {
                                     status: 1,
                                     tenantId: tenantId,
@@ -455,7 +455,12 @@ module.exports = {
                                 sort:{
                                     check_in_time: -1
                                 }
-                            }, {skip: page.skip, limit: page.size}).populate('drugId', 'img');
+                            }, {skip: page.skip, limit: page.size}).populate('drugs.drugId', 'img');
+
+
+                            app._.each(drugInOutStocks, (o)=>{
+                                console.log('drugInOutStock drugs:', o.drugs);
+                            });
 
                             this.body = app.wrapper.res.rows(drugInOutStocks);
 

@@ -522,8 +522,11 @@
                     drugUseItemRemove:drugUseItemRemove,
                     drugQueryAll: drugQueryAll,
                     drugInStock: drugInStock,
-                    stockInRecordCheck: stockInRecordCheck,
-                    updateInStock: updateInStock,
+                    drugStockInRecordCheck: drugStockInRecordCheck,
+                    updateDrugsInStock: updateDrugsInStock,
+                    elderlyDrugStockList: elderlyDrugStockList,
+                    elderlyDrugUseWithStockList: elderlyDrugUseWithStockList,
+                    elderlyDrugStockSummary: elderlyDrugStockSummary,
                     drugOutStock: drugOutStock,
                     drugOutStockInvalid: drugOutStockInvalid,
                     drugStockEditLogInsert: drugStockEditLogInsert,
@@ -534,7 +537,6 @@
                     changeElderlyNursingLevel: changeElderlyNursingLevel,
                     receptionVisiterSyncElderlyFamilyMembers: receptionVisiterSyncElderlyFamilyMembers,
                     leaveAccompanierSyncElderlyFamilyMembers: leaveAccompanierSyncElderlyFamilyMembers,
-                    instockAbolish: instockAbolish,
                     checkCanChangeBookingOrUnbookingRecharge: checkCanChangeBookingOrUnbookingRecharge,
                     bookingRecharge: bookingRecharge,
                     disableRechargeAndUnbooking: disableRechargeAndUnbooking,
@@ -680,9 +682,6 @@
                 function drugUseItemRemove(elderlyId,tenantId,drugUseItemIds){
                     return $http.post(baseUrl + 'drugUseItemRemove',{elderlyId:elderlyId,tenantId:tenantId,drugUseItemIds:drugUseItemIds});
                 }
-                function instockAbolish(inStockId) {
-                    return $http.get(baseUrl + 'inStockAbolish/' + inStockId);
-                }
 
                 function drugOutStockInvalid(drugInOutStockId) {
                     return $http.post(baseUrl + 'drugOutStockInvalid', { drugInOutStockId: drugInOutStockId });
@@ -740,11 +739,11 @@
                     return $http.post(baseUrl + 'inStock', {tenantId: tenantId, operated_by: operated_by, inStockData: inStockData});
                 }
 
-                function stockInRecordCheck(tenantId, drugInOutStockId) {
-                    return $http.post(baseUrl + 'stockInRecordCheck', {tenantId: tenantId, drugInOutStockId: drugInOutStockId});
+                function drugStockInRecordCheck(tenantId, drugInOutStockId) {
+                    return $http.post(baseUrl + 'drugStockInRecordCheck', {tenantId: tenantId, drugInOutStockId: drugInOutStockId});
                 }
 
-                function updateInStock(tenantId, drugInOutStockId, operated_by, model, drugs_to_remove) {
+                function updateDrugsInStock(tenantId, drugInOutStockId, operated_by, model, drugs_to_remove) {
                     var inStockData;
                     if(drugs_to_remove.length>0){
                         inStockData = _.extend({}, model);
@@ -752,7 +751,19 @@
                     } else {
                         inStockData = model;
                     }
-                    return $http.post(baseUrl + 'updateInStock', {tenantId: tenantId, drugInOutStockId: drugInOutStockId, operated_by: operated_by, inStockData: inStockData});
+                    return $http.post(baseUrl + 'updateDrugsInStock', {tenantId: tenantId, drugInOutStockId: drugInOutStockId, operated_by: operated_by, inStockData: inStockData});
+                }
+
+                function elderlyDrugStockList(tenantId, elderlyId) {
+                    return $http.post(baseUrl + 'elderlyDrugStockList', {tenantId:tenantId, elderlyId:elderlyId});
+                }
+
+                function elderlyDrugUseWithStockList(tenantId, elderlyId) {
+                    return $http.post(baseUrl + 'elderlyDrugUseWithStockList', {tenantId:tenantId, elderlyId:elderlyId});
+                }
+
+                function elderlyDrugStockSummary(tenantId, elderlyId, drugId) {
+                    return $http.post(baseUrl + 'elderlyDrugStockSummary', {tenantId:tenantId, elderlyId: elderlyId, drugId: drugId});
                 }
 
                 function drugOutStock(tenantId, elderlyId, drugId, in_out_quantity, type, unit) {

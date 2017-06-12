@@ -1,4 +1,4 @@
-// Created by yrm on 17-3-28.
+// Created by yrm on 17-3-28. modified by zppro 2017-6-12
 (function() {
     'use strict';
     
@@ -19,88 +19,61 @@
 
         function init() {
             vm.init({removeDialog: ngDialog});
-            vm.query();
+
+            vm.onRoomChange = onRoomChange;
+
+            vm.roomTreeDataPromise = vmh.shareService.tmp('T3009', null, { tenantId: vm.tenantId });
+        }
+
+        function fetchElderly(roomIds) {
+            vmh.shareService.tmp('T3001/psn-elderly', 'name sex birthday enter_code room_summary nursing_info',
+                {
+                    tenantId: vm.tenantId, status: 1,
+                    live_in_flag: true,
+                    begin_exit_flow: {$in: [false, undefined]},
+                    "room_value.roomId": {$in: roomIds}
+                }
+            ).then(function (nodes) {
+                vm.elderlys = nodes;
+            });
+        }
+        function onRoomChange() {
+            fetchElderly(_.map(vm.roomData, function(o){return o._id}));
         }
     }
-    DrugStockDetailsController.$inject = ['$scope', 'ngDialog', 'vmh', 'entityVM'];
 
+    DrugStockDetailsController.$inject = ['$scope', 'ngDialog', 'vmh', 'entityVM'];
     function  DrugStockDetailsController($scope, ngDialog, vmh, vm) {
 
         var vm = $scope.vm = vm;
         $scope.utils = vmh.utils.v;
 
-
         init();
 
         function init() {
             vm.init({removeDialog: ngDialog});
-            vm.doSubmit = doSubmit;
-            vm.queryElderly = queryElderly;
-            vm.selectElerly = selectElerly;
-            vm.queryDrug = queryDrug;
-            vm.selectDrug = selectDrug;
-            vm.tab1 = {cid: 'contentTab1'};
-            vmh.parallel([
-                vmh.shareService.d('D3013'),
-            ]).then(function(results){
-                vm.selectBinding.unit = results[0];
-            })   
+            vm.elderlyId = vm._id_ ;
 
-            vm.load().then(function(){
-                vm.origin_quantity = vm.model.current_quantity
-                if(vm.model.elderlyId){
-                    vm.selectedElderly = {_id: vm.model.elderlyId, name: vm.model.elderly_name};
-                    vm.selectedDrug = {_id:vm.model.drugId,barcode:vm.model.barcode};
-                }
+            vm.tab1 = {cid: 'contentTab1'};
+
+            vmh.parallel([
+                vmh.shareService.d('D1006'),
+                vmh.shareService.d('D1008'),
+            ]).then(function (results) {
+                vm.selectBinding.sex = results[0];
+                vm.selectBinding.medical_insurances = results[1];
             });
 
-
+            vm.load().then(function () {
+                fetchDrugStock();
+            });
         }
 
-        function queryElderly(keyword) {
-            return vmh.fetch(vmh.psnService.queryElderly(vm.tenantId, keyword, {
-                  live_in_flag: true,
-                  // sbegin_exit_flow: {'$in':[false,undefined]}
-            }, 'name'));
+        function fetchDrugStock() {
+            vmh.psnService.elderlyDrugStockList(vm.tenantId, vm.elderlyId).then(function(rows){
+                vm.elderlyDrugStockList = rows;
+            });
         }
-
-        function selectElerly(o) {
-            if(o){
-                // vm.model.enter_code = o.originalObject.enter_code;
-                vm.model.elderlyId = o.originalObject._id;
-                vm.model.elderly_name = o.title;
-            }
-        }
-         
-        function queryDrug(keyword) {
-            return vmh.fetch(vmh.psnService.queryDrug(vm.tenantId, keyword, {}, 'barcode full_name'));
-        }
-
-        function selectDrug(o) {
-            if(o){
-                vm.model.drugId = o.originalObject._id;
-                vm.model.barcode = o.originalObject.barcode;
-                vm.model.drug_full_name = o.originalObject.full_name;
-            }
-        }
-
-        function doSubmit() {
-
-            if ($scope.theForm.$valid) {
-                vm.save(true).then(function(ret){
-                    vmh.psnService.drugStockEditLogInsert(vm.tenantId,vm.model._id,vm.origin_quantity,vm.model.current_quantity,vm.operated_by_name).then(function(ret){
-                         vm.returnBack();
-                    });
-                });
-            }
-            else {
-                if ($scope.utils.vtab(vm.tab1.cid)) {
-                    vm.tab1.active = true;
-                }
-            }
-        }
-
-
     }
 
 })();

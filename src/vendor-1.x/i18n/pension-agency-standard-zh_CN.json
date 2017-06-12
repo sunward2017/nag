@@ -380,7 +380,8 @@
       "BTN-CANCEL-READONLY-WORK-ITEMS": "编辑",
       "BTN-DO-READONLY-WORK-ITEMS": "返回",
       "BTN-ADD-CUSTOMIZED-WORK-ITEMS": "添加自定义项目",
-      "BTN-GEN-NURSING-CONTENT": "生成",
+      "BTN-GEN-NURSING-RECORD": "照护记录",
+      "BTN-GEN-DRUG-USE-LIST": "用药请单",
       "BTN-SET-NURSING-PLAN-REMARK": "填写备注",
       "DIALOG-GENERATE-NURSING-RECORD": "生成的数据将覆盖之前还未执行的照护内容,您确定要生成吗？",
       "DLG-WORK-ITEM-TITLE": "工作项目自定义",
@@ -587,8 +588,10 @@
         "TAB1-LABEL-MEDICAL_INSURANCE": "医保所在地",
         "TAB1-LABEL-REMARK": "备注",
         "TAB1-LABEL-DRUG-NAME": "药品名称",
-        "TAB1-LABEL-BARCODE":"药品条形码",
+        "TAB1-LABEL-QUANTITY_AND_UNIT":"药品用量",
         "TAB1-PLACEHOLDER-NAME": "喂早餐..",
+        "TAB1-LABEL-QUANTITY": "一次服用量",
+        "TAB1-LABEL-UNIT": "用量单位",
         "TAB1-LABEL-DESCRIPTION": "服用方法",
         "TAB1-PLACEHOLDER-DESCRIPTION": "每日三次...",
         "TAB1-LABEL-DRUG_USE_TEMPLATE": "用药模版",
@@ -614,6 +617,7 @@
         "TAB1-PLACEHOLDER-REMIND_TIMES": "3..",
         "WARNING-SAME-DRUG-IN-TEMPLATE": "模版中已存在相同的药品",
         "WARNING-SAME-DRUG-NO-TEMPLATE": "非模版中已存在相同的药品",
+        "WARNING-UNIT-IS-DIFFERENT": "药品单位不一致,请仔细检查您的药品服用单位",
         "VOICE_TEPLATE_ERROR": "语音模板有错误"
       }
     },
@@ -689,11 +693,21 @@
       },
       "details": {
         "TITLE": "养老机构-药品管理-库存-详情",
-        "TAB1": "库存信息",
-        "TAB1-LABEL-DRUG-NO": "药品编码",
+        "TAB1": "",
         "TAB1-LABEL-ELDERLY-NAME": "老人",
         "TAB1-LABEL-CURRENT-QUANTITY": "当前库存量",
-        "TAB1-LABEL-UNIT": "单位"
+        "TAB1-LABEL-UNIT": "单位",
+        "TAB1-PLACEHOLDER-REMARK": "补充说明一些情况",
+        "TAB1-LABEL-SEX": "性别",
+        "TAB1-LABEL-MEDICAL_HISTORIES": "过往病史",
+        "TAB1-LABEL-BIRTHDAY": "出生日期",
+        "TAB1-LABEL-MEDICAL_INSURANCE": "医保所在地",
+        "TAB1-LABEL-DRUG-STOCK-LIST": "老人药品库存",
+        "TAB1-LABEL-DRUG-NAME": "药品名称",
+        "TAB1-LABEL-QUANTITY": "药品数量",
+        "TAB1-LABEL-MINI_UNIT": "最小单位",
+        "TAB1-LABEL-CHECK_IN_TIME": "入库日期",
+        "TAB1-LABEL-EXPIRE_IN": "有效期至"
       }
     },
     "drug-in-stock": {

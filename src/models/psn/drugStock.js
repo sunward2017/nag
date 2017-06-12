@@ -3,6 +3,8 @@
  * 养老机构 药品库存
  */
 var mongoose = require('mongoose');
+var D3026 = require('../../pre-defined/dictionary.json')['D3026'];
+
 module.isloaded = false;
 
 
@@ -38,6 +40,13 @@ module.exports = function(ctx,name) {
         drugStockSchema.pre('update', function (next) {
             this.update({}, {$set: {operated_on: new Date()}});
             next();
+        });
+
+        drugStockSchema.virtual('mini_unit_name').get(function () {
+            if (this.mini_unit) {
+                return D3026[this.mini_unit].name;
+            }
+            return '';
         });
 
         return mongoose.model(name, drugStockSchema, name);

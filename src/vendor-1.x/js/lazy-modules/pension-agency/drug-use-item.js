@@ -62,10 +62,11 @@
             vm.init({ removeDialog: ngDialog });
             vmh.parallel([
                 vmh.shareService.d('D1006'),
-                vmh.shareService.d('D1008'),
+                vmh.shareService.d('D1008')
             ]).then(function (results) {
                 vm.selectBinding.sex = results[0];
                 vm.selectBinding.medical_insurances = results[1];
+                console.log('vm.selectBinding.units:', vm.selectBinding.units);
             });
             vm.medical_historiesPromise = vmh.shareService.d('D1014').then(function (medical_histories) {
                 vmh.utils.v.changeProperyName(medical_histories, [{ o: 'value', n: '_id' }]);
@@ -219,13 +220,20 @@
 
             vmh.parallel([
                 vmh.shareService.d('D0103'),
-                vmh.shareService.d('D0104')
+                vmh.shareService.d('D0104'),
+                vmh.shareService.d('D3026')
             ]).then(function (results) {
                 vm.selectBinding.repeatTypes = results[0];
                 vm.selectBinding.remindModes = results[1];
+                vm.selectBinding.units = results[2];
             });
 
             vm.model = $scope.ngDialogData.drugUseItem || {elderlyId:$scope.ngDialogData.elderlyId, elderly_name: $scope.ngDialogData.elderlyName, tenantId: $scope.ngDialogData.tenantId};
+
+            if(vm.model.drugId) {
+                elderlyDrugStockSummary(vm.model.elderlyId, vm.model.drugId);
+            }
+            
             vm.selectBinding = {};
 
             if (vm.model._id) {
@@ -285,7 +293,7 @@
 
         function selectDrugForBackFiller(row) {
             if (row) {
-                checkSameDrug(row.id)
+                checkSameDrug(row.id);
                 vm.model.drugId = row.id;
                 vm.model.barcode = row.barcode;
                 if (row.short_name) {
@@ -293,6 +301,7 @@
                 } else {
                     vm.model.name = row.full_name;
                 }
+                elderlyDrugStockSummary(vm.model.elderlyId, vm.model.drugId);
             }
         }
 
@@ -323,9 +332,19 @@
             return;
         }
 
+        function elderlyDrugStockSummary(elderlyId, drugId) {
+            vmh.psnService.elderlyDrugStockSummary(vm.tenantId, elderlyId, drugId).then(function(ret){
+                vm.drugStockModel = ret;
+            });
+        }
+
         function doSubmit() {
             if(vm.alertMessage) {
                 vmh.alertWarning(vm.alertMessage, true);
+                return;
+            }
+            if(vm.drugStockModel.mini_unit && vm.model.unit != vm.drugStockModel.mini_unit) {
+                vmh.alertWarning(vm.viewTranslatePath('WARNING-UNIT-IS-DIFFERENT'), true);
                 return;
             }
             vm.model.repeat_values = vm.repeat_values ? vm.repeat_values.split(",") : [];

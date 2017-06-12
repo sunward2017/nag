@@ -73,6 +73,7 @@ module.exports = {
                         try {
                             var elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], this.params._id);
                             var ret = app._.pick(elderly.toObject(), this.params.select.split(','));
+                            console.log('elderlyInfo:', ret);
                             this.body = app.wrapper.res.ret(ret);
                         } catch (e) {
                             self.logger.error(e.message);
@@ -5886,9 +5887,9 @@ module.exports = {
                 }
             },
             {
-                method: 'stockInRecordCheck',
+                method: 'drugStockInRecordCheck',
                 verb: 'post',
-                url: this.service_url_prefix + "/stockInRecordCheck",
+                url: this.service_url_prefix + "/drugStockInRecordCheck",
                 handler: function (app, options) {
                     return function* (next) {
                         try {
@@ -5905,9 +5906,9 @@ module.exports = {
                 }
             },
             {
-                method: 'updateInStock',
+                method: 'updateDrugsInStock',
                 verb: 'post',
-                url: this.service_url_prefix + "/updateInStock",
+                url: this.service_url_prefix + "/updateDrugsInStock",
                 handler: function (app, options) {
                     return function* (next) {
                         try {
@@ -5926,41 +5927,53 @@ module.exports = {
                 }
             },
             {
-                method: 'inStockAbolish',
-                verb: 'get',
-                url: this.service_url_prefix + "/inStockAbolish/:_id", //:select需要提取的字段域用逗号分割 e.g. name,type
+                method: 'elderlyDrugStockList',
+                verb: 'post',
+                url: this.service_url_prefix + "/elderlyDrugStockList",
                 handler: function (app, options) {
                     return function* (next) {
                         try {
-                            var inStock = yield app.modelFactory().model_read(app.models['psn_drugInOutStock'], this.params._id);
-                            var inStockJson = inStock.toObject();
+                            var tenantId = this.request.body.tenantId;
+                            var elderlyId = this.request.body.elderlyId;
 
-                            var drugStock = yield app.modelFactory().model_one(app.models['psn_drugStock'], {
-                                where: {
-                                    status: 1,
-                                    elderlyId: inStockJson.elderlyId,
-                                    drugId: inStockJson.drugId,
-                                    unit: inStockJson.unit,
-                                }
-                            });
-                            // console.log(drugStock);
-                            if (!drugStock) {
-                                this.body = app.wrapper.res.error({ message: '当前无库存，无法取消记录' });
-                                yield next;
-                                return;
-                            } else {
-                                if (drugStock.current_quantity < inStockJson.in_out_quantity) {
-                                    this.body = app.wrapper.res.error({ message: '库存不足，无法取消记录!' });
-                                    yield next;
-                                    return;
-                                } else {
-                                    inStock.valid_flag = false;
-                                    yield inStock.save();
-                                    drugStock.current_quantity = parseInt(drugStock.current_quantity) - parseInt(inStockJson.in_out_quantity);
-                                    yield drugStock.save();
-                                }
-                            }
-                            this.body = app.wrapper.res.default();
+                            this.body = yield app.psn_drug_stock_service.elderlyStockList(tenantId, elderlyId);
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
+            {
+                method: 'elderlyDrugUseWithStockList',
+                verb: 'post',
+                url: this.service_url_prefix + "/elderlyDrugUseWithStockList",
+                handler: function (app, options) {
+                    return function* (next) {
+                        try {
+                            var tenantId = this.request.body.tenantId;
+                            var elderlyId = this.request.body.elderlyId;
+                            this.body = yield app.psn_drug_stock_service.elderlyDrugUseWithStockList(tenantId, elderlyId);
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
+            {
+                method: 'elderlyDrugStockSummary',
+                verb: 'post',
+                url: this.service_url_prefix + "/elderlyDrugStockSummary",
+                handler: function (app, options) {
+                    return function* (next) {
+                        try {
+                            var tenantId = this.request.body.tenantId;
+                            var elderlyId = this.request.body.elderlyId;
+                            var drugId = this.request.body.drugId;
+                            this.body = yield app.psn_drug_stock_service.elderlyStockSummary(tenantId, elderlyId, drugId);
                         } catch (e) {
                             self.logger.error(e.message);
                             this.body = app.wrapper.res.error(e);

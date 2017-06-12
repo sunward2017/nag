@@ -26,7 +26,7 @@
   },
   {
     "_id":"generate_nursing_content",
-     "name": "照护记录",
+     "name": "生成",
     "width": "60"
   }
    

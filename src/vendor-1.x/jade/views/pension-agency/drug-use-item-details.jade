@@ -52,7 +52,7 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='')
                                         th.text-center(width="80")
                                             | {{ vm.viewTranslatePath('TAB1-LABEL-DRUG-NAME') | translate}}
                                         th.text-center(width="50")
-                                            | {{ vm.viewTranslatePath('TAB1-LABEL-BARCODE') | translate}}
+                                            | {{ vm.viewTranslatePath('TAB1-LABEL-QUANTITY_AND_UNIT') | translate}}
                                         th.text-center(width="40")
                                             | {{ vm.viewTranslatePath('TAB1-LABEL-REPEAT_VALUES') | translate}}
                                         th.text-center(width="40")
@@ -68,8 +68,8 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='')
                                                     input(type='checkbox',ng-model="row.checked" ng-change="vm.addRowIds(row)")
                                                     span.fa.fa-check
                                         td.text-center(ng-if="row.row_span", rowspan="{{row.row_span}}") {{::row.drugUseTemplateId.name}}
-                                        td.text-center {{::row.drugId.short_name | defaultValue:row.drugId.full_name }}
-                                        td.text-center {{::row.barcode}}
+                                        td {{::row.drugId.short_name | defaultValue:row.drugId.full_name }}
+                                        td.text-center {{::row.quantity }} {{::row.unit_name}}
                                         td.text-center {{::row.repeat_type_name }}{{row.repeat_values | repeatInfoCombo: row.repeat_start}}
                                         td.text-center {{::row.description}}
                                         td.text-center {{::row.stop_flag|boolFilter}}
@@ -109,11 +109,28 @@ script(type="text/ng-template", id="drug-use-item.html")
                 fieldset: .form-group
                     <!--药品目录-->
                     label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-DRUG-NAME') | translate}}:
-                    .col-md-10(ng-if="!vm.readonly && vm._action_!='edit' ")
+                    .col-md-6(ng-if="!vm.readonly && vm._action_!='edit' ")
                         .backfiller(backfiller,ng-model="vm.selectedDrug", text-key="full_name", required="true", input-name="drug", fetch-rows="vm.queryDrugPromise", fetch-columns="vm.fetchDrugColumnsPromise", picker-title="挑选药品" on-select="vm.selectDrugForBackFiller(row)", on-search="vm.searchForBackFiller(keyword)")
                         span.text-danger(ng-show="utils.vinput(theForm,'drug','autocomplete-required')") {{ "validator.REQUIRED" | translate}}
-                    .col-md-10(ng-if="vm.readonly || vm._action_=='edit'")
+                    .col-md-6(ng-if="vm.readonly || vm._action_=='edit'")
                         .form-readable {{vm.model.name}}
+                    .col-md-4
+                        <!--药品库存-->
+                        .form-readable {{vm.drugStockModel.total}} {{vm.drugStockModel.mini_unit_name}}
+                fieldset: .form-group
+                    <!--一次服用量-->
+                    label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-QUANTITY') | translate}}:
+                    .col-md-4
+                        input.form-control(type='number',name='quantity' ,ng-model='vm.model.quantity', required='' ui-validate="'$value>=1'" )
+                        span.text-danger(ng-show="utils.vinput(theForm,'quantity','required')") {{ "validator.REQUIRED" | translate}}
+                        span.text-danger(ng-show="utils.vinput(theForm,'quantity','number')") {{ "validator.NUMBER" | translate}}
+                        span.text-danger(ng-show="utils.vinput(theForm,'quantity','validator')") {{ "validator.MIN" | translate:{min:1} }}
+                    <!--服用单位-->
+                    label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-UNIT') | translate}}:
+                    .col-md-4
+                        .btn-group
+                            .btn.btn-primary(name='unit',ng-repeat='unit in vm.selectBinding.units',ng-model='vm.model.unit',btn-radio="unit.value",required='') {{unit.name}}
+                        span.text-danger(ng-show="utils.vinput(theForm,'unit','required')") {{ "validator.REQUIRED" | translate}}
                 fieldset: .form-group
                     <!--服用方法-->
                     label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-DESCRIPTION') | translate}}:
@@ -130,20 +147,19 @@ script(type="text/ng-template", id="drug-use-item.html")
                     <!--重复类型-->
                 fieldset: .form-group
                     label.col-md-2.control-label.text-right {{ vm.viewTranslatePath('TAB1-LABEL-REPEAT_TYPE') | translate}}:
-                    .col-md-10
+                    .col-md-4
                         .btn-group
                             .btn.btn-primary(name='repeat_type',ng-change="vm.initVoiceTemplate()",ng-repeat='repeatType in vm.selectBinding.repeatTypes',ng-model='vm.model.repeat_type',btn-radio="repeatType.value",required='') {{repeatType.name}}
                         span.text-danger(ng-show="utils.vinput(this.theForm,'repeat_type','required')") {{ "validator.REQUIRED" | translate}}
+                    <!--重复点-->
+                    label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-REPEAT_START') | translate}}:
+                    .col-md-4
+                        input.form-control(type='text',ng-disabled="vm.switch", name='repeat_start',ng-model='vm.model.repeat_start',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-REPEAT_START")|translate}}')
                 fieldset: .form-group
                     <!--重复值域-->
                     label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-REPEAT_VALUES') | translate}}:
                     .col-md-10
                         input.form-control(type='text',ng-disabled="vm.switch", name='repeat_values',ng-model='vm.repeat_values',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-REPEAT_VALUES")|translate}}')
-                fieldset: .form-group
-                    <!--重复点-->
-                    label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-REPEAT_START') | translate}}:
-                    .col-md-10
-                        input.form-control(type='text',ng-disabled="vm.switch", name='repeat_start',ng-model='vm.model.repeat_start',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-REPEAT_START")|translate}}')
                 fieldset: .form-group
                     <!--语音播报-->
                     label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-VOICE-TEMPLATE') | translate}}:
@@ -179,14 +195,13 @@ script(type="text/ng-template", id="drug-use-item.html")
                 fieldset(ng-if="vm.model.remind_flag"): .form-group
                     <!--提醒方式-->
                     label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-REMIND_MODE') | translate}}:
-                    .col-md-10
+                    .col-md-4
                         .btn-group
                             .btn.btn-primary(name='remind_mode',ng-repeat='remindMode in vm.selectBinding.remindModes',ng-model='vm.model.remind_mode',btn-radio="remindMode.value",required='') {{remindMode.name}}
                         span.text-danger(ng-show="utils.vinput(theForm,'remind_mode','required')") {{ "validator.REQUIRED" | translate}}
-                fieldset(ng-if="vm.model.remind_flag"): .form-group
                     <!--提醒次数-->
                     label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-REMIND_TIMES') | translate}}:
-                    .col-md-10
+                    .col-md-4
                         input.form-control(type='number',name='remind_times' ,ng-model='vm.model.remind_times',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-REMIND_TIMES")|translate}}', required='' ui-validate="'$value>=1'" )
                         span.text-danger(ng-show="utils.vinput(theForm,'remind_times','required')") {{ "validator.REQUIRED" | translate}}
                         span.text-danger(ng-show="utils.vinput(theForm,'remind_times','number')") {{ "validator.NUMBER" | translate}}

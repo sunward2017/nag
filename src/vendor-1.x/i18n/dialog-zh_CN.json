@@ -22,6 +22,20 @@
       "MSG-NO-TENANT-SELECTED": "没有选中任何机构",
       "LOADING-TEXT-SYNC-TO-TENANT": "正在同步药品.."
     }
+  },
+  "dlg-drug-use-list-in-nursing-plan": {
+    "html": {
+      "TITLE": "查看对话框",
+      "SHEET_TITLE": "老人用药每日请单",
+      "SHEET-LABEL-ELDERLY_NAME": "姓名",
+      "SHEET-LABEL-ENTER_CODE": "入院号",
+      "SHEET-LABEL-ROOM_SUMMARY": "房间床位",
+      "COL-LABEL-DRUG_USE_TEMPLATE": "时间",
+      "COL-LABEL-DRUG": "药品",
+      "COL-LABEL-QUANTITY_AND_UNIT": "单次用量",
+      "COL-LABEL-STOCK": "库存",
+      "COL-LABEL-UNIT": "单位"
+    }
   }
 }
 

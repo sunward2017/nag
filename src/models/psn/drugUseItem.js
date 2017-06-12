@@ -5,6 +5,7 @@
 var mongoose = require('mongoose');
 var D0103 = require('../../pre-defined/dictionary.json')['D0103'];
 var D0104 = require('../../pre-defined/dictionary.json')['D0104'];
+var D3026 = require('../../pre-defined/dictionary.json')['D3026'];
 var DIC = require('../../pre-defined/dictionary-constants.json');
 
 module.isloaded = false;
@@ -30,6 +31,8 @@ module.exports = function(ctx,name) {
             barcode:{type: String,},// 药品编码
             name:{type: String}, //因为药品名称在实际使用中通常会用简称代替,因此此冗余已经无用
             description:{type: String},
+            quantity:{type:Number},// 一般来说用药使用标准模版,即吃药严格按照时刻来执行,因此此处的数量代表按照医嘱的一次用药量
+            unit: {type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3026"])}, //用药单位,理论上需要和库存的最小单位保持一致
             drugUseTemplateId:{type: mongoose.Schema.Types.ObjectId,ref:'psn_drugUseTemplate'},//关联用药模版
             duration: {type: Number, default: 0}, // 完成时长 单为分
             repeat_type: {type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D0103"])},
@@ -69,6 +72,12 @@ module.exports = function(ctx,name) {
             return DIC.D3019.TAKE_DRUG;
         });
 
+        drugUseItemSchema.virtual('unit_name').get(function () {
+            if (this.unit) {
+                return D3026[this.unit].name;
+            }
+            return '';
+        });
 
         drugUseItemSchema.pre('update', function (next) {
             this.update({}, {$set: {operated_on: new Date()}});

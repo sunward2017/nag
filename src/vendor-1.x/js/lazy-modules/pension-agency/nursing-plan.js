@@ -1,6 +1,6 @@
 /**
  * district Created by zppro on 17-3-17.
- * Target:养老机构 模版计划
+ * Target:养老机构 照护计划
  */
 
 (function () {
@@ -10,6 +10,7 @@
         .module('subsystem.pension-agency')
         .controller('NursingPlanController', NursingPlanController)
         .controller('WorkItemCustomController', WorkItemCustomController)
+        .controller('ElderlyDrugUseListInNursingPlanController', ElderlyDrugUseListInNursingPlanController)
         ;
 
     NursingPlanController.$inject = ['$scope', 'ngDialog', 'vmh', 'instanceVM'];
@@ -39,6 +40,7 @@
             vm.saveNursingPlanRemark = saveNursingPlanRemark;
             vm.cancelNursingPlanRemark = cancelNursingPlanRemark;
             vm.generateNursingRecord = generateNursingRecord;
+            vm.showElderlyDrugUseList = showElderlyDrugUseList;
             vm.customizedWorkItem = customizedWorkItem;
             vm.workItemByElderly = workItemByElderly;
             vm.allWorkItemChecked = allWorkItemChecked;
@@ -352,6 +354,31 @@
             });
         }
 
+        function showElderlyDrugUseList (trackedKey) {
+            var elderlyId = vm.aggrData[trackedKey]['elderly'].id;
+            console.log('vm.tenant_name:', vm.tenant_name);
+            ngDialog.open({
+                template: 'dlg-drug-use-list-in-nursing-plan.html',
+                controller: 'ElderlyDrugUseListInNursingPlanController',
+                className: 'ngdialog-theme-default ngdialog-drug-use-list-in-nursing-plan',
+                data: {
+                    tenantId: vm.tenantId,
+                    tenant_name: vm.tenant_name,
+                    elderlyId: elderlyId
+                },
+                resolve:{
+                    vmh: function () {
+                        return vmh;
+                    },
+                    translatePath: function () {
+                        return function (key) {
+                            return 'dlg-drug-use-list-in-nursing-plan.html.' + key;
+                        }
+                    }
+                }
+            })
+        }
+
         function workItemByElderly(workItems, elderlyId) {
             if (workItems && workItems.length > 0) {
                 var allWorkItems = _.filter(workItems, function (option) {
@@ -512,6 +539,73 @@
         }
         function cancel() {
             ngDialog.close("#work-item-custom.html")
+        }
+    }
+
+    ElderlyDrugUseListInNursingPlanController.$inject = ['$scope', 'modelNode', 'vmh', 'translatePath'];
+
+    function ElderlyDrugUseListInNursingPlanController($scope, modelNode, vmh, translatePath) {
+        var vm = $scope.vm = {};
+        vm.translatePath = translatePath;
+        $scope.utils = vmh.utils.v;
+
+        init();
+
+        function init() {
+            vm.moduleTranslatePathRoot = $scope.ngDialogData.moduleTranslatePathRoot;
+            vm.viewTranslatePath = function (key) {
+                return vm.moduleTranslatePathRoot + '.' + key;
+            };
+            vm.tenantId = $scope.ngDialogData.tenantId;
+            vm.tenant_name = $scope.ngDialogData.tenant_name;
+            vm.elderlyId = $scope.ngDialogData.elderlyId;
+
+            vmh.psnService.elderlyInfo(vm.elderlyId, 'name,enter_code,room_summary').then(function (ret) {
+                vm.elderly = ret;
+            });
+            fetchDrugUseItem();
+        }
+
+        function fetchDrugUseItem() {
+            vmh.psnService.elderlyDrugUseWithStockList(vm.tenantId, vm.elderlyId).then(function(rows){
+                console.log('elderlyDrugUseWithStockList:', rows);
+                var groupObject = _.groupBy(rows, function(o){
+                    if(o.drugUseTemplateId){
+                        return o.drugUseTemplateId._id;
+                    } else {
+                        return o._id;
+                    }
+                });
+                var elderlyDrugUseItems = [], groupValue, row;
+                for(var key in groupObject) {
+                    groupValue = groupObject[key];
+                    for (var i = 0, len = groupValue.length; i < len; i++) {
+                        row = groupValue[i];
+                        if (row.drugUseTemplateId) {
+                            row.group_order = row.drugUseTemplateId.order_no;
+                        } else {
+                            row.group_order = 99999;
+                        }
+                        if (len > 1) {
+                            if (i == 0) {
+                                row.row_span = len;
+                            }
+                            elderlyDrugUseItems.push(row)
+                        } else {
+                            row.row_span = 1;
+                            elderlyDrugUseItems.push(row)
+                        }
+                    }
+                }
+                console.log('elderlyDrugUseItems:', elderlyDrugUseItems);
+                vm.elderlyDrugUseItems = elderlyDrugUseItems
+            });
+        }
+
+        function elderlyDrugStockSummary(elderlyId, drugId) {
+            vmh.psnService.elderlyDrugStockSummary(vm.tenantId, elderlyId, drugId).then(function(ret){
+                vm.drugStockModel = ret;
+            });
         }
     }
 })();

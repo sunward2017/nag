@@ -91,7 +91,12 @@
                             .btn-group(ng-if="vm.aggrData[row.trackedKey]['elderly']['nursingLevelId']")
                                 a.btn.btn-warning.btn-sm(ng-click="vm.generateNursingRecord(row.trackedKey)")
                                     i.glyphicon.glyphicon-list
-                                    span.ml-sm {{ vm.moduleTranslatePath('BTN-GEN-NURSING-CONTENT') | translate}}
+                                    span.ml-sm {{ vm.moduleTranslatePath('BTN-GEN-NURSING-RECORD') | translate}}
+                            .btn-split
+                            .btn-group(ng-if="vm.aggrData[row.trackedKey]['elderly']['nursingLevelId']")
+                                a.btn.btn-success.btn-sm(ng-click="vm.showElderlyDrugUseList(row.trackedKey)")
+                                    i.glyphicon.glyphicon-list
+                                    span.ml-sm {{ vm.moduleTranslatePath('BTN-GEN-DRUG-USE-LIST') | translate}}
                         //- td.text-center
                             div(ng-if="vm.aggrData[row.trackedKey]['elderly']['id']")
                         //-         span(ng-if="!vm.$editings[row.trackedKey]['remark'] && vm.aggrData[row.trackedKey]['nursing_plan']['remark']") {{vm.aggrData[row.trackedKey]['nursing_plan']['remark']}}
@@ -194,8 +199,55 @@ script(type="text/ng-template", id="work-item-custom.html")
                         span.text-danger(ng-show="utils.vinput(this.theForm,'fee','required')") {{ "validator.REQUIRED" | translate}}
                         span.text-danger(ng-show="utils.vinput(this.theForm,'fee','number')") {{ "validator.NUMBER" | translate}}
                         span.text-danger(ng-show="utils.vinput(this.theForm,'fee','validator')") {{ "validator.MIN" | translate:{min:1} }}
-                 
         .ngdialog-buttons
             .col-md-12.text-right
                 button.btn.btn-warning(type='button',ng-click="vm.cancel()") {{ "button.CANCEL" | translate}}
-                button.btn.btn-success(type='submit',ng-click="doSubmit()") {{ "button.CONFIRM" | translate}}               
+                button.btn.btn-success(type='submit',ng-click="doSubmit()") {{ "button.CONFIRM" | translate}}
+script(type="text/ng-template", id="dlg-drug-use-list-in-nursing-plan.html")
+    .ngdialog-title
+        i.glyphicon.glyphicon-info-sign
+        | {{ vm.translatePath('TITLE') | translate }}
+    .ngdialog-input
+        .sheet-head
+            h5.tenant-name.text-center {{vm.tenant_name}}
+            h3.sheet-title.text-center {{ vm.translatePath('SHEET_TITLE') | translate}}
+        .sheet-neck
+            label.col-md-1 {{ vm.translatePath('SHEET-LABEL-ELDERLY_NAME') | translate}}
+            .col-md-1 {{vm.elderly.name}}
+            label.col-md-2.text-right {{ vm.translatePath('SHEET-LABEL-ENTER_CODE') | translate}}
+            .col-md-1 {{vm.elderly.enter_code}}
+            .col-md-1
+            label.col-md-2.text-right {{ vm.translatePath('SHEET-LABEL-ROOM_SUMMARY') | translate}}
+            .col-md-4 {{vm.elderly.room_summary}}
+            .clear-fix
+        .sheet-body
+            //.panel.panel-default.panel-grid
+            table.grid.table.table-bordered.table-hover.table-striped.table-responsive
+                thead
+                    colgroup
+                        col.text-center(width="100")
+                        col.text-left(width="350")
+                        col.text-center(width="100")
+                        col.text-right(width="100")
+                        col.text-center(width="100")
+                    tr
+                        th.text-center
+                            | {{ vm.translatePath('COL-LABEL-DRUG_USE_TEMPLATE') | translate}}
+                        th.text-center
+                            | {{ vm.translatePath('COL-LABEL-DRUG') | translate}}
+                        th.text-center
+                            | {{ vm.translatePath('COL-LABEL-QUANTITY_AND_UNIT') | translate}}
+                        th.text-center
+                            | {{ vm.translatePath('COL-LABEL-STOCK') | translate}}
+                        th.text-center
+                            | {{ vm.translatePath('COL-LABEL-UNIT') | translate}}
+                tbody
+                    tr(ng-repeat="row in vm.elderlyDrugUseItems|orderBy:'group_order' " )
+                        td(ng-if="row.row_span", rowspan="{{row.row_span}}") {{::row.drugUseTemplateId.name}}
+                        td {{::row.name }}
+                        td.text-right {{::row.quantity }}
+                        td.text-right(ng-class='{"bg-success": !row.stock.is_warning && !row.stock.is_danger, "bg-warning": row.stock.is_warning, "bg-danger": row.stock.is_danger}') {{::row.stock.total}}
+                        td.text-center {{::row.stock.unit_name || row.unit_name}}
+                    tr(ng-if="vm.elderlyDrugUseItems.length==0")
+                        td(colspan="4") {{ 'grid.NO-RESULTS' | translate}}
+

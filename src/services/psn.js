@@ -73,6 +73,7 @@ module.exports = {
                         try {
                             var elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], this.params._id);
                             var ret = app._.pick(elderly.toObject(), this.params.select.split(','));
+                            console.log('elderlyInfo:', ret);
                             this.body = app.wrapper.res.ret(ret);
                         } catch (e) {
                             self.logger.error(e.message);
@@ -5926,16 +5927,53 @@ module.exports = {
                 }
             },
             {
-                method: 'drugStockList',
+                method: 'elderlyDrugStockList',
                 verb: 'post',
-                url: this.service_url_prefix + "/drugStockList",
+                url: this.service_url_prefix + "/elderlyDrugStockList",
                 handler: function (app, options) {
                     return function* (next) {
                         try {
                             var tenantId = this.request.body.tenantId;
                             var elderlyId = this.request.body.elderlyId;
 
-                            this.body = yield app.psn_drug_stock_service.stockList(tenantId, elderlyId);
+                            this.body = yield app.psn_drug_stock_service.elderlyStockList(tenantId, elderlyId);
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
+            {
+                method: 'elderlyDrugUseWithStockList',
+                verb: 'post',
+                url: this.service_url_prefix + "/elderlyDrugUseWithStockList",
+                handler: function (app, options) {
+                    return function* (next) {
+                        try {
+                            var tenantId = this.request.body.tenantId;
+                            var elderlyId = this.request.body.elderlyId;
+                            this.body = yield app.psn_drug_stock_service.elderlyDrugUseWithStockList(tenantId, elderlyId);
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
+            {
+                method: 'elderlyDrugStockSummary',
+                verb: 'post',
+                url: this.service_url_prefix + "/elderlyDrugStockSummary",
+                handler: function (app, options) {
+                    return function* (next) {
+                        try {
+                            var tenantId = this.request.body.tenantId;
+                            var elderlyId = this.request.body.elderlyId;
+                            var drugId = this.request.body.drugId;
+                            this.body = yield app.psn_drug_stock_service.elderlyStockSummary(tenantId, elderlyId, drugId);
                         } catch (e) {
                             self.logger.error(e.message);
                             this.body = app.wrapper.res.error(e);

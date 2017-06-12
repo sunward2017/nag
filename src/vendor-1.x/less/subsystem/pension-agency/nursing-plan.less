@@ -25,7 +25,80 @@
     .drug-use-item{
       width:100%;
     }
+    .btn-split{
+      height: 5px;
+    }
   }
+}
+
+.ngdialog.ngdialog-theme-default.ngdialog-drug-use-list-in-nursing-plan{
+  padding-top: 40px !important;
+  padding-bottom: 40px !important;
+  .ngdialog-content {
+    width: 800px;
+    min-height: 760px;
+    background-color: white;
+    color:#566565;
+    .ngdialog-title{
+      width:100%;
+      position: absolute;
+      height:40px;
+      line-height: 40px;
+      top: 0;
+      left:0;
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+      background-color: #34BCE6;
+      color:white;
+      font-size: 20px;
+      font-weight: bold;
+      font-family: 黑体;
+      text-indent: 10px;
+      i{
+        height:40px;
+        line-height: 40px;
+        font-size: 20px;
+        margin-right:5px;
+      }
+    }
+    .ngdialog-input {
+      margin-top: 30px;
+      margin-bottom: 0;
+      overflow-y: auto;
+      h5{
+        margin-bottom: 5px;
+      }
+      h3{
+        margin-top:3px;
+        margin-bottom: 8px;
+      }
+      .sheet-body{
+        width:100%;
+        min-height: 600px;
+        overflow: auto;
+        border: solid 2px #DDDDDD;
+        //table{
+        //  border: solid 2px #ddd;
+        //}
+
+        thead {
+          //display: block;
+          //border-bottom: solid 1px #DDDDDD;
+        }
+        tbody{
+          th{
+            border-bottom: solid 3px #DDDDDD;
+          }
+          //display: block;
+          overflow-y: auto;    /* Trigger vertical scroll    */
+          overflow-x: auto;  /* Hide the horizontal scroll */
+
+        }
+      }
+
+    }
+  }
+
 }
 
 .ngdialog.ngdialog-theme-default.ngdialog-nursing-plan-custom{

@@ -47,11 +47,11 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='')
                                         th.text-center(width="40")
                                             | {{ vm.viewTranslatePath('TAB1-LABEL-EXPIRE_IN') | translate}}
                                 tbody
-                                    tr(ng-repeat="row in vm.elderlyStockList " )
+                                    tr(ng-repeat="row in vm.elderlyDrugStockList " )
                                         td {{::row.drug_name}}
                                         td.text-right {{::row.quantity}}
                                         td.text-center {{::row.mini_unit_name }}
-                                        td.text-center {{::row.check_in_time | date: 'yyyy-MM-dd'}}
+                                        td.text-center {{::row.check_in_time | date: 'yyyy-MM-dd HH:mm'}}
                                         td.text-center {{::row.expire_in | date: 'yyyy-MM-dd'}}
                                     tr(ng-if="vm.paged.length==0")
                                         td(colspan="{{utils.noResultsColspan(vm)}}") {{ 'grid.NO-RESULTS' | translate}}

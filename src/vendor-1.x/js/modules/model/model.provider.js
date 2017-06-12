@@ -524,7 +524,9 @@
                     drugInStock: drugInStock,
                     drugStockInRecordCheck: drugStockInRecordCheck,
                     updateDrugsInStock: updateDrugsInStock,
-                    drugStockList: drugStockList,
+                    elderlyDrugStockList: elderlyDrugStockList,
+                    elderlyDrugUseWithStockList: elderlyDrugUseWithStockList,
+                    elderlyDrugStockSummary: elderlyDrugStockSummary,
                     drugOutStock: drugOutStock,
                     drugOutStockInvalid: drugOutStockInvalid,
                     drugStockEditLogInsert: drugStockEditLogInsert,
@@ -752,8 +754,16 @@
                     return $http.post(baseUrl + 'updateDrugsInStock', {tenantId: tenantId, drugInOutStockId: drugInOutStockId, operated_by: operated_by, inStockData: inStockData});
                 }
 
-                function drugStockList(elderlyId, tenantId) {
-                    return $http.post(baseUrl + 'drugStockList', {elderlyId:elderlyId, tenantId:tenantId});
+                function elderlyDrugStockList(tenantId, elderlyId) {
+                    return $http.post(baseUrl + 'elderlyDrugStockList', {tenantId:tenantId, elderlyId:elderlyId});
+                }
+
+                function elderlyDrugUseWithStockList(tenantId, elderlyId) {
+                    return $http.post(baseUrl + 'elderlyDrugUseWithStockList', {tenantId:tenantId, elderlyId:elderlyId});
+                }
+
+                function elderlyDrugStockSummary(tenantId, elderlyId, drugId) {
+                    return $http.post(baseUrl + 'elderlyDrugStockSummary', {tenantId:tenantId, elderlyId: elderlyId, drugId: drugId});
                 }
 
                 function drugOutStock(tenantId, elderlyId, drugId, in_out_quantity, type, unit) {

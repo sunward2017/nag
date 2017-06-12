@@ -70,8 +70,8 @@
         }
 
         function fetchDrugStock() {
-            vmh.psnService.drugStockList(vm.elderlyId, vm.tenantId).then(function(rows){
-                vm.elderlyStockList = rows;
+            vmh.psnService.elderlyDrugStockList(vm.tenantId, vm.elderlyId).then(function(rows){
+                vm.elderlyDrugStockList = rows;
             });
         }
     }

@@ -689,11 +689,21 @@
       },
       "details": {
         "TITLE": "养老机构-药品管理-库存-详情",
-        "TAB1": "库存信息",
-        "TAB1-LABEL-DRUG-NO": "药品编码",
+        "TAB1": "",
         "TAB1-LABEL-ELDERLY-NAME": "老人",
         "TAB1-LABEL-CURRENT-QUANTITY": "当前库存量",
-        "TAB1-LABEL-UNIT": "单位"
+        "TAB1-LABEL-UNIT": "单位",
+        "TAB1-PLACEHOLDER-REMARK": "补充说明一些情况",
+        "TAB1-LABEL-SEX": "性别",
+        "TAB1-LABEL-MEDICAL_HISTORIES": "过往病史",
+        "TAB1-LABEL-BIRTHDAY": "出生日期",
+        "TAB1-LABEL-MEDICAL_INSURANCE": "医保所在地",
+        "TAB1-LABEL-DRUG-STOCK-LIST": "老人药品库存",
+        "TAB1-LABEL-DRUG-NAME": "药品名称",
+        "TAB1-LABEL-QUANTITY": "药品数量",
+        "TAB1-LABEL-MINI_UNIT": "最小单位",
+        "TAB1-LABEL-CHECK_IN_TIME": "入库日期",
+        "TAB1-LABEL-EXPIRE_IN": "有效期至"
       }
     },
     "drug-in-stock": {

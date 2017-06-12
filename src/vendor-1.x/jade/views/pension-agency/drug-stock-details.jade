@@ -1,5 +1,4 @@
-//-  Created by yrm on 17-3-29
-form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="vm.doSubmit()")
+form.form-validate.mb-lg(role='form', name="theForm", novalidate='')
     .panel
         tabset(justified="true")
             tab(active="vm.tab1.active")
@@ -8,28 +7,53 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                     span.text-danger(title="{{'validator.FIELD-INVALID'|translate}}" , ng-show="utils.vtab('contentTab1')")
                         i.glyphicon.glyphicon-minus-sign
                 div#contentTab1
-                    fieldset(disabled): .form-group
-                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-DRUG-NO') | translate}}:
-                        .col-md-10
-                            div#drug(angucomplete-alt,input-name="barcode",minlength="1",field-required="true",text-searching='{{"label.TEXT-SEARCHING"|translate}}',text-no-results='{{"label.TEXT-NO-RESULTS"|translate}}',placeholder="",pause="400",selected-object="vm.selectDrug",remote-api-handler="vm.queryDrug",title-field="barcode",initial-value="vm.selectedDrug",input-class="form-control form-control-small")
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'barcode','autocomplete-required')") {{ "validator.REQUIRED" | translate}}  
-                    fieldset(disabled): .form-group
-                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-ELDERLY-NAME') | translate}}:
-                        .col-md-10
-                            div#elderly(angucomplete-alt,input-name="elderly",minlength="1",field-required="true",text-searching='{{"label.TEXT-SEARCHING"|translate}}',text-no-results='{{"label.TEXT-NO-RESULTS"|translate}}',placeholder="",pause="400",selected-object="vm.selectElerly",remote-api-handler="vm.queryElderly",title-field="name",initial-value="vm.selectedElderly",input-class="form-control form-control-small")
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'elderly','autocomplete-required')") {{ "validator.REQUIRED" | translate}}
                     fieldset: .form-group
-                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-CURRENT-QUANTITY') | translate}}:
-                        .col-md-10
-                            input.form-control(type='text', name='current_quantity',ng-model='vm.model.current_quantity',placeholder='{{vm.viewTranslatePath("TAB1-LABEL-CURRENT-QUANTITY")|translate}}' ,required='')
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'current_quantity','required')") {{ "validator.REQUIRED" | translate}}
-                   fieldset: .form-group
-                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-UNIT') | translate}}:
-                        .col-md-10
+                        <!--姓名-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-ELDERLY-NAME') | translate}}:
+                        .col-md-10(ng-if="vm.readonly || vm._action_=='edit'")
+                            .form-readable {{vm.model.name}}
+                    fieldset: .form-group
+                        <!--性别-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-SEX') | translate}}:
+                        .col-md-10(ng-if="vm.readonly || vm._action_=='edit'")
                             .btn-group
-                                .btn.btn-primary.disabled(name='unit',ng-repeat='item in vm.selectBinding.unit',ng-model='vm.model.unit',btn-radio="item.value",required='') {{item.name}}
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'unit','required')") {{ "validator.REQUIRED" | translate}}
-
+                                .btn.btn-primary.cursor-not-allowed(name='sex',ng-repeat='sex in vm.selectBinding.sex',ng-class="{'active':vm.model.sex==sex.value}") {{sex.name}}
+                    fieldset: .form-group
+                        <!--出生日期-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-BIRTHDAY') | translate}}:
+                        .col-md-2(ng-if="vm.readonly || vm._action_=='edit'")
+                            .form-readable {{vm.model.birthday|date}}
+                    fieldset: .form-group
+                        <!--医保所在地-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-MEDICAL_INSURANCE') | translate}}:
+                        .col-md-10(ng-if="vm.readonly || vm._action_=='edit'")
+                            .btn-group
+                                .btn.btn-primary.cursor-not-allowed(name='medical_insurance',ng-repeat='medical_insurance in vm.selectBinding.medical_insurances',ng-class="{'active':vm.model.medical_insurance==medical_insurance.value}") {{medical_insurance.name}}
+                    fieldset: .form-group
+                        .panel.panel-default.panel-grid
+                            .panel-heading-normal
+                                a {{ vm.viewTranslatePath('TAB1-LABEL-DRUG-STOCK-LIST') | translate}}
+                            table.grid.table.table-bordered.table-hover.table-striped
+                                thead
+                                    tr
+                                        th.text-center(width="80")
+                                            | {{ vm.viewTranslatePath('TAB1-LABEL-DRUG-NAME') | translate}}
+                                        th.text-center(width="50")
+                                            | {{ vm.viewTranslatePath('TAB1-LABEL-QUANTITY') | translate}}
+                                        th.text-center(width="40")
+                                            | {{ vm.viewTranslatePath('TAB1-LABEL-MINI_UNIT') | translate}}
+                                        th.text-center(width="40")
+                                            | {{ vm.viewTranslatePath('TAB1-LABEL-CHECK_IN_TIME') | translate}}
+                                        th.text-center(width="40")
+                                            | {{ vm.viewTranslatePath('TAB1-LABEL-EXPIRE_IN') | translate}}
+                                tbody
+                                    tr(ng-repeat="row in vm.elderlyStockList " )
+                                        td {{::row.drug_name}}
+                                        td.text-right {{::row.quantity}}
+                                        td.text-center {{::row.mini_unit_name }}
+                                        td.text-center {{::row.check_in_time | date: 'yyyy-MM-dd'}}
+                                        td.text-center {{::row.expire_in | date: 'yyyy-MM-dd'}}
+                                    tr(ng-if="vm.paged.length==0")
+                                        td(colspan="{{utils.noResultsColspan(vm)}}") {{ 'grid.NO-RESULTS' | translate}}
     .text-right.mt-lg
-        button.btn.btn-warning(type="button",ng-click="vm.cancel()") {{'button.CANCEL'|translate}}
-        button.btn.btn-success(type="submit") {{'button.SAVE'|translate}}
+        button.btn.btn-primary(type="button",ng-click="vm.toListView()") {{'button.RETURN'|translate}}

@@ -392,6 +392,29 @@ module.exports = {
             }
         }).catch(self.ctx.coOnError);
     },
+    stockList: function (tenantId, elderlyId) {
+        var self = this;
+        return co(function *() {
+            try {
+                var drugsInStock = yield self.ctx.modelFactory().model_query(self.ctx.models['psn_drugStock'], {
+                    select: 'drugId drug_name quantity mini_unit check_in_time expire_in',
+                    where: {
+                        status: 1,
+                        elderlyId: elderlyId,
+                        tenantId: tenantId
+                    },
+                    sort: {expire_in: 1, check_in_time: 1}
+                });
+
+                return self.ctx.wrapper.res.rows(drugsInStock);
+            }
+            catch (e) {
+                console.log(e);
+                self.logger.error(e.message);
+                return self.ctx.wrapper.res.error(e.message);
+            }
+        }).catch(self.ctx.coOnError);
+    },
     modifyStockQuantity: function (operated_by_name, drugStockId, newQuantity) {
         var self = this;
         return co(function *() {

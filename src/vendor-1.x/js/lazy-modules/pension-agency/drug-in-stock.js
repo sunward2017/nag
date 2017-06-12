@@ -85,7 +85,7 @@
                 }
 
                 if(vm.model.id) {
-                    vmh.psnService.stockInRecordCheck(vm.tenantId, vm.model.id).then(function(ret) {
+                    vmh.psnService.drugStockInRecordCheck(vm.tenantId, vm.model.id).then(function(ret) {
                         vm.drugsStockStatus = ret;
                     });
                 }
@@ -208,7 +208,7 @@
                         vm.returnBack();
                     });
                 } else {
-                    vmh.psnService.updateInStock(vm.tenantId, vm.model._id, vm.operated_by, vm.model, vm.drugs_to_remove).then(function () {
+                    vmh.psnService.updateDrugsInStock(vm.tenantId, vm.model._id, vm.operated_by, vm.model, vm.drugs_to_remove).then(function () {
                         vmh.alertSuccess();
                         vm.returnBack();
                     });

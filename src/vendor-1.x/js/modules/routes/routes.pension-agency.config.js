@@ -1878,51 +1878,49 @@
                 controller: 'DrugStockGridController',
                 resolve: {
                     entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'drug-stock.list', {
-                        modelName: 'psn-drugStock',
-                        searchForm: { "status": 1 },
+                        modelName: 'psn-elderly',
+                        searchForm: { "status": 1, "live_in_flag": true },
+                        switches: { leftTree: true },
                         serverPaging: true,
                         columns: [{
-                            label: '药品条形码',
-                            name: 'barcode',
+                            label: '老人',
+                            name: 'name',
                             type: 'string',
-                            width: 80,
+                            width: 60,
                             sortable: true
                         }, {
-                            label: '药品名称',
-                            name: 'drug_full_name',
+                            label: '性别',
+                            name: 'sex',
                             type: 'string',
-                            width: 80,
-                            sortable: true
+                            width: 40,
+                            formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D1006/object')
                         }, {
-                            label: '有效期',
-                            name: 'period_validity',
+                            label: '年龄',
+                            name: 'birthday',
                             type: 'date',
-                            width: 100,
-                            sortable: true 
-                        }, {
-                            label: '关联老人',
-                            name: 'elderly_name',
-                            type: 'string',
-                            width: 100,
+                            width: 40,
                             sortable: true
                         }, {
-                            label: '当前库存量',
-                            name: 'current_quantity',
-                            type: 'number',
-                            width: 60,
-                            sortable: true
-                        }, {
-                            label: '最小包装',
-                            name: 'unit',
+                            label: '入院登记号',
+                            name: 'enter_code',
                             type: 'string',
                             width: 60,
-                            sortable: true,
-                            formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D3013/object'),
+                            sortable: true
+                        },  {
+                            label: '房间床位',
+                            name: 'room_summary',
+                            type: 'string',
+                            width: 120
                         }, {
-                            label: '操作',
+                            label: '照护信息',
+                            name: 'nursing_info',
+                            type: 'string',
+                            width: 150
+                        }, {
+                            label: '',
                             name: 'actions',
                             sortable: false,
-                            width: 40
+                            width: 30
                         }]
                     })
                 }
@@ -1935,7 +1933,7 @@
                 params: { autoSetTab: null },
                 resolve: {
                     entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'drug-stock.details', {
-                        modelName: 'psn-drugStock',
+                        modelName: 'psn-elderly',
                         model: {},
                         blockUI: true
                     }),

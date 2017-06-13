@@ -8,36 +8,45 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                         i.glyphicon.glyphicon-minus-sign
                 div#contentTab1
                     fieldset: .form-group
-                            label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-TENANT_NAME') | translate}}:
-                            .col-md-10
-                                input.form-control(type='text', name='tenant_name',ng-model='vm.tenant_name' ,required='' )
-                                span.text-danger(ng-show="utils.vinput(this.theForm,'tenant_name','required')") {{ "validator.REQUIRED" | translate}}
+                        <!--机构名称-->
+                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-TENANT_NAME') | translate}}:
+                        .col-md-10
+                            input.form-control(type='text', name='tenant_name',ng-model='vm.tenant_name' ,required='' )
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'tenant_name','required')") {{ "validator.REQUIRED" | translate}}
                     fieldset: .form-group
+                        <!--睡眠带超时时间（分）-->
                         label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-BED_MONITOR_TIMEOUT') | translate}}:
                         .col-md-10
                             input.form-control(type='number', name='psn_bed_monitor_timeout',ng-model='vm.other_configs.psn_bed_monitor_timeout',placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-BED_MONITOR_TIMEOUT")|translate}}' ,required='',ui-validate="'$value>=1'" )
                             span.text-danger(ng-show="utils.vinput(this.theForm,'psn_bed_monitor_timeout','required')") {{ "validator.REQUIRED" | translate}}
                     fieldset: .form-group
+                        <!--睡眠带超时报警开始时间-->
                         label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-BED_MONITOR_TIMEOUT_ALARM_BRGIN') | translate}}:
                         .col-md-10
                             input.form-control(type='text', ng-minlength=5,ng-maxlength=5,name='psn_bed_monitor_timeout_alarm_begin',ng-model='vm.other_configs.psn_bed_monitor_timeout_alarm_begin',placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-BED_MONITOR_TIMEOUT_ALARM_BRGIN")|translate}}' ,required='')
                             span.text-danger(ng-show="utils.vinput(this.theForm,'psn_bed_monitor_timeout_alarm_begin','required')") {{ "validator.REQUIRED" | translate}}
                     fieldset: .form-group
+                        <!--睡眠带超时报警结束时间-->
                         label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-BED_MONITOR_TIMEOUT_ALARM_END') | translate}}:
                         .col-md-10
                             input.form-control(type='text', ng-minlength=5,ng-maxlength=5,name='psn_bed_monitor_timeout_alarm_end',ng-model='vm.other_configs.psn_bed_monitor_timeout_alarm_end',placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-BED_MONITOR_TIMEOUT_ALARM_END")|translate}}' ,required='')
                             span.text-danger(ng-show="utils.vinput(this.theForm,'psn_bed_monitor_timeout_alarm_end','required')") {{ "validator.REQUIRED" | translate}}
                     fieldset: .form-group
+                        <!--离床报警模版-->
                         label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-ALARM_D3016_A1000') | translate}}:
                         .col-md-10
                             input.form-control(type='text',name='pub_alarm_D3016_A1000',ng-model='vm.other_configs.pub_alarm_D3016_A1000',placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-ALARM_D3016_A1000")|translate}}')
                             span.text-danger(ng-show="utils.vinput(this.theForm,'pub_alarm_D3016_A1000','required')") {{ "validator.REQUIRED" | translate}}
                     fieldset: .form-group
-                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-ASSESSMENT_REGULAR_PERIOD') | translate}}:
+                        <!--药品低库存警戒线-->
+                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-DRUG_STOCK_ALARM_LOW_PERCENT') | translate}}:
                         .col-md-10
-                            input.form-control(type='number',name='pub_assessment_regular_period',ng-model='vm.other_configs.pub_assessment_regular_period',placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-ASSESSMENT_REGULAR_PERIOD")|translate}}',ui-validate="'$value>=1'")
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'pub_assessment_regular_period','required')") {{ "validator.REQUIRED" | translate}}
+                            input.form-control(type='number',name='psn_drug_stock_alarm_low_percent',ng-model='vm.other_configs.psn_drug_stock_alarm_low_percent',placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-DRUG_STOCK_ALARM_LOW_PERCENT")|translate}}',ui-validate='{min:"$value>=0", max:"$value<=50"}')
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'psn_drug_stock_alarm_low_percent','number')") {{ "validator.NUMBER" | translate}}
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'psn_drug_stock_alarm_low_percent','min')") {{ "validator.MIN" | translate:{min:0} }}
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'psn_drug_stock_alarm_low_percent','max')") {{ "validator.MAX" | translate:{max:50} }}
                     fieldset: .form-group
+                        <!--药品入库时检查效期-->
                         label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-FLAG-COLLECTION') | translate}}:
                         .col-md-2
                             .checkbox.c-checkbox
@@ -45,5 +54,12 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                                     input#drugInStockExpireDateCheckFlag(type='checkbox',ng-model='vm.other_configs.psn_drug_in_stock_expire_date_check_flag')
                                     span.fa.fa-check
                             label(for="drugInStockExpireDateCheckFlag") {{ vm.moduleTranslatePath('TAB1-LABEL-PSN_DRUG_IN_STOCK_EXPIRE_DATE_CHECK_FLAG') | translate}}
+                    fieldset: .form-group
+                        <!--评估周期（月）-->
+                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-ASSESSMENT_REGULAR_PERIOD') | translate}}:
+                        .col-md-10
+                            input.form-control(type='number',name='pub_assessment_regular_period',ng-model='vm.other_configs.pub_assessment_regular_period',placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-ASSESSMENT_REGULAR_PERIOD")|translate}}',ui-validate="'$value>=1'")
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'pub_assessment_regular_period','required')") {{ "validator.REQUIRED" | translate}}
+
     .text-right.mt-lg
         button.btn.btn-success(type="submit") {{'button.SAVE'|translate}}

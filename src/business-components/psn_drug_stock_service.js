@@ -456,9 +456,9 @@ module.exports = {
 
                 var elderlyStockObject = yield self._elderlyStockObject(tenant, elderly);
 
-                var rows = self.ctx._.map(drugUseItems, (o)=>{
+                var rows = self.ctx._.map(drugUseItems, (o)=> {
                     var obj = o.toObject();
-                    obj.stock = elderlyStockObject[o.drugId] || {total: 0, is_danger: true};
+                    obj.stock = elderlyStockObject[o.drugId] || {total: 0, is_danger: true, is_warning: false};
                     return obj;
                 });
 
@@ -523,11 +523,14 @@ module.exports = {
                     }
                 ]);
 
+                // 获取药品低库存警戒线
+                var stock_alarm_low_percent = tenant.other_config.psn_drug_stock_alarm_low_percent || self.ctx.modelVariables.DEFAULTS.TENANT_DRUG_STOCK_ALARM_LOW_PERCENT || 30;
 
-                var ret = {}, drugInStock;
+                var ret = {}, drugInStock, alarm_low_quantity;
                 for (var i=0,len = drugsInStock.length;i< len;i++) {
                     drugInStock = drugsInStock[i];
-                    ret[drugInStock.drugId] = { total: drugInStock.total, unit_name: D3026[drugInStock.unit].name };
+                    alarm_low_quantity = Math.round(drugInStock.total * stock_alarm_low_percent / 100);
+                    ret[drugInStock.drugId] = { total: drugInStock.total, is_warning: drugInStock.total <= alarm_low_quantity &&  drugInStock.total > 0, is_danger: drugInStock.total<=0, unit_name: D3026[drugInStock.unit].name };
                 }
 
 
@@ -576,11 +579,23 @@ module.exports = {
 
                 console.log('drugsInStock:', drugsInStock);
 
+
                 var ret = { total: 0};
                 if(drugsInStock.length>0) {
                     ret.total = self.ctx._.reduce(drugsInStock,(total, o)=>{  return total + o.quantity || 0;}, 0);
+
+                    var stock_alarm_low_percent = tenant.other_config.psn_drug_stock_alarm_low_percent || self.ctx.modelVariables.DEFAULTS.TENANT_DRUG_STOCK_ALARM_LOW_PERCENT || 30;
+                    var alarm_low_quantity = Math.round(ret.total * stock_alarm_low_percent / 100);
+
                     ret.mini_unit = drugsInStock[0].mini_unit;
                     ret.mini_unit_name = drugsInStock[0].mini_unit_name;
+                    if(ret.total <= 0) {
+                        ret.is_danger = true;
+                        ret.is_warning = false;
+                    } else {
+                        ret.is_danger = false;
+                        ret.is_warning = ret.total <= alarm_low_quantity
+                    }
                 }
 
                 return self.ctx.wrapper.res.ret(ret);

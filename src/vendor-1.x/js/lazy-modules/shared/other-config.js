@@ -16,7 +16,7 @@
     function Shared_OtherConfigGridController($scope, ngDialog, vmh, vm) {
 
         $scope.vm = vm;
-        $scope.utils = vmh.utils.g;
+        $scope.utils = vmh.utils.v;
         var tenantService = vm.modelNode.services['pub-tenant'];
 
         init();

@@ -77,19 +77,18 @@
                 vm.selectBinding.mini_units = results[2];
                 vm.selectBinding.modes =  results[3];
 
+                vm.load().then(function () {
+                    if (vm.model.elderlyId) {
+                        vm.selectedElderly = { _id: vm.model.elderlyId, name: vm.model.elderly_name };
+                    }
+
+                    if(vm.model.id) {
+                        vmh.psnService.drugStockInRecordCheck(vm.tenantId, vm.model.id).then(function(ret) {
+                            vm.drugsStockStatus = ret;
+                        });
+                    }
+                });
             })
-
-            vm.load().then(function () {
-                if (vm.model.elderlyId) {
-                    vm.selectedElderly = { _id: vm.model.elderlyId, name: vm.model.elderly_name };
-                }
-
-                if(vm.model.id) {
-                    vmh.psnService.drugStockInRecordCheck(vm.tenantId, vm.model.id).then(function(ret) {
-                        vm.drugsStockStatus = ret;
-                    });
-                }
-            });
 
         }
 

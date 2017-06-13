@@ -42,7 +42,7 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                         .panel.panel-default.panel-grid
                             .panel-heading-normal
                                 a {{ vm.viewTranslatePath('TAB1-LABEL-DRUG-LIST') | translate}}
-                                span.drugsListChangeNotify(ng-if="vm.checkDrugsListChanged()") 入库药品信息有变动,点击[保存]按钮后生效
+                                span.drugsListChangeNotify(ng-if="vm.checkDrugsListChanged()") {{ vm.viewTranslatePath('TOOLTIP_DRUGS_LIST_CHANGE_NOTIFY') | translate}}
                             table.grid.table.table-bordered.table-hover.table-striped
                                 thead
                                     tr

@@ -528,6 +528,7 @@
                     elderlyDrugUseWithStockList: elderlyDrugUseWithStockList,
                     elderlyDrugStockSummary: elderlyDrugStockSummary,
                     drugOutStock: drugOutStock,
+                    queryElderlyDrugStock: queryElderlyDrugStock,
                     drugOutStockInvalid: drugOutStockInvalid,
                     drugStockEditLogInsert: drugStockEditLogInsert,
                     elderlyInfo: elderlyInfo,
@@ -768,6 +769,10 @@
 
                 function drugOutStock(tenantId, elderlyId, drugId, in_out_quantity, type, unit) {
                     return $http.post(baseUrl + 'outStock', { tenantId: tenantId, elderlyId: elderlyId, drugId: drugId, in_out_quantity: in_out_quantity, type: type, unit: unit });
+                }
+
+                function queryElderlyDrugStock(tenantId, elderlyId, keyword) {
+                    return $http.post(baseUrl + 'q/elderlyDrugStock', { tenantId: tenantId, elderlyId: elderlyId, keyword: keyword});
                 }
 
                 function checkCanChangeBookingOrUnbookingRecharge(rechargeId) {

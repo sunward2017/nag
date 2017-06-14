@@ -5983,7 +5983,7 @@ module.exports = {
                 }
             },
             {
-                method: 'outStock',
+                method: 'drugOutStock',
                 verb: 'post',
                 url: this.service_url_prefix + "/outStock",
                 handler: function (app, options) {
@@ -5991,83 +5991,50 @@ module.exports = {
                         var tenant, elderly, drug;
                         try {
                             var tenantId = this.request.body.tenantId;
-                            tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], tenantId);
-                            if (!tenant || tenant.status == 0) {
-                                this.body = app.wrapper.res.error({ message: '无法找到养老机构!' });
-                                yield next;
-                                return;
-                            }
-
+                            var operated_by = this.request.body.operated_by;
+                            var outStockData = this.request.body.outStockData;
+                            this.body = yield app.psn_drug_stock_service.outStock(tenantId, outStockData, operated_by);
+                        } catch (e) {
+                            console.log(e);
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
+            {
+                method: 'updateDrugsOutStock',
+                verb: 'post',
+                url: this.service_url_prefix + "/updateDrugsOutStock",
+                handler: function (app, options) {
+                    return function* (next) {
+                        try {
+                            var tenantId = this.request.body.tenantId;
+                            var drugInOutStockId = this.request.body.drugInOutStockId;
+                            var outStockData = this.request.body.outStockData;
+                            var operated_by = this.request.body.operated_by;
+                            this.body = yield app.psn_drug_stock_service.updateOutStock(tenantId, drugInOutStockId, outStockData, operated_by);
+                        } catch (e) {
+                            console.log(e);
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
+            {
+                method: 'queryElderlyDrugStock',
+                verb: 'post',
+                url: this.service_url_prefix + "/q/elderlyDrugStock",
+                handler: function (app, options) {
+                    return function* (next) {
+                        try {
+                            var tenantId = this.request.body.tenantId;
                             var elderlyId = this.request.body.elderlyId;
-                            elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], elderlyId);
-                            if (!elderly || elderly.status == 0) {
-                                this.body = app.wrapper.res.error({ message: '无法找到老人!' });
-                                yield next;
-                                return;
-                            }
-                            var elderly_json = elderly.toObject();
-                            var drugId = this.request.body.drugId;
-                            drug = yield app.modelFactory().model_read(app.models['psn_drugDirectory'], drugId);
-                            if (!drug || drug.status == 0) {
-                                this.body = app.wrapper.res.error({ message: '无法找到药品!' });
-                                yield next;
-                                return;
-                            }
-                            var drug_json = drug.toObject();
-                            var in_out_quantity = this.request.body.in_out_quantity;
-                            var unit = this.request.body.unit;
-                            var type = this.request.body.type;
-                            // yield app.modelFactory().model_create(app.models['psn_drugInOutStock'],{
-                            //     elderlyId: elderlyId,
-                            //     elderly_name:elderly_json.name,
-                            //     tenantId: tenantId,
-                            //     drugId: drugId,
-                            //     drug_no: drug_json.drug_no,
-                            //     drug_full_name: drug_json.full_name,
-                            //     in_out_quantity: in_out_quantity,
-                            //     unit: unit,
-                            //     type: type,
-                            //     in_out_no: 'out-'+ app.moment().format('YYYY-MM-DD HH:mm:ss')
-                            // });
-                            var drugStock = yield app.modelFactory().model_one(app.models['psn_drugStock'], {
-                                where: {
-                                    status: 1,
-                                    elderlyId: elderlyId,
-                                    drugId: drugId,
-                                    tenantId: tenantId,
-                                    unit: unit
-                                }
-                            });
-
-                            if (!drugStock) {
-                                this.body = app.wrapper.res.error({ message: '当前无库存，无法出库!' });
-                                yield next;
-                                return;
-                            } else {
-                                if (drugStock.current_quantity < in_out_quantity) {
-                                    this.body = app.wrapper.res.error({ message: '出库数量大于当前库存，无法出库!' });
-                                    yield next;
-                                    return;
-                                } else {
-                                    yield app.modelFactory().model_create(app.models['psn_drugInOutStock'], {
-                                        elderlyId: elderlyId,
-                                        elderly_name: elderly_json.name,
-                                        tenantId: tenantId,
-                                        drugId: drugId,
-                                        drug_no: drug_json.drug_no,
-                                        drug_full_name: drug_json.full_name,
-                                        in_out_quantity: in_out_quantity,
-                                        unit: unit,
-                                        type: type,
-                                        in_out_type: 0,
-                                        in_out_no: 'OUT-' + new Date().valueOf()
-                                    });
-                                    drugStock.current_quantity = parseInt(drugStock.current_quantity) - parseInt(in_out_quantity);
-                                    yield drugStock.save();
-                                }
-
-                            }
-                            this.body = app.wrapper.res.default();
+                            var keyword = this.request.body.keyword;
+                            this.body = yield app.psn_drug_stock_service.elderlyStockQuery(tenantId, elderlyId, keyword);
                         } catch (e) {
                             console.log(e);
                             self.logger.error(e.message);

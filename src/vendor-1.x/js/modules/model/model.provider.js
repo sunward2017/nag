@@ -528,6 +528,8 @@
                     elderlyDrugUseWithStockList: elderlyDrugUseWithStockList,
                     elderlyDrugStockSummary: elderlyDrugStockSummary,
                     drugOutStock: drugOutStock,
+                    updateDrugsOutStock: updateDrugsOutStock,
+                    queryElderlyDrugStock: queryElderlyDrugStock,
                     drugOutStockInvalid: drugOutStockInvalid,
                     drugStockEditLogInsert: drugStockEditLogInsert,
                     elderlyInfo: elderlyInfo,
@@ -766,8 +768,23 @@
                     return $http.post(baseUrl + 'elderlyDrugStockSummary', {tenantId:tenantId, elderlyId: elderlyId, drugId: drugId});
                 }
 
-                function drugOutStock(tenantId, elderlyId, drugId, in_out_quantity, type, unit) {
-                    return $http.post(baseUrl + 'outStock', { tenantId: tenantId, elderlyId: elderlyId, drugId: drugId, in_out_quantity: in_out_quantity, type: type, unit: unit });
+                function drugOutStock(tenantId, operated_by, outStockData) {
+                    return $http.post(baseUrl + 'outStock', { tenantId: tenantId, operated_by: operated_by, outStockData: outStockData });
+                }
+
+                function updateDrugsOutStock (tenantId, drugInOutStockId, operated_by, model, drugs_to_remove) {
+                    var outStockData;
+                    if(drugs_to_remove.length>0){
+                        outStockData = _.extend({}, model);
+                        outStockData.drugs = outStockData.drugs.concat(drugs_to_remove);
+                    } else {
+                        outStockData = model;
+                    }
+                    return $http.post(baseUrl + 'updateDrugsOutStock', {tenantId: tenantId, drugInOutStockId: drugInOutStockId, operated_by: operated_by, outStockData: outStockData});
+                }
+
+                function queryElderlyDrugStock(tenantId, elderlyId, keyword) {
+                    return $http.post(baseUrl + 'q/elderlyDrugStock', { tenantId: tenantId, elderlyId: elderlyId, keyword: keyword});
                 }
 
                 function checkCanChangeBookingOrUnbookingRecharge(rechargeId) {

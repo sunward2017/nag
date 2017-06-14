@@ -601,11 +601,5 @@
                 vm.elderlyDrugUseItems = elderlyDrugUseItems
             });
         }
-
-        function elderlyDrugStockSummary(elderlyId, drugId) {
-            vmh.psnService.elderlyDrugStockSummary(vm.tenantId, elderlyId, drugId).then(function(ret){
-                vm.drugStockModel = ret;
-            });
-        }
     }
 })();

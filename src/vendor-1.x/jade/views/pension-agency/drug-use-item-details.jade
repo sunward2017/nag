@@ -116,7 +116,7 @@ script(type="text/ng-template", id="drug-use-item.html")
                         .form-readable {{vm.model.name}}
                     .col-md-4
                         <!--药品库存-->
-                        .form-readable {{vm.drugStockModel.total}} {{vm.drugStockModel.mini_unit_name}}
+                        .form-readable {{vm.drugStockModel.total}} {{vm.drugStockModel.unit_name}}
                 fieldset: .form-group
                     <!--一次服用量-->
                     label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-QUANTITY') | translate}}:

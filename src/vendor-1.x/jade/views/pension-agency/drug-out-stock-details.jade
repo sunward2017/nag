@@ -1,5 +1,13 @@
-//- Created by yrm on 17-3-31.
 form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="vm.doSubmit()")
+    .row
+        .col-md-1.control-label {{ vm.viewTranslatePath('HEAD-LABEL-CODE') | translate}}:
+        .col-md-3
+            input.read-control-underline(readonly,placeholder='{{vm.viewTranslatePath("HEAD-PLACEHOLDER-CODE")|translate}}',ng-model="vm.model.code")
+        .col-md-5
+        .col-md-1.control-label {{ vm.viewTranslatePath('HEAD-LABEL-STOCK_IN_ON') | translate}}:
+        .col-md-2
+            input.read-control-underline(readonly,value="{{ (vm.model.check_in_time | date) || vm.now }}")
+    .row-split
     .panel
         tabset(justified="true")
             tab(active="vm.tab1.active")
@@ -10,38 +18,117 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                 div#contentTab1
                     fieldset: .form-group
                         <!--老人-->
-                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-ELDERLY-NAME') | translate}}:
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-ELDERLY') | translate}}:
                         .col-md-10(ng-if="!vm.readonly && vm._action_!='edit' ")
-                            .backfiller(backfiller,ng-model="vm.selectedElderly", input-name="elderly", required="true", fetch-rows="vm.queryElderlyPromise", fetch-columns="vm.fetchElderlyColumnsPromise", picker-title="挑选老人" on-select="vm.selectElerlyForBackFiller(row)", on-search="vm.searchElderlyForBackFiller(keyword)")
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'elderly','autocomplete-required')") {{ "validator.REQUIRED" | translate}}
-                        .col-md-10(ng-if="vm.readonly || vm._action_=='edit'")
-                            .form-readable {{vm.model.elderly_name}}  
+                            .backfiller(backfiller,ng-model="vm.selectedElderly", input-name="elderly", required="true", fetch-rows="vm.queryElderlyPromise", fetch-columns="vm.fetchElderlyColumnsPromise", picker-title="挑选老人" on-select="vm.selectElderlyForBackFiller(row)", on-search="vm.searchElderlyForBackFiller(keyword)")
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'elderly','required')") {{ "validator.REQUIRED" | translate}}
+                        .col-md-10(ng-if="vm.readonly || vm._action_=='edit' ")
+                            .form-readable {{vm.model.elderly_name}}
                     fieldset: .form-group
-                        <!--药品目录-->
-                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-DRUG-NAME') | translate}}:
-                        .col-md-10(ng-if="!vm.readonly && vm._action_!='edit' ")
-                            .backfiller(backfiller,ng-model="vm.selectedDrug", text-key="full_name", required="true", input-name="drug", fetch-rows="vm.queryDrugPromise", fetch-columns="vm.fetchDrugColumnsPromise", picker-title="挑选药品" on-select="vm.selectDrugForBackFiller(row)", on-search="vm.searchDrugForBackFiller(keyword)")
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'drug','autocomplete-required')") {{ "validator.REQUIRED" | translate}}
-                        .col-md-10(ng-if="vm.readonly || vm._action_=='edit'")
-                            .form-readable {{vm.model.drug_full_name}}        
-                    fieldset: .form-group
+                        <!--出库类别-->
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-TYPE') | translate}}:
                         .col-md-10
-                            .tree.tree-dropdown(name='type',s-tree,s-tree-data="vm.typePromise",s-tree-height="200", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{layout:'dropdown',readonly:{{vm.readonly}}}",ng-model="vm.model.type",required='')
+                            .btn-group
+                                .btn.btn-primary(name='type',ng-repeat='type in vm.selectBinding.types',ng-model='vm.model.type',btn-radio="type.value",required='') {{type.name}}
                             span.text-danger(ng-show="utils.vinput(this.theForm,'type','required')") {{ "validator.REQUIRED" | translate}}
                     fieldset: .form-group
-                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-QUANTITY') | translate}}:
-                        .col-md-10
-                            input.form-control(type='text', name='in_out_quantity',ng-model='vm.model.in_out_quantity',placeholder='' ,required='')
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'in_out_quantity','required')") {{ "validator.REQUIRED" | translate}}
-                    fieldset: .form-group
-                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-UNIT') | translate}}:
+                        <!--出库方式-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-MODE') | translate}}:
                         .col-md-10
                             .btn-group
-                                .btn.btn-primary(name='unit',ng-repeat='item in vm.selectBinding.unit',ng-model='vm.model.unit',btn-radio="item.value",required='') {{item.name}}
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'unit','required')") {{ "validator.REQUIRED" | translate}}
-                        
+                                .btn.btn-primary(name='mode',ng-repeat='mode in vm.selectBinding.modes',ng-model='vm.model.mode',btn-radio="mode.value",required='') {{mode.name}}
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'mode','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset: .form-group
+                        .panel.panel-default.panel-grid
+                            .panel-heading-normal
+                                a {{ vm.viewTranslatePath('TAB1-LABEL-DRUG-LIST') | translate}}
+                                span.drugsListChangeNotify(ng-if="vm.checkDrugsListChanged()") {{ vm.viewTranslatePath('TOOLTIP_DRUGS_LIST_CHANGE_NOTIFY') | translate}}
+                            table.grid.table.table-bordered.table-hover.table-striped
+                                thead
+                                    tr
+                                        th.text-center(check-all,width="30")
+                                            .checkbox.c-checkbox(data-toggle="tooltip",data-title="Check All")
+                                                label
+                                                    input(type='checkbox' ng-model="vm.all" ng-change="vm.selectAll()")
+                                                    span.fa.fa-check
+                                        th.text-center(width="80")
+                                            | {{ vm.viewTranslatePath('TAB1-LABEL-DRUG_NAME') | translate}}
+                                        th.text-center(width="50")
+                                            | {{ vm.viewTranslatePath('TAB1-LABEL-QUANTITY') | translate}}
+                                        th.text-center(width="40")
+                                            | {{ vm.viewTranslatePath('TAB1-LABEL-MINI_UNIT') | translate}}
+                                        th.text-center(width="20")
+                                tbody
+                                    tr(ng-repeat="row in vm.model.drugs " )
+                                        td.text-center
+                                            .checkbox.c-checkbox
+                                                label
+                                                    input(type='checkbox',ng-model="row.checked" )
+                                                    span.fa.fa-check
+                                        td {{row.drug_name}}
+                                        td.text-center {{row.quantity}}
+                                        td.text-center {{row.mini_unit | diFilter: vm.selectBinding.mini_units }}
+                                        td.text-center
+                                            .btn-group
+                                                a.btn.btn-primary.btn-xs(title="{{'button.EDIT'|translate}}",  ng-click="vm.editDrugOutStock(row)")
+                                                    i.glyphicon.glyphicon-pencil
+                                    tr(ng-if="vm.paged.length==0")
+                                        td(colspan="{{utils.noResultsColspan(vm)}}") {{ 'grid.NO-RESULTS' | translate}}
+                            .panel-footer
+                                .row
+                                    .col-md-4.text-left
+                                        .btn-toolbar
+                                            .btn-group
+                                                a.btn.btn-primary.btn-sm(title="{{'button.ADD'|translate}}",ng-click="vm.addDrugOutStock()")
+                                                    i.glyphicon.glyphicon-plus
+                                                a.btn.btn-primary.btn-sm(title="{{'button.REMOVE'|translate}}",ng-click="vm.removeDrugOutStock()")
+                                                    i.glyphicon.glyphicon-minus
+
+
     .text-right.mt-lg
         button.btn.btn-warning(type="button",ng-click="vm.cancel()") {{'button.CANCEL'|translate}}
         button.btn.btn-success(type="submit") {{'button.SAVE'|translate}}
- 
+
+script(type="text/ng-template", id="out-stock-add-drug.html")
+    form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="vm.doSubmit()")
+        .ngdialog-title
+            i.glyphicon.glyphicon-info-sign
+            | {{ vm.viewTranslatePath('TAB1') | translate }}
+        .ngdialog-input
+            .col-md-12
+                fieldset: .form-group
+                    <!--药品目录-->
+                    label.col-md-3.control-label {{ vm.viewTranslatePath('TAB1-LABEL-DRUG_NAME') | translate}}:
+                    .col-md-9(ng-if="!vm.readonly")
+                        .backfiller(backfiller,ng-model="vm.selectedDrugStock", text-key="drug.full_name", required="true", input-name="elderlyDrugStock", fetch-rows="vm.queryElderlyDrugStockPromise", fetch-columns="vm.fetchElderlyDrugStockColumnsPromise", picker-title="挑选库存药品" on-select="vm.selectElderlyDrugStockForBackFiller(row)", on-search="vm.searchForBackFiller(keyword)")
+                        span.text-danger(ng-show="utils.vinput(theForm,'elderlyDrugStock','required')") {{ "validator.REQUIRED" | translate}}
+                    .col-md-9(ng-if="vm.readonly")
+                        .form-readable {{vm.model.drug_name}}
+                fieldset: .form-group
+                    <!--库存数量-->
+                    label.col-md-3.control-label {{ vm.viewTranslatePath('TAB1-LABEL-STOCK_TOTAL') | translate}}:
+                    .col-md-3
+                        .form-readable {{vm.stock.total}}
+                    <!--库存单位-->
+                    label.col-md-3.control-label {{ vm.viewTranslatePath('TAB1-LABEL-UNIT') | translate}}:
+                    .col-md-3
+                        .form-readable {{vm.stock.unit_name}}
+                fieldset: .form-group
+                    <!--出库数量-->
+                    label.col-md-3.control-label {{ vm.viewTranslatePath('TAB1-LABEL-QUANTITY') | translate}}:
+                    .col-md-9
+                        input.form-control(type='number',name='quantity' ,ng-model='vm.model.quantity',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-QUANTITY")|translate}}', required='', ui-validate="{min:'$value>=1', max:'$value<=vm.stock.total'}" )
+                        span.text-danger(ng-show="utils.vinput(this.theForm,'quantity','required')") {{ "validator.REQUIRED" | translate}}
+                        span.text-danger(ng-show="utils.vinput(this.theForm,'quantity','number')") {{ "validator.NUMBER" | translate}}
+                        span.text-danger(ng-show="utils.vinput(this.theForm,'quantity','min')") {{ "validator.MIN" | translate:{min:1} }}
+                        span.text-danger(ng-show="utils.vinput(this.theForm,'quantity','max')") {{ "validator.MAX" | translate:{max:vm.stock.total} }}
+                fieldset: .form-group
+                    <!--最小单位-->
+                    label.col-md-3.control-label {{ vm.viewTranslatePath('TAB1-LABEL-MINI_UNIT') | translate}}:
+                    .col-md-9
+                        .btn-group
+                            .btn.btn-primary(name='mini_unit',ng-repeat='mini_unit in vm.selectBinding.mini_units',ng-model='vm.model.mini_unit',btn-radio="mini_unit.value",required='') {{mini_unit.name}}
+                        span.text-danger(ng-show="utils.vinput(this.theForm,'mini_unit','required')") {{ "validator.REQUIRED" | translate}}
+                        span.text-danger(ng-show="vm.stock.unit && vm.stock.unit != vm.model.mini_unit") {{ vm.viewTranslatePath('VALIDATOR-UNIT-NOT-EQUAL') | translate }}
+        .text-right.mt-lg
+            button.btn.btn-success(type="submit" ) {{'button.CONFIRM'|translate}}

@@ -23,6 +23,9 @@
     "RECHARGE": "psn_recharge",
     "RED": "pub_red"
   },
+  "DEFAULTS": {
+    "TENANT_DRUG_STOCK_ALARM_LOW_PERCENT": 30
+  },
   "PENSION-AGENCY": {
     "SUB_SYSTEM": "pension-agency",
     "DEFAULT_CHARGE_STANDARD": "S1",

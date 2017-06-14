@@ -26,7 +26,7 @@ module.exports = function(ctx,name) {
             mini_unit: {type: String, minlength: 5, maxlength: 5, required: true, enum: ctx._.rest(ctx.dictionary.keys["D3026"])},
             expire_in: {type: Date}, //效期
             drugInStockId:{type: mongoose.Schema.Types.ObjectId,ref:'psn_drugInOutStock'},//关联入库单Id
-            drugOutStockId:{type: mongoose.Schema.Types.ObjectId,ref:'psn_drugInOutStock'},//关联出库单Id
+            drugOutStockIds:[{type: mongoose.Schema.Types.ObjectId,ref:'psn_drugInOutStock'}],//关联多张出库单Id
             tenantId: {type: mongoose.Schema.Types.ObjectId,required: true,ref:'pub_tenant'}//关联机构
         }, {
             toObject: {

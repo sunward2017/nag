@@ -77,13 +77,14 @@ module.exports = function(ctx,name) {
                 self: {type: Number, default: 0.00},//主账户
                 other: {type: Number, default: 0.00} //其他账户
             },
-            other_config:{
-                psn_bed_monitor_timeout:{type:Number,default:5.00},//睡眠带超时时间设置，单位：分钟，默认5分钟
-                psn_bed_monitor_timeout_alarm_begin:{type:String,minlength: 5, maxlength: 5,default:'22:00'},//睡眠带报警时间范围，起始时间,22:00
-                psn_bed_monitor_timeout_alarm_end:{type:String,minlength: 5, maxlength: 5,default:'06:00'},//睡眠带报警时间范围，结束时间,06:00
-                pub_alarm_D3016_A1000:{type:String},
-                pub_assessment_regular_period:{type:Number,default:3.00},//定期评估周期，单位：月，默认3个月
-                psn_drug_in_stock_expire_date_check_flag: {type: Boolean, default: false} // 药品入库是否需要检查效期 (扫码时是否要输入效期字段)
+            other_config: {
+                psn_bed_monitor_timeout: {type: Number, default: 5.00},//睡眠带超时时间设置，单位：分钟，默认5分钟
+                psn_bed_monitor_timeout_alarm_begin: {type: String, minlength: 5, maxlength: 5, default: '22:00'},//睡眠带报警时间范围，起始时间,22:00
+                psn_bed_monitor_timeout_alarm_end: {type: String, minlength: 5, maxlength: 5, default: '06:00'},//睡眠带报警时间范围，结束时间,06:00
+                pub_alarm_D3016_A1000: {type: String},
+                pub_assessment_regular_period: {type: Number, default: 3.00},//定期评估周期，单位：月，默认3个月
+                psn_drug_in_stock_expire_date_check_flag: {type: Boolean, default: false}, // 药品入库是否需要检查效期 (扫码时是否要输入效期字段)
+                psn_drug_stock_alarm_low_percent: {type: Number, default: 30, min: 0, max: 50} // 药品低库存警戒线
             }
         });
 

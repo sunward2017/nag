@@ -6004,6 +6004,27 @@ module.exports = {
                 }
             },
             {
+                method: 'updateDrugsOutStock',
+                verb: 'post',
+                url: this.service_url_prefix + "/updateDrugsOutStock",
+                handler: function (app, options) {
+                    return function* (next) {
+                        try {
+                            var tenantId = this.request.body.tenantId;
+                            var drugInOutStockId = this.request.body.drugInOutStockId;
+                            var outStockData = this.request.body.outStockData;
+                            var operated_by = this.request.body.operated_by;
+                            this.body = yield app.psn_drug_stock_service.updateOutStock(tenantId, drugInOutStockId, outStockData, operated_by);
+                        } catch (e) {
+                            console.log(e);
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
+            {
                 method: 'queryElderlyDrugStock',
                 verb: 'post',
                 url: this.service_url_prefix + "/q/elderlyDrugStock",

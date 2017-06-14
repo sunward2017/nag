@@ -78,14 +78,15 @@
                 vm.selectBinding.modes =  results[3];
 
                 vm.load().then(function () {
+                    console.log('vm.model.drugs:', vm.model.drugs);
                     if (vm.model.elderlyId) {
                         vm.selectedElderly = { _id: vm.model.elderlyId, name: vm.model.elderly_name };
                     }
 
                     if(vm.model.id) {
-                        vmh.psnService.drugStockOutRecordCheck(vm.tenantId, vm.model.id).then(function(ret) {
-                            vm.drugsStockStatus = ret;
-                        });
+                        // vmh.psnService.drugStockOutRecordCheck(vm.tenantId, vm.model.id).then(function(ret) {
+                        //     vm.drugsStockStatus = ret;
+                        // });
                     }
                 });
             })
@@ -224,7 +225,6 @@
                 }
             }
         }
-
     }
 
     StockOutDrugPickerController.$inject = ['$scope', 'ngDialog'];
@@ -269,6 +269,12 @@
 
             if (vm.model.drugId) {
                 // 修改
+                
+                //读取选中药品库存
+                vmh.psnService.elderlyDrugStockSummary(vm.tenantId, vm.elderlyId, vm.model.drugId).then(function(ret){
+                    vm.stock = ret;
+                });
+                
                 vm.readonly = true;
             } else {
                 vm.queryElderlyDrugStockPromise = queryElderlyDrugStock('');

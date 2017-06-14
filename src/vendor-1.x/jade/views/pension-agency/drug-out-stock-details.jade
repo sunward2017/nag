@@ -61,7 +61,7 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                                 tbody
                                     tr(ng-repeat="row in vm.model.drugs " )
                                         td.text-center
-                                            .checkbox.c-checkbox(ng-if=" vm._action_ == 'add' || !row.id || (row._id && vm.drugsStockStatus[row.drugId]) ")
+                                            .checkbox.c-checkbox
                                                 label
                                                     input(type='checkbox',ng-model="row.checked" )
                                                     span.fa.fa-check
@@ -70,7 +70,7 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                                         td.text-center {{row.mini_unit | diFilter: vm.selectBinding.mini_units }}
                                         td.text-center
                                             .btn-group
-                                                a.btn.btn-primary.btn-xs(title="{{'button.EDIT'|translate}}", ng-class='{"disabled": vm._action_=="edit" && row.id && !vm.drugsStockStatus[row.drugId]  }', ng-click="vm.editDrugOutStock(row)")
+                                                a.btn.btn-primary.btn-xs(title="{{'button.EDIT'|translate}}",  ng-click="vm.editDrugOutStock(row)")
                                                     i.glyphicon.glyphicon-pencil
                                     tr(ng-if="vm.paged.length==0")
                                         td(colspan="{{utils.noResultsColspan(vm)}}") {{ 'grid.NO-RESULTS' | translate}}

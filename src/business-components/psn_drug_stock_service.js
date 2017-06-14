@@ -941,11 +941,11 @@ module.exports = {
                         ret.is_danger = true;
                         ret.is_warning = false;
                     } else {
-
                         var stock_alarm_low_day = tenant.other_config.psn_drug_stock_alarm_low_day || self.ctx.modelVariables.DEFAULTS.TENANT_DRUG_STOCK_ALARM_LOW_DAY;
                         var drugUseOneDay = yield self._elderlyDrugUseOneDayForOneDrug(tenant, elderly, drugId);
-                        if(ret.unit != drugUseOneDay.unit){
-                            return self.ctx.wrapper.res.error({ message: '最小用量单位不一致' });
+
+                        if(drugUseOneDay.unit && ret.unit != drugUseOneDay.unit) {
+                            return self.ctx.wrapper.res.error({message: '最小用量单位不一致'});
                         }
                         var canUseDays = Math.floor(ret.total / drugUseOneDay.total);
                         ret.is_danger = false;
@@ -1096,7 +1096,7 @@ module.exports = {
                         }
                     }
                 }
-                return { total: total, unit: unit, unit_name: D3026[unit].name };;
+                return { total: total, unit: unit, unit_name: (D3026[unit] || {}).name };;
             }
             catch (e) {
                 console.log(e);

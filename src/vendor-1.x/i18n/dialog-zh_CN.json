@@ -34,7 +34,8 @@
       "COL-LABEL-DRUG": "药品",
       "COL-LABEL-QUANTITY_AND_UNIT": "单次用量",
       "COL-LABEL-STOCK": "库存",
-      "COL-LABEL-UNIT": "单位"
+      "COL-LABEL-UNIT": "单位",
+      "COL-LABEL-CAN_USE_DAYS": "可用天数"
     }
   }
 }

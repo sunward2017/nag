@@ -935,17 +935,22 @@ module.exports = {
                 if(drugsInStock.length>0) {
                     ret.total = self.ctx._.reduce(drugsInStock,(total, o)=>{  return total + o.quantity || 0;}, 0);
 
-                    var stock_alarm_low_percent = tenant.other_config.psn_drug_stock_alarm_low_percent || self.ctx.modelVariables.DEFAULTS.TENANT_DRUG_STOCK_ALARM_LOW_PERCENT || 30;
-                    var alarm_low_quantity = Math.round(ret.total * stock_alarm_low_percent / 100);
-
                     ret.unit = drugsInStock[0].mini_unit;
                     ret.unit_name = drugsInStock[0].mini_unit_name;
                     if(ret.total <= 0) {
                         ret.is_danger = true;
                         ret.is_warning = false;
                     } else {
+
+                        var stock_alarm_low_day = tenant.other_config.psn_drug_stock_alarm_low_day || self.ctx.modelVariables.DEFAULTS.TENANT_DRUG_STOCK_ALARM_LOW_DAY;
+                        var drugUseOneDay = yield self._elderlyDrugUseOneDayForOneDrug(tenant, elderly, drugId);
+                        if(ret.unit != drugUseOneDay.unit){
+                            return self.ctx.wrapper.res.error({ message: '最小用量单位不一致' });
+                        }
+                        var canUseDays = Math.floor(ret.total / drugUseOneDay.total);
                         ret.is_danger = false;
-                        ret.is_warning = ret.total <= alarm_low_quantity
+                        ret.is_warning = canUseDays <= stock_alarm_low_day;
+                        ret.canUseDays = canUseDays;
                     }
                 }
 
@@ -997,13 +1002,21 @@ module.exports = {
                 var drugsInStock = yield self._elderlyStockListAsSameDrugMerged(tenant, elderly);
 
                 // 获取药品低库存警戒线
-                var stock_alarm_low_percent = tenant.other_config.psn_drug_stock_alarm_low_percent || self.ctx.modelVariables.DEFAULTS.TENANT_DRUG_STOCK_ALARM_LOW_PERCENT || 30;
-
+                var stock_alarm_low_day = tenant.other_config.psn_drug_stock_alarm_low_day || self.ctx.modelVariables.DEFAULTS.TENANT_DRUG_STOCK_ALARM_LOW_DAY;
+                var drugUseOneDayObject = yield self._elderlyDrugUseOneDay(tenant, elderly);
+                var canUseDays, drugUseOneDay;
                 var ret = {}, drugInStock, alarm_low_quantity;
                 for (var i=0,len = drugsInStock.length;i< len;i++) {
                     drugInStock = drugsInStock[i];
-                    alarm_low_quantity = Math.round(drugInStock.total * stock_alarm_low_percent / 100);
-                    ret[drugInStock.drugId] = { total: drugInStock.total, is_warning: drugInStock.total <= alarm_low_quantity &&  drugInStock.total > 0, is_danger: drugInStock.total<=0, unit_name: D3026[drugInStock.unit].name };
+                    drugUseOneDay = drugUseOneDayObject[drugInStock.drugId]
+                    if(drugUseOneDay) {
+                        canUseDays = Math.floor(drugInStock.total / drugUseOneDay.total);
+                    } else {
+                        // 用药计划中没有当前药品
+                        canUseDays = -1;
+                    }
+
+                    ret[drugInStock.drugId] = { total: drugInStock.total, canUseDays: canUseDays, is_warning: drugInStock.total > 0 &&  canUseDays > 0 && canUseDays <= stock_alarm_low_day, is_danger: drugInStock.total<=0, unit_name: D3026[drugInStock.unit].name };
                 }
 
                 return ret;
@@ -1048,6 +1061,84 @@ module.exports = {
                 ]);
 
                 return drugsInStock;
+            }
+            catch (e) {
+                console.log(e);
+                self.logger.error(e.message);
+                return self.ctx.wrapper.res.error(e.message);
+            }
+        }).catch(self.ctx.coOnError);
+    },
+    _elderlyDrugUseOneDayForOneDrug: function (tenant, elderly, drugId){
+        var self = this;
+        return co(function *() {
+            try {
+                var where = {
+                    status: 1,// 隐式包含了quantity>0
+                    elderlyId: elderly._id,
+                    drugId: drugId,
+                    tenantId: tenant._id
+                };
+                var drugsInStock = yield self.ctx.modelFactory().model_query(self.ctx.models['psn_drugUseItem'], {
+                    select: 'drugId name quantity unit',
+                    where: where
+                });
+
+                var drugInStock, total = 0, unit;
+                for (var i=0,len = drugsInStock.length;i< len;i++) {
+                    drugInStock = drugsInStock[i];
+                    total += drugInStock.quantity;
+                    if(!unit){
+                        unit = drugInStock.unit;
+                    } else {
+                        if(unit != drugInStock.unit) {
+                            return self.ctx.wrapper.res.error('药品' + (drugInStock.name || drugInStock.drugId.toString()) + "用药计划中同一药品单位不一致");
+                        }
+                    }
+                }
+                return { total: total, unit: unit, unit_name: D3026[unit].name };;
+            }
+            catch (e) {
+                console.log(e);
+                self.logger.error(e.message);
+                return self.ctx.wrapper.res.error(e.message);
+            }
+        }).catch(self.ctx.coOnError);
+    },
+    _elderlyDrugUseOneDay: function (tenant, elderly){
+        var self = this;
+        return co(function *() {
+            try {
+                var where = {
+                    status: 1,// 隐式包含了quantity>0
+                    elderlyId: elderly._id,
+                    tenantId: tenant._id
+                };
+                var drugsInStock = yield self.ctx.modelFactory().model_aggregate(self.ctx.models['psn_drugUseItem'], [
+                    {
+                        $match: where
+                    },
+                    {
+                        $group: {
+                            _id: {drugId: '$drugId', unit: '$unit'},
+                            quantity: {$sum: '$quantity'}
+                        }
+                    },
+                    {
+                        $project: {
+                            total: '$quantity',
+                            drugId: "$_id.drugId",
+                            unit: "$_id.unit"
+                        }
+                    }
+                ]);
+
+                var ret = {}, drugInStock;
+                for (var i=0,len = drugsInStock.length;i< len;i++) {
+                    drugInStock = drugsInStock[i];
+                    ret[drugInStock.drugId] = { total: drugInStock.total, unit: drugInStock.unit, unit_name: D3026[drugInStock.unit].name };
+                }
+                return ret;
             }
             catch (e) {
                 console.log(e);

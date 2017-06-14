@@ -39,12 +39,12 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                             span.text-danger(ng-show="utils.vinput(this.theForm,'pub_alarm_D3016_A1000','required')") {{ "validator.REQUIRED" | translate}}
                     fieldset: .form-group
                         <!--药品低库存警戒线-->
-                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-DRUG_STOCK_ALARM_LOW_PERCENT') | translate}}:
+                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-DRUG_STOCK_ALARM_LOW_DAY') | translate}}:
                         .col-md-10
-                            input.form-control(type='number',name='psn_drug_stock_alarm_low_percent',ng-model='vm.other_configs.psn_drug_stock_alarm_low_percent',placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-DRUG_STOCK_ALARM_LOW_PERCENT")|translate}}',ui-validate='{min:"$value>=0", max:"$value<=50"}')
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'psn_drug_stock_alarm_low_percent','number')") {{ "validator.NUMBER" | translate}}
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'psn_drug_stock_alarm_low_percent','min')") {{ "validator.MIN" | translate:{min:0} }}
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'psn_drug_stock_alarm_low_percent','max')") {{ "validator.MAX" | translate:{max:50} }}
+                            input.form-control(type='number',name='psn_drug_stock_alarm_low_day',ng-model='vm.other_configs.psn_drug_stock_alarm_low_day',placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-DRUG_STOCK_ALARM_LOW_DAY")|translate}}',ui-validate='{min:"$value>=0", max:"$value<=50"}')
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'psn_drug_stock_alarm_low_day','number')") {{ "validator.NUMBER" | translate}}
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'psn_drug_stock_alarm_low_day','min')") {{ "validator.MIN" | translate:{min:0} }}
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'psn_drug_stock_alarm_low_day','max')") {{ "validator.MAX" | translate:{max:50} }}
                     fieldset: .form-group
                         <!--药品入库时检查效期-->
                         label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-FLAG-COLLECTION') | translate}}:

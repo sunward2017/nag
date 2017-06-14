@@ -24,7 +24,7 @@
     "RED": "pub_red"
   },
   "DEFAULTS": {
-    "TENANT_DRUG_STOCK_ALARM_LOW_PERCENT": 30
+    "TENANT_DRUG_STOCK_ALARM_LOW_DAY": 3
   },
   "PENSION-AGENCY": {
     "SUB_SYSTEM": "pension-agency",

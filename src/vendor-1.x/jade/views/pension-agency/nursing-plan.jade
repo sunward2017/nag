@@ -249,5 +249,5 @@ script(type="text/ng-template", id="dlg-drug-use-list-in-nursing-plan.html")
                         td.text-right(ng-class='{"bg-success": !row.stock.is_warning && !row.stock.is_danger, "bg-warning": row.stock.is_warning, "bg-danger": row.stock.is_danger}') {{::row.stock.total}}
                         td.text-center {{::row.stock.unit_name || row.unit_name}}
                     tr(ng-if="vm.elderlyDrugUseItems.length==0")
-                        td(colspan="4") {{ 'grid.NO-RESULTS' | translate}}
+                        td(colspan="5") {{ 'grid.NO-RESULTS' | translate}}
 

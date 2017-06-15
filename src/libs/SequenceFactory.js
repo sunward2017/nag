@@ -107,7 +107,7 @@ module.exports = {
                 }
             }
 
-            console.log(sequence);
+            // console.log(sequence);
             if (sequence.close_flag) {
                 assert('sequence overflow!');
                 return null;

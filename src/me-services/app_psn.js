@@ -4,6 +4,8 @@
  */
 var rp = require('request-promise-native');
 var DIC = require('../pre-defined/dictionary-constants.json');
+var D0103 = require('../pre-defined/dictionary.json')['D0103'];
+var D3026 = require('../pre-defined/dictionary.json')['D3026'];
 module.exports = {
     init: function (option) {
         var self = this;
@@ -423,6 +425,99 @@ module.exports = {
                             console.log("body", this.request.body);
 
                             this.body = yield app.psn_drug_stock_service.inStock(tenantId, inStockData, operated_by, openid);
+
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    }
+                }
+            },
+            {
+                method: 'elderly_room$check',
+                verb: 'post',
+                url: this.service_url_prefix + "/elderly-room/check",
+                handler: function (app, options) {
+                    return function*(next) {
+                        try {
+                            // console.log("request", this.request.body.drug);
+                            var tenantId = this.request.body.tenantId;
+                            var elderlyId = this.request.body.elderlyId;
+                            var roomId = this.request.body.roomId;
+                            var elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], elderlyId);
+                            if (!elderly || elderly.status == 0) {
+                                return app.wrapper.res.error({ message: '无法找到对应的老人资料' });
+                            }
+                            if (!elderly.live_in_flag || elderly.begin_exit_flow) {
+                                return app.wrapper.res.error({ message: '当前老人不在院或正在办理出院手续' });
+                            }
+
+                            if( elderly.tenantId.toString() == tenantId && elderly.room_value && elderly.room_value.roomId && elderly.room_value.roomId.toString() == roomId) {
+                                //返回老人当日的用药
+                                var drugUseItems = yield app.modelFactory().model_query(app.models['psn_drugUseItem'], {
+                                    select: 'drugId name quantity unit drugUseTemplateId repeat_type repeat_start',
+                                    where: {
+                                        status: 1,
+                                        elderlyId: elderlyId,
+                                        stop_flag: false,
+                                        tenantId: tenantId
+                                    }
+                                }).populate('drugId', 'img', 'psn_drugDirectory').populate('drugUseTemplateId', 'order_no', 'psn_drugUseTemplate');
+
+                                var groupObject = app._.groupBy(drugUseItems, function(o){
+                                    if(o.drugUseTemplateId){
+                                        return o.drugUseTemplateId._id;
+                                    } else {
+                                        return o._id;
+                                    }
+                                });
+                                var elderlyDrugUseItems = [], groupValue, row;
+                                for(var key in groupObject) {
+                                    groupValue = groupObject[key];
+                                    for (var i = 0, len = groupValue.length; i < len; i++) {
+                                        row = groupValue[i].toObject();
+                                        if (row.drugUseTemplateId) {
+                                            row.group_order = row.drugUseTemplateId.order_no;
+                                        } else {
+                                            row.group_order = 99999;
+                                        }
+
+                                        if (row.unit) {
+                                            row.unit_name = D3026[row.unit].name;
+                                        }
+                                        row.exec_on_str =  D0103[row.repeat_type].name + '' + row.repeat_start;
+
+                                        elderlyDrugUseItems.push(row)
+                                    }
+                                }
+                                this.body = app.wrapper.res.rows(elderlyDrugUseItems);
+                            } else {
+                                this.body = app.wrapper.res.error({ message: '老人与房间不匹配,请仔细检查核对' });
+                            }
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    }
+                }
+            },
+            {
+                method: 'drug$stock$out',
+                verb: 'post',
+                url: this.service_url_prefix + "/drug/stock/out",
+                handler: function (app, options) {
+                    return function*(next) {
+                        try {
+                            var tenantId = this.request.body.tenantId;
+                            var operated_by = this.request.body.userId;
+                            var openid = this.openid;
+                            var outStockData = this.request.body.outStockData;
+
+                            console.log("body", this.request.body);
+
+                            this.body = yield app.psn_drug_stock_service.outStock(tenantId, outStockData, operated_by, openid);
 
                         } catch (e) {
                             self.logger.error(e.message);

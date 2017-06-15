@@ -159,6 +159,7 @@
                         modelName: 'psn-elderly',
                         searchForm: { "status": 1, "live_in_flag": true },
                         transTo: {
+                            "qrcode": MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'in.qrcode',
                             "inConfig": MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'in.config'
                         },
                         serverPaging: true,
@@ -166,7 +167,7 @@
                             label: '老人',
                             name: 'name',
                             type: 'string',
-                            width: 80,
+                            width: 60,
                             sortable: true
                         }, {
                             label: '性别',
@@ -184,28 +185,28 @@
                             label: '入院登记号',
                             name: 'enter_code',
                             type: 'string',
-                            width: 80,
+                            width: 60,
                             sortable: true
                         }, {
                             label: '饮食套餐',
                             name: 'board_summary',
                             type: 'string',
-                            width: 80
+                            width: 40
                         }, {
                             label: '房间床位',
                             name: 'room_summary',
                             type: 'string',
-                            width: 120
+                            width: 100
                         }, {
                             label: '照护信息',
                             name: 'nursing_info',
                             type: 'string',
-                            width: 120
+                            width: 100
                         }, {
                             label: '状态',
                             name: 'begin_exit_flow',
                             type: 'string',
-                            width: 80,
+                            width: 60,
                             formatter: function () {
                                 return { "true": "正在出院", "false": "在院", "undefined": "在院" }
                             }
@@ -213,7 +214,7 @@
                             label: '',
                             name: 'actions',
                             sortable: false,
-                            width: 60
+                            width: 80
                         }]
                     })
                 }
@@ -237,6 +238,18 @@
                 controller: 'InConfigController',
                 resolve: {
                     entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'in.config', {
+                        modelName: 'psn-elderly',
+                        blockUI: true
+                    })
+                }
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'in.qrcode', {
+                url: '/qrcode/:_id',
+                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'in-qrcode.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'InQRCodeController',
+                resolve: {
+                    entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'in.qrcode', {
                         modelName: 'psn-elderly',
                         blockUI: true
                     })

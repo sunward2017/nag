@@ -28,7 +28,7 @@ module.exports = {
         var self = this;
         return co(function*() {
             var tenants = yield  self.ctx.modelFactory().model_query(self.ctx.models['pub_tenant'], {
-                select: '_id',
+                select: '_id name',
                 where: {
                     status: 1,
                     type: {'$in': [DIC.D1002.MINI_PENSION_ORG, DIC.D1002.MIDDLE_SIZE_PENSION_ORG, DIC.D1002.LARGE_SCALE_ORG]},
@@ -39,7 +39,11 @@ module.exports = {
             });
             for (var i = 0, len = tenants.length; i < len; i++) {
                 console.log('tenantId:', tenants[i]);
-                yield self.generateByTenantId(tenants[i]._id);
+                try{
+                    yield self.generateByTenantId(tenants[i]._id);
+                }catch(ex){
+                    self.ctx.clog.log(self.logger, 'tenant ' + tenants[i].name + ' generateNurisngRecord failed : ', ex);
+                }
             }
             return true;
         }).catch(self.ctx.coOnError);
@@ -318,10 +322,10 @@ module.exports = {
                             }
                         });
 
-                        console.log('allElderly:', allElderly);
+                        // console.log('allElderly:', allElderly);
                         elderlyIds = [];
                         self.ctx._.each(allElderly, (o) => {
-                            console.log('o.room_value:', o.name, o.room_value);
+                            // console.log('o.room_value:', o.name, o.room_value);
                             elderlyMapRoom[o._id.toString()] = o.room_value;
                             elderlyIds.push(o._id);
                         });
@@ -336,14 +340,15 @@ module.exports = {
                             }
                         });
                     }
-                    // console.log('nursingPlanItems', nursingPlanItems);
+                    console.log('nursingPlanItems', nursingPlanItems.length);
                     if (nursingPlanItems.length) {
                         now = self.ctx.moment();
                         gen_batch_no = yield self.ctx.sequenceFactory.getSequenceVal(self.ctx.modelVariables.SEQUENCE_DEFS.CODE_OF_NURSING_RECORD);
                         // console.log('gen_batch_no:',gen_batch_no);
                         for (var i = 0, len = nursingPlanItems.length; i < len; i++) {
                             nursingPlanItem = nursingPlanItems[i];
-                            console.log('elderlyRoomValue:', nursingPlanItem.elderlyId, elderlyMapRoom[nursingPlanItem.elderlyId]);
+                            workItems = []; //每次循环需要清空workItems
+                            // console.log('elderlyRoomValue:', nursingPlanItem.elderlyId, elderlyMapRoom[nursingPlanItem.elderlyId]);
                             elderlyRoomValue = elderlyMapRoom[nursingPlanItem.elderlyId];
                             nursingRecord = {
                                 elderlyId: nursingPlanItem.elderlyId,
@@ -387,7 +392,7 @@ module.exports = {
                                 }
                             }
                             
-                            // console.log("workItems", workItems)
+                            console.log("workItems", workItems.length)
                             for (var j = 0, len2 = workItems.length; j < len2; j++) {
                                 workOrDrugUseItem = workItems[j];
                                 remind_max = workOrDrugUseItem.remind_times || 1;
@@ -520,7 +525,7 @@ module.exports = {
                             }
                         }
 
-                        // console.log('nursingRecordsToSave:', nursingRecordsToSave);
+                        console.log('nursingRecordsToSave:', nursingRecordsToSave.length);
                         for (var i = 0, findNuringWorkerCount = 0, len = nursingRecordsToSave.length; i < len; i++) {
                             nursingRecordToSave = nursingRecordsToSave[i];
                             elderlyRoomValue = elderlyMapRoom[nursingRecordToSave.elderlyId];

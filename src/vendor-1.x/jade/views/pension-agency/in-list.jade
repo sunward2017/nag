@@ -43,6 +43,9 @@
                                 a.btn.btn-primary.btn-xs(title="{{'button.EDIT'|translate}}",ng-click="vm.edit(row._id)")
                                     i.glyphicon.glyphicon-pencil
                             .btn-group
+                                a.btn.btn-primary.btn-xs(title="{{ 'button.GEN' | translate}}",ng-click="$state.go(vm.transTo.qrcode,{_id:row._id})")
+                                    i.glyphicon.glyphicon-qrcode
+                            .btn-group
                                 a.btn.btn-primary.btn-xs(title="{{'button.CONFIG'|translate}}",ng-click="$state.go(vm.transTo.inConfig,{_id:row._id})")
                                     i.glyphicon.glyphicon-cog
                     tr(ng-if="vm.paged.length==0")

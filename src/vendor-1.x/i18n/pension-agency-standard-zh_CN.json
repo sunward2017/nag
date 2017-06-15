@@ -168,6 +168,14 @@
         "TAB1-PLACEHOLDER-BED_MONITOR_TIMEOUT_ALARM_BEGIN": "22:00",
         "TAB1-LABEL-BED_MONITOR_TIMEOUT_ALARM_END": "超时报警结束时间",
         "TAB1-PLACEHOLDER-BED_MONITOR_TIMEOUT_ALARM_END": "06:00"
+      },
+      "qrcode": {
+        "TITLE": "养老机构-老人管理-在院-配置",
+        "HEAD-LABEL-ELDERLY_NAME": "老人姓名",
+        "HEAD-LABEL-ELDERLY_BED_NO": "床位",
+        "TAB1": "老人相关二维码",
+        "TAB1-LABEL-PASTE_IN_BED": "粘贴在床边的",
+        "TAB1-LABEL-PASTE_IN_PILL_BOX": "粘贴在药盒上"
       }
     },
     "exit": {

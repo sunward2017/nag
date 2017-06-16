@@ -10,6 +10,7 @@
         .module('subsystem.pension-agency')
         .controller('DistrictGridController', DistrictGridController)
         .controller('DistrictDetailsController', DistrictDetailsController)
+        .controller('DistrictConfigController', DistrictConfigController)
     ;
 
 
@@ -69,8 +70,42 @@
                 }
             }
         }
+    }
+
+    DistrictConfigController.$inject = ['$scope', 'ngDialog', 'vmh', 'entityVM'];
+
+    function DistrictConfigController($scope, ngDialog, vmh, vm){
+        var vm = $scope.vm = vm;
+        $scope.utils = vmh.utils.v;
 
 
+        init();
+
+        function init() {
+
+            vm.init({removeDialog: ngDialog});
+            vm.doSubmit = doSubmit;
+            vm.tab1 = {cid: 'contentTab1'};
+
+            vmh.parallel([
+                vmh.shareService.d('D3028')
+            ]).then(function (results) {
+                vm.selectBinding.modes = results[0];
+            });
+
+            vm.load();
+        }
+
+        function doSubmit(){
+            if ($scope.theForm.$valid) {
+                vm.save();
+            }
+            else {
+                if ($scope.utils.vtab(vm.tab1.cid)) {
+                    vm.tab1.active = true;
+                }
+            }
+        }
     }
 
 })();

@@ -1,0 +1,23 @@
+form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="vm.doSubmit()")
+    .row
+        .col-md-1.control-label {{ vm.viewTranslatePath('HEAD-LABEL-DISTRICT_NAME') | translate}}:
+        .col-md-3
+            input.read-control-underline(readonly,placeholder='',ng-model="vm.model.name")
+        .col-md-8
+    .row-split
+    .panel
+        tabset(justified="true")
+            tab(active="vm.tab1.active")
+                tab-heading
+                    | {{ vm.viewTranslatePath('TAB1') | translate}}
+                    span.text-danger(title="{{'validator.FIELD-INVALID'|translate}}" , ng-show="utils.vtab('contentTab1')")
+                        i.glyphicon.glyphicon-minus-sign
+                div#contentTab1
+                    fieldset: .form-group
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-ELDERLYS_OUT_STOCK_CHECK_MODE') | translate}}:
+                        .col-md-10
+                            .btn-group
+                                .btn.btn-primary(name='elderlys_out_stock_check_mode',ng-repeat='mode in vm.selectBinding.modes',ng-model='vm.model.config.elderlys_out_stock_check_mode',btn-radio="mode.value" ) {{mode.name}}
+    .text-right.mt-lg
+        button.btn.btn-warning(type="button",ng-click="vm.cancel()") {{'button.CANCEL'|translate}}
+        button.btn.btn-success(type="submit") {{'button.SAVE'|translate}}

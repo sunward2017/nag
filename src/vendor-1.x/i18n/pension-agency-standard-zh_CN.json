@@ -736,7 +736,7 @@
         "TAB1-PLACEHOLDER-QUANTITY": "大于0...",
         "TAB1-LABEL-MINI_UNIT": "最小单位",
         "TAB1-LABEL-EXPIRE_IN": "有效期",
-        "TAB1-LABEL-DRUG-LIST": "入库药品列表",
+        "TAB1-LABEL-DRUG-LIST": "入库药品明细",
         "TOOLTIP_DRUGS_LIST_CHANGE_NOTIFY": "入库药品信息有变动,点击[保存]按钮后生效"
       }
     },
@@ -757,7 +757,7 @@
         "TAB1-LABEL-QUANTITY": "出库数量",
         "TAB1-PLACEHOLDER-QUANTITY": "大于0...",
         "TAB1-LABEL-MINI_UNIT": "最小单位",
-        "TAB1-LABEL-DRUG-LIST": "出库药品列表",
+        "TAB1-LABEL-DRUG-LIST": "出库药品明细",
         "TOOLTIP_DRUGS_LIST_CHANGE_NOTIFY": "出库药品信息有变动,点击[保存]按钮后生效",
         "WARNING-NOT-SELECT-ELDERLY": "必须先选择老人",
         "TAB1-LABEL-STOCK_TOTAL": "库存数量",
@@ -951,6 +951,12 @@
         "TAB1": "基本信息",
         "TAB1-LABEL-NAME": "片区名称",
         "TAB1-PLACEHOLDER-NAME": "A区南楼.."
+      },
+      "config": {
+        "TITLE": "养老机构-基础设置-片区-配置",
+        "HEAD-LABEL-DISTRICT_NAME": "片区名称",
+        "TAB1": "配置信息",
+        "TAB1-LABEL-ELDERLYS_OUT_STOCK_CHECK_MODE": "药品扫码出库方式"
       }
     },
     "nursing-level": {

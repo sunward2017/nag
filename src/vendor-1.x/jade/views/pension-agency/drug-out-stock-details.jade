@@ -27,17 +27,23 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                     fieldset: .form-group
                         <!--出库类别-->
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-TYPE') | translate}}:
-                        .col-md-10
+                        .col-md-10(ng-if="!vm.readonly")
                             .btn-group
                                 .btn.btn-primary(name='type',ng-repeat='type in vm.selectBinding.types',ng-model='vm.model.type',btn-radio="type.value",required='') {{type.name}}
                             span.text-danger(ng-show="utils.vinput(this.theForm,'type','required')") {{ "validator.REQUIRED" | translate}}
+                        .col-md-10(ng-if="vm.readonly")
+                            .btn-group
+                                .btn.btn-primary.cursor-not-allowed(name='type',ng-repeat='type in vm.selectBinding.types',ng-class="{'active':vm.model.type==type.value}") {{type.name}}
                     fieldset: .form-group
                         <!--出库方式-->
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-MODE') | translate}}:
-                        .col-md-10
+                        .col-md-10(ng-if="!vm.readonly")
                             .btn-group
                                 .btn.btn-primary(name='mode',ng-repeat='mode in vm.selectBinding.modes',ng-model='vm.model.mode',btn-radio="mode.value",required='') {{mode.name}}
                             span.text-danger(ng-show="utils.vinput(this.theForm,'mode','required')") {{ "validator.REQUIRED" | translate}}
+                        .col-md-10(ng-if="vm.readonly")
+                            .btn-group
+                                .btn.btn-primary.cursor-not-allowed(name='mode',ng-repeat='mode in vm.selectBinding.modes',ng-class="{'active':vm.model.mode==mode.value}") {{mode.name}}
                     fieldset: .form-group
                         .panel.panel-default.panel-grid
                             .panel-heading-normal
@@ -46,7 +52,7 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                             table.grid.table.table-bordered.table-hover.table-striped
                                 thead
                                     tr
-                                        th.text-center(check-all,width="30")
+                                        th.text-center(check-all,width="30", ng-if="!vm.readonly")
                                             .checkbox.c-checkbox(data-toggle="tooltip",data-title="Check All")
                                                 label
                                                     input(type='checkbox' ng-model="vm.all" ng-change="vm.selectAll()")
@@ -57,10 +63,10 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                                             | {{ vm.viewTranslatePath('TAB1-LABEL-QUANTITY') | translate}}
                                         th.text-center(width="40")
                                             | {{ vm.viewTranslatePath('TAB1-LABEL-MINI_UNIT') | translate}}
-                                        th.text-center(width="20")
+                                        th.text-center(width="20", ng-if="!vm.readonly")
                                 tbody
                                     tr(ng-repeat="row in vm.model.drugs " )
-                                        td.text-center
+                                        td.text-center(ng-if="!vm.readonly")
                                             .checkbox.c-checkbox
                                                 label
                                                     input(type='checkbox',ng-model="row.checked" )
@@ -68,13 +74,13 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                                         td {{row.drug_name}}
                                         td.text-center {{row.quantity}}
                                         td.text-center {{row.mini_unit | diFilter: vm.selectBinding.mini_units }}
-                                        td.text-center
+                                        td.text-center(ng-if="!vm.readonly")
                                             .btn-group
                                                 a.btn.btn-primary.btn-xs(title="{{'button.EDIT'|translate}}",  ng-click="vm.editDrugOutStock(row)")
                                                     i.glyphicon.glyphicon-pencil
                                     tr(ng-if="vm.paged.length==0")
                                         td(colspan="{{utils.noResultsColspan(vm)}}") {{ 'grid.NO-RESULTS' | translate}}
-                            .panel-footer
+                            .panel-footer(ng-if="!vm.readonly")
                                 .row
                                     .col-md-4.text-left
                                         .btn-toolbar
@@ -85,10 +91,11 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                                                     i.glyphicon.glyphicon-minus
 
 
-    .text-right.mt-lg
+    .text-right.mt-lg(ng-if="!vm.readonly")
         button.btn.btn-warning(type="button",ng-click="vm.cancel()") {{'button.CANCEL'|translate}}
         button.btn.btn-success(type="submit") {{'button.SAVE'|translate}}
-
+    .text-right.mt-lg(ng-if="vm.readonly")
+        button.btn.btn-primary(type="button",ng-click="vm.toListView()") {{'button.RETURN'|translate}}
 script(type="text/ng-template", id="out-stock-add-drug.html")
     form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="vm.doSubmit()")
         .ngdialog-title
@@ -117,7 +124,7 @@ script(type="text/ng-template", id="out-stock-add-drug.html")
                     <!--出库数量-->
                     label.col-md-3.control-label {{ vm.viewTranslatePath('TAB1-LABEL-QUANTITY') | translate}}:
                     .col-md-9
-                        input.form-control(type='number',name='quantity' ,ng-model='vm.model.quantity',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-QUANTITY")|translate}}', required='', ui-validate="{min:'$value>=1', max:'$value<=vm.stock.total'}" )
+                        input.form-control(type='number',name='quantity' ,ng-model='vm.model.quantity',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-QUANTITY")|translate}}', required='', ng-model-options="{ allowInvalid: true }", ui-validate="{min:'$value>=1', max: $value<=vm.stock.total'}" )
                         span.text-danger(ng-show="utils.vinput(this.theForm,'quantity','required')") {{ "validator.REQUIRED" | translate}}
                         span.text-danger(ng-show="utils.vinput(this.theForm,'quantity','number')") {{ "validator.NUMBER" | translate}}
                         span.text-danger(ng-show="utils.vinput(this.theForm,'quantity','min')") {{ "validator.MIN" | translate:{min:1} }}

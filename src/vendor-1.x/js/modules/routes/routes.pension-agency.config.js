@@ -2692,19 +2692,32 @@
                     entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'district.list', {
                         modelName: 'psn-district',
                         searchForm: { "status": 1 },
+                        transTo: {
+                            "config": MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'district.config'
+                        },
                         serverPaging: true,
-                        columns: [{
-                            label: '片区名称',
-                            name: 'name',
-                            type: 'string',
-                            width: 320,
-                            sortable: true
-                        }, {
-                            label: '',
-                            name: 'actions',
-                            sortable: false,
-                            width: 60
-                        }]
+                        columns: [
+                            {
+                                label: '片区名称',
+                                name: 'name',
+                                type: 'string',
+                                width: 320,
+                                sortable: true
+                            },
+                            {
+                                label: '药品扫码出库方式',
+                                name: 'config.config.elderlys_out_stock_check_mode',
+                                type: 'string',
+                                width: 100,
+                                sortable: true
+                            },
+                            {
+                                label: '',
+                                name: 'actions',
+                                sortable: false,
+                                width: 60
+                            }
+                        ]
                     })
                 }
             })
@@ -2719,6 +2732,18 @@
                         blockUI: true
                     })
                     //, deps: helper.resolveFor2('ui.select')
+                }
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'district.config', {
+                url: '/config/:_id',
+                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'district-config.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'DistrictConfigController',
+                resolve: {
+                    entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'district.config', {
+                        modelName: 'psn-district',
+                        blockUI: true
+                    })
                 }
             })
             .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'nursing-level', {

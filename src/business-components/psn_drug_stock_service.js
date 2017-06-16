@@ -310,27 +310,69 @@ module.exports = {
                     expire_date_check_flag = !!tenant.other_config.psn_drug_in_stock_expire_date_check_flag;
                 }
 
-                var drugs = outStockData.drugs;
-                if(!drugs | drugs.length == 0) {
-                    return self.ctx.wrapper.res.error({ message: '无法提供出库药品数据' });
+                // 按片区配置 获取药品扫码出库方式
+                var district  = yield self.ctx.modelFactory().model_read(self.ctx.models['psn_district'], elderly.room_value.districtId);
+                if (!district || district.status == 0) {
+                    return self.ctx.wrapper.res.error({ message: '无法找到对应的片区' });
                 }
-                var drugIds = self.ctx._.map(drugs, (o) => {
-                    return o.drugId;
-                });
-                var drugObjects = yield self.ctx.modelFactory().model_query(self.ctx.models['psn_drugDirectory'], {
-                    select: 'full_name short_name',
-                    where: {
-                        status: 1,
-                        _id: {$in: drugIds}
-                    }
-                });
 
-                if(drugs.length != drugObjects.length) {
-                    return self.ctx.wrapper.res.error({ message: '出库药品中包含无效的药品记录' });
+                var elderlys_out_stock_check_mode = DIC.D3028.BY_TIME_TEMPLATE;
+                if(district.config && district.config.elderlys_out_stock_check_mode){
+                    elderlys_out_stock_check_mode = district.config.elderlys_out_stock_check_mode;
                 }
+
+                var drugs = outStockData.drugs;
+                if(!drugs || drugs.length == 0) {
+                    return self.ctx.wrapper.res.error({ message: '出库药品不能为空1' });
+                }
+
+                if(elderlys_out_stock_check_mode == DIC.D3028.BY_TIME_TEMPLATE) {
+                    console.log('按时间段一般不可能出现相同药');
+                    var drugObjects = yield self.ctx.modelFactory().model_query(self.ctx.models['psn_drugDirectory'], {
+                        select: 'full_name short_name',
+                        where: {
+                            status: 1,
+                            _id: {
+                                $in: self.ctx._.map(drugs, (o) => {
+                                    return o.drugId;
+                                })
+                            }
+                        }
+                    });
+                    console.log('drugObjects:', drugObjects);
+                    if (drugs.length != drugObjects.length) {
+                        return self.ctx.wrapper.res.error({message: '出库药品中包含无效的药品记录'});
+                    }
+                } else {
+                    console.log('按天,需要将相同的药合并');
+                    var grouped = self.ctx._.groupBy(drugs, (o)=>{
+                        return o.drugId;
+                    });
+                    console.log('grouped:',grouped);
+                    var mergedDrugs = [], groupDrugs, toMerge;
+                    for (var key in grouped) {
+                        groupDrugs = grouped[key];
+                        toMerge = groupDrugs[0];
+                        if (groupDrugs.length > 1) {
+                            toMerge.quantity = self.ctx._.reduce(groupDrugs, (total, o) => {
+                                return total + o.quantity;
+                            }, 0);
+                        }
+                        mergedDrugs.push(toMerge);
+                    }
+                    console.log('drugs:', drugs.length);
+                    console.log('mergedDrugs:', mergedDrugs.length);
+                    drugs = mergedDrugs;
+                }
+
+                if(drugs.length == 0) {
+                    return self.ctx.wrapper.res.error({ message: '出库药品不能为空2' });
+                }
+
 
                 console.log('检查库存是否满足出库要求...');
                 var elderlyStockObject = yield self._elderlyStockObject(tenant, elderly);
+                console.log('elderlyStockObject:', elderlyStockObject);
                 var drugData, drugStock;
                 for (var i=0,len=drugs.length;i<len;i++) {
                     drugData = drugs[i];
@@ -342,6 +384,7 @@ module.exports = {
                         return self.ctx.wrapper.res.error({message: '出库药品' + (drugData.drug_name || '') + '库存不足'});
                     }
                 }
+
 
                 console.log('新增出库记录...');
                 var drugOutStock = yield self.ctx.modelFactory().model_create(self.ctx.models['psn_drugInOutStock'], {

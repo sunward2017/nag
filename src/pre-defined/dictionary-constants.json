@@ -114,5 +114,9 @@
     "ACCEPTED": "A0003",
     "AUDIT_PASS": "A0005",
     "TERMINATED":"A0007"
+  },
+  "D3028":{
+    "BY_TIME_TEMPLATE":"A0001",
+    "BY_DAY":"A0003"
   }
 }

@@ -117,7 +117,7 @@ script(type="text/ng-template", id="out-stock-add-drug.html")
                     <!--出库数量-->
                     label.col-md-3.control-label {{ vm.viewTranslatePath('TAB1-LABEL-QUANTITY') | translate}}:
                     .col-md-9
-                        input.form-control(type='number',name='quantity' ,ng-model='vm.model.quantity',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-QUANTITY")|translate}}', required='', ui-validate="{min:'$value>=1', max:'$value<=vm.stock.total'}" )
+                        input.form-control(type='number',name='quantity' ,ng-model='vm.model.quantity',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-QUANTITY")|translate}}', required='', ng-model-options="{ allowInvalid: true }", ui-validate="{min:'$value>=1', max: $value<=vm.stock.total'}" )
                         span.text-danger(ng-show="utils.vinput(this.theForm,'quantity','required')") {{ "validator.REQUIRED" | translate}}
                         span.text-danger(ng-show="utils.vinput(this.theForm,'quantity','number')") {{ "validator.NUMBER" | translate}}
                         span.text-danger(ng-show="utils.vinput(this.theForm,'quantity','min')") {{ "validator.MIN" | translate:{min:1} }}

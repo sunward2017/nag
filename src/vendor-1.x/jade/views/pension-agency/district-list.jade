@@ -26,10 +26,14 @@
                                     input(type='checkbox' data="trBubble" ng-model="row.checked" )
                                     span.fa.fa-check(data="trBubble")
                         td.text-left {{::row.name}}
+                        td {{::row.config.elderlys_out_stock_check_mode_name}}
                         td
                             .btn-group
                                 a.btn.btn-primary.btn-xs(title="{{'button.EDIT'|translate}}",ng-click="vm.edit(row._id)")
                                     i.glyphicon.glyphicon-pencil
+                            .btn-group
+                                a.btn.btn-primary.btn-xs(title="{{'button.CONFIG'|translate}}",ng-click="$state.go(vm.transTo.config,{_id:row._id})")
+                                    i.glyphicon.glyphicon-cog
                     tr(ng-if="vm.paged.length==0")
                         td(colspan="{{utils.noResultsColspan(vm)}}") {{ 'grid.NO-RESULTS' | translate}}
             .panel-footer

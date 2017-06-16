@@ -951,6 +951,12 @@
         "TAB1": "基本信息",
         "TAB1-LABEL-NAME": "片区名称",
         "TAB1-PLACEHOLDER-NAME": "A区南楼.."
+      },
+      "config": {
+        "TITLE": "养老机构-基础设置-片区-配置",
+        "HEAD-LABEL-DISTRICT_NAME": "片区名称",
+        "TAB1": "配置信息",
+        "TAB1-LABEL-ELDERLYS_OUT_STOCK_CHECK_MODE": "药品扫码出库方式"
       }
     },
     "nursing-level": {

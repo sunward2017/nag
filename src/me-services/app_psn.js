@@ -453,6 +453,18 @@ module.exports = {
                                 return app.wrapper.res.error({ message: '当前老人不在院或正在办理出院手续' });
                             }
 
+                            // 按片区配置 获取药品扫码出库方式
+                            var district  = yield app.modelFactory().model_read(app.models['psn_district'], elderly.room_value.districtId);
+                            if (!district || district.status == 0) {
+                                return app.wrapper.res.error({ message: '无法找到对应的片区' });
+                            }
+                            
+                            var elderlys_out_stock_check_mode = DIC.D3028.BY_TIME_TEMPLATE;
+                            if(district.config && district.config.elderlys_out_stock_check_mode){
+                                elderlys_out_stock_check_mode = district.config.elderlys_out_stock_check_mode;
+                            }
+
+
                             if( elderly.tenantId.toString() == tenantId && elderly.room_value && elderly.room_value.roomId && elderly.room_value.roomId.toString() == roomId) {
                                 //返回老人当日的用药
                                 var drugUseItems = yield app.modelFactory().model_query(app.models['psn_drugUseItem'], {
@@ -463,7 +475,7 @@ module.exports = {
                                         stop_flag: false,
                                         tenantId: tenantId
                                     }
-                                }).populate('drugId', 'img', 'psn_drugDirectory').populate('drugUseTemplateId', 'order_no', 'psn_drugUseTemplate');
+                                }).populate('drugId', 'img', 'psn_drugDirectory').populate('drugUseTemplateId', 'name order_no', 'psn_drugUseTemplate');
 
                                 var groupObject = app._.groupBy(drugUseItems, function(o){
                                     if(o.drugUseTemplateId){
@@ -479,9 +491,16 @@ module.exports = {
                                         row = groupValue[i].toObject();
                                         if (row.drugUseTemplateId) {
                                             row.group_order = row.drugUseTemplateId.order_no;
+                                            row.template_name =  row.drugUseTemplateId.name;
+                                            row.templateId =  row.drugUseTemplateId.id;
                                         } else {
                                             row.group_order = 99999;
+                                            row.template_name = '无';
                                         }
+                                        row.drugUseTemplateId = undefined;
+
+                                        row.drug_img = row.drugId.img;
+                                        row.drugId = row.drugId.id;
 
                                         if (row.unit) {
                                             row.unit_name = D3026[row.unit].name;
@@ -491,7 +510,10 @@ module.exports = {
                                         elderlyDrugUseItems.push(row)
                                     }
                                 }
-                                this.body = app.wrapper.res.rows(elderlyDrugUseItems);
+
+                                var ret = {elderlys_out_stock_check_mode: elderlys_out_stock_check_mode, drugs: elderlyDrugUseItems};
+
+                                this.body = app.wrapper.res.ret(ret);
                             } else {
                                 this.body = app.wrapper.res.error({ message: '老人与房间不匹配,请仔细检查核对' });
                             }

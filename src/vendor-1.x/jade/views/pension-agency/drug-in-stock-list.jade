@@ -32,7 +32,10 @@
                         td {{::row.type_name}}
                         td {{::row.mode_name}}
                         td
-                            .btn-group
+                            .btn-group(ng-if="row.mode=='A0001'")
+                                a.btn.btn-primary.btn-xs(title="{{'button.READ'|translate}}",ng-click="vm.read(row._id)")
+                                    i.glyphicon.glyphicon-search
+                            .btn-group(ng-if="row.mode=='A0003'")
                                 a.btn.btn-primary.btn-xs(title="{{'button.EDIT'|translate}}", ng-click="vm.edit(row._id)")
                                     i.glyphicon.glyphicon-pencil
                     tr(ng-if="vm.paged.length==0")

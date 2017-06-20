@@ -489,8 +489,8 @@
             vm.tab1 = {cid: 'contentTab1'};
 
             vm.load().then(function(){
-                vm.paste_in_bed = 'http://tools.okertrip.com/node-ot/?text={"tenantId":"'+vm.model.tenantId+'","roomId":"'+vm.model.room_value.roomId+'", "name":"'+encodeURIComponent(vm.model.room_summary)+'"}&ei=https://wx.qlogo.cn/mmhead/Q3auHgzwzM4bMub0HlUQejcYdLia8LORibXLl4vyot9SoLxNATehqUEQ/0'
-                vm.paste_in_pill_box_qrcode = 'http://tools.okertrip.com/node-ot/?text={"tenantId":"'+vm.model.tenantId+'","elderlyId":"'+vm.model.id+'", "name":"'+encodeURIComponent(vm.model.name)+'", "avatar":"'+vm.model.avatar+'"}&ei=https://wx.qlogo.cn/mmhead/Q3auHgzwzM4bMub0HlUQejcYdLia8LORibXLl4vyot9SoLxNATehqUEQ/0'
+                vm.paste_in_bed = 'http://tools.okertrip.com/qr/?text={"tenantId":"'+vm.model.tenantId+'","roomId":"'+vm.model.room_value.roomId+'", "name":"'+encodeURIComponent(vm.model.room_summary)+'"}&ei=https://wx.qlogo.cn/mmhead/Q3auHgzwzM4bMub0HlUQejcYdLia8LORibXLl4vyot9SoLxNATehqUEQ/0'
+                vm.paste_in_pill_box_qrcode = 'http://tools.okertrip.com/qr/?text={"tenantId":"'+vm.model.tenantId+'","elderlyId":"'+vm.model.id+'", "name":"'+encodeURIComponent(vm.model.name)+'", "avatar":"'+vm.model.avatar+'"}&ei=https://wx.qlogo.cn/mmhead/Q3auHgzwzM4bMub0HlUQejcYdLia8LORibXLl4vyot9SoLxNATehqUEQ/0'
             });
         }
     }

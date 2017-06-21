@@ -683,7 +683,7 @@
         function buildEntityVM(name, option) {
             option = option || {};
             var arrNames = name.split('.');
-            return ['$rootScope','$state', '$stateParams', '$window', '$q', '$timeout', '$translate', 'blockUI', 'Auth', 'modelNode', 'Notify', 'GridDemoModelSerivce','GridFactory', function ($rootScope,$state, $stateParams, $window, $q, $timeout, $translate, blockUI, Auth, modelNode, Notify, GridDemoModelSerivce,GridFactory) {
+            return ['$rootScope','$state', '$stateParams', '$window', '$q', '$timeout', '$translate', 'blockUI', 'Auth', 'modelNode', 'shareNode','Notify', 'GridDemoModelSerivce','GridFactory', function ($rootScope,$state, $stateParams, $window, $q, $timeout, $translate, blockUI, Auth, modelNode, shareNode, Notify, GridDemoModelSerivce,GridFactory) {
                 var modelService = option.modelName ? modelNode.services[option.modelName] : GridDemoModelSerivce;
 
                 function init(initOption) {
@@ -746,6 +746,10 @@
 
                 function getParam(name) {
                     return $stateParams[name];
+                }
+
+                function notifyDataChange (item, id, param) {
+                    return shareNode.notifyDataChange(item, id, param);
                 }
 
                 function cancel() {
@@ -877,6 +881,18 @@
                         //$state.go(self.moduleRoute('list'), self.toListParams);
                         if (!manuallyTransfer) {
                             self.returnBack();
+                        }
+
+                        var _id;
+                        if (self._id_ == 'new') {
+                            //create
+                            _id = ret[1]._id;
+                        } else {
+                            _id = self._id_;
+                        }
+                        console.log('self.notifySaved', self.notifySaved);
+                        if(self.notifySaved) {
+                            self.notifyDataChange(self.notifySaved, _id);
                         }
 
                         return ret[1];
@@ -1037,6 +1053,8 @@
                     viewTranslatePath: viewTranslatePath,
                     fieldConvert: fieldConvert,
                     registerFieldConverter: registerFieldConverter,
+                    notifySaved: option.notifySaved,
+                    notifyDataChange: notifyDataChange,
                     modelService: modelService,
                     name: name || 'no-entityName',
                     pk: option.pk || '_id',

@@ -311,7 +311,7 @@ module.exports = {
                             var tenantId = this.request.body.tenantId;
                             var barcode = this.request.body.barcode;
 
-                            // console.log("body", this.request.body);
+                            console.log("body", this.request.body);
 
                             var psnDrug = yield app.modelFactory().model_one(app.models['psn_drugDirectory'], {
                                 where: {
@@ -320,7 +320,7 @@ module.exports = {
                                     barcode: barcode
                                 }
                             });
-                            // console.log("psnDrug", psnDrug);
+                            console.log("psnDrug", psnDrug);
                             if (!psnDrug) {
                                 var pubDrug_json = yield app.modelFactory().model_one(app.models['pub_drug'], {where: {barcode: barcode}});
                                 if (pubDrug_json) {

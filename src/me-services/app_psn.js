@@ -287,7 +287,7 @@ module.exports = {
                             console.log('dynamicFilter:', dynamicFilter);
 
                             var elderly = yield app.modelFactory().model_query(app.models['psn_elderly'], {
-                                select: 'name room_summary avatar',
+                                select: 'name birthday room_summary avatar',
                                 where: dynamicFilter
                             });
 
@@ -369,29 +369,29 @@ module.exports = {
                             // console.log("request", this.request.body.drug);
                             var drug = this.request.body.drug;
                             var barcode = drug.barcode;
-                            var drugDirectory = yield app.modelFactory().model_one(app.models['psn_drugDirectory'], {where: {barcode: barcode}});
+                            var pubDrug = yield app.modelFactory().model_one(app.models['pub_drug'], {where: {barcode: barcode}});
+                            if (!pubDrug) {
+                                pubDrug = yield app.modelFactory().model_create(app.models['pub_drug'], {
+                                    barcode: drug.barcode,
+                                    img: drug.img,
+                                    name: drug.full_name,
+                                    reference_price: drug.price,
+                                    vender: drug.vender,
+                                    dosage_form: drug.dosage_form,
+                                    short_name: drug.short_name,
+                                    alias: drug.alias,
+                                    english_name: drug.english_name,
+                                    specification: drug.special_individuals,
+                                    usage: drug.usage,
+                                    indications_function: drug.indications_function,
+                                    otc_flag: drug.otc_flag,
+                                    medical_insurance_flag: drug.health_care_flag
+                                });
+                            }
 
+                            var drugDirectory = yield app.modelFactory().model_one(app.models['psn_drugDirectory'], {where: {barcode: barcode}});
                             if(!drugDirectory) {
                                 //本地库不存在
-                                var pubDrug = yield app.modelFactory().model_one(app.models['pub_drug'], {where: {barcode: barcode}});
-                                if (!pubDrug) {
-                                    pubDrug = yield app.modelFactory().model_create(app.models['pub_drug'], {
-                                        barcode: drug.barcode,
-                                        img: drug.img,
-                                        name: drug.full_name,
-                                        reference_price: drug.price,
-                                        vender: drug.vender,
-                                        dosage_form: drug.dosage_form,
-                                        short_name: drug.short_name,
-                                        alias: drug.alias,
-                                        english_name: drug.english_name,
-                                        specification: drug.special_individuals,
-                                        usage: drug.usage,
-                                        indications_function: drug.indications_function,
-                                        otc_flag: drug.otc_flag,
-                                        medical_insurance_flag: drug.health_care_flag
-                                    });
-                                }
                                 drug.drugSourceId = pubDrug._id;
                                 drugDirectory = yield app.modelFactory().model_create(app.models['psn_drugDirectory'], drug);
                             } else {

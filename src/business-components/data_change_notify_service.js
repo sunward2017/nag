@@ -65,10 +65,13 @@ module.exports = {
                         yield elderly.save();
                     }
                 }
+
+                return self.ctx.wrapper.res.default();
             }
             catch (e) {
                 console.log(e);
                 self.logger.error(e.message);
+                return self.ctx.wrapper.res.error(e);
             }
         }).catch(self.ctx.coOnError);
     },
@@ -113,10 +116,12 @@ module.exports = {
                         yield elderly.save();
                     }
                 }
+                return self.ctx.wrapper.res.default();
             }
             catch (e) {
                 console.log(e);
                 self.logger.error(e.message);
+                return self.ctx.wrapper.res.error(e);
             }
         }).catch(self.ctx.coOnError);
     },
@@ -146,11 +151,122 @@ module.exports = {
                     yield room.save();
                 }
 
-
+                return self.ctx.wrapper.res.default();
             }
             catch (e) {
                 console.log(e);
                 self.logger.error(e.message);
+                return self.ctx.wrapper.res.error(e);
+            }
+        }).catch(self.ctx.coOnError);
+    },
+    pub$bedMonitor$$disabled: function (id, params) {
+        var self = this;
+        return co(function *() {
+            try {
+                console.log('id:', id);
+                console.log('params:', params);
+                var rooms = yield self.ctx.modelFactory().model_query(self.ctx.models['psn_room'], {
+                    select: 'bedMonitors',
+                    where: {
+                        tenantId: params.tenantId,
+                        bedMonitors: {$elemMatch: {bedMonitorId: id }}
+                    }
+                });
+
+                console.log('rooms:', rooms);
+
+                var room, bedMonitors, index;
+                for(var i=0,len = rooms.length;i<len;i++) {
+                    room = rooms[i], bedMonitors = room.bedMonitors;
+                    index = self.ctx._.findIndex(bedMonitors, (o)=> {
+                        return o.bedMonitorId.toString() == id;
+                    });
+                    bedMonitors.splice(index,1);
+                    yield room.save();
+                }
+
+                return self.ctx.wrapper.res.default();
+            }
+            catch (e) {
+                console.log(e);
+                self.logger.error(e.message);
+                return self.ctx.wrapper.res.error(e);
+            }
+        }).catch(self.ctx.coOnError);
+    },
+    psn$drugDirectory$$syncToPubDrug: function (id) {
+        var self = this;
+        return co(function *() {
+            try {
+                console.log('psn$drugDirectory$$syncToPubDrug:', id);
+                var drugDirectory, drug;
+                drugDirectory = yield self.ctx.modelFactory().model_read(self.ctx.models['psn_drugDirectory'], id);
+                if (!drugDirectory || drugDirectory.status == 0) {
+                    return self.ctx.wrapper.res.error({message: '无效的本地药品目录'});
+                }
+                drug = yield self.ctx.modelFactory().model_one(self.ctx.models['pub_drug'], {
+                    where:{
+                        barcode: drugDirectory.barcode,
+                        status: 1
+                    }
+                });
+                console.log('drug:', drug);
+                if (!drug) {
+                    // 添加到远程库
+                    if(drugDirectory.barcode){
+
+                        var drugData = self.ctx._.extend({}, drugDirectory.toObject(),
+                            {medical_insurance_flag: !!drugDirectory.health_care_flag, name: drugDirectory.full_name }
+                        );
+                        console.log('drugData:', drugData)
+                        drug = yield self.ctx.modelFactory().model_create(self.ctx.models['pub_drug'],drugData);
+                        drugDirectory.drugSourceId = drug._id;
+                        yield drugDirectory.save();
+                    }
+                } else {
+                    // 更新到远程库
+                    if (drugDirectory.img) {
+                        drug.img = drugDirectory.img;
+                    }
+                    if (drugDirectory.full_name) {
+                        drug.name = drugDirectory.full_name;
+                    }
+                    if (drugDirectory.dosage_form) {
+                        drug.dosage_form = drugDirectory.dosage_form;
+                    }
+                    if (drugDirectory.short_name) {
+                        drug.short_name = drugDirectory.short_name;
+                    }
+                    if (drugDirectory.alias) {
+                        drug.alias = drugDirectory.alias;
+                    }
+                    if (drugDirectory.english_name) {
+                        drug.english_name = drugDirectory.english_name;
+                    }
+                    if (drugDirectory.specification) {
+                        drug.specification = drugDirectory.specification;
+                    }
+                    if (drugDirectory.usage) {
+                        drug.usage = drugDirectory.usage;
+                    }
+                    if (drugDirectory.indications_function) {
+                        drug.indications_function = drugDirectory.indications_function;
+                    }
+                    if (drugDirectory.special_individuals) {
+                        drug.special_individuals = drugDirectory.special_individuals;
+                    }
+                    drug.otc_flag = !!drugDirectory.otc_flag;
+                    drug.medical_insurance_flag = !!drugDirectory.health_care_flag;
+                    yield drug.save();
+                }
+
+                return self.ctx.wrapper.res.default();
+            }
+            catch (e) {
+                console.log(e);
+                self.logger.error(e.message);
+                return self.ctx.wrapper.res.error(e);
             }
         }).catch(self.ctx.coOnError);
     }

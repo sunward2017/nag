@@ -1862,6 +1862,7 @@
                     entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'drug-directory.details', {
                         modelName: 'psn-drugDirectory',
                         model: {},
+                        notifySaved: 'psn$drugDirectory$$syncToPubDrug',
                         blockUI: true
                     })
                 }
@@ -2463,6 +2464,7 @@
                         modelName: 'pub-bedMonitor',
                         searchForm: { "status": 1 },
                         serverPaging: true,
+                        notifyRowDisabled: 'pub$bedMonitor$$disabled',
                         columns: [{
                             label: '名称',
                             name: 'code',

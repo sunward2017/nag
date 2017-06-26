@@ -102,6 +102,8 @@
         "TITLE": "养老机构-老人管理-在院-详情",
         "TAB1": "老人信息",
         "TAB2": "财务信息",
+        "TAB1-LABEL-AVATAR": "老人头像",
+        "TAB1-PLACEHOLDER-AVATAR": "头像地址 https://...",
         "TAB1-LABEL-NAME": "老人姓名",
         "TAB1-PLACEHOLDER-NAME": "张三",
         "TAB1-LABEL-ID_NO": "身份证号",

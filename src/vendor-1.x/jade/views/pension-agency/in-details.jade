@@ -9,6 +9,19 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                 div#contentTab1
                     fieldset: .form-group
                         <!--姓名-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-AVATAR') | translate}}:
+                        .col-md-10(ng-if="!vm.readonly")
+                            .img-border
+                                .img-loader(ng-if="vm.model.avatar")
+                                    img(ng-src="{{vm.model.avatar}}")
+                                .uploader-area(qiniu-uploader, button-text="选择图片" bucket='4gimg',user='vm.model.id',ng-uploaded-url="vm.model.avatar")
+                            input.form-control(type='text', name='avatar',ng-model='vm.model.avatar',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-AVATAR")|translate}}')
+                        .col-md-10(ng-if="vm.readonly")
+                            .img-border
+                                .img-loader(ng-if="vm.model.avatar")
+                                    img(ng-src="{{vm.model.avatar}}")
+                    fieldset: .form-group
+                        <!--姓名-->
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-NAME') | translate}}:
                         .col-md-10(ng-if="!vm.readonly")
                             input.form-control(type='text', name='name',ng-model='vm.model.name',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-NAME")|translate}}' ,required='')

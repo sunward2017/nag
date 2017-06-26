@@ -15,19 +15,25 @@
             div#contentTab1
                 fieldset: .form-group
                     label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-PASTE_IN_BED') | translate}}:
-                    .col-md-2
-                        img.qrcode-86(ng-src="{{vm.paste_in_bed}}")
+                    //.col-md-2
+                    //    img.qrcode-86(ng-src="{{vm.paste_in_bed}}")
                     .col-md-2
                         img.qrcode-129(ng-src="{{vm.paste_in_bed}}")
                     .col-md-2
                         img.qrcode-172(ng-src="{{vm.paste_in_bed}}")
                 fieldset: .form-group
                     label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-PASTE_IN_PILL_BOX') | translate}}:
-                    .col-md-2
-                        img.qrcode-86(ng-src="{{vm.paste_in_pill_box_qrcode}}")
+                    //.col-md-2
+                    //    img.qrcode-86(ng-src="{{vm.paste_in_pill_box_qrcode}}")
                     .col-md-2
                         img.qrcode-129(ng-src="{{vm.paste_in_pill_box_qrcode}}")
                     .col-md-2
                         img.qrcode-172(ng-src="{{vm.paste_in_pill_box_qrcode}}")
+                    .col-md-2
+                        .checkbox.c-checkbox
+                            label
+                                input#embededElderlyAvatarFlag(type='checkbox',ng-model='vm.embededElderlyAvatarFlag', ng-change="vm.buildQR()")
+                                span.fa.fa-check
+                        label(for="embededElderlyAvatarFlag") {{ vm.viewTranslatePath('TAB1-LABEL-EMBEDED_ELDERLY_AVATAR_FLAG') | translate}}
 .text-right.mt-lg
     button.btn.btn-primary(type="button",ng-click="vm.toListView()") {{'button.RETURN'|translate}}

@@ -58,8 +58,9 @@
             vm.tab1 = {cid: 'contentTab1',active:true};
 
             vm.load().then(function () {
-                vm.splash_imgs_count = vm.model.splash_imgs.length
+                vm.splash_imgs_count =vm.model.splash_imgs ? vm.model.splash_imgs.length : 0;
                 vm.splash_imgs = [].concat(vm.model.splash_imgs);
+                fillSplashArray();
                 console.log(vm.splash_imgs)
             });
         }

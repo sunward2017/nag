@@ -228,7 +228,8 @@
                     entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'in.details', {
                         modelName: 'psn-elderly',
                         blockUI: true
-                    })
+                    }),
+                    deps: helper.resolveFor2('qiniu', 'qiniu-ng')
                 }
             })
             .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'in.config', {

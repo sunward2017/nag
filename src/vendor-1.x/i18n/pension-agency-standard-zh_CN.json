@@ -177,7 +177,8 @@
         "HEAD-LABEL-ELDERLY_BED_NO": "床位",
         "TAB1": "老人相关二维码",
         "TAB1-LABEL-PASTE_IN_BED": "粘贴在床边的",
-        "TAB1-LABEL-PASTE_IN_PILL_BOX": "粘贴在药盒上"
+        "TAB1-LABEL-PASTE_IN_PILL_BOX": "粘贴在药盒上",
+        "TAB1-LABEL-EMBEDED_ELDERLY_AVATAR_FLAG": "嵌入头像"
       }
     },
     "exit": {

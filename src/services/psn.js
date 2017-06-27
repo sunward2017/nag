@@ -64,7 +64,48 @@ module.exports = {
                         yield next;
                     };
                 }
-            }, {
+            },
+            {
+                method: 'excel$eldelryPrintQRLabel',
+                verb: 'post',
+                url: this.service_url_prefix + "/excel/eldelryPrintQRLabel",
+                handler: function (app, options) {
+                    return function* (next) {
+                        try {
+                            var tenantId = this.request.body.tenantId;
+                            var file_name = this.request.body.file_name;
+                            var where = {
+                                status: 1,
+                                tenantId: tenantId,
+                                live_in_flag: true,
+                                begin_exit_flow: {$ne: true}
+                            }
+                            var rawRows = yield app.modelFactory().model_query(app.models['psn_elderly'], {
+                                select: 'name avatar enter_code tenantId',
+                                where: where
+                            }).populate('tenantId', 'name');
+                            var rows = app._.map(rawRows, (raw) => {
+                                return {
+                                    '单位名称': raw.tenantId.name,
+                                    '二维码': {tenantId: tenantId, elderlyId: raw.id, name: raw.name, avatar: raw.avatar},
+                                    '姓名': raw.name,
+                                    '入院号': raw.enter_code
+                                };
+                            });
+
+                            // this.response.attachment = file_name;
+                            this.set('Parse','no-parse');
+                            this.body = yield app.excel_service.build(file_name, rows, ['单位名称', '二维码', '姓名', '入院号']);
+
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
+            {
                 method: 'elderlyInfo',
                 verb: 'get',
                 url: this.service_url_prefix + "/elderlyInfo/:_id/:select", //:select需要提取的字段域用逗号分割 e.g. name,type

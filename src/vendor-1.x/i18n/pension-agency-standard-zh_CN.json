@@ -96,7 +96,8 @@
       "list": {
         "TITLE": "养老机构-老人管理-在院-列表",
         "LABEL-ARCHIVE": "全档案",
-        "TITLE-ARCHIVE": "综合了老人在机构内部多个维度的数据"
+        "TITLE-ARCHIVE": "综合了老人在机构内部多个维度的数据",
+        "BTN-EXPORT-EXCEL-FOR-ELDERLY-PRINT-QR-LABEL": "老人标签打印Excel"
       },
       "details": {
         "TITLE": "养老机构-老人管理-在院-详情",

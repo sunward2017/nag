@@ -1,6 +1,6 @@
 {
   "name": "nag",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "",
   "main": "src/app.js",
   "scripts": {

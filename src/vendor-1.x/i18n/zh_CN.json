@@ -49,7 +49,8 @@
     "REPLACE": "替换",
     "APPEND": "追加",
     "QUERY": "查询",
-    "SEARCH": "查询"
+    "SEARCH": "查询",
+    "Export-AS-EXCEL": "导出Excel"
   },
   "label": {
     "NONE": "无",

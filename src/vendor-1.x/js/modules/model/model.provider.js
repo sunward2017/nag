@@ -517,6 +517,7 @@
                     disableEnterRelatedAction: disableEnterRelatedAction,
                     checkBeforeAddEnter: checkBeforeAddEnter,
                     queryElderly: queryElderly,
+                    exportExcelForEldelryPrintQRLabel: exportExcelForEldelryPrintQRLabel,
                     queryDrug: queryDrug,
                     drugUseItemSave:drugUseItemSave,
                     drugUseItemRemove:drugUseItemRemove,
@@ -661,6 +662,14 @@
                             select: select,
                             sort: sort
                         }
+                    });
+                }
+
+                function exportExcelForEldelryPrintQRLabel(file_name, tenantId) {
+                    // return $http.post(baseUrl + 'excel/eldelryPrintQRLabel',  { tenantId: tenantId});
+                    return $http.post(baseUrl + 'excel/eldelryPrintQRLabel', { file_name: file_name, tenantId: tenantId }, { responseType: 'blob' }).success(function (res) {
+                        console.log('res', res);
+                        saveAs(res, decodeURI(file_name+'.xlsx'));
                     });
                 }
 

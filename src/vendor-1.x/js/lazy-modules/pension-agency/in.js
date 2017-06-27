@@ -30,11 +30,16 @@
             vm.init({removeDialog: ngDialog});
 
             vm.readElderlyArchive = readElderlyArchive;
+            vm.exportExcelForEldelryPrintQRLabel = exportExcelForEldelryPrintQRLabel;
             vm.query();
         }
 
         function readElderlyArchive (row) {
             
+        }
+
+        function exportExcelForEldelryPrintQRLabel() {
+            vmh.psnService.exportExcelForEldelryPrintQRLabel('老人二维码打印信息表', vm.tenantId);
         }
     }
 

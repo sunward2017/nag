@@ -53,5 +53,8 @@
             .panel-footer
                 .row
                     .col-md-4.text-left
+                        .btn-toolbar
+                            .btn-group
+                                a.btn.btn-success.btn-sm(ng-click="vm.exportExcelForEldelryPrintQRLabel()") {{ vm.viewTranslatePath('BTN-EXPORT-EXCEL-FOR-ELDERLY-PRINT-QR-LABEL') | translate}}
                     .col-md-8
                         pagination.pagination-sm.pull-right(total-items="vm.page.totals",ng-model="vm.page.no",max-size="5",items-per-page="vm.page.size",boundary-links="true" ,ng-change="vm.paging()")

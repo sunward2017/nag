@@ -217,6 +217,7 @@
                             width: 80
                         }]
                     })
+                    , deps: helper.resolveFor2('file-saver')
                 }
             })
             .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'in.details', {
@@ -2604,6 +2605,7 @@
                         switches: { leftTree: true },
                         toDetails: ['districtId']
                     })
+                    , deps: helper.resolveFor2('file-saver')
                 }
             })
             .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'room.details', {

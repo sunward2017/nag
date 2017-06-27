@@ -96,7 +96,8 @@
       "list": {
         "TITLE": "养老机构-老人管理-在院-列表",
         "LABEL-ARCHIVE": "全档案",
-        "TITLE-ARCHIVE": "综合了老人在机构内部多个维度的数据"
+        "TITLE-ARCHIVE": "综合了老人在机构内部多个维度的数据",
+        "BTN-EXPORT-EXCEL-FOR-ELDERLY-PRINT-QR-LABEL": "老人标签打印Excel"
       },
       "details": {
         "TITLE": "养老机构-老人管理-在院-详情",
@@ -892,7 +893,8 @@
     },
     "room": {
       "list": {
-        "TITLE": "养老机构-基础设置-房间-列表"
+        "TITLE": "养老机构-基础设置-房间-列表",
+        "BTN-EXPORT-EXCEL-FOR-ROOM-BED-PRINT-QR-LABEL": "房间床位标签打印Excel"
       },
       "details": {
         "TITLE": "养老机构-基础设置-房间-详情",

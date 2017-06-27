@@ -47,7 +47,7 @@
                         td(colspan="{{utils.noResultsColspan(vm)}}") {{ 'grid.NO-RESULTS' | translate}}
             .panel-footer
                 .row
-                    .col-md-4.text-left
+                    .col-md-6.text-left
                         .btn-toolbar
                             .btn-group
                                 a.btn.btn-primary.btn-sm(title="{{'button.ADD'|translate}}",ng-click="vm.add()")
@@ -58,5 +58,7 @@
                                     | {{'button.BATCH-ADD'|translate}}
                                 a.btn.btn-primary.btn-sm(title="{{'button.BATCH-EDIT'|translate}}",ng-click="vm.batchEdit()")
                                     | {{'button.BATCH-EDIT'|translate}}
-                    .col-md-8
+                            .btn-group
+                                a.btn.btn-success.btn-sm(ng-click="vm.exportExcelForRoomBedPrintQRLabel()") {{ vm.viewTranslatePath('BTN-EXPORT-EXCEL-FOR-ROOM-BED-PRINT-QR-LABEL') | translate}}
+                    .col-md-6
                         pagination.pagination-sm.pull-right(total-items="vm.page.totals",ng-model="vm.page.no",max-size="5",items-per-page="vm.page.size",boundary-links="true" ,ng-change="vm.paging()")

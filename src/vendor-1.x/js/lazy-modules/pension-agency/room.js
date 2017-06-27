@@ -28,6 +28,8 @@
         function init() {
             vm.init({removeDialog: ngDialog});
 
+            vm.exportExcelForRoomBedPrintQRLabel = exportExcelForRoomBedPrintQRLabel;
+
             if (vm.switches.leftTree) {
                 vmh.shareService.tmp('T3001/psn-district', 'name', vm.treeFilterObject).then(function (treeNodes) {
                     vm.trees = [new vmh.treeFactory.sTree('tree1', treeNodes, {mode: 'grid'})];
@@ -45,6 +47,10 @@
             }
 
             vm.query();
+        }
+
+        function exportExcelForRoomBedPrintQRLabel() {
+            vmh.psnService.exportExcelForRoomBedPrintQRLabel('房间床位二维码打印信息表', vm.tenantId);
         }
     }
 

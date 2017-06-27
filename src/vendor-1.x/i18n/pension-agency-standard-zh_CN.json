@@ -893,7 +893,8 @@
     },
     "room": {
       "list": {
-        "TITLE": "养老机构-基础设置-房间-列表"
+        "TITLE": "养老机构-基础设置-房间-列表",
+        "BTN-EXPORT-EXCEL-FOR-ROOM-BED-PRINT-QR-LABEL": "房间床位标签打印Excel"
       },
       "details": {
         "TITLE": "养老机构-基础设置-房间-详情",

@@ -2282,7 +2282,58 @@ module.exports = {
                     };
                 }
             },
-            /**********************房间状态相关*****************************/
+            /**********************房间相关*****************************/
+            {
+                method: 'excel$roomBedPrintQRLabel',
+                verb: 'post',
+                url: this.service_url_prefix + "/excel/roomBedPrintQRLabel",
+                handler: function (app, options) {
+                    return function* (next) {
+                        try {
+                            var tenantId = this.request.body.tenantId;
+                            var file_name = this.request.body.file_name;
+                            var where = {
+                                status: 1,
+                                stop_flag: false,
+                                tenantId: tenantId
+                            }
+                            var rooms = yield app.modelFactory().model_query(app.models['psn_room'], {
+                                select: 'name floor capacity forbiddens districtId tenantId',
+                                where: where
+                            }).populate('districtId', 'name').populate('tenantId', 'name');
+                            // console.log('rooms:', rooms);
+                            var rows = [], room_full_name, forbiddens;
+                            app._.each(rooms, (room)=>{
+                               for(var i=0, len = room.capacity;i<len;i++) {
+                                   forbiddens = room.forbiddens;
+                                   console.log('room:', room);
+                                   if (forbiddens && forbiddens.length > 0 && app._.contains(forbiddens, i + 1)) {
+                                        continue;
+                                   }
+
+                                   room_full_name = [room.districtId.name, room.floor + 'F', room.name, (i + 1) + '#床'].join('-');
+                                   rows.push({
+                                       '单位名称': room.tenantId.name,
+                                       '二维码': {tenantId: tenantId, roomId: room.id, name: room_full_name},
+                                       '房间床位': room_full_name
+                                   });
+                               }
+                            });
+
+                            console.log('rows:', rows);
+
+                            // this.response.attachment = file_name;
+                            this.set('Parse','no-parse');
+                            this.body = yield app.excel_service.build(file_name, rows, ['单位名称', '二维码', '房间床位']);
+
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
             {
                 method: 'roomStatusInfo',
                 verb: 'get',

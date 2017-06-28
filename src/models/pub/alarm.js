@@ -4,7 +4,8 @@
  */
 var mongoose = require('mongoose');
 var D3016 = require('../../pre-defined/dictionary.json')['D3016'];
-
+var D3029 = require('../../pre-defined/dictionary.json')['D3029'];
+var D3030 = require('../../pre-defined/dictionary.json')['D3030'];
 module.isloaded = false;
 
 
@@ -28,6 +29,10 @@ module.exports = function(ctx,name) {
             object_name: {type: String, required: true}, //报警对象名称
             reason: {type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3016"])},//报警原因
             content:{type: String},
+            level: {type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3029"])},//报警等级
+            modes: [{type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3030"])}],//报警方式 可多选
+            sended_on: {type: Date},//发送时间 报警方式为电话自助,短信发送,微信推送时使用
+            sended_flag: {type: Boolean, default: false},//发送标识 报警方式为电话自助,短信发送,微信推送时使用
             process_flag: {type: Boolean, default: false},//处理标识
             processed_on: {type: Date},
             processed_by: {type: mongoose.Schema.Types.ObjectId},

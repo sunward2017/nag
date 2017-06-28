@@ -66,6 +66,7 @@ module.exports = {
                         where: {
                             subjectId: {$in: bedMonitors},
                             process_flag: false,
+                            modes: { $elemMatch: DIC.D3030.ROBOT},
                             tenantId: tenantId
                         },
                         sort: 'check_in_time'

@@ -32,7 +32,8 @@
     "OffLine":"A0003"
   },
   "D3016":{
-    "LEAVE_BED_TIMEOUT":"A1000"
+    "LEAVE_BED_TIMEOUT":"A1000",
+    "DRUG_STOCK_LOW":"A2000"
   },
   "D3017":{
     "NURSING_ITEM":"A0001",
@@ -118,6 +119,12 @@
   "D3028":{
     "BY_TIME_TEMPLATE":"A0001",
     "BY_DAY":"A0003"
+  },
+  "D3029":{
+    "BLUE":"A0001",
+    "YELLOW":"A0003",
+    "ORANGE":"A0005",
+    "RED":"A0007"
   },
   "D3030":{
     "ROBOT":"A0001",

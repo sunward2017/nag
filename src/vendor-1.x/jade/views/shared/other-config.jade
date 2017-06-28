@@ -33,20 +33,73 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                             span.text-danger(ng-show="utils.vinput(this.theForm,'psn_bed_monitor_timeout_alarm_end','required')") {{ "validator.REQUIRED" | translate}}
                     fieldset: .form-group
                         <!--离床报警模版-->
-                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-ALARM_D3016_A1000') | translate}}:
+                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-ALARM_D3016_A1000_SETTING_CONTENT_TEMPLATE') | translate}}:
                         .col-md-10
-                            input.form-control(type='text',name='pub_alarm_D3016_A1000',ng-model='vm.other_configs.pub_alarm_D3016_A1000',placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-ALARM_D3016_A1000")|translate}}')
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'pub_alarm_D3016_A1000','required')") {{ "validator.REQUIRED" | translate}}
+                            input.form-control(type='text',name='pub_alarm_D3016_A1000_setting-content_template',ng-model='vm.pub_alarm_D3016_A1000_setting.content_template',placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-ALARM_D3016_A1000_SETTING_CONTENT_TEMPLATE")|translate}}' ,required="")
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'pub_alarm_D3016_A1000_setting-content_template','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset: .form-group
+                        <!--离床报警级别-->
+                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-ALARM_D3016_A1000_SETTING_LEVEL') | translate}}:
+                        .col-md-10
+                            .btn-group
+                                .btn.btn-primary(name='pub_alarm_D3016_A1000_setting_level',ng-repeat='level in vm.selectBinding.alarm_levels',ng-model='vm.pub_alarm_D3016_A1000_setting.level',btn-radio="level.value",required='') {{level.name}}
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'pub_alarm_D3016_A1000_setting_level','required')") {{ "validator.REQUIRED" | translate}}
                     fieldset: .form-group
                         <!--离床报警方式-->
-                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-ALARM_D3016_A1000_MODES') | translate}}:
+                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-ALARM_D3016_A1000_SETTING_MODES') | translate}}:
                         .col-md-10
                             .check-list-item(ng-repeat="mode in vm.selectBinding.alarm_modes ")
                                 .checkbox.c-checkbox
                                     label
-                                        input(id="D3016_A1000_{{mode.value}}" type='checkbox',ng-model='vm.pub_alarm_D3016_A1000_to_modes[mode.value]')
+                                        input(id="D3016_A1000_{{mode.value}}" type='checkbox',ng-model='vm.pub_alarm_D3016_A1000_setting_modes[mode.value]')
                                         span.fa.fa-check
                                 label(for="D3016_A1000_{{mode.value}}" ) {{ mode.name}}
+                    fieldset(ng-if="vm.pub_alarm_D3016_A1000_setting_modes['A0001']"): .form-group
+                        <!--离床报警方式A0001机器人接收者-->
+                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-ALARM_D3016_A1000_SETTING_MODE_A0001_RECEIVER_TYPES') | translate}}:
+                        .col-md-10
+                            .check-list-item(ng-repeat="receiver_type in vm.selectBinding.alarm_mode_A0001_receiver_types ")
+                                .checkbox.c-checkbox
+                                    label
+                                        input(id="ALARM_D3016_A1000_MODE_A0001_{{receiver_type.value}}" type='checkbox',ng-model='vm.pub_alarm_D3016_A1000_modes_receivers_obj["A0001"][receiver_type.value]')
+                                        span.fa.fa-check
+                                label(for="ALARM_D3016_A1000_MODE_A0001_{{receiver_type.value}}" ) {{ receiver_type.name}}
+                    fieldset(ng-if="vm.pub_alarm_D3016_A1000_setting_modes['A0003']"): .form-group
+                        <!--离床报警方式A0003电话自助接收者-->
+                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-ALARM_D3016_A1000_SETTING_MODE_A0003_RECEIVER_TYPES') | translate}}:
+                        .col-md-10
+                            .check-list-item(ng-repeat="receiver_type in vm.selectBinding.alarm_mode_A0003_receiver_types ")
+                                .checkbox.c-checkbox
+                                    label
+                                        input(id="ALARM_D3016_A1000_MODE_A0003_{{receiver_type.value}}" type='checkbox',ng-model='vm.pub_alarm_D3016_A1000_modes_receivers_obj["A0003"][receiver_type.value]')
+                                        span.fa.fa-check
+                                label(for="ALARM_D3016_A1000_MODE_A0003_{{receiver_type.value}}" ) {{ receiver_type.name}}
+                            div(ng-if='vm.pub_alarm_D3016_A1000_modes_receivers_obj["A0003"]["A3001"]')
+                                input.form-control(type='text', name='alarm_d3016_a1000_mode_a0003_a3001_value',ng-model='vm.pub_alarm_D3016_A1000_modes_receivers_value["A0003"]["A3001"]' ,placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-MODE-A3001-RECEIVER-VALUE")|translate}}', required='' )
+                                span.text-danger(ng-show="utils.vinput(this.theForm,'alarm_d3016_a1000_mode_a0003_a3001_value','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset(ng-if="vm.pub_alarm_D3016_A1000_setting_modes['A0005']"): .form-group
+                        <!--离床报警方式A0005短信发送接收者-->
+                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-ALARM_D3016_A1000_SETTING_MODE_A0005_RECEIVER_TYPES') | translate}}:
+                        .col-md-10
+                            .check-list-item(ng-repeat="receiver_type in vm.selectBinding.alarm_mode_A0005_receiver_types ")
+                                .checkbox.c-checkbox
+                                    label
+                                        input(id="ALARM_D3016_A1000_MODE_A0005_{{receiver_type.value}}" type='checkbox',ng-model='vm.pub_alarm_D3016_A1000_modes_receivers_obj["A0005"][receiver_type.value]')
+                                        span.fa.fa-check
+                                label(for="ALARM_D3016_A1000_MODE_A0005_{{receiver_type.value}}" ) {{ receiver_type.name}}
+                            div(ng-if='vm.pub_alarm_D3016_A1000_modes_receivers_obj["A0005"]["A3001"]')
+                                input.form-control(type='text', name='alarm_d3016_a1000_mode_a0005_a3001_value',ng-model='vm.pub_alarm_D3016_A1000_modes_receivers_value["A0005"]["A3001"]' ,placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-MODE-A3001-RECEIVER-VALUE")|translate}}', required='' )
+                                span.text-danger(ng-show="utils.vinput(this.theForm,'alarm_d3016_a1000_mode_a0005_a3001_value','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset(ng-if="vm.pub_alarm_D3016_A1000_setting_modes['A0007']"): .form-group
+                        <!--离床报警方式A0007微信推送接收者-->
+                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-ALARM_D3016_A1000_SETTING_MODE_A0005_RECEIVER_TYPES') | translate}}:
+                        .col-md-10
+                            .check-list-item(ng-repeat="receiver_type in vm.selectBinding.alarm_mode_A0007_receiver_types ")
+                                .checkbox.c-checkbox
+                                    label
+                                        input(id="ALARM_D3016_A1000_MODE_A0007_{{receiver_type.value}}" type='checkbox',ng-model='vm.pub_alarm_D3016_A1000_modes_receivers_obj["A0007"][receiver_type.value]')
+                                        span.fa.fa-check
+                                label(for="ALARM_D3016_A1000_MODE_A0007_{{receiver_type.value}}" ) {{ receiver_type.name}}
                     fieldset: .form-group
                         <!--药品低库存警戒线-->
                         label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-DRUG_STOCK_ALARM_LOW_DAY') | translate}}:
@@ -56,15 +109,74 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                             span.text-danger(ng-show="utils.vinput(this.theForm,'psn_drug_stock_alarm_low_day','min')") {{ "validator.MIN" | translate:{min:0} }}
                             span.text-danger(ng-show="utils.vinput(this.theForm,'psn_drug_stock_alarm_low_day','max')") {{ "validator.MAX" | translate:{max:50} }}
                     fieldset: .form-group
-                        <!--药品低库存警戒线通知方式-->
-                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-ALARM_D3016_A2000_MODES') | translate}}:
+                        <!--药品低库存通知模版-->
+                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-ALARM_D3016_A2000_SETTING_CONTENT_TEMPLATE') | translate}}:
+                        .col-md-10
+                            input.form-control(type='text',name='pub_alarm_D3016_A2000_setting-content_template',ng-model='vm.pub_alarm_D3016_A2000_setting.content_template',placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-ALARM_D3016_A2000_SETTING_CONTENT_TEMPLATE")|translate}}' ,required="")
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'pub_alarm_D3016_A2000_setting-content_template','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset: .form-group
+                        <!--药品低库存通知级别-->
+                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-ALARM_D3016_A2000_SETTING_LEVEL') | translate}}:
+                        .col-md-10
+                            .btn-group
+                                .btn.btn-primary(name='pub_alarm_D3016_A2000_setting_level',ng-repeat='level in vm.selectBinding.alarm_levels',ng-model='vm.pub_alarm_D3016_A2000_setting.level',btn-radio="level.value",required='') {{level.name}}
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'pub_alarm_D3016_A2000_setting_level','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset: .form-group
+                        <!--药品低库存通知方式-->
+                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-ALARM_D3016_A2000_SETTING_MODES') | translate}}:
                         .col-md-10
                             .check-list-item(ng-repeat="mode in vm.selectBinding.alarm_modes ")
                                 .checkbox.c-checkbox
                                     label
-                                        input(id="D3016_A2000_{{mode.value}}" type='checkbox',ng-model='vm.pub_alarm_D3016_A2000_to_modes[mode.value]')
+                                        input(id="D3016_A2000_{{mode.value}}" type='checkbox',ng-model='vm.pub_alarm_D3016_A2000_setting_modes[mode.value]')
                                         span.fa.fa-check
                                 label(for="D3016_A2000_{{mode.value}}" ) {{ mode.name}}
+                    fieldset(ng-if="vm.pub_alarm_D3016_A2000_setting_modes['A0001']"): .form-group
+                        <!--药品低库存通知A0001机器人接收者-->
+                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-ALARM_D3016_A2000_SETTING_MODE_A0001_RECEIVER_TYPES') | translate}}:
+                        .col-md-10
+                            .check-list-item(ng-repeat="receiver_type in vm.selectBinding.alarm_mode_A0001_receiver_types ")
+                                .checkbox.c-checkbox
+                                    label
+                                        input(id="ALARM_D3016_A2000_MODE_A0001_{{receiver_type.value}}" type='checkbox',ng-model='vm.pub_alarm_D3016_A2000_modes_receivers_obj["A0001"][receiver_type.value]')
+                                        span.fa.fa-check
+                                label(for="ALARM_D3016_A2000_MODE_A0001_{{receiver_type.value}}" ) {{ receiver_type.name}}
+                    fieldset(ng-if="vm.pub_alarm_D3016_A2000_setting_modes['A0003']"): .form-group
+                        <!--药品低库存通知A0003电话自助接收者-->
+                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-ALARM_D3016_A2000_SETTING_MODE_A0003_RECEIVER_TYPES') | translate}}:
+                        .col-md-10
+                            .check-list-item(ng-repeat="receiver_type in vm.selectBinding.alarm_mode_A0003_receiver_types ")
+                                .checkbox.c-checkbox
+                                    label
+                                        input(id="ALARM_D3016_A2000_MODE_A0003_{{receiver_type.value}}" type='checkbox',ng-model='vm.pub_alarm_D3016_A2000_modes_receivers_obj["A0003"][receiver_type.value]')
+                                        span.fa.fa-check
+                                label(for="ALARM_D3016_A2000_MODE_A0003_{{receiver_type.value}}" ) {{ receiver_type.name}}
+                            div(ng-if='vm.pub_alarm_D3016_A2000_modes_receivers_obj["A0003"]["A3001"]')
+                                input.form-control(type='text', name='alarm_d3016_a2000_mode_a0003_a3001_value',ng-model='vm.pub_alarm_D3016_A2000_modes_receivers_value["A0003"]["A3001"]' , placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-MODE-A3001-RECEIVER-VALUE")|translate}}', required='' )
+                                span.text-danger(ng-show="utils.vinput(this.theForm,'alarm_d3016_a2000_mode_a0003_a3001_value','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset(ng-if="vm.pub_alarm_D3016_A2000_setting_modes['A0005']"): .form-group
+                        <!--药品低库存通知A0005短信发送接收者-->
+                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-ALARM_D3016_A2000_SETTING_MODE_A0005_RECEIVER_TYPES') | translate}}:
+                        .col-md-10
+                            .check-list-item(ng-repeat="receiver_type in vm.selectBinding.alarm_mode_A0005_receiver_types ")
+                                .checkbox.c-checkbox
+                                    label
+                                        input(id="ALARM_D3016_A2000_MODE_A0005_{{receiver_type.value}}" type='checkbox',ng-model='vm.pub_alarm_D3016_A2000_modes_receivers_obj["A0005"][receiver_type.value]')
+                                        span.fa.fa-check
+                                label(for="ALARM_D3016_A2000_MODE_A0005_{{receiver_type.value}}" ) {{ receiver_type.name}}
+                            div(ng-if='vm.pub_alarm_D3016_A2000_modes_receivers_obj["A0005"]["A3001"]')
+                                input.form-control(type='text', name='alarm_d3016_a2000_mode_a0005_a3001_value',ng-model='vm.pub_alarm_D3016_A2000_modes_receivers_value["A0005"]["A3001"]' ,placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-MODE-A3001-RECEIVER-VALUE")|translate}}', required='' )
+                                span.text-danger(ng-show="utils.vinput(this.theForm,'alarm_d3016_a2000_mode_a0005_a3001_value','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset(ng-if="vm.pub_alarm_D3016_A2000_setting_modes['A0007']"): .form-group
+                        <!--药品低库存通知A0007微信推送接收者-->
+                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-ALARM_D3016_A2000_SETTING_MODE_A0007_RECEIVER_TYPES') | translate}}:
+                        .col-md-10
+                            .check-list-item(ng-repeat="receiver_type in vm.selectBinding.alarm_mode_A0007_receiver_types ")
+                                .checkbox.c-checkbox
+                                    label
+                                        input(id="ALARM_D3016_A2000_MODE_A0007_{{receiver_type.value}}" type='checkbox',ng-model='vm.pub_alarm_D3016_A2000_modes_receivers_obj["A0007"][receiver_type.value]')
+                                        span.fa.fa-check
+                                label(for="ALARM_D3016_A2000_MODE_A0007_{{receiver_type.value}}" ) {{ receiver_type.name}}
                     fieldset: .form-group
                         <!--药品入库时检查效期-->
                         label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-FLAG-COLLECTION') | translate}}:

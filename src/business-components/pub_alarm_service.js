@@ -66,7 +66,7 @@ module.exports = {
                         where: {
                             subjectId: {$in: bedMonitors},
                             process_flag: false,
-                            modes: { $elemMatch: DIC.D3030.ROBOT},
+                            modes: {$elemMatch: {value: DIC.D3030.ROBOT}},
                             tenantId: tenantId
                         },
                         sort: 'check_in_time'
@@ -148,7 +148,13 @@ module.exports = {
                 }
                 tenant = yield self.ctx.modelFactory().model_read(self.ctx.models['pub_tenant'], bedMonitor.tenantId);
 
-                var content = tenant.other_config.pub_alarm_D3016_A0001 || '${发生时间}${房间床位}${老人姓名}离床未归!';
+                //获取该类告警配置
+                var pub_alarm_D3016_A1000_setting = self.ctx._.find(tenant.other_config.pub_alarm_D3016_settings, (o)=>{
+                    return o.reason == DIC.D3016.LEAVE_BED_TIMEOUT
+                }) || {reason: DIC.D3016.LEAVE_BED_TIMEOUT, content_template: '${发生时间}${房间床位}${老人姓名}离床未归!', level: DIC.D3029.RED, modes:[DIC.D3030.ROBOT, DIC.D3030.PHONE, DIC.D3030.SMS, DIC.D3030.PHONE]};
+                
+                // 替换模版内容
+                var content = pub_alarm_D3016_A1000_setting.content_template;
                 var reg = /\${([^}]+)}/, result;
                 while ((result = reg.exec(content)) != null) {
                     if (RegExp.$1 == "发生时间") {
@@ -166,7 +172,8 @@ module.exports = {
                         content = content.replace(reg, elderly.name);
                     }
                 }
-
+                
+                // 设置告警等级和方式
                 var result = yield self.ctx.modelFactory().model_create(self.ctx.models['pub_alarm'], {
                     subject: 'pub_bedMonitor',
                     subjectId: bedMonitor._id,
@@ -176,12 +183,26 @@ module.exports = {
                     object_name: elderly.name,
                     reason: DIC.D3016.LEAVE_BED_TIMEOUT,
                     content: content,
+                    level: pub_alarm_D3016_A1000_setting.level,
+                    modes: pub_alarm_D3016_A1000_setting.modes,
                     tenantId: bedMonitor.tenantId
                 });
 
                 return result.id;
             }
             catch (e) {
+                console.log(e);
+                self.logger.error(e.message);
+            }
+        }).catch(self.ctx.coOnError);
+    },
+    sendAlarmLast24Hours: function () {
+        var self = this;
+        return co(function*() {
+            try {
+                // 过去24小时需要发送的通知报警信息
+
+            } catch (e) {
                 console.log(e);
                 self.logger.error(e.message);
             }

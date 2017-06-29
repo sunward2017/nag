@@ -39,7 +39,7 @@
         }
 
         function exportExcelForEldelryPrintQRLabel() {
-            vmh.psnService.exportExcelForEldelryPrintQRLabel('老人二维码打印信息表', vm.tenantId);
+            vmh.psnService.exportExcelForEldelryPrintQRLabel('老人二维码打印信息表(' + vm.tenant_name +'-' + moment().format('YYYY.MM.DD') + ')', vm.tenantId);
         }
     }
 

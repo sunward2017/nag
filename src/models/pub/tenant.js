@@ -77,6 +77,10 @@ module.exports = function(ctx,name) {
                 self: {type: Number, default: 0.00},//主账户
                 other: {type: Number, default: 0.00} //其他账户
             },
+            head_of_agency: {
+                name:{type: String}, //机构负责人姓名
+                phone:{type: String} //机构负责人电话
+            },
             other_config: {
                 psn_bed_monitor_timeout: {type: Number, default: 5.00},//睡眠带超时时间设置，单位：分钟，默认5分钟
                 psn_bed_monitor_timeout_alarm_begin: {type: String, minlength: 5, maxlength: 5, default: '22:00'},//睡眠带报警时间范围，起始时间,22:00

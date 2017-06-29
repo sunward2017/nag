@@ -40,6 +40,7 @@
             ]).then(function (results) {
                 vm.other_configs = results[0][0].other_config;
                 vm.tenant_name = results[0][0].name;
+                vm.head_of_agency = results[0][0].head_of_agency || {};
 
                 _.each(results[2], function(mode){
                     vm.pub_alarm_D3016_A1000_modes_receivers_obj[mode.value] = {};
@@ -103,15 +104,15 @@
         function doSubmit(){
             if ($scope.theForm.$valid) {
 
-                var alarm_D3016_A1000_modes = [],alarm_D3016_A2000_modes = [], alarm_D3016_A1000_modes_receivers, alarm_D3016_A1000_modes_receiver, alarm_D3016_A2000_modes_receivers, alarm_D3016_A2000_modes_receiver;
+                var alarm_D3016_A1000_modes = [], alarm_D3016_A2000_modes = [], alarm_D3016_A1000_modes_receivers, alarm_D3016_A1000_modes_receiver, alarm_D3016_A2000_modes_receivers, alarm_D3016_A2000_modes_receiver;
                 console.log('格式化离床告警设置..');
-                for(var mode in vm.pub_alarm_D3016_A1000_setting_modes) {
-                    if(vm.pub_alarm_D3016_A1000_setting_modes[mode]){
+                for (var mode in vm.pub_alarm_D3016_A1000_setting_modes) {
+                    if (vm.pub_alarm_D3016_A1000_setting_modes[mode]) {
                         alarm_D3016_A1000_modes_receivers = [];
-                        for(var receiverType in vm.pub_alarm_D3016_A1000_modes_receivers_obj[mode]){
-                            if(vm.pub_alarm_D3016_A1000_modes_receivers_obj[mode][receiverType]){
+                        for (var receiverType in vm.pub_alarm_D3016_A1000_modes_receivers_obj[mode]) {
+                            if (vm.pub_alarm_D3016_A1000_modes_receivers_obj[mode][receiverType]) {
                                 alarm_D3016_A1000_modes_receiver = {type: receiverType};
-                                if(receiverType == 'A3001') {
+                                if (receiverType == 'A3001') {
                                     alarm_D3016_A1000_modes_receiver.value = vm.pub_alarm_D3016_A1000_modes_receivers_value[mode][receiverType];
                                 }
                                 alarm_D3016_A1000_modes_receivers.push(alarm_D3016_A1000_modes_receiver);
@@ -123,13 +124,13 @@
                 vm.pub_alarm_D3016_A1000_setting.modes = alarm_D3016_A1000_modes;
 
                 console.log('格式化药品低库存通知设置..');
-                for(var mode in vm.pub_alarm_D3016_A2000_setting_modes) {
-                    if(vm.pub_alarm_D3016_A2000_setting_modes[mode]){
+                for (var mode in vm.pub_alarm_D3016_A2000_setting_modes) {
+                    if (vm.pub_alarm_D3016_A2000_setting_modes[mode]) {
                         alarm_D3016_A2000_modes_receivers = [];
-                        for(var receiverType in vm.pub_alarm_D3016_A2000_modes_receivers_obj[mode]){
-                            if(vm.pub_alarm_D3016_A2000_modes_receivers_obj[mode][receiverType]){
+                        for (var receiverType in vm.pub_alarm_D3016_A2000_modes_receivers_obj[mode]) {
+                            if (vm.pub_alarm_D3016_A2000_modes_receivers_obj[mode][receiverType]) {
                                 alarm_D3016_A2000_modes_receiver = {type: receiverType};
-                                if(receiverType == 'A3001') {
+                                if (receiverType == 'A3001') {
                                     alarm_D3016_A2000_modes_receiver.value = vm.pub_alarm_D3016_A2000_modes_receivers_value[mode][receiverType];
                                 }
                                 alarm_D3016_A2000_modes_receivers.push(alarm_D3016_A2000_modes_receiver);
@@ -141,7 +142,10 @@
                 vm.pub_alarm_D3016_A2000_setting.modes = alarm_D3016_A2000_modes;
 
                 console.log('vm.other_configs.pub_alarm_D3016_settings:', vm.other_configs.pub_alarm_D3016_settings);
-                vmh.exec(vmh.extensionService.saveTenantOtherConfig(vm.model['tenantId'], vm.other_configs, vm.tenant_name));
+                vmh.exec(vmh.extensionService.saveTenantConfig(vm.model['tenantId'], {
+                    main: {name: vm.tenant_name, head_of_agency: vm.head_of_agency},
+                    other: vm.other_configs
+                }));
             }
             else {
                 if ($scope.utils.vtab(vm.tab1.cid)) {

@@ -14,6 +14,16 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                             input.form-control(type='text', name='tenant_name',ng-model='vm.tenant_name' ,required='' )
                             span.text-danger(ng-show="utils.vinput(this.theForm,'tenant_name','required')") {{ "validator.REQUIRED" | translate}}
                     fieldset: .form-group
+                        <!--机构负责人姓名-->
+                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-HEAD_OF_AGENCY_NAME') | translate}}:
+                        .col-md-10
+                            input.form-control(type='text', name='head_of_agency_name',ng-model='vm.head_of_agency.name' ,required='' )
+                    fieldset: .form-group
+                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-HEAD_OF_AGENCY_PHONE') | translate}}:
+                        .col-md-10
+                            input.form-control(type='text',name='head_of_agency_phone' , ng-model='vm.head_of_agency.phone',placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-MULTIPLE_PHONES")|translate}}' ,required='' )
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'head_of_agency_phone','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset: .form-group
                         <!--睡眠带超时时间（分）-->
                         label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-BED_MONITOR_TIMEOUT') | translate}}:
                         .col-md-10
@@ -75,7 +85,7 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                                         span.fa.fa-check
                                 label(for="ALARM_D3016_A1000_MODE_A0003_{{receiver_type.value}}" ) {{ receiver_type.name}}
                             div(ng-if='vm.pub_alarm_D3016_A1000_modes_receivers_obj["A0003"]["A3001"]')
-                                input.form-control(type='text', name='alarm_d3016_a1000_mode_a0003_a3001_value',ng-model='vm.pub_alarm_D3016_A1000_modes_receivers_value["A0003"]["A3001"]' ,placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-MODE-A3001-RECEIVER-VALUE")|translate}}', required='' )
+                                input.form-control(type='text', name='alarm_d3016_a1000_mode_a0003_a3001_value',ng-model='vm.pub_alarm_D3016_A1000_modes_receivers_value["A0003"]["A3001"]' ,placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-MULTIPLE_PHONES")|translate}}', required='' )
                                 span.text-danger(ng-show="utils.vinput(this.theForm,'alarm_d3016_a1000_mode_a0003_a3001_value','required')") {{ "validator.REQUIRED" | translate}}
                     fieldset(ng-if="vm.pub_alarm_D3016_A1000_setting_modes['A0005']"): .form-group
                         <!--离床报警方式A0005短信发送接收者-->
@@ -88,7 +98,7 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                                         span.fa.fa-check
                                 label(for="ALARM_D3016_A1000_MODE_A0005_{{receiver_type.value}}" ) {{ receiver_type.name}}
                             div(ng-if='vm.pub_alarm_D3016_A1000_modes_receivers_obj["A0005"]["A3001"]')
-                                input.form-control(type='text', name='alarm_d3016_a1000_mode_a0005_a3001_value',ng-model='vm.pub_alarm_D3016_A1000_modes_receivers_value["A0005"]["A3001"]' ,placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-MODE-A3001-RECEIVER-VALUE")|translate}}', required='' )
+                                input.form-control(type='text', name='alarm_d3016_a1000_mode_a0005_a3001_value',ng-model='vm.pub_alarm_D3016_A1000_modes_receivers_value["A0005"]["A3001"]' ,placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-MULTIPLE_PHONES")|translate}}', required='' )
                                 span.text-danger(ng-show="utils.vinput(this.theForm,'alarm_d3016_a1000_mode_a0005_a3001_value','required')") {{ "validator.REQUIRED" | translate}}
                     fieldset(ng-if="vm.pub_alarm_D3016_A1000_setting_modes['A0007']"): .form-group
                         <!--离床报警方式A0007微信推送接收者-->
@@ -152,7 +162,7 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                                         span.fa.fa-check
                                 label(for="ALARM_D3016_A2000_MODE_A0003_{{receiver_type.value}}" ) {{ receiver_type.name}}
                             div(ng-if='vm.pub_alarm_D3016_A2000_modes_receivers_obj["A0003"]["A3001"]')
-                                input.form-control(type='text', name='alarm_d3016_a2000_mode_a0003_a3001_value',ng-model='vm.pub_alarm_D3016_A2000_modes_receivers_value["A0003"]["A3001"]' , placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-MODE-A3001-RECEIVER-VALUE")|translate}}', required='' )
+                                input.form-control(type='text', name='alarm_d3016_a2000_mode_a0003_a3001_value',ng-model='vm.pub_alarm_D3016_A2000_modes_receivers_value["A0003"]["A3001"]' , placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-MULTIPLE_PHONES")|translate}}', required='' )
                                 span.text-danger(ng-show="utils.vinput(this.theForm,'alarm_d3016_a2000_mode_a0003_a3001_value','required')") {{ "validator.REQUIRED" | translate}}
                     fieldset(ng-if="vm.pub_alarm_D3016_A2000_setting_modes['A0005']"): .form-group
                         <!--药品低库存通知A0005短信发送接收者-->
@@ -165,7 +175,7 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                                         span.fa.fa-check
                                 label(for="ALARM_D3016_A2000_MODE_A0005_{{receiver_type.value}}" ) {{ receiver_type.name}}
                             div(ng-if='vm.pub_alarm_D3016_A2000_modes_receivers_obj["A0005"]["A3001"]')
-                                input.form-control(type='text', name='alarm_d3016_a2000_mode_a0005_a3001_value',ng-model='vm.pub_alarm_D3016_A2000_modes_receivers_value["A0005"]["A3001"]' ,placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-MODE-A3001-RECEIVER-VALUE")|translate}}', required='' )
+                                input.form-control(type='text', name='alarm_d3016_a2000_mode_a0005_a3001_value',ng-model='vm.pub_alarm_D3016_A2000_modes_receivers_value["A0005"]["A3001"]' ,placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-MULTIPLE_PHONES")|translate}}', required='' )
                                 span.text-danger(ng-show="utils.vinput(this.theForm,'alarm_d3016_a2000_mode_a0005_a3001_value','required')") {{ "validator.REQUIRED" | translate}}
                     fieldset(ng-if="vm.pub_alarm_D3016_A2000_setting_modes['A0007']"): .form-group
                         <!--药品低库存通知A0007微信推送接收者-->

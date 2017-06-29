@@ -216,9 +216,9 @@ module.exports = {
                 }
             },
             {
-                method: 'saveTenantOtherConfig',//保存机构其它配置
+                method: 'saveTenantConfig',//保存机构配置
                 verb: 'post',
-                url: this.service_url_prefix + "/saveTenantOtherConfig/:id",
+                url: this.service_url_prefix + "/saveTenantConfig/:id",
                 handler: function (app, options) {
                     return function * (next) {
                         try {
@@ -229,8 +229,10 @@ module.exports = {
                                 return;
                             }
                             // console.log('saveTenantOtherConfig', this.request.body);
-                            tenant.other_config = this.request.body.otherConfig;
+                            
                             tenant.name = this.request.body.name;
+                            tenant.head_of_agency = this.request.body.head_of_agency;
+                            tenant.other_config = this.request.body.otherConfig;
                             yield tenant.save();
                             this.body = app.wrapper.res.default();
                         } catch (e) {

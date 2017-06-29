@@ -173,7 +173,11 @@ module.exports = {
                     }
                 }
                 
-                // 设置告警等级和方式
+                // 设置报警等级和报警方式
+
+                var alarm_modes = yield self._getAlarmModesByD3016SettingForElderly(pub_alarm_D3016_A1000_setting.modes, tenant, elderly);
+                console.log('alarm_modes:>>>>>>>>>>>>>>>>>', alarm_modes);
+                 
                 var result = yield self.ctx.modelFactory().model_create(self.ctx.models['pub_alarm'], {
                     subject: 'pub_bedMonitor',
                     subjectId: bedMonitor._id,
@@ -184,13 +188,65 @@ module.exports = {
                     reason: DIC.D3016.LEAVE_BED_TIMEOUT,
                     content: content,
                     level: pub_alarm_D3016_A1000_setting.level,
-                    modes: pub_alarm_D3016_A1000_setting.modes,
+                    modes: alarm_modes,
                     tenantId: bedMonitor.tenantId
                 });
 
                 return result.id;
             }
             catch (e) {
+                console.log(e);
+                self.logger.error(e.message);
+            }
+        }).catch(self.ctx.coOnError);
+    },
+    _getAlarmModesByD3016SettingForElderly: function (settingModes, tenant, elderly) {
+        var self = this;
+        return co(function*() {
+            try {
+                var mode, alarm_modes = [], receiver, alarm_mode, mode_send_tos;
+                for(var i=0,len=settingModes.length;i<len;i++ ){
+                    mode = settingModes[i];
+                    alarm_mode = {value: mode.value};
+                    if(mode.value == DIC.D3030.PHONE || mode.value == DIC.D3030.SMS) {
+                        mode_send_tos = [];
+                        for(var j=0,jLen=mode.receivers.length;j<jLen;j++ ){
+                            receiver = mode.receivers[j];
+
+                            if(receiver.type == DIC.D3031.MOBILE_DEFINED){
+                                receiver.value && (mode_send_tos = mode_send_tos.concat(receiver.value.split(',')));
+                            } else if(receiver.type == DIC.D3031.RELATIVES_AND_FRIENDS){
+                                // 查找老人亲友
+                                elderly.family_members.length > 0 && (mode_send_tos = mode_send_tos.concat(self.ctx._.map(elderly.family_members, member=> member.phone)));
+                            } else if(receiver.type == DIC.D3031.NURSING_WORKER_SERVED){
+                                // 查找当班护工
+
+                                var start = self.ctx.moment(self.ctx.moment().format('YYYY-MM-DD')), end = self.ctx.moment(start).add(1, 'days');
+                                var nursingWorkerScheduleItems = yield self.ctx.modelFactory().model_query(self.ctx.models['psn_nursingSchedule'], {
+                                    select: 'aggr_value',
+                                    where: {
+                                        status: 1,
+                                        x_axis: {'$gte': start, '$lt': end},
+                                        y_axis: elderly.room_value.roomId,
+                                        tenantId: tenant._id
+                                    }
+                                }).populate('aggr_value', 'phone', 'psn_nursingWorker');
+
+                                nursingWorkerScheduleItems.length > 0 && (mode_send_tos = mode_send_tos.concat(self.ctx._.map(nursingWorkerScheduleItems, item=>item.aggr_value.phone)));
+
+                            } else if(receiver.type == DIC.D3031.NURSE_IN_CHARGE){
+                                // 暂时先不实现,可能已值班手机来设置
+                            } else if(receiver.type == DIC.D3031.HEAD_OF_AGENCY){
+                                tenant.head_of_agency && tenant.head_of_agency.phone && (mode_send_tos.concat(tenant.head_of_agency.phone.split(',')));
+                            }
+                        }
+                        alarm_mode.send_tos = mode_send_tos;
+                    }
+                    alarm_modes.push(alarm_mode);
+
+                }
+                return alarm_modes;
+            } catch (e) {
                 console.log(e);
                 self.logger.error(e.message);
             }

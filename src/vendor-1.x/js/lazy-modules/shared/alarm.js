@@ -8,13 +8,13 @@
     
     angular
         .module('subsystem.pension-agency')
-        .controller('WarningGridController',WarningGridController)
+        .controller('AlarmGridController',AlarmGridController)
          
     ;
 
-    WarningGridController.$inject = ['$scope', 'ngDialog', 'vmh', 'entryVM'];
+    AlarmGridController.$inject = ['$scope', 'ngDialog', 'vmh', 'entryVM'];
 
-    function  WarningGridController($scope, ngDialog, vmh, vm) {
+    function  AlarmGridController($scope, ngDialog, vmh, vm) {
 
         $scope.vm = vm;
         $scope.utils = vmh.utils.g;

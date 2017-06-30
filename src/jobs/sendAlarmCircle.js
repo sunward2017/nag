@@ -8,14 +8,14 @@
  var job_name =  '每天每隔时间发送警报(level=橙色,红色)';
  var job_rule = new schedule.RecurrenceRule();
  var times = [];
- for(var i=0; i<60; i+= 5) {
+ for(var i=1; i<60; i+= 30) {
     times.push(i);
  }
  job_rule.second = times;
  var printLog = true;
 
  module.exports = {
-     needRegister: true,
+     needRegister: false,
      register: function (ctx) {
          if (this.needRegister) {
              return co(function*() {
@@ -24,7 +24,7 @@
                      if (ctx.onJobExecute && ctx._.isFunction(ctx.onJobExecute)) {
                          ctx.onJobExecute.call(null, job_id);
                      }
-                     ctx.pub_alarm_service.sendAlarmLast24HoursCircle();
+                     ctx.pub_alarm_service.sendAlarmForLevelsOfOrangeAndRed();
                      // console.log(ctx.moment().format('HH:mm:ss') + ' ' + job_id + '(' + job_name + ') => executed.');
                  }, {printLog: printLog});
 

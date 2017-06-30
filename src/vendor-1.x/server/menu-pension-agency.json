@@ -97,14 +97,15 @@
         "name": "照护组",
         "sref": "app.pension-agency.nursing-group.list"
       },
-       {
+      {
         "_id": "menu.pension-agency.OVERDUE-WORKITEM",
         "name": "过期工作项目",
         "sref": "app.pension-agency.overdue-workitem.list"
-      }, {
-        "_id": "menu.pension-agency.WARNING-GROUP",
-        "name": "报警列表",
-        "sref": "app.pension-agency.warning-group.list"
+      },
+      {
+        "_id": "menu.pension-agency.ALARM-A1000",
+        "name": "离床报警",
+        "sref": "app.pension-agency.alarm-a1000.list"
       }
     ]
   },

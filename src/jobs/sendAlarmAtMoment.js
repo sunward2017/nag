@@ -19,7 +19,7 @@ var printLog = true;
                      if (ctx.onJobExecute && ctx._.isFunction(ctx.onJobExecute)) {
                          ctx.onJobExecute.call(null, job_id);
                      }
-                     ctx.pub_alarm_service.sendAlarmLast24HoursAtMoment();
+                     ctx.pub_alarm_service.sendAlarmForLevelsOfBlueAndYellow();
                      // console.log(ctx.moment().format('HH:mm:ss') + ' ' + job_id + '(' + job_name + ') => executed.');
                  }, {printLog: printLog});
 

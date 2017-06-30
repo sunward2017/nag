@@ -26,6 +26,7 @@ module.exports = {
         // isProduction = true;//使用正式接口
         this.vmsUrl = isProduction ? wodongConfig.production.host + wodongConfig.production.vms : wodongConfig.develop.host + wodongConfig.develop.vms;
         this.smsUrl = isProduction ? wodongConfig.production.host + wodongConfig.production.sms : wodongConfig.develop.host + wodongConfig.develop.sms;
+        this.shared_form = isProduction ? wodongConfig.production.shared_form: wodongConfig.develop.shared_form;
 
         console.log(this.filename + ' ready... ');
         return this;
@@ -34,30 +35,39 @@ module.exports = {
         var self = this;
         return co(function*() {
             try {
-                var mobile = '';
+                var mobile = '', raw_mobiles = '';
                 if (self.ctx._.isArray(mobiles)) {
+                    raw_mobiles = mobiles.join();
+                    mobiles = self.ctx._.filter(mobiles, (o)=>{
+                        return self.ctx.util.isPhone(o);
+                    });
                     mobile = mobiles.join();
                 } else if (self.ctx._.isString(mobiles)) {
-                    mobile = mobiles;
-                }
-                var url = self.vmsUrl + '&mobile=' + mobile + '&title=' + encodeURIComponent(title) + '&Vmsmsg=' + encodeURIComponent(sendContent);
-                console.log(url);
-
-                var ret = yield rp({
-                    method: 'POST',
-                    url: externalSystemConfig.bed_monitor_status.api_url + '/ECSServer/userws/userAuthenticate.json',
-                    form: {
-                        token: ret.retValue,
-                        userName: member.name,
-                        encryptedName: member.name,
-                        encryptedPwd: member.passhash,
-                        userType: "zjwsy"
+                    raw_mobiles = mobiles;
+                    if(self.ctx.util.isPhone(o)){
+                        mobile = mobiles;
                     }
-                });
+                }
 
-                var sendRet = yield rp(url);
-                console.log('sms sendRet:', sendRet);
-                return self.ctx.wrapper.res.ret({url: url, result: sendRet});
+                if(!mobile){
+                    return self.ctx.wrapper.res.error({message: '无效的号码:' + raw_mobiles});
+                }
+
+                var formData = self.ctx._.extend({
+                    mobile: mobile,
+                    title: title,
+                    Vmsmsg: sendContent
+                }, self.shared_form);
+
+
+                var sendRet = yield rp({
+                    method: 'POST',
+                    url: self.vmsUrl,
+                    form: formData,
+                    json: true
+                });
+                console.log('---------------- vms sendRet', self.vmsUrl, formData.mobile, sendRet);
+                return self.ctx.wrapper.res.ret({url: self.vmsUrl, formData: formData, result: sendRet});
             }
             catch (e) {
                 console.log(e);
@@ -71,14 +81,37 @@ module.exports = {
         var self = this;
         return co(function*() {
             try {
-                var mobile = '';
-                if(self.ctx._.isArray(mobiles)){
+                var mobile = '', raw_mobiles = '';
+                if (self.ctx._.isArray(mobiles)) {
+                    raw_mobiles = mobiles.join();
+                    mobiles = self.ctx._.filter(mobiles, (o)=>{
+                        return self.ctx.util.isPhone(o);
+                    });
                     mobile = mobiles.join();
+                } else if (self.ctx._.isString(mobiles)) {
+                    raw_mobiles = mobiles;
+                    if(self.ctx.util.isPhone(o)){
+                        mobile = mobiles;
+                    }
                 }
-                var url = self.smsUrl + '&mobile=' + mobile + '&content=' + sendContent;
-                var sendRet = yield rp(url);
-                console.log('sms sendRet:',sendRet);
-                return self.ctx.wrapper.res.ret({url: url, result: sendRet});
+
+                if(!mobile){
+                    return self.ctx.wrapper.res.error({message: '无效的号码:' + raw_mobiles});
+                }
+
+                var formData = self.ctx._.extend({
+                    mobile: mobile,
+                    content: sendContent
+                }, self.shared_form);
+
+                var sendRet = yield rp({
+                    method: 'POST',
+                    url: self.smsUrl,
+                    form: formData,
+                    json: true
+                });
+                console.log('---------------- sms sendRet', self.smsUrl, formData.mobile, sendRet);
+                return self.ctx.wrapper.res.ret({url: self.smsUrl, formData: formData, result: sendRet});
             }
             catch (e) {
                 console.log(e);

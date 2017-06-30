@@ -237,7 +237,7 @@ module.exports = {
                             } else if(receiver.type == DIC.D3031.NURSE_IN_CHARGE){
                                 // 暂时先不实现,可能已值班手机来设置
                             } else if(receiver.type == DIC.D3031.HEAD_OF_AGENCY){
-                                tenant.head_of_agency && tenant.head_of_agency.phone && (mode_send_tos.concat(tenant.head_of_agency.phone.split(',')));
+                                tenant.head_of_agency && tenant.head_of_agency.phone && (mode_send_tos = mode_send_tos.concat(tenant.head_of_agency.phone.split(',')));
                             }
                         }
                         alarm_mode.send_tos = mode_send_tos;
@@ -252,24 +252,25 @@ module.exports = {
             }
         }).catch(self.ctx.coOnError);
     },
-    sendAlarmLast24HoursCircle: function () {
+    sendAlarmForLevelsOfOrangeAndRed: function () {
         var self = this;
         return co(function*() {
             try {
                 // 过去24小时需要发送的通知报警信息
                 var now = self.ctx.moment(), before = self.ctx.moment(now).add(-1, 'days');
-                var alarms = yield self.ctx.modelFactory().model_query(self.ctx.models['pub_alarm'], {
-                    select: 'reason content level modes tenantId',
+                var alarm = yield self.ctx.modelFactory().model_one(self.ctx.models['pub_alarm'], {
+                    select: 'reason content level modes sended_count tenantId',
                     where: {
                         sended_flag: {$in: [undefined, false]},
+                        process_flag: {$in: [undefined, false]},
                         level: {$in: [DIC.D3029.ORANGE, DIC.D3029.RED]},
                         modes: {$elemMatch: {value: {$in: [DIC.D3030.PHONE, DIC.D3030.SMS]}}},
                         check_in_time: {'$gte': before, '$lt': now}
                     },
                     sort: 'check_in_time'
-                });
-
-                console.log('sendAlarmLast24HoursCircle alarms:', alarms);
+                }).populate('tenantId', 'name');
+                var alarms = alarm? [alarm]: [];
+                // console.log('sendAlarmLast24HoursCircle alarms:', alarms);
                 yield self._sendAlarms(alarms);
             } catch (e) {
                 console.log(e);
@@ -277,14 +278,14 @@ module.exports = {
             }
         }).catch(self.ctx.coOnError);
     },
-    sendAlarmLast24HoursAtMoment: function () {
+    sendAlarmForLevelsOfBlueAndYellow: function () {
         var self = this;
         return co(function*() {
             try {
                 // 过去24小时需要发送的通知报警信息
                 var now = self.ctx.moment(), before = self.ctx.moment(now).add(-1, 'days');
                 var alarms = yield self.ctx.modelFactory().model_query(self.ctx.models['pub_alarm'], {
-                    select: 'reason content level modes tenantId',
+                    select: 'reason content level modes sended_count tenantId',
                     where: {
                         sended_flag: {$in: [undefined, false]},
                         level: {$in: [DIC.D3029.BLUE, DIC.D3029.YELLOW]},
@@ -292,9 +293,9 @@ module.exports = {
                         check_in_time: {'$gte': before, '$lt': now}
                     },
                     sort: 'check_in_time'
-                });
+                }).populate('tenantId', 'name');
 
-                console.log('sendAlarmLast24HoursAtMoment  alarms:', alarms);
+                // console.log('sendAlarmLast24HoursAtMoment  alarms:', alarms);
                 yield self._sendAlarms(alarms);
             } catch (e) {
                 console.log(e);
@@ -306,43 +307,43 @@ module.exports = {
         var self = this;
         return co(function*() {
             try {
-                var alarm, repeat_count, sendTitle, sendContent, mode, sendResult;
+                var alarm, repeat_count, sendTitle, vmsContent, smsContent, smsSuffix, mode, sendResult;
                 for(var i=0,len = alarms.length;i<len;i++) {
                     alarm = alarms[i];
                     if (alarm.modes.length > 0) {
-                        sendContent = alarm.content
+                        smsContent = vmsContent = alarm.content;
                         if (alarm.level == DIC.D3029.ORANGE) {
-                            sendContent = sendContent + '，' + sendContent;
+                            vmsContent = vmsContent + '，' + vmsContent;
                         } else if (alarm.level == DIC.D3029.RED) {
-                            sendContent = sendContent + '，' + sendContent + '，' + sendContent;
+                            vmsContent = vmsContent + '，' + vmsContent + '，' + vmsContent;
                         }
-                        console.log('>>>>>>>>>>>>>>>>>>>>>alarm:', alarm);
                         for (var j = 0, jLen = alarm.modes.length; j < jLen; j++) {
-                            mode = alarm.modes[j];
-                            console.log('>>>>>>>>>>>>>>>>>>>>>mode:', mode);
+                            mode = alarm.modes[j], sendResult = undefined;
                             if (mode.send_tos.length > 0) {
-                                sendResult = undefined;
                                 if (mode.value == DIC.D3030.PHONE) {
                                     sendTitle = D3016[alarm.reason].name;
-                                    sendResult = yield self.ctx.send_wodong_service.vms(mode.send_tos, sendTitle, sendContent);
+                                    sendResult = yield self.ctx.send_wodong_service.vms(mode.send_tos, sendTitle, vmsContent);
                                 } else if (mode.value == DIC.D3030.SMS) {
-                                    // sendResult = yield self.ctx.send_wodong_service.sms(mode.send_tos, sendContent);
+                                    smsSuffix = alarm.tenantId.name || '浙江梧斯源'
+                                    smsContent = '【' + smsSuffix + '】' + smsContent;
+                                    sendResult = yield self.ctx.send_wodong_service.sms(mode.send_tos, smsContent);
                                 }
                                 if (sendResult) {
                                     //保存发送记录的流水
                                     var result = yield self.ctx.modelFactory().model_create(self.ctx.models['pub_sendRecord'], {
                                         service_provider: 'wodong',
-                                        send_content: sendContent,
+                                        send_content: vmsContent,
                                         send_to: mode.send_tos.join(),
                                         send_result: JSON.stringify(sendResult),
                                         alarmId: alarm._id,
-                                        tenantId: alarm.tenantId
+                                        tenantId: alarm.tenantId._id
                                     });
                                 }
                             }
                         }
 
-                        alarm.sended_on = self.ctx.moment();
+                        alarm.sended_count += 1;
+                        alarm.last_sended_on = self.ctx.moment();
                         alarm.sended_flag = true;
                         yield alarm.save();
                     }

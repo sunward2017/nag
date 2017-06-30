@@ -1067,9 +1067,9 @@
                     })
                 }
             })
-            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'warning-group', {
-                url: '/warning-group',
-                title: '报警列表',
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'alarm-a1000', {
+                url: '/alarm',
+                title: '报警列表-离床报警',
                 abstract: true,
                 views: {
                     "module-header": {
@@ -1081,27 +1081,26 @@
                     }
                 },
                 data: {
-                    func_id: MODEL_VARIABLES.BIZ_FUNC_PREFIXS.PENSION_AGENCY + 'WARNING-GROUP' //业务系统使用
+                    func_id: MODEL_VARIABLES.BIZ_FUNC_PREFIXS.PENSION_AGENCY + 'ALARM-A1000' //业务系统使用
                 },
-                resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.PENSION_AGENCY + 'warning-group.js')
+                resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.SHARED + 'alarm.js')
             })
-            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'warning-group.list', {
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'alarm-a1000.list', {
                 url: '/list/:action',
-                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'warning-group-list.html'),
+                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.SHARED + 'alarm-list.html'),
                 access_level: AUTH_ACCESS_LEVELS.USER,
-                controller: 'WarningGridController',
+                controller: 'AlarmGridController',
                 resolve: {
-                    entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'warning-group.list', {
+                    entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'alarm-a1000.list', {
                         modelName: 'pub-alarm',
-                        searchForm: { "status": 1 },
+                        searchForm: { "status": 1, reason: 'A1000' },
                         serverPaging: true,
                         columns: [{
                             label: '报警设备',
                             name: 'subject_name',
                             type: 'string',
                             width: 80,
-                            sortable: false,
-                            formatter: { type: 'populate', options: { path: 'subjectId', select: '-_id name code',model:'pub_bedMonitor'} } 
+                            sortable: false
                         }, {
                             label: '报警对象',
                             name: 'object_name',
@@ -1110,10 +1109,9 @@
                             sortable: true
                         }, {
                             label: '报警原因',
-                            name: 'reason',
+                            name: 'reason_name',
                             type: 'string',
-                            width: 100,
-                            formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D3016/object')
+                            width: 100
                         }, {
                             label: '内容',
                             name: 'content',

@@ -77,11 +77,26 @@ module.exports = function(ctx,name) {
                 self: {type: Number, default: 0.00},//主账户
                 other: {type: Number, default: 0.00} //其他账户
             },
+            head_of_agency: {
+                name:{type: String}, //机构负责人姓名
+                phone:{type: String} //机构负责人电话
+            },
             other_config: {
                 psn_bed_monitor_timeout: {type: Number, default: 5.00},//睡眠带超时时间设置，单位：分钟，默认5分钟
                 psn_bed_monitor_timeout_alarm_begin: {type: String, minlength: 5, maxlength: 5, default: '22:00'},//睡眠带报警时间范围，起始时间,22:00
                 psn_bed_monitor_timeout_alarm_end: {type: String, minlength: 5, maxlength: 5, default: '06:00'},//睡眠带报警时间范围，结束时间,06:00
-                pub_alarm_D3016_A1000: {type: String},
+                pub_alarm_D3016_settings: [{
+                    reason: {type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3016"])},
+                    content_template: {type: String},
+                    level: {type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3029"])},//报警等级
+                    modes: [{
+                        value: {type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3030"])},
+                        receivers:[{
+                            type:{type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3031"])},
+                            value:{type: String} // 接收者类型 = A3001 使用
+                        }]
+                    }]//报警方式 可多选
+                }],
                 pub_assessment_regular_period: {type: Number, default: 3.00},//定期评估周期，单位：月，默认3个月
                 psn_drug_in_stock_expire_date_check_flag: {type: Boolean, default: false}, // 药品入库是否需要检查效期 (扫码时是否要输入效期字段)
                 psn_drug_stock_alarm_low_day: {type: Number, default: 3, min: 0} // 药品低库存警戒(剩余天数)

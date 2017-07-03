@@ -1,0 +1,24 @@
+{
+  "develop" :{
+    "host": "https://client.movek.net:8443",
+    "vms": "/sendvms.aspx",
+    "sms": "/sms.aspx",
+    "shared_form": {
+      "action": "send",
+      "userid": 611,
+      "account": "WEB-A611-611",
+      "password": "887273"
+    }
+  },
+  "production":{
+    "host": "https://client.movek.net:8443",
+    "vms": "/sendvms.aspx",
+    "sms": "/sms.aspx",
+    "shared_form": {
+      "action": "send",
+      "userid": 611,
+      "account": "WEB-A611-611",
+      "password": "887273"
+    }
+  }
+}

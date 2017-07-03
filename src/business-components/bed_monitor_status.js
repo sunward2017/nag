@@ -1113,7 +1113,16 @@ module.exports = {
                                     }
                                 }
                             } else {
+
+                                //通过更新alarm的sended_flag=false来使报警中的信息重复发送
+
                                 self.ctx.clog.log(self.logger, 'c 报警中 睡眠带:' + bedMonitor);
+                                var alarm = yield self.ctx.modelFactory().model_read(self.ctx.models['pub_alarm'], oldBedStatus.alarmId);
+                                if(alarm.sended_flag) {
+                                    alarm.sended_flag = false;
+                                    console.log('更改alarm' + oldBedStatus.alarmId + ' sended_flag = false');
+                                    yield alarm.save();
+                                }
                             }
                         }
                     }

@@ -199,7 +199,7 @@
       "NURSING-WORKER-SCHEDULE-TEMPLATE": "护工排班模版",
       "NURSING-GROUP": "照护组",
       "OVERDUE-WORKITEM":"照护异常记录",
-      "WARNING-GROUP":"报警目录",
+      "ALARM-A1000":"离床报警",
       "------------": "",
       "FINANCIAL": "财务管理",
       "ENTER-PAYMENT": "入院缴费",

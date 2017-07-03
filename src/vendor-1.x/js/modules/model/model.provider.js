@@ -270,7 +270,7 @@
                     tenantChargeItemNursingLevelAsTree: tenantChargeItemNursingLevelAsTree,
                     tenantChargeItemCustomizedAsTree: tenantChargeItemCustomizedAsTree,
                     saveTenantChargeItemCustomized: saveTenantChargeItemCustomized,
-                    saveTenantOtherConfig: saveTenantOtherConfig,
+                    saveTenantConfig: saveTenantConfig,
                     queryVoucherNo: queryVoucherNo,
                     completeOrder: completeOrder,
                     refundOrder: refundOrder,
@@ -299,8 +299,8 @@
                     return $http.post(baseUrl + 'saveTenantChargeItemCustomized/' + tenantId, chargeStandard);
                 }
 
-                function saveTenantOtherConfig(tenantId, otherConfig, name) {
-                    return $http.post(baseUrl + 'saveTenantOtherConfig/' + tenantId, { otherConfig: otherConfig, name: name });
+                function saveTenantConfig(tenantId, config) {
+                    return $http.post(baseUrl + 'saveTenantConfig/' + tenantId, { name: config.main.name, head_of_agency: config.main.head_of_agency, otherConfig: config.other });
                 }
 
                 function queryVoucherNo(tenantId, modelName, keyword, where, select, sort) {

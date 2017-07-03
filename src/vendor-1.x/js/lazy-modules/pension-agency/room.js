@@ -50,7 +50,7 @@
         }
 
         function exportExcelForRoomBedPrintQRLabel() {
-            vmh.psnService.exportExcelForRoomBedPrintQRLabel('房间床位二维码打印信息表', vm.tenantId);
+            vmh.psnService.exportExcelForRoomBedPrintQRLabel('房间床位二维码打印信息表(' + vm.tenant_name +'-' + moment().format('YYYY.MM.DD') + ')', vm.tenantId);
         }
     }
 

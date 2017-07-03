@@ -23,7 +23,28 @@
 
         function init() {
             vm.init({removeDialog: ngDialog});
+
+            vm.closeAlarm = closeAlarm;
+
             vm.query();
         }
+
+        function closeAlarm(alarmId) {
+            var promise = ngDialog.openConfirm({
+                template: 'customConfirmDialog.html',
+                className: 'ngdialog-theme-default',
+                controller: ['$scope', function ($scopeConfirm) {
+                    $scopeConfirm.message = vm.viewTranslatePath('DLG-ALARM-TO-CONFIRM-CLOSE')
+                }]
+            }).then(function () {
+                vmh.psnService.nursingStationCloseBedMonitorAlarm(alarmId, {
+                    operated_by: vm.operated_by,
+                    operated_by_name: vm.operated_by_name
+                }).then(function (ret) {
+                    vm.query();
+                });
+            });
+        }
     }
+    
 })();

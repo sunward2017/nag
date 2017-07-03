@@ -1113,6 +1113,11 @@
                             type: 'string',
                             width: 100
                         }, {
+                            label: '报警等级',
+                            name: 'level_name',
+                            type: 'string',
+                            width: 60
+                        }, {
                             label: '内容',
                             name: 'content',
                             type: 'string',
@@ -1124,6 +1129,12 @@
                             type: 'bool',
                             width: 50,
                             sortable: true
+                        },
+                        {
+                                label: '',
+                                name: 'actions',
+                                sortable: false,
+                                width: 60
                         }]
                     })
                 }

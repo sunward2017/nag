@@ -526,9 +526,10 @@
         "TITLE": "养老机构-照护管理-照护异常记录-列表"
       } 
     },
-     "alarm": {
+     "alarm-a1000": {
       "list": {
-        "TITLE": "养老机构-照护管理-离床报警-列表"
+        "TITLE": "养老机构-照护管理-离床报警-列表",
+        "DLG-ALARM-TO-CONFIRM-CLOSE": "当前报警信息将被关闭,确定要继续吗？"
       }
     },
     "enter-payment": {

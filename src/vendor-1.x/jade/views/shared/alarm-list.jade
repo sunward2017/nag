@@ -30,12 +30,12 @@
                         td {{::row.subject_name}}
                         td {{::row.object_name}}
                         td {{::row.reason_name}}
+                        td {{::row.level_name}}
                         td.text-left {{::row.content}}
                         td {{::row.process_flag|boolFilter}}
-                        // td
-                        //     .btn-group
-                        //         a.btn.btn-primary.btn-xs(title="{{'button.EDIT'|translate}}",ng-click="vm.edit(row._id)")
-                        //             i.glyphicon.glyphicon-pencil
+                        td
+                            .btn-group(ng-if="!row.process_flag")
+                                a.btn.btn-success.btn-sm(ng-click="vm.closeAlarm(row.id)") {{ 'button.CLOSE' | translate}}
 
                     tr(ng-if="vm.paged.length==0")
                         td(colspan="{{utils.noResultsColspan(vm)}}") {{ 'grid.NO-RESULTS' | translate}}
@@ -48,5 +48,7 @@
                             //         i.glyphicon.glyphicon-plus
                             //     a.btn.btn-primary.btn-sm(title="{{'button.REMOVE'|translate}}",ng-click="vm.remove()")
                             //         i.glyphicon.glyphicon-minus
+                            //.btn-group
+                            //    a.btn.btn-success.btn-sm(ng-click="vm.closeAlarm()") {{ vm.viewTranslatePath('BTN-CLOSE-ALARM') | translate}}
                     .col-md-8
                         pagination.pagination-sm.pull-right(total-items="vm.page.totals",ng-model="vm.page.no",max-size="5",items-per-page="vm.page.size",boundary-links="true" ,ng-change="vm.paging()")

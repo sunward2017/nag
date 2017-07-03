@@ -58,6 +58,13 @@ module.exports = function(ctx,name) {
             return '';
         });
 
+        alarmSchema.virtual('level_name').get(function () {
+            if (this.level) {
+                return D3029[this.level].name;
+            }
+            return '';
+        });
+
         alarmSchema.pre('update', function (next) {
             this.update({}, {$set: {operated_on: new Date()}});
             next();

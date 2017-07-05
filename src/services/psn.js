@@ -5734,13 +5734,16 @@ module.exports = {
                             var keyword = this.request.body.keyword;
                             var data = this.request.body.data;
 
-                            app._.extend(data.where, {
+                            data.where = app._.extend(data.where || {}, {
                                 status: 1,
                                 tenantId: tenantId
                             });
 
+                            console.log('data.where:', data.where);
+
                             if (keyword) {
                                 var keywordReg = new RegExp(keyword);
+
                                 data.where.$or = [
                                     { full_name : keywordReg },
                                     { $and : [ {short_name: { $exists : true }}, { short_name : keywordReg } ] },

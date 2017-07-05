@@ -69,7 +69,7 @@
                     });
                     
                 } else {
-                    vm.pub_alarm_D3016_A1000_setting = {reason: 'A1000', content_template: '${发生时间}${房间床位}${老人姓名}离床未归!', level: 'A0007'};
+                    vm.pub_alarm_D3016_A1000_setting = {reason: 'A1000', content_template: '${发生时间}${房间床位}${老人姓名}离床未归', level: 'A0007'};
                     vm.other_configs.pub_alarm_D3016_settings.push(vm.pub_alarm_D3016_A1000_setting);
                 }
 
@@ -88,7 +88,7 @@
                         });
                     });
                 } else {
-                    vm.pub_alarm_D3016_A2000_setting = {reason: 'A2000', content_template: '截止到${发生时间}${老人姓名}的药品已有不足.附${药品请单}!', level: 'A0001'};
+                    vm.pub_alarm_D3016_A2000_setting = {reason: 'A2000', content_template: '截止到${发生时间}${老人姓名}的药品已有不足.请单:${药品请单}', level: 'A0001'};
                     vm.other_configs.pub_alarm_D3016_settings.push(vm.pub_alarm_D3016_A2000_setting);
                 }
 

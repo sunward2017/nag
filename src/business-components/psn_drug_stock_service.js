@@ -442,6 +442,18 @@ module.exports = {
                         }
                     }
                 }
+                console.log('如果有药品不足,则生成通知...');
+                var lowStockDrugStats = [], drugStockStat;
+                for(var drugId in elderlyStockObject) {
+                    drugStockStat = elderlyStockObject[drugId];
+                    if(drugStockStat.is_warning) {
+                        lowStockDrugStats.push(drugStockStat);
+                    }
+                }
+                if(lowStockDrugStats.length>0){
+                    self.ctx.pub_alarm_service.saveLowStockDrugsAlarmForElderly(lowStockDrugStats, elderly)
+                }
+
                 return self.ctx.wrapper.res.default();
             }
             catch (e) {
@@ -769,6 +781,20 @@ module.exports = {
                     }
                 }
 
+
+                console.log('修改时不去生成药品不足通知,...');
+                // 修改时要按照库存+出库药品数量来计算剩余天数
+                // var lowStockDrugStats = [], drugStockStat;
+                // for(var drugId in elderlyStockObject) {
+                //     drugStockStat = elderlyStockObject[drugId];
+                //     if(drugStockStat.is_warning) {
+                //         lowStockDrugStats.push(drugStockStat);
+                //     }
+                // }
+                // if(lowStockDrugStats.length>0){
+                //     self.ctx.pub_alarm_service.saveLowStockDrugsAlarmForElderly(lowStockDrugStats, elderly)
+                // }
+
                 return self.ctx.wrapper.res.default();
             }
             catch (e) {
@@ -1059,7 +1085,7 @@ module.exports = {
                         canUseDays = -1;
                     }
 
-                    ret[drugInStock.drugId] = { total: drugInStock.total, canUseDays: canUseDays, is_warning: drugInStock.total > 0 &&  canUseDays > 0 && canUseDays <= stock_alarm_low_day, is_danger: drugInStock.total<=0, unit_name: D3026[drugInStock.unit].name };
+                    ret[drugInStock.drugId] = { drug_name: drugInStock.drug_name, total: drugInStock.total, canUseDays: canUseDays, is_warning: drugInStock.total > 0 &&  canUseDays > 0 && canUseDays <= stock_alarm_low_day, is_danger: drugInStock.total<=0, unit_name: D3026[drugInStock.unit].name };
                 }
 
                 return ret;
@@ -1090,7 +1116,7 @@ module.exports = {
                     },
                     {
                         $group: {
-                            _id: {drugId: '$drugId', unit: '$mini_unit'},
+                            _id: {drugId: '$drugId', drug_name: '$drug_name', unit: '$mini_unit'},
                             quantity: {$sum: '$quantity'}
                         }
                     },
@@ -1098,6 +1124,7 @@ module.exports = {
                         $project: {
                             total: '$quantity',
                             drugId: "$_id.drugId",
+                            drug_name: "$_id.drug_name",
                             unit: "$_id.unit"
                         }
                     }

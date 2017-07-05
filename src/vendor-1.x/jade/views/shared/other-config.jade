@@ -18,6 +18,7 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                         label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-HEAD_OF_AGENCY_NAME') | translate}}:
                         .col-md-10
                             input.form-control(type='text', name='head_of_agency_name',ng-model='vm.head_of_agency.name' ,required='' )
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'head_of_agency_name','required')") {{ "validator.REQUIRED" | translate}}
                     fieldset: .form-group
                         label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-HEAD_OF_AGENCY_PHONE') | translate}}:
                         .col-md-10

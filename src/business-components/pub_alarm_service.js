@@ -152,7 +152,7 @@ module.exports = {
                 //获取该类告警配置
                 var pub_alarm_D3016_A1000_setting = self.ctx._.find(tenant.other_config.pub_alarm_D3016_settings, (o)=>{
                     return o.reason == DIC.D3016.LEAVE_BED_TIMEOUT
-                }) || {reason: DIC.D3016.LEAVE_BED_TIMEOUT, content_template: '${发生时间}${房间床位}${老人姓名}离床未归!', level: DIC.D3029.RED, modes:[DIC.D3030.ROBOT, DIC.D3030.PHONE, DIC.D3030.SMS, DIC.D3030.PHONE]};
+                }) || {reason: DIC.D3016.LEAVE_BED_TIMEOUT, content_template: '${发生时间}${房间床位}${老人姓名}离床未归', level: DIC.D3029.RED, modes:[DIC.D3030.ROBOT, DIC.D3030.PHONE, DIC.D3030.SMS, DIC.D3030.WX]};
                 
                 // 替换模版内容
                 var content = pub_alarm_D3016_A1000_setting.content_template;
@@ -186,11 +186,74 @@ module.exports = {
                     object: 'psn_elderly',
                     objectId: elderly._id,
                     object_name: elderly.name,
-                    reason: DIC.D3016.LEAVE_BED_TIMEOUT,
+                    reason: pub_alarm_D3016_A1000_setting.reason,
                     content: content,
                     level: pub_alarm_D3016_A1000_setting.level,
                     modes: alarm_modes,
-                    tenantId: bedMonitor.tenantId
+                    tenantId: elderly.tenantId
+                });
+
+                return result.id;
+            }
+            catch (e) {
+                console.log(e);
+                self.logger.error(e.message);
+            }
+        }).catch(self.ctx.coOnError);
+    },
+    saveLowStockDrugsAlarmForElderly: function (lowStockDrugStats, elderly) {
+        var self = this;
+        return co(function *() {
+            try {
+                // && order.order_status == DIC.MWS01.WAITING_SHIP
+                var tenant;
+                if (!elderly || elderly.status == 0) {
+                    self.ctx.clog.log(self.logger, 'saveBedMonitorAlarmForElderly: 无法找到老人');
+                    return;
+                }
+                tenant = yield self.ctx.modelFactory().model_read(self.ctx.models['pub_tenant'], elderly.tenantId);
+
+                //获取该类告警配置
+                var pub_alarm_D3016_A2000_setting = self.ctx._.find(tenant.other_config.pub_alarm_D3016_settings, (o)=>{
+                        return o.reason == DIC.D3016.DRUG_STOCK_LOW
+                    }) || {reason: DIC.D3016.DRUG_STOCK_LOW, content_template: '截止到${发生时间}${老人姓名}的药品已有不足.请单:${药品请单}', level: DIC.D3029.BLUE, modes:[DIC.D3030.PHONE, DIC.D3030.SMS, DIC.D3030.WX]};
+
+
+
+
+                lowStockDrugStats.sort((a,b)=> a.canUseDays - b.canUseDays);
+                var drugListContent = self.ctx._.map(lowStockDrugStats, (o)=>{
+                    return o.drug_name + '(剩余' + o.canUseDays + '天)';
+                }).join(';');
+
+                // 替换模版内容
+                var content = pub_alarm_D3016_A2000_setting.content_template;
+                var reg = /\${([^}]+)}/, result;
+                while ((result = reg.exec(content)) != null) {
+                    if (RegExp.$1 == "发生时间") {
+                        content = content.replace(reg, self.ctx.moment().format('YYYY年MM月DD日HH点mm分'));
+                    } else if (RegExp.$1 == "老人姓名") {
+                        content = content.replace(reg, elderly.name);
+                    } else if ( RegExp.$1 == '药品请单' ) {
+                        content = content.replace(reg, drugListContent);
+                    }
+                }
+
+                // 设置报警等级和报警方式
+                var alarm_modes = yield self._getAlarmModesByD3016SettingForElderly(pub_alarm_D3016_A2000_setting.modes, tenant, elderly);
+                console.log('alarm_modes:>>>>>>>>>>>>>>>>>', alarm_modes);
+
+                var result = yield self.ctx.modelFactory().model_create(self.ctx.models['pub_alarm'], {
+                    subject: self.ctx.modelVariables.ALARM_SUBJECT_SYSTEM_ROLE.SYSTEM.ID,
+                    subject_name: self.ctx.modelVariables.ALARM_SUBJECT_SYSTEM_ROLE.SYSTEM.NAME,
+                    object: 'psn_elderly',
+                    objectId: elderly._id,
+                    object_name: elderly.name,
+                    reason: pub_alarm_D3016_A2000_setting.reason,
+                    content: content,
+                    level: pub_alarm_D3016_A2000_setting.level,
+                    modes: alarm_modes,
+                    tenantId: elderly.tenantId
                 });
 
                 return result.id;

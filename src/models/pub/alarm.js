@@ -21,9 +21,9 @@ module.exports = function(ctx,name) {
             check_in_time: {type: Date, default: Date.now},
             operated_on: {type: Date, default: Date.now},
             status: {type: Number, min: 0, max: 1, default: 1},
-            subject: {type: String, required: true}, // pub_bedMonitor 报警设备
-            subjectId: {type: mongoose.Schema.Types.ObjectId, required: true}, //报警设备编号
-            subject_name: {type: String, required: true, maxlength: 100}, //报警设备名称
+            subject: {type: String, required: true}, // pub_bedMonitor报警设备, $STSTEM$ 系统
+            subjectId: {type: mongoose.Schema.Types.ObjectId}, //报警设备编号
+            subject_name: {type: String, maxlength: 100}, //报警设备名称 系统
             object: {type: String, required: true}, // psn_elderly 报警对象
             objectId: {type: mongoose.Schema.Types.ObjectId, required: true}, //报警对象编号
             object_name: {type: String, required: true}, //报警对象名称

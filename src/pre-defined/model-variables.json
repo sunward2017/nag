@@ -23,6 +23,12 @@
     "RECHARGE": "psn_recharge",
     "RED": "pub_red"
   },
+  "ALARM_SUBJECT_SYSTEM_ROLE": {
+    "SYSTEM": {
+      "ID": "$SYSTEM$",
+      "NAME": "系统"
+    }
+  },
   "DEFAULTS": {
     "TENANT_DRUG_STOCK_ALARM_LOW_DAY": 3
   },

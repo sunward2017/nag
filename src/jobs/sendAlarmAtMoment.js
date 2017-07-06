@@ -10,7 +10,7 @@ var job_rule = '30 0 * * *';//每天 几点:几分 '30 0 * * *' 零点30分执�
 var printLog = true;
 
  module.exports = {
-     needRegister: false,
+     needRegister: true,
      register: function (ctx) {
          if (this.needRegister) {
              return co(function*() {

@@ -2314,7 +2314,7 @@ module.exports = {
                                    room_full_name = [room.districtId.name, room.floor + 'F', room.name, (i + 1) + '#床'].join('-');
                                    rows.push({
                                        '单位名称': room.tenantId.name,
-                                       '二维码': {tenantId: tenantId, roomId: room.id, name: room_full_name},
+                                       '二维码': {tenantId: tenantId, roomId: room.id, bed_no:(i + 1), name: room_full_name},
                                        '房间床位': room_full_name
                                    });
                                }

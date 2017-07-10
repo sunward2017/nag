@@ -445,6 +445,7 @@ module.exports = {
                             var tenantId = this.request.body.tenantId;
                             var elderlyId = this.request.body.elderlyId;
                             var roomId = this.request.body.roomId;
+                            var bed_no = this.request.body.bed_no;
                             var elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], elderlyId);
                             if (!elderly || elderly.status == 0) {
                                 return app.wrapper.res.error({ message: '无法找到对应的老人资料' });
@@ -463,9 +464,7 @@ module.exports = {
                             if(district.config && district.config.elderlys_out_stock_check_mode){
                                 elderlys_out_stock_check_mode = district.config.elderlys_out_stock_check_mode;
                             }
-
-
-                            if( elderly.tenantId.toString() == tenantId && elderly.room_value && elderly.room_value.roomId && elderly.room_value.roomId.toString() == roomId) {
+                            if( elderly.tenantId.toString() == tenantId && elderly.room_value && elderly.room_value.roomId && elderly.room_value.roomId.toString() == roomId && elderly.room_value.bed_no == bed_no) {
                                 //返回老人当日的用药
                                 var drugUseItems = yield app.modelFactory().model_query(app.models['psn_drugUseItem'], {
                                     select: 'drugId name quantity unit drugUseTemplateId repeat_type repeat_start',
@@ -515,7 +514,7 @@ module.exports = {
 
                                 this.body = app.wrapper.res.ret(ret);
                             } else {
-                                this.body = app.wrapper.res.error({ message: '老人与房间不匹配,请仔细检查核对' });
+                                this.body = app.wrapper.res.error({ message: '老人与房间床位不匹配,请仔细检查核对' });
                             }
                         } catch (e) {
                             self.logger.error(e.message);

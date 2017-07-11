@@ -525,6 +525,25 @@ module.exports = {
                 }
             },
             {
+                method: 'elderlyDrugMergedStock',
+                verb: 'post',
+                url: this.service_url_prefix + "/elderly/drugMergedStock",
+                handler: function (app, options) {
+                    return function* (next) {
+                        try {
+                            var tenantId = this.request.body.tenantId;
+                            var elderlyId = this.request.body.elderlyId;
+                            this.body = yield app.psn_drug_stock_service.elderlyStockQuery(tenantId, elderlyId);
+                        } catch (e) {
+                            console.log(e);
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
+            {
                 method: 'drug$stock$out',
                 verb: 'post',
                 url: this.service_url_prefix + "/drug/stock/out",

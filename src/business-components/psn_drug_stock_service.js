@@ -923,7 +923,8 @@ module.exports = {
                             _id: {drugId: '$drugId', unit: '$mini_unit'},
                             drugId : { $first: "$drugId" },
                             unit : { $first: "$mini_unit" },
-                            quantity: {$sum: '$quantity'}
+                            quantity: {$sum: '$quantity'},
+                            min_expire_in: {$min: '$expire_in'}
                         }
                     },
                     {
@@ -938,6 +939,7 @@ module.exports = {
                     {
                         $project: {
                             total: '$quantity',
+                            min_expire_in: {$dateToString:{ format: "%Y-%m-%d", date:'$min_expire_in' }},
                             drugId: "$_id.drugId",
                             unit: "$_id.unit",
                             drug: "$drug",
@@ -945,14 +947,22 @@ module.exports = {
                         }
                     }
                 ]);
-                // console.log('2------------', drugsInStock);
-                var rows = [], drugInStock;
-                for (var i=0,len = drugsInStock.length;i<len;i++) {
-                    drugInStock = JSON.parse(JSON.stringify(drugsInStock[i]));
-                    drugInStock = self.ctx.util.flatten(drugInStock);
-                    drugInStock.unit_name =  D3026[drugInStock.unit].name;
-                    rows.push(drugInStock);
+                var rows = [];
+                if(drugsInStock.length > 0) {
+                    var drugUseOneDayObject = yield self._elderlyDrugUseOneDay(tenant, elderly), drugInStock,
+                        drugUseOneDayQuantity;
+                    for (var i = 0, len = drugsInStock.length; i < len; i++) {
+                        drugInStock = JSON.parse(JSON.stringify(drugsInStock[i]));
+                        drugInStock = self.ctx.util.flatten(drugInStock);
+                        drugInStock.unit_name = D3026[drugInStock.unit].name;
+                        rows.push(drugInStock);
+                        if (drugUseOneDayObject[drugInStock.drugId]) {
+                            drugUseOneDayQuantity = drugUseOneDayObject[drugInStock.drugId].total;
+                            drugInStock.total_days = Math.floor(drugInStock.total / drugUseOneDayQuantity);
+                        }
+                    }
                 }
+                // console.log('rows :', rows)
 
                 return self.ctx.wrapper.res.rows(rows);
             }
@@ -1184,7 +1194,7 @@ module.exports = {
                     elderlyId: elderly._id,
                     tenantId: tenant._id
                 };
-                var drugsInStock = yield self.ctx.modelFactory().model_aggregate(self.ctx.models['psn_drugUseItem'], [
+                var drugsUseOneDay = yield self.ctx.modelFactory().model_aggregate(self.ctx.models['psn_drugUseItem'], [
                     {
                         $match: where
                     },
@@ -1204,8 +1214,8 @@ module.exports = {
                 ]);
 
                 var ret = {}, drugInStock;
-                for (var i=0,len = drugsInStock.length;i< len;i++) {
-                    drugInStock = drugsInStock[i];
+                for (var i=0,len = drugsUseOneDay.length;i< len;i++) {
+                    drugInStock = drugsUseOneDay[i];
                     ret[drugInStock.drugId] = { total: drugInStock.total, unit: drugInStock.unit, unit_name: D3026[drugInStock.unit].name };
                 }
                 return ret;

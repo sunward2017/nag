@@ -544,6 +544,54 @@ module.exports = {
                 }
             },
             {
+                method: 'elderlyDrugLowStockWarning',
+                verb: 'post',
+                url: this.service_url_prefix + "/elderly/drugLowStockWarning",
+                handler: function (app, options) {
+                    return function* (next) {
+                        try {
+                            var tenantId = this.request.body.tenantId;
+                            var elderlyId = this.request.body.elderlyId;
+
+                            var tenant, elderly;
+                            tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], tenantId);
+                            if (!tenant || tenant.status == 0) {
+                                return app.wrapper.res.error({ message: '无法找到养老机构' });
+                            }
+                            elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], elderlyId);
+                            if (!elderly || elderly.status == 0) {
+                                return app.wrapper.res.error({ message: '无法找到入库药品对应的老人资料' });
+                            }
+                            if (!elderly.live_in_flag || elderly.begin_exit_flow) {
+                                return app.wrapper.res.error({ message: '当前老人不在院或正在办理出院手续' });
+                            }
+
+                            var elderlyStockObject = yield app.psn_drug_stock_service._elderlyStockObject(tenant, elderly);
+
+                            var lowStockDrugStats = [], drugStockStat;
+                            for(var drugId in elderlyStockObject) {
+                                drugStockStat = elderlyStockObject[drugId];
+                                if(drugStockStat.is_warning) {
+                                    lowStockDrugStats.push(drugStockStat);
+                                }
+                            }
+                            if(lowStockDrugStats.length == 0){
+                                this.body = app.wrapper.res.error({message: '当前库存充足,无需提醒'});
+                                return;
+                            }
+
+                            yield app.pub_alarm_service.saveLowStockDrugsAlarmForElderly(lowStockDrugStats, elderly);
+                            this.body = yield app.wrapper.res.default();
+                        } catch (e) {
+                            console.log(e);
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
+            {
                 method: 'drug$stock$out',
                 verb: 'post',
                 url: this.service_url_prefix + "/drug/stock/out",

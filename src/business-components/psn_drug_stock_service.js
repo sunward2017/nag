@@ -1073,6 +1073,34 @@ module.exports = {
             }
         }).catch(self.ctx.coOnError);
     },
+    _elderlyStockObject2: function (tenantId, elderlyId) {
+        var self = this;
+        return co(function *() {
+            try {
+                var tenant, elderly;
+                tenant = yield self.ctx.modelFactory().model_read(self.ctx.models['pub_tenant'], tenantId);
+                if (!tenant || tenant.status == 0) {
+                    return self.ctx.wrapper.res.error({ message: '无法找到养老机构' });
+                }
+                elderly = yield self.ctx.modelFactory().model_read(self.ctx.models['psn_elderly'], elderlyId);
+                if (!elderly || elderly.status == 0) {
+                    return self.ctx.wrapper.res.error({ message: '无法找到入库药品对应的老人资料' });
+                }
+                if (!elderly.live_in_flag || elderly.begin_exit_flow) {
+                    return self.ctx.wrapper.res.error({ message: '当前老人不在院或正在办理出院手续' });
+                }
+                console.log('_elderlyStockObject2:', elderly);
+                var elderlyStockObject = yield self._elderlyStockObject(tenant, elderly);
+
+                return elderlyStockObject;
+            }
+            catch (e) {
+                console.log(e);
+                self.logger.error(e.message);
+                return self.ctx.wrapper.res.error(e.message);
+            }
+        }).catch(self.ctx.coOnError);
+    },
     _elderlyStockObject: function (tenant, elderly){
         var self = this;
         return co(function *() {

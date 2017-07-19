@@ -656,6 +656,50 @@ module.exports = {
                 }
             },
             {
+                method: 'handoverlog$fetch',
+                verb: 'post',
+                url: this.service_url_prefix + "/handoverlog/fetch",
+                handler: function (app, options) {
+                    return function*(next) {
+                        try {
+                            console.log("body", this.request.body);
+                            var data = app._.extend({
+                                select: 'check_in_time title description elderlies level',
+                                where: {status: 1},
+                                sort: {check_in_time: -1}
+                            }, this.request.body);
+                            var rows = yield app.modelFactory().model_query(app.models['psn_handoverLog'], data).populate('elderlies');
+                            console.log(rows);
+                            this.body = app.wrapper.res.rows(rows);
+
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    }
+                }
+            },
+            {
+                method: 'handoverlog$save',
+                verb: 'post',
+                url: this.service_url_prefix + "/handoverlog/save",
+                handler: function (app, options) {
+                    return function*(next) {
+                        try {
+                            console.log("body", this.request.body);
+                            yield app.modelFactory().model_create(app.models['psn_handoverLog'], this.request.body);
+                            this.body = app.wrapper.res.default();
+
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    }
+                }
+            },
+            {
                 method: 'user$auth',
                 verb: 'post',
                 url: this.service_url_prefix + "/user/auth",

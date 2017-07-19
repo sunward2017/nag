@@ -2,6 +2,7 @@
  * idt Created by zppro on 17-2-15.
  * 养老机构接口
  */
+var crypto = require('crypto');
 var DIC = require('../pre-defined/dictionary-constants.json');
 
 module.exports = {
@@ -4548,6 +4549,55 @@ module.exports = {
                             // console.log(yAxisData);
                             // console.log(rows);
                             this.body = app.wrapper.res.rows(rows);
+                        } catch (e) {
+                            console.log(e);
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
+            /**********************护士排班*****************************/
+            {
+                method: 'nurseGenerateUser',
+                verb: 'post',
+                url: this.service_url_prefix + "/nurseGenerateUser",
+                handler: function (app, options) {
+                    return function* (next) {
+                        try {
+                            var nurse = yield app.modelFactory().model_read(app.models['psn_nurse'], this.request.body.nurseId);
+                            if (!nurse || nurse.status == 0) {
+                                this.body = app.wrapper.res.error({ message: '无法找到护士!' });
+                                yield next;
+                                return;
+                            }
+
+                            if (!nurse.userId) {
+                                var user = yield app.modelFactory().model_create(app.models['pub_user'],
+                                    {
+                                        _id: nurse._id,
+                                        code: nurse.code,
+                                        name: nurse.name,
+                                        phone: nurse.phone,
+                                        type:DIC.D1000.TENANT,
+                                        roles: ['2'],
+                                        stop_flag: nurse.stop_flag,
+                                        tenantId: nurse.tenantId
+                                    });
+                                nurse.userId = user._id;
+                                yield nurse.save();
+                            } else {
+                                yield app.modelFactory().model_update(app.models['pub_user'], nurse.userId,
+                                    {
+                                        code: nurse.code,
+                                        name: nurse.name,
+                                        phone: nurse.phone,
+                                        stop_flag: nurse.stop_flag
+                                    });
+                            }
+
+                            this.body = app.wrapper.res.ret(nurse.userId);
                         } catch (e) {
                             console.log(e);
                             self.logger.error(e.message);

@@ -52,9 +52,12 @@
 
 
         function doSubmit() {
-
             if ($scope.theForm.$valid) {
-                vm.save();
+                vm.save().then(function (ret) {
+                    return vmh.psnService.nurseGenerateUser(vm.model._id || ret._id).then(function (userId) {
+                        vm.model.userId = userId;
+                    });
+                });
             }
             else {
                 if ($scope.utils.vtab(vm.tab1.cid)) {

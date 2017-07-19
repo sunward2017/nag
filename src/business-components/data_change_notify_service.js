@@ -125,6 +125,21 @@ module.exports = {
             }
         }).catch(self.ctx.coOnError);
     },
+    psn$nurse$$disabled: function (id) {
+        var self = this;
+        return co(function *() {
+            try {
+                // console.log('id:', id);
+                yield self.ctx.modelFactory().model_update(self.ctx.models['pub_user'], id, { status: 0 });
+                return self.ctx.wrapper.res.default();
+            }
+            catch (e) {
+                console.log(e);
+                self.logger.error(e.message);
+                return self.ctx.wrapper.res.error(e);
+            }
+        }).catch(self.ctx.coOnError);
+    },
     pub$robot$$disabled: function (id, params) {
         var self = this;
         return co(function *() {

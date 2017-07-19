@@ -2154,6 +2154,7 @@
                         modelName: 'psn-nurse',
                         searchForm: { "status": 1 },
                         serverPaging: true,
+                        notifyRowDisabled: 'psn$nurse$$disabled',
                         columns: [{
                             label: '护士工号',
                             name: 'code',

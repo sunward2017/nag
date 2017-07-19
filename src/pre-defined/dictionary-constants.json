@@ -9,6 +9,11 @@
     "DAY_IN_WEEK": "A0005",
     "DATE_IN_MONTH": "A0007"
   },
+  "D1000": {
+    "PLATFORM": "A0001",
+    "TENANT": "A0002",
+    "AGENT": "A0003"
+  },
   "D1002": {
     "INTEGRATION_ORG": "A0000",
     "MINI_PENSION_ORG": "A0001",

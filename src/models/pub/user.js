@@ -21,7 +21,7 @@ module.exports = function(ctx,name) {
             status: {type: Number, min: 0, max: 1, default: 1},
             code: {type: String, required: true, maxlength: 30, index: {unique: true}},
             name: {type: String, required: true, maxlength: 30},
-            phone: {type: String, maxlength: 20, unique: true, index: true},
+            phone: {type: String, maxlength: 20, unique: false},
             type: {type: String, enum: ctx._.rest(ctx.dictionary.keys["D1000"])},
             //role: {type: Number, min: 1, max: 9999},// bit flag
             roles: [String],

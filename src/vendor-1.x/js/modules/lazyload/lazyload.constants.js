@@ -83,6 +83,7 @@
                 {name:'subsystem.pension-agency.drug-in-stock.js',files:['app/js/lazy-modules/pension-agency/drug-in-stock.js']},
                 {name:'subsystem.pension-agency.drug-out-stock.js',files:['app/js/lazy-modules/pension-agency/drug-out-stock.js']},
                 {name:'subsystem.pension-agency.exit-item-return.js',files:['app/js/lazy-modules/pension-agency/exit-item-return.js']},
+                {name:'subsystem.pension-agency.nurse.js',files:['app/js/lazy-modules/pension-agency/nurse.js']},
                 {name:'subsystem.pension-agency.nursing-worker.js',files:['app/js/lazy-modules/pension-agency/nursing-worker.js']},
                 {name:'subsystem.pension-agency.work-item.js',files:['app/js/lazy-modules/pension-agency/work-item.js']},
                 {name:'subsystem.pension-agency.nursing-shift.js',files:['app/js/lazy-modules/pension-agency/nursing-shift.js']},

@@ -2126,6 +2126,85 @@
                     })
                 }
             })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'nurse', {
+                url: '/nurse',
+                title: '护士管理',
+                abstract: true,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath(MODEL_VARIABLES.HEAD_TEMPLATES.PENSION_AGENCY),
+                        controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER_FOR_TENANT
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div><div class="clearfix"></div>'
+                    }
+                },
+                data: {
+                    func_id: MODEL_VARIABLES.BIZ_FUNC_PREFIXS.PENSION_AGENCY + 'NURSE' //业务系统使用
+                },
+                resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.PENSION_AGENCY + 'nurse.js')
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'nurse.list', {
+                url: '/list/:action',
+                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'nurse-list.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'NurseGridController',
+                resolve: {
+                    entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'nurse.list', {
+                        modelName: 'psn-nurse',
+                        searchForm: { "status": 1 },
+                        serverPaging: true,
+                        notifyRowDisabled: 'psn$nurse$$disabled',
+                        columns: [{
+                            label: '护士工号',
+                            name: 'code',
+                            type: 'string',
+                            width: 120,
+                            sortable: true
+                        }, {
+                            label: '护士名称',
+                            name: 'name',
+                            type: 'string',
+                            width: 120,
+                            sortable: true
+                        }, {
+                            label: '手机号码',
+                            name: 'phone',
+                            type: 'string',
+                            width: 120,
+                            sortable: true
+                        }, {
+                            label: '护士长',
+                            name: 'leader_flag',
+                            type: 'bool',
+                            width: 80
+                        }, {
+                            label: '停用',
+                            name: 'stop_flag',
+                            type: 'bool',
+                            width: 80
+                        }, {
+                            label: '',
+                            name: 'actions',
+                            sortable: false,
+                            width: 60
+                        }]
+                    })
+                }
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'nurse.details', {
+                url: '/details/:action/:_id',
+                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'nurse-details.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'NurseDetailsController',
+                resolve: {
+                    entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'nurse.details', {
+                        modelName: 'psn-nurse',
+                        blockUI: true
+                    })
+                    //, deps: helper.resolveFor2('ui.select')
+                }
+            })
             .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'nursing-worker', {
                 url: '/nursing-worker',
                 title: '护工管理',

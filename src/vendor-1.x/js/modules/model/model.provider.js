@@ -550,6 +550,7 @@
                     checkCanChangeBookingOrUnbookingRedToElderlyRecharge: checkCanChangeBookingOrUnbookingRedToElderlyRecharge,
                     disableRedAndUnbookingToElderlyRecharge: disableRedAndUnbookingToElderlyRecharge,
                     changeRedBookingAmountToElderlyRecharge: changeRedBookingAmountToElderlyRecharge,
+                    nurseGenerateUser: nurseGenerateUser,
                     nursingScheduleWeekly: nursingScheduleWeekly,
                     nursingScheduleSave: nursingScheduleSave,
                     nursingScheduleRemove: nursingScheduleRemove,
@@ -839,6 +840,10 @@
 
                 function changeRedBookingAmountToElderlyRecharge(redId, data) {
                     return $http.post(baseUrl + 'changeRedBookingAmountToElderlyRecharge/' + redId, data);
+                }
+
+                function nurseGenerateUser(nurseId) {
+                    return $http.post(baseUrl + 'nurseGenerateUser', {nurseId: nurseId});
                 }
 
                 function nursingScheduleWeekly(tenantId, start, end) {

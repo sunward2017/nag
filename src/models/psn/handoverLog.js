@@ -19,6 +19,8 @@ module.exports = function(ctx, name) {
         var handoverLogSchema = new mongoose.Schema({
             check_in_time: { type: Date, default: Date.now },
             operated_on: { type: Date, default: Date.now },
+            operated_by: {type: mongoose.Schema.Types.ObjectId},
+            operated_by_name: {type: String},
             status: {type: Number, min: 0, max: 1, default: 1},
             elderlies: [{ type: mongoose.Schema.Types.ObjectId, ref: 'psn_elderly' }],
             title: { type: String },

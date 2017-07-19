@@ -246,6 +246,11 @@
     "icon": "fa fa-file-o",
     "children": [
       {
+        "_id": "menu.pension-agency.NURSE",
+        "name": "护士",
+        "sref": "app.pension-agency.nurse.list"
+      },
+      {
         "_id": "menu.pension-agency.NURSING-WORKER",
         "name": "护工",
         "sref": "app.pension-agency.nursing-worker.list"

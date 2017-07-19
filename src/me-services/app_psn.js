@@ -663,11 +663,11 @@ module.exports = {
                     return function*(next) {
                         try {
                             console.log("body", this.request.body);
-                            var data = {
+                            var data = app._.extend({
                                 select: 'check_in_time title description elderlies level',
                                 where: {status: 1},
                                 sort: {check_in_time: -1}
-                            }
+                            }, this.request.body);
                             var rows = yield app.modelFactory().model_query(app.models['psn_handoverLog'], data).populate('elderlies');
                             console.log(rows);
                             this.body = app.wrapper.res.rows(rows);

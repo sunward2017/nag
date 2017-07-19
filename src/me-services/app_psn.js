@@ -718,6 +718,40 @@ module.exports = {
                 }
             },
             {
+                method: 'user$changePassword',
+                verb: 'post',
+                url: this.service_url_prefix + "/user/changePassword",
+                handler: function (app, options) {
+                    return function*(next) {
+                        try {
+                            // console.log("request", this.request.body);
+                            var user = yield app.modelFactory().model_read(app.models['pub_user'], this.request.body.userId);
+                            if(!user){
+                                this.body = app.wrapper.res.error({message: '无效的用户!'});
+                                yield next;
+                                return;
+                            }
+                            var oldPasswordHash = app.crypto.createHash('md5').update(this.request.body.old_password).digest('hex');
+                            if(user.password_hash != oldPasswordHash) {
+                                this.body = app.wrapper.res.error({message: '旧密码错误!'});
+                                yield next;
+                                return;
+                            }
+
+                            var newPasswordHash = app.crypto.createHash('md5').update(this.request.body.new_password).digest('hex');
+                            user.password_hash = newPasswordHash;
+                            user.save();
+                            this.body = app.wrapper.res.default();
+
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    }
+                }
+            },
+            {
                 method: 'user$auth',
                 verb: 'post',
                 url: this.service_url_prefix + "/user/auth",

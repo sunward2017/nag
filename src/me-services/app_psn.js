@@ -663,11 +663,29 @@ module.exports = {
                     return function*(next) {
                         try {
                             console.log("body", this.request.body);
+                            var level = this.request.body.level;
+                            var elderlyId = this.request.body.elderlyId;
+                            var check_in_time = this.request.body.check_in_time;
+
+                            var where = {};
+                            if(level) {
+                                where.level = level;
+                            }
+                            if(elderlyId){
+                                where.elderlies = { $elemMatch: { $eq: elderlyId } }
+                            }
+                            if(check_in_time){
+                                where.check_in_time = {
+                                    '$gte': app.moment(check_in_time).toDate(),
+                                    '$lt': app.moment(check_in_time).add(1, 'days').toDate()
+                                }
+                            }
+
                             var data = app._.extend({
                                 select: 'check_in_time title description elderlies level',
                                 where: {status: 1},
                                 sort: {check_in_time: -1}
-                            }, this.request.body);
+                            }, where);
                             var rows = yield app.modelFactory().model_query(app.models['psn_handoverLog'], data).populate('elderlies');
                             console.log(rows);
                             this.body = app.wrapper.res.rows(rows);

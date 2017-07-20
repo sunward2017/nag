@@ -2419,6 +2419,11 @@
                             width: 120,
                             sortable: true
                         }, {
+                          label: '接收告警',
+                          name: 'receive_alarm_flag',
+                          type: 'bool',
+                          width: 80
+                        }, {
                             label: '停用',
                             name: 'stop_flag',
                             type: 'bool',

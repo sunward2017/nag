@@ -55,12 +55,12 @@
             vm.removeSelected = removeSelected;
             vm.tab1 = {cid: 'contentTab1'};
 
-            vm.aggrValuePromise = vmh.shareService.tmp('T3001/psn-nursingShift', 'name', {tenantId: vm.tenantId, status: 1, stop_flag: false}).then(function (treeNodes) {
+            vm.aggrValuePromise = vmh.shareService.tmp('T3001/psn-nursingShift', 'code name', {tenantId: vm.tenantId, status: 1, stop_flag: false}).then(function (treeNodes) {
                 vm.selectBinding.nursingWorkers = treeNodes;
                 return treeNodes;
             });
 
-            vm.yAxisDataPromise = vmh.shareService.tmp('T3001/psn-nursingWorker', null, {tenantId:vm.tenantId, status: 1, stop_flag: false});
+            vm.yAxisDataPromise = vmh.shareService.tmp('T3001/psn-nursingWorker', 'name', {tenantId:vm.tenantId, status: 1, stop_flag: false});
             
             
             vm.load().then(function(){

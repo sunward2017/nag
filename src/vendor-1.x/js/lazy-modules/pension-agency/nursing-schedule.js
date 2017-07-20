@@ -4,530 +4,553 @@
  */
 
 (function() {
-    'use strict';
-    
-    angular
-        .module('subsystem.pension-agency')
-        .controller('NursingScheduleController', NursingScheduleController)
-        .controller('NursingScheduleSaveAsTemplateController', NursingScheduleSaveAsTemplateController)
-        .filter('nursingScheduleCellFilter', nursingScheduleCellFilter)
-    ;
+  'use strict';
 
-    NursingScheduleController.$inject = ['$scope', 'ngDialog', 'vmh', 'instanceVM'];
+  angular
+    .module('subsystem.pension-agency')
+    .controller('NursingScheduleController', NursingScheduleController)
+    .controller('NursingScheduleSaveAsTemplateController', NursingScheduleSaveAsTemplateController)
+    .filter('nursingScheduleCellFilter', nursingScheduleCellFilter)
+  ;
 
-    function NursingScheduleController($scope, ngDialog, vmh, vm) {
+  NursingScheduleController.$inject = ['$scope', 'ngDialog', 'vmh', 'instanceVM'];
 
-        var vm = $scope.vm = vm;
-        $scope.utils = vmh.utils.v;
+  function NursingScheduleController($scope, ngDialog, vmh, vm) {
 
-        init();
+    var vm = $scope.vm = vm;
+    $scope.utils = vmh.utils.v;
 
-        function init() {
+    init();
 
-            vm.init({removeDialog: ngDialog});
- 
-            vm.preWeek = preWeek;
-            vm.nextWeek = nextWeek;
-            vm.onRoomChange = onRoomChange;
-            vm.selectGrid = selectGrid;
-            vm.selectGridCol = selectGridCol;
-            vm.selectGridRow = selectGridRow;
-            vm.selectGridCell = selectGridCell;
-            vm.replaceSelected = replaceSelected;
-            vm.appendSelected = appendSelected;
-            vm.removeSelected = removeSelected;
-            vm.importTemplate = importTemplate;
-            vm.saveAsTemplate = saveAsTemplate;
-            vm.tab1 = {cid: 'contentTab1'};
+    function init() {
 
-            fetchNursingScheduleTemplates();
-            vmh.shareService.tmp('T3001/psn-nursingWorker', 'name', {tenantId: vm.tenantId, status: 1, stop_flag: false}).then(function (treeNodes) {
-                vm.selectBinding.nursingWorkers = treeNodes;
-            });
+      vm.init({removeDialog: ngDialog});
 
-            vmh.shareService.tmp('T3001/psn-nursingShift', 'code', {tenantId: vm.tenantId, status: 1, stop_flag: false}).then(function (nodes) {
-                vm.selectBinding.nursingShifts = nodes;
-                return nodes;
-            });
+      vm.preWeek = preWeek;
+      vm.nextWeek = nextWeek;
+      vm.onRoomChange = onRoomChange;
+      vm.selectGrid = selectGrid;
+      vm.selectGridCol = selectGridCol;
+      vm.selectGridRow = selectGridRow;
+      vm.selectGridCell = selectGridCell;
+      vm.replaceSelected = replaceSelected;
+      vm.appendSelected = appendSelected;
+      vm.removeSelected = removeSelected;
+      vm.importTemplate = importTemplate;
+      vm.saveAsTemplate = saveAsTemplate;
+      vm.tab1 = {cid: 'contentTab1'};
 
-            vm.aggrValuePromise = vmh.shareService.tmp('T3013', null, {tenantId:vm.tenantId}).then(function(nodes){
-                console.log('aggrValuePromise:', nodes);
-                return nodes;
-            });
+      fetchNursingScheduleTemplates();
+      vmh.shareService.tmp('T3001/psn-nursingWorker', 'name', {
+        tenantId: vm.tenantId,
+        status: 1,
+        stop_flag: false
+      }).then(function (treeNodes) {
+        vm.selectBinding.nursingWorkers = treeNodes;
+      });
 
-            vm.baseWeek = 0;
-            var p1 = loadWeek();
-            var p2 = vm.yAxisDataPromise = vmh.shareService.tmp('T3009', null, {tenantId:vm.tenantId}).then(function(nodes){
-                return nodes;
-            });
+      vmh.shareService.tmp('T3001/psn-nursingShift', 'code name', {
+        tenantId: vm.tenantId,
+        status: 1,
+        stop_flag: false
+      }).then(function (nodes) {
+        vm.selectBinding.nursingShifts = nodes;
+        return nodes;
+      });
+
+      vm.aggrValuePromise = vmh.shareService.tmp('T3013', null, {tenantId: vm.tenantId}).then(function (nodes) {
+        console.log('aggrValuePromise:', nodes);
+        return nodes;
+      });
+
+      vm.baseWeek = 0;
+      var p1 = loadWeek();
+      var p2 = vm.yAxisDataPromise = vmh.shareService.tmp('T3009', null, {tenantId: vm.tenantId}).then(function (nodes) {
+        return nodes;
+      });
+    }
+
+
+    function fetchNursingScheduleTemplates() {
+      vmh.shareService.tmp('T3001/psn-nursingScheduleTemplate', 'name', {
+        tenantId: vm.tenantId,
+        status: 1,
+        stop_flag: false
+      }, null, true).then(function (treeNodes) {
+        vm.selectBinding.nursingScheduleTemplates = treeNodes;
+      });
+    }
+
+    function preWeek() {
+      loadWeek(-1);
+    }
+
+    function nextWeek() {
+      loadWeek(1);
+    }
+
+    function loadWeek(delta) {
+      vm.baseWeek += delta || 0;
+      return vmh.blocking(vmh.shareService.tmp('T0100', null, {delta: vm.baseWeek}, null, true).then(function (treeNodes) {
+        vm.xAxisData = treeNodes;
+        vm.cols = {};
+        for (var j = 0, xlen = vm.xAxisData.length; j < xlen; j++) {
+          var colId = vm.xAxisData[j]._id;
+          vm.cols[colId] = false;//selectedCol control variable
         }
+        queryNursingSchedule();
+        queryNursingWorkerSchedule();
+      }));
+    }
 
+    function queryNursingSchedule() {
+      var start = vm.xAxisData[0].value;
+      var end = vm.xAxisData[vm.xAxisData.length - 1].value;
+      var p3 = vmh.psnService.nursingScheduleWeekly(vm.tenantId, start, end).then(parseNursingSchedule);
+    }
 
-        function fetchNursingScheduleTemplates () {
-            vmh.shareService.tmp('T3001/psn-nursingScheduleTemplate', 'name', {tenantId: vm.tenantId, status: 1, stop_flag: false}, null, true).then(function (treeNodes) {
-                vm.selectBinding.nursingScheduleTemplates = treeNodes;
-            });
-        }
-        
-        function preWeek() {
-            loadWeek(-1);
-        }
-        function nextWeek() {
-            loadWeek(1);
-        }
-        function loadWeek(delta) {
-            vm.baseWeek += delta || 0;
-            return vmh.blocking(vmh.shareService.tmp('T0100', null, {delta: vm.baseWeek}, null, true).then(function (treeNodes) {
-                vm.xAxisData = treeNodes;
-                vm.cols = {};
-                for (var j=0, xlen = vm.xAxisData.length;j<xlen;j++) {
-                    var colId = vm.xAxisData[j]._id;
-                    vm.cols[colId] = false;//selectedCol control variable
-                }
-                queryNursingSchedule();
-                queryNursingWorkerSchedule();
-            }));
-        }
-        
-        function queryNursingSchedule() {
-            var start = vm.xAxisData[0].value;
-            var end = vm.xAxisData[vm.xAxisData.length-1].value;
-            var p3 = vmh.psnService.nursingScheduleWeekly(vm.tenantId, start, end).then(parseNursingSchedule);
-        }
+    function queryNursingWorkerSchedule() {
+      var start = vm.xAxisData[0].value;
+      var end = vm.xAxisData[vm.xAxisData.length - 1].value;
+      vmh.psnService.nursingWorkerScheduleWeekly(vm.tenantId, start, end).then(parseNursingWorkerSchedule);
+    }
 
-        function queryNursingWorkerSchedule () {
-            var start = vm.xAxisData[0].value;
-            var end = vm.xAxisData[vm.xAxisData.length-1].value;
-            vmh.psnService.nursingWorkerScheduleWeekly(vm.tenantId, start, end).then(parseNursingWorkerSchedule);
+    function parseNursingSchedule(nursingSchedule) {
+      console.log('parse nursingScheduleItems');
+      var nursingScheduleItems = nursingSchedule.items;
+      console.log(nursingSchedule);
+      // vm.yAxisData = nursingSchedule.yAxisData;  ?  //The default nursing scheduling state is not selected
+      var nursingWorkers = vm.selectBinding.nursingWorkers;
+      vm.aggrData = {};
+
+      // 确保vm.aggrData[rowId] 存在并初始化
+      for (var i = 0, len = vm.yAxisData.length; i < len; i++) {
+        var rowId = vm.yAxisData[i]._id;
+        if (!vm.aggrData[rowId]) {
+          vm.aggrData[rowId] = {};
         }
+      }
 
-        function parseNursingSchedule(nursingSchedule) {
-            console.log('parse nursingScheduleItems');
-            var nursingScheduleItems = nursingSchedule.items;
-            console.log(nursingSchedule);
-            // vm.yAxisData = nursingSchedule.yAxisData;  ?  //The default nursing scheduling state is not selected
-            var nursingWorkers = vm.selectBinding.nursingWorkers;
-            vm.aggrData = {};
+      for (var i = 0, len = nursingScheduleItems.length; i < len; i++) {
+        var nursingScheduleItem = nursingScheduleItems[i];
+        var nursingWorkerObject = _.find(nursingWorkers, function (o) {
+          return o._id == nursingScheduleItem.aggr_value
+        });
+        if (nursingWorkerObject) {
+          if (!vm.aggrData[nursingScheduleItem.y_axis]) {
+            vm.aggrData[nursingScheduleItem.y_axis] = {};
+          }
 
-            // 确保vm.aggrData[rowId] 存在并初始化
-            for (var i=0,len= vm.yAxisData.length;i<len;i++) {
-                var rowId = vm.yAxisData[i]._id;
-                if (!vm.aggrData[rowId]) {
-                    vm.aggrData[rowId] = {};
-                }
+          if (!vm.aggrData[nursingScheduleItem.y_axis][nursingScheduleItem.x_axis_value]) {
+            vm.aggrData[nursingScheduleItem.y_axis][nursingScheduleItem.x_axis_value] = [];
+          }
+          vm.aggrData[nursingScheduleItem.y_axis][nursingScheduleItem.x_axis_value].push(nursingWorkerObject);
+        }
+      }
+    }
+
+    function parseNursingWorkerSchedule(nursingWorkerSchedule) {
+      console.log('parse nursingWorkerScheduleItems');
+      var nursingWorkerScheduleItems = nursingWorkerSchedule.items;
+      // vm.yAxisData = nursingSchedule.yAxisData;  ?  //The default nursing scheduling state is not selected
+      var nursingWorkers = vm.selectBinding.nursingWorkers;
+      var nursingShifts = vm.selectBinding.nursingShifts;
+
+      vm.aggrMapData = {};
+
+      for (var i = 0, len = nursingWorkerScheduleItems.length; i < len; i++) {
+        var nursingWorkerScheduleItem = nursingWorkerScheduleItems[i];
+        var nursingShiftObject = _.find(nursingShifts, function (o) {
+          return o._id == nursingWorkerScheduleItem.aggr_value
+        });
+        console.log('nursingShiftObject:', nursingShiftObject, nursingWorkerScheduleItem.x_axis_value);
+        if (nursingShiftObject) {
+          if (!vm.aggrMapData[nursingWorkerScheduleItem.x_axis_value]) {
+            vm.aggrMapData[nursingWorkerScheduleItem.x_axis_value] = {};
+          }
+          if (!vm.aggrMapData[nursingWorkerScheduleItem.x_axis_value][nursingWorkerScheduleItem.y_axis]) {
+            vm.aggrMapData[nursingWorkerScheduleItem.x_axis_value][nursingWorkerScheduleItem.y_axis] = [];
+          }
+          vm.aggrMapData[nursingWorkerScheduleItem.x_axis_value][nursingWorkerScheduleItem.y_axis].push(nursingShiftObject.code);
+        }
+      }
+
+      console.log('aggrMapData:',vm.aggrMapData);
+    }
+
+    function onRoomChange() {
+      console.log('onRoomChange');
+      exitGridEditMode();
+      enterGridEditMode()
+    }
+
+    function enterGridEditMode() {
+      vm.gridEditing = true;
+      if (!vm.aggrData) {
+        vm.aggrData = {};
+      }
+      if (!vm.cells) {
+        vm.cells = {};
+      }
+      for (var i = 0, ylen = vm.yAxisData.length; i < ylen; i++) {
+        var rowId = vm.yAxisData[i]._id;
+        var rowDataObject = vm.aggrData[rowId];
+        if (!rowDataObject) {
+          rowDataObject = vm.aggrData[rowId] = {};
+        }
+        var rowCellsObject = vm.cells[rowId];
+        if (!rowCellsObject) {
+          rowCellsObject = vm.cells[rowId] = {'row-selected': false};
+        }
+        for (var j = 0, xlen = vm.xAxisData.length; j < xlen; j++) {
+          var colId = vm.xAxisData[j]._id;
+          var aggrValue = rowDataObject[colId];
+          if (aggrValue === undefined) {
+            rowDataObject[colId] = []; // "" => []
+          }
+          var cell = rowCellsObject[colId];
+          if (cell === undefined) {
+            rowCellsObject[colId] = false;
+          }
+        }
+      }
+    }
+
+    function exitGridEditMode() {
+      _unSelectAll();
+      vm.gridEditing = false;
+    }
+
+    function _unSelectAll() {
+      for (var i = 0, ylen = vm.yAxisData.length; i < ylen; i++) {
+        var rowId = vm.yAxisData[i]._id;
+        if (vm.cells && vm.cells[rowId]) {
+          vm.cells[rowId]['row-selected'] = false;
+          for (var j = 0, xlen = vm.xAxisData.length; j < xlen; j++) {
+            var colId = vm.xAxisData[j]._id;
+            vm.cells[rowId][colId] = false
+            if (vm.cols[colId]) {
+              vm.cols[colId] = false;
             }
-
-            for(var i=0,len=nursingScheduleItems.length;i<len;i++) {
-                var nursingScheduleItem = nursingScheduleItems[i];
-                var nursingWorkerObject = _.find(nursingWorkers, function(o){
-                    return o._id == nursingScheduleItem.aggr_value
-                });
-                if (nursingWorkerObject) {
-                    if (!vm.aggrData[nursingScheduleItem.y_axis]) {
-                        vm.aggrData[nursingScheduleItem.y_axis] = {};
-                    }
-
-                    if (!vm.aggrData[nursingScheduleItem.y_axis][nursingScheduleItem.x_axis_value]){
-                        vm.aggrData[nursingScheduleItem.y_axis][nursingScheduleItem.x_axis_value] = [];
-                    }
-                    vm.aggrData[nursingScheduleItem.y_axis][nursingScheduleItem.x_axis_value].push(nursingWorkerObject);
-                }
-            }
+          }
         }
+      }
+    }
 
-        function parseNursingWorkerSchedule(nursingWorkerSchedule) {
-            console.log('parse nursingWorkerScheduleItems');
-            var nursingWorkerScheduleItems = nursingWorkerSchedule.items;
-            // vm.yAxisData = nursingSchedule.yAxisData;  ?  //The default nursing scheduling state is not selected
-            var nursingWorkers = vm.selectBinding.nursingWorkers;
-            var nursingShifts = vm.selectBinding.nursingShifts;
-            vm.aggrMapData = {};
-
-            for(var i=0,len=nursingWorkerScheduleItems.length;i<len;i++) {
-                var nursingWorkerScheduleItem = nursingWorkerScheduleItems[i];
-                var nursingShiftObject = _.find(nursingShifts, function(o){
-                    return o._id == nursingWorkerScheduleItem.aggr_value
-                });
-                if (nursingShiftObject) {
-                    if (!vm.aggrMapData[nursingWorkerScheduleItem.x_axis_value]) {
-                        vm.aggrMapData[nursingWorkerScheduleItem.x_axis_value] = {};
-                    }
-                    if (!vm.aggrMapData[nursingWorkerScheduleItem.x_axis_value][nursingWorkerScheduleItem.y_axis]) {
-                        vm.aggrMapData[nursingWorkerScheduleItem.x_axis_value][nursingWorkerScheduleItem.y_axis] = [];
-                    }
-                    vm.aggrMapData[nursingWorkerScheduleItem.x_axis_value][nursingWorkerScheduleItem.y_axis].push(nursingShiftObject.code);
-                }
-            }
-
-            console.log(vm.aggrMapData);
+    function _checkWholeRowIsSelected(rowId) {
+      var wholeRowSelected = true;
+      for (var j = 0, xlen = vm.xAxisData.length; j < xlen; j++) {
+        var colId2 = vm.xAxisData[j]._id;
+        wholeRowSelected = wholeRowSelected && vm.cells[rowId][colId2];
+        if (!wholeRowSelected) {
+          break;
         }
-        
-        function onRoomChange () {
-            console.log('onRoomChange');
-            exitGridEditMode();
-            enterGridEditMode()
-        }
+      }
+      return wholeRowSelected;
+    }
 
-        function enterGridEditMode () {
-            vm.gridEditing = true;
-            if (!vm.aggrData) {
-                vm.aggrData = {};
-            }
-            if (!vm.cells) {
-                vm.cells = {};
-            }
-            for(var i=0, ylen = vm.yAxisData.length;i< ylen;i++) {
-                var rowId = vm.yAxisData[i]._id;
-                var rowDataObject = vm.aggrData[rowId];
-                if (!rowDataObject) {
-                    rowDataObject = vm.aggrData[rowId] = {};
-                }
-                var rowCellsObject = vm.cells[rowId];
-                if (!rowCellsObject) {
-                    rowCellsObject = vm.cells[rowId] = {'row-selected': false};
-                }
-                for (var j=0, xlen = vm.xAxisData.length;j<xlen;j++) {
-                    var colId = vm.xAxisData[j]._id;
-                    var aggrValue = rowDataObject[colId];
-                    if(aggrValue === undefined) {
-                        rowDataObject[colId] = []; // "" => []
-                    }
-                    var cell = rowCellsObject[colId];
-                    if(cell === undefined) {
-                        rowCellsObject[colId] = false;
-                    }
-                }
-            }
+    function _checkWholeColIsSelected(colId) {
+      var wholeColSelected = true;
+      for (var i = 0, ylen = vm.yAxisData.length; i < ylen; i++) {
+        var rowId = vm.yAxisData[i]._id;
+        wholeColSelected = wholeColSelected && vm.cells[rowId][colId];
+        if (!wholeColSelected) {
+          break;
         }
-        
-        function exitGridEditMode () {
-            _unSelectAll();
-            vm.gridEditing = false;
-        }
+      }
+      return wholeColSelected;
+    }
 
-        function _unSelectAll () {
-            for(var i=0, ylen = vm.yAxisData.length;i< ylen;i++) {
-                var rowId = vm.yAxisData[i]._id;
-                if (vm.cells && vm.cells[rowId]) {
-                    vm.cells[rowId]['row-selected'] = false;
-                    for (var j=0, xlen = vm.xAxisData.length;j<xlen;j++) {
-                        var colId = vm.xAxisData[j]._id;
-                        vm.cells[rowId][colId] = false
-                        if (vm.cols[colId]){
-                            vm.cols[colId] = false;
-                        }
-                    }
-                }
-            }
-        }
+    function selectGrid() {
+      if (!vm.gridEditing) return;
+      for (var i = 0, ylen = vm.yAxisData.length; i < ylen; i++) {
+        var rowId = vm.yAxisData[i]._id;
+        selectGridRow(rowId);
+      }
+    }
 
-        function _checkWholeRowIsSelected (rowId) {
-            var wholeRowSelected = true;
-            for (var j=0, xlen = vm.xAxisData.length;j<xlen;j++) {
-                var colId2 = vm.xAxisData[j]._id;
-                wholeRowSelected = wholeRowSelected  && vm.cells[rowId][colId2];
-                if (!wholeRowSelected){
-                    break;
-                }
-            }
-            return wholeRowSelected;
-        }
+    function selectGridCol(colId) {
+      if (!vm.gridEditing) return;
+      var newColSelected = vm.cols[colId] = !vm.cols[colId]
+      for (var i = 0, ylen = vm.yAxisData.length; i < ylen; i++) {
+        var rowId = vm.yAxisData[i]._id;
+        vm.cells[rowId][colId] = newColSelected;
+        vm.cells[rowId]['row-selected'] = _checkWholeRowIsSelected(rowId);
+      }
+    }
 
-        function _checkWholeColIsSelected (colId) {
-            var wholeColSelected = true;
-            for(var i=0, ylen = vm.yAxisData.length;i< ylen;i++) {
-                var rowId = vm.yAxisData[i]._id;
-                wholeColSelected = wholeColSelected  && vm.cells[rowId][colId];
-                if (!wholeColSelected){
-                    break;
-                }
-            }
-            return wholeColSelected;
-        }
+    function selectGridRow(rowId) {
+      if (!vm.gridEditing) return;
+      var newRowSelected = vm.cells[rowId]['row-selected'] = !vm.cells[rowId]['row-selected'];
+      for (var j = 0, xlen = vm.xAxisData.length; j < xlen; j++) {
+        var colId = vm.xAxisData[j]._id;
+        vm.cells[rowId][colId] = newRowSelected;
+        vm.cols[colId] = _checkWholeColIsSelected(colId);
+      }
+    }
 
-        function selectGrid() {
-            if(!vm.gridEditing) return;
-            for(var i=0, ylen = vm.yAxisData.length;i< ylen;i++) {
-                var rowId = vm.yAxisData[i]._id;
-                selectGridRow(rowId);
-            }
-        }
+    function selectGridCell(rowId, colId) {
+      console.log(vm.gridEditing)
+      if (!vm.gridEditing) return;
 
-        function selectGridCol(colId) {
-            if(!vm.gridEditing) return;
-            var newColSelected = vm.cols[colId] = !vm.cols[colId]
-            for(var i=0, ylen = vm.yAxisData.length;i< ylen;i++) {
-                var rowId = vm.yAxisData[i]._id;
-                vm.cells[rowId][colId] = newColSelected;
-                vm.cells[rowId]['row-selected'] = _checkWholeRowIsSelected(rowId);
-            }
-        }
+      vm.cells[rowId][colId] = !vm.cells[rowId][colId];
+      vm.cells[rowId]['row-selected'] = _checkWholeRowIsSelected(rowId);
+      vm.cols[colId] = _checkWholeColIsSelected(colId);
+    }
 
-        function selectGridRow(rowId) {
-            if(!vm.gridEditing) return;
-            var newRowSelected = vm.cells[rowId]['row-selected'] = !vm.cells[rowId]['row-selected'];
-            for (var j=0, xlen = vm.xAxisData.length;j<xlen;j++) {
-                var colId = vm.xAxisData[j]._id;
-                vm.cells[rowId][colId] = newRowSelected;
-                vm.cols[colId] = _checkWholeColIsSelected(colId);
-            }
-        }
+    function replaceSelected() {
+      saveSelected(true);
+    }
 
-        function selectGridCell (rowId, colId) {
-            console.log(vm.gridEditing)
-            if(!vm.gridEditing) return;
+    function appendSelected() {
+      saveSelected(false);
+    }
 
-            vm.cells[rowId][colId] = !vm.cells[rowId][colId];
+    function saveSelected(isReplace) {
+      // if (!vm.selectedNursingWorker) {
+      //     vmh.alertWarning(vm.moduleTranslatePath('MSG-NO-PICK-NURSING'), true);
+      //     return;
+      // }
+      if (!vm.selectedNursingWorkers || vm.selectedNursingWorkers.length == 0) {
+        vmh.alertWarning(vm.moduleTranslatePath('MSG-NO-PICK-NURSING'), true);
+        return;
+      }
+      var selectedNursingWorkers = _.map(vm.selectedNursingWorkers, function (o) {
+        return {_id: o._id, id: o.id, name: o.name};
+      });
+      var toSaveRows = [];
+      for (var i = 0, ylen = vm.yAxisData.length; i < ylen; i++) {
+        var rowId = vm.yAxisData[i]._id;
+        for (var j = 0, xlen = vm.xAxisData.length; j < xlen; j++) {
+          var colId = vm.xAxisData[j]._id;
+          var date = vm.xAxisData[j].value;
+          if (vm.cells[rowId][colId]) {
+            vm.cells[rowId][colId] = false;
             vm.cells[rowId]['row-selected'] = _checkWholeRowIsSelected(rowId);
             vm.cols[colId] = _checkWholeColIsSelected(colId);
-        }
 
-        function replaceSelected () {
-            saveSelected(true);
-        }
-
-        function appendSelected () {
-            saveSelected(false);
-        }
-
-        function saveSelected (isReplace) {
-            // if (!vm.selectedNursingWorker) {
-            //     vmh.alertWarning(vm.moduleTranslatePath('MSG-NO-PICK-NURSING'), true);
-            //     return;
-            // }
-            if (!vm.selectedNursingWorkers || vm.selectedNursingWorkers.length == 0) {
-                vmh.alertWarning(vm.moduleTranslatePath('MSG-NO-PICK-NURSING'), true);
-                return;
-            }
-            var selectedNursingWorkers = _.map(vm.selectedNursingWorkers, function (o) {
-                return {_id: o._id, id: o.id, name: o.name};
-            });
-            var toSaveRows = [];
-            for(var i=0, ylen = vm.yAxisData.length;i< ylen;i++) {
-                var rowId = vm.yAxisData[i]._id;
-                for (var j=0, xlen = vm.xAxisData.length;j<xlen;j++) {
-                    var colId = vm.xAxisData[j]._id;
-                    var date = vm.xAxisData[j].value;
-                    if (vm.cells[rowId][colId]) {
-                        vm.cells[rowId][colId] = false;
-                        vm.cells[rowId]['row-selected'] = _checkWholeRowIsSelected(rowId);
-                        vm.cols[colId] = _checkWholeColIsSelected(colId);
-
-                        if (isReplace) {
-                            vm.aggrData[rowId][colId] = selectedNursingWorkers;
-                            _.each(selectedNursingWorkers, function (o){
-                                toSaveRows.push({ x_axis: date, y_axis: rowId, aggr_value: o.id });
-                            });
-                        } else {
-                            // 追加
-                            var arr = vm.aggrData[rowId][colId];
-                            // if (!_.contains(arr, function(o){
-                            //    return o.id == vm.selectedNursingWorker.id;
-                            // })){
-                            //     vm.aggrData[rowId][colId].push(vm.selectedNursingWorker);
-                            //
-                            //     _.each(arr, function (o){
-                            //         toSaveRows.push({ x_axis: date, y_axis: rowId, aggr_value: o.id });
-                            //     })
-                            // };
-
-                            _.each(selectedNursingWorkers, function (o) {
-                                var findIndex = _.findIndex(arr, function (o2) {
-                                    return o.id == o2.id
-                                });
-                                console.log('findIndex:', findIndex);
-                                if (findIndex == -1) {
-                                    console.log('o:', o);
-                                    arr.push(o);
-                                    // toSaveRows.push({ x_axis: date, y_axis: rowId, aggr_value: o.id });
-                                }
-                            });
-
-                            _.each(arr, function(o){
-                                toSaveRows.push({ x_axis: date, y_axis: rowId, aggr_value: o.id });
-                            });
-                        }
-                    }
-                }
-            }
-            if(toSaveRows.length > 0) {
-                vmh.psnService.nursingScheduleSave(vm.tenantId, toSaveRows).then(function(){
-                    vmh.alertSuccess();
-                });
-            }
-        }
-
-        function removeSelected () {
-            ngDialog.openConfirm({
-                template: 'removeConfirmDialog.html',
-                className: 'ngdialog-theme-default'
-            }).then(function () {
-                var toRemoveRows = [];
-                for(var i=0, ylen = vm.yAxisData.length;i< ylen;i++) {
-                    var rowId = vm.yAxisData[i]._id;
-                    for (var j=0, xlen = vm.xAxisData.length;j<xlen;j++) {
-                        var colId = vm.xAxisData[j]._id;
-                        var date = vm.xAxisData[j].value;
-                        if (vm.cells[rowId][colId]) {
-                            vm.cells[rowId][colId] = false;
-                            vm.cells[rowId]['row-selected'] = _checkWholeRowIsSelected(rowId);
-                            vm.cols[colId] = _checkWholeColIsSelected(colId);
-
-                            if (vm.aggrData[rowId][colId]) {
-                                vm.aggrData[rowId][colId] = null;
-                                toRemoveRows.push({ x_axis: date, y_axis: rowId });
-                            }
-                        }
-                    }
-                }
-                if(toRemoveRows.length > 0) {
-                    vmh.psnService.nursingScheduleRemove(vm.tenantId, toRemoveRows).then(function(){
-                        vmh.alertSuccess('notification.REMOVE-SUCCESS', true);
-                    });
-                }
-            });
-        }
-        
-        function importTemplate () {
-            console.log('selectedNursingScheduleTemplate')
-
-            if (!vm.selectedNursingScheduleTemplate) {
-                console.log(vm.moduleTranslatePath('MSG-NO-PICK-NURSING_SCHEDULE_TEMPLATE'));
-                vmh.alertWarning(vm.moduleTranslatePath('MSG-NO-PICK-NURSING_SCHEDULE_TEMPLATE'), true);
-                return;
-            }
-
-            ngDialog.openConfirm({
-                template: 'customConfirmDialog.html',
-                className: 'ngdialog-theme-default',
-                controller: ['$scope', function ($scopeConfirm) {
-                    $scopeConfirm.message = vm.moduleTranslatePath('DIALOG-IMPORT-MESSAGE')
-                }]
-            }).then(function () {
-                var toImportXAxisRange = vm.xAxisData.map(function (o) {return o.value });
-                console.log(vm.selectedNursingScheduleTemplate._id);
-                vmh.psnService.nursingScheduleTemplateImport(vm.selectedNursingScheduleTemplate._id, toImportXAxisRange).then(function(){
-                    vmh.alertSuccess('notification.NORMAL-SUCCESS', true);
-                    loadWeek();
-                });
-            });
-        }
-
-        function saveAsTemplate () {
-
-            var toSaveRows = [];
-            var findNursingWorkerToSaveTemplate = false;
-            for(var i=0, ylen = vm.yAxisData.length;i< ylen;i++) {
-                var rowId = vm.yAxisData[i]._id;
-                for (var j=0, xlen = vm.xAxisData.length;j<xlen;j++) {
-                    var colId = vm.xAxisData[j]._id;
-                    if(vm.aggrData[rowId][colId]) {
-                        var assignedWorkers = vm.aggrData[rowId][colId];
-                        for(var k=0,zlen = assignedWorkers.length;k<zlen;k++) {
-                            toSaveRows.push({ x_axis: moment(vm.xAxisData[j].value).day(), y_axis: rowId, aggr_value: assignedWorkers[k] });
-                            if(!findNursingWorkerToSaveTemplate) {
-                                findNursingWorkerToSaveTemplate = true;
-                            }
-                        }
-                    }
-                }
-            }
-
-            if(!findNursingWorkerToSaveTemplate) {
-                vmh.alertWarning(vm.moduleTranslatePath('MSG-SAVE-AS-TEMPLATE-DATA-INVALID'), true);
-                return;
-            }
-
-            ngDialog.open({
-                template: 'nursing-schedule-save-as-template.html',
-                controller: 'NursingScheduleSaveAsTemplateController',
-                className: 'ngdialog-theme-default ngdialog-nursing-schedule-save-as-template',
-                data: {
-                    vmh: vmh,
-                    moduleTranslatePathRoot: vm.moduleTranslatePath(),
-                    tenantId: vm.tenantId,
-                    nursingScheduleTemplates: vm.selectBinding.nursingScheduleTemplates,
-                    toSaveRows: toSaveRows
-                }
-            }).closePromise.then(function (ret) {
-                if(ret.value!='$document' && ret.value!='$closeButton' && ret.value!='$escape' ) {
-                    console.log(ret.value)
-                    if(ret.value === true){
-                        console.log('fetchNursingScheduleTemplates')
-                        fetchNursingScheduleTemplates();
-                    }
-                }
-            });
-        }
-    }
-
-    NursingScheduleSaveAsTemplateController.$inject = ['$scope', 'ngDialog'];
-
-    function NursingScheduleSaveAsTemplateController($scope, ngDialog) {
-
-        var vm = $scope.vm = {};
-        var vmh = $scope.ngDialogData.vmh;
-
-        $scope.utils = vmh.utils.v;
-
-        init();
-
-        function init() {
-            vm.moduleTranslatePathRoot = $scope.ngDialogData.moduleTranslatePathRoot;
-            vm.moduleTranslatePath = function(key) {
-                return vm.moduleTranslatePathRoot + '.' + key;
-            };
-            vm.tenantId = $scope.ngDialogData.tenantId;
-            vm.fetchNursingScheduleTemplatesPromise = vmh.promiseWrapper($scope.ngDialogData.nursingScheduleTemplates);
-            vm.toSaveRows = $scope.ngDialogData.toSaveRows;
-
-            vm.selectNuringScheduleTemplateToSave = selectNuringScheduleTemplateToSave;
-            vm.cancel = cancel;
-            vm.doSubmit = doSubmit;
-        }
-
-        function selectNuringScheduleTemplateToSave(selectedNode) {
-            console.log(selectedNode);
-            vmh.timeout(function(){
-                vm.nursingScheduleTemplateName = selectedNode.name;
-            }, 25);
-        }
-
-        function cancel(){
-            $scope.closeThisDialog('$closeButton');
-        }
-
-        function doSubmit() {
-            if ($scope.theForm.$valid) {
-                var promise = ngDialog.openConfirm({
-                    template: 'customConfirmDialog.html',
-                    className: 'ngdialog-theme-default',
-                    controller: ['$scope', function ($scopeConfirm) {
-                        $scopeConfirm.message = vm.moduleTranslatePath('CONFIRM-MESSAGE-SAVE-AS-TEMPLATE')
-                    }]
-                }).then(function () {
-                    vmh.psnService.nursingScheduleSaveAsTemplateWeekly(vm.tenantId, vm.nursingScheduleTemplateName, vm.toSaveRows).then(function (isCreate) {
-                        $scope.closeThisDialog(isCreate);
-                        vmh.alertSuccess();
-                    });
-                });
-            }
-        }
-    }
-
-    function nursingScheduleCellFilter() {
-        return nursingScheduleCellFormatter;
-    }
-    function nursingScheduleCellFormatter(cellObject, key, workerScheduleOnXAxis) {
-        if (!cellObject || !angular.isArray(cellObject) || cellObject.length === 0)
-            return '';
-        return cellObject.map(function (o) {
-            if(workerScheduleOnXAxis && workerScheduleOnXAxis[o['_id']]) {
-                return (o[key] || '') + '<span class="nursingWorkerScheduleInNursingScheduleCell">(' + workerScheduleOnXAxis[o['_id']].join() + ')</span>'
+            if (isReplace) {
+              vm.aggrData[rowId][colId] = selectedNursingWorkers;
+              _.each(selectedNursingWorkers, function (o) {
+                toSaveRows.push({x_axis: date, y_axis: rowId, aggr_value: o.id});
+              });
             } else {
-                return (o[key] || '')
+              // 追加
+              var arr = vm.aggrData[rowId][colId];
+              // if (!_.contains(arr, function(o){
+              //    return o.id == vm.selectedNursingWorker.id;
+              // })){
+              //     vm.aggrData[rowId][colId].push(vm.selectedNursingWorker);
+              //
+              //     _.each(arr, function (o){
+              //         toSaveRows.push({ x_axis: date, y_axis: rowId, aggr_value: o.id });
+              //     })
+              // };
+
+              _.each(selectedNursingWorkers, function (o) {
+                var findIndex = _.findIndex(arr, function (o2) {
+                  return o.id == o2.id
+                });
+                console.log('findIndex:', findIndex);
+                if (findIndex == -1) {
+                  console.log('o:', o);
+                  arr.push(o);
+                  // toSaveRows.push({ x_axis: date, y_axis: rowId, aggr_value: o.id });
+                }
+              });
+
+              _.each(arr, function (o) {
+                toSaveRows.push({x_axis: date, y_axis: rowId, aggr_value: o.id});
+              });
             }
-        }).join('<br/>')
+          }
+        }
+      }
+      if (toSaveRows.length > 0) {
+        vmh.psnService.nursingScheduleSave(vm.tenantId, toSaveRows).then(function () {
+          vmh.alertSuccess();
+        });
+      }
     }
-    
+
+    function removeSelected() {
+      ngDialog.openConfirm({
+        template: 'removeConfirmDialog.html',
+        className: 'ngdialog-theme-default'
+      }).then(function () {
+        var toRemoveRows = [];
+        for (var i = 0, ylen = vm.yAxisData.length; i < ylen; i++) {
+          var rowId = vm.yAxisData[i]._id;
+          for (var j = 0, xlen = vm.xAxisData.length; j < xlen; j++) {
+            var colId = vm.xAxisData[j]._id;
+            var date = vm.xAxisData[j].value;
+            if (vm.cells[rowId][colId]) {
+              vm.cells[rowId][colId] = false;
+              vm.cells[rowId]['row-selected'] = _checkWholeRowIsSelected(rowId);
+              vm.cols[colId] = _checkWholeColIsSelected(colId);
+
+              if (vm.aggrData[rowId][colId]) {
+                vm.aggrData[rowId][colId] = null;
+                toRemoveRows.push({x_axis: date, y_axis: rowId});
+              }
+            }
+          }
+        }
+        if (toRemoveRows.length > 0) {
+          vmh.psnService.nursingScheduleRemove(vm.tenantId, toRemoveRows).then(function () {
+            vmh.alertSuccess('notification.REMOVE-SUCCESS', true);
+          });
+        }
+      });
+    }
+
+    function importTemplate() {
+      console.log('selectedNursingScheduleTemplate')
+
+      if (!vm.selectedNursingScheduleTemplate) {
+        console.log(vm.moduleTranslatePath('MSG-NO-PICK-NURSING_SCHEDULE_TEMPLATE'));
+        vmh.alertWarning(vm.moduleTranslatePath('MSG-NO-PICK-NURSING_SCHEDULE_TEMPLATE'), true);
+        return;
+      }
+
+      ngDialog.openConfirm({
+        template: 'customConfirmDialog.html',
+        className: 'ngdialog-theme-default',
+        controller: ['$scope', function ($scopeConfirm) {
+          $scopeConfirm.message = vm.moduleTranslatePath('DIALOG-IMPORT-MESSAGE')
+        }]
+      }).then(function () {
+        var toImportXAxisRange = vm.xAxisData.map(function (o) {
+          return o.value
+        });
+        console.log(vm.selectedNursingScheduleTemplate._id);
+        vmh.psnService.nursingScheduleTemplateImport(vm.selectedNursingScheduleTemplate._id, toImportXAxisRange).then(function () {
+          vmh.alertSuccess('notification.NORMAL-SUCCESS', true);
+          loadWeek();
+        });
+      });
+    }
+
+    function saveAsTemplate() {
+
+      var toSaveRows = [];
+      var findNursingWorkerToSaveTemplate = false;
+      for (var i = 0, ylen = vm.yAxisData.length; i < ylen; i++) {
+        var rowId = vm.yAxisData[i]._id;
+        for (var j = 0, xlen = vm.xAxisData.length; j < xlen; j++) {
+          var colId = vm.xAxisData[j]._id;
+          if (vm.aggrData[rowId][colId]) {
+            var assignedWorkers = vm.aggrData[rowId][colId];
+            for (var k = 0, zlen = assignedWorkers.length; k < zlen; k++) {
+              toSaveRows.push({
+                x_axis: moment(vm.xAxisData[j].value).day(),
+                y_axis: rowId,
+                aggr_value: assignedWorkers[k]
+              });
+              if (!findNursingWorkerToSaveTemplate) {
+                findNursingWorkerToSaveTemplate = true;
+              }
+            }
+          }
+        }
+      }
+
+      if (!findNursingWorkerToSaveTemplate) {
+        vmh.alertWarning(vm.moduleTranslatePath('MSG-SAVE-AS-TEMPLATE-DATA-INVALID'), true);
+        return;
+      }
+
+      ngDialog.open({
+        template: 'nursing-schedule-save-as-template.html',
+        controller: 'NursingScheduleSaveAsTemplateController',
+        className: 'ngdialog-theme-default ngdialog-nursing-schedule-save-as-template',
+        data: {
+          vmh: vmh,
+          moduleTranslatePathRoot: vm.moduleTranslatePath(),
+          tenantId: vm.tenantId,
+          nursingScheduleTemplates: vm.selectBinding.nursingScheduleTemplates,
+          toSaveRows: toSaveRows
+        }
+      }).closePromise.then(function (ret) {
+        if (ret.value != '$document' && ret.value != '$closeButton' && ret.value != '$escape') {
+          console.log(ret.value)
+          if (ret.value === true) {
+            console.log('fetchNursingScheduleTemplates')
+            fetchNursingScheduleTemplates();
+          }
+        }
+      });
+    }
+  }
+
+  NursingScheduleSaveAsTemplateController.$inject = ['$scope', 'ngDialog'];
+
+  function NursingScheduleSaveAsTemplateController($scope, ngDialog) {
+
+    var vm = $scope.vm = {};
+    var vmh = $scope.ngDialogData.vmh;
+
+    $scope.utils = vmh.utils.v;
+
+    init();
+
+    function init() {
+      vm.moduleTranslatePathRoot = $scope.ngDialogData.moduleTranslatePathRoot;
+      vm.moduleTranslatePath = function (key) {
+        return vm.moduleTranslatePathRoot + '.' + key;
+      };
+      vm.tenantId = $scope.ngDialogData.tenantId;
+      vm.fetchNursingScheduleTemplatesPromise = vmh.promiseWrapper($scope.ngDialogData.nursingScheduleTemplates);
+      vm.toSaveRows = $scope.ngDialogData.toSaveRows;
+
+      vm.selectNuringScheduleTemplateToSave = selectNuringScheduleTemplateToSave;
+      vm.cancel = cancel;
+      vm.doSubmit = doSubmit;
+    }
+
+    function selectNuringScheduleTemplateToSave(selectedNode) {
+      console.log(selectedNode);
+      vmh.timeout(function () {
+        vm.nursingScheduleTemplateName = selectedNode.name;
+      }, 25);
+    }
+
+    function cancel() {
+      $scope.closeThisDialog('$closeButton');
+    }
+
+    function doSubmit() {
+      if ($scope.theForm.$valid) {
+        var promise = ngDialog.openConfirm({
+          template: 'customConfirmDialog.html',
+          className: 'ngdialog-theme-default',
+          controller: ['$scope', function ($scopeConfirm) {
+            $scopeConfirm.message = vm.moduleTranslatePath('CONFIRM-MESSAGE-SAVE-AS-TEMPLATE')
+          }]
+        }).then(function () {
+          vmh.psnService.nursingScheduleSaveAsTemplateWeekly(vm.tenantId, vm.nursingScheduleTemplateName, vm.toSaveRows).then(function (isCreate) {
+            $scope.closeThisDialog(isCreate);
+            vmh.alertSuccess();
+          });
+        });
+      }
+    }
+  }
+
+  function nursingScheduleCellFilter() {
+    return nursingScheduleCellFormatter;
+  }
+
+  function nursingScheduleCellFormatter(cellObject, key, workerScheduleOnXAxis) {
+    if (!cellObject || !angular.isArray(cellObject) || cellObject.length === 0)
+      return '';
+    return cellObject.map(function (o) {
+      if (workerScheduleOnXAxis && workerScheduleOnXAxis[o['_id']]) {
+        return (o[key] || '') + '<span class="nursingWorkerScheduleInNursingScheduleCell">(' + workerScheduleOnXAxis[o['_id']].join() + ')</span>'
+      } else {
+        return (o[key] || '')
+      }
+    }).join('<br/>')
+  }
+
 })();

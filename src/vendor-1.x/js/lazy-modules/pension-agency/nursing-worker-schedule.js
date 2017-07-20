@@ -39,8 +39,9 @@
             vm.tab1 = {cid: 'contentTab1'};
 
             fetchNursingWorkerScheduleTemplates();
-            vm.aggrValuePromise = vmh.shareService.tmp('T3001/psn-nursingShift', 'name', {tenantId: vm.tenantId, status: 1, stop_flag: false}).then(function (nodes) {
+            vm.aggrValuePromise = vmh.shareService.tmp('T3001/psn-nursingShift', 'code name', {tenantId: vm.tenantId, status: 1, stop_flag: false}).then(function (nodes) {
                 vm.selectBinding.nursingShifts = nodes;
+                console.log('nursingShift:', nodes);
                 return nodes;
             });
             vmh.shareService.tmp('T3001/psn-nursingWorker', 'name', {tenantId: vm.tenantId, status: 1, stop_flag: false}).then(function (nodes) {

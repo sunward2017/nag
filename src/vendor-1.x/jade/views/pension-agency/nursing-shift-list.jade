@@ -27,6 +27,7 @@
                                     span.fa.fa-check(data="trBubble")
                         td.text-left {{::row.code}}
                         td.text-left {{::row.name}}
+                        td {{::row.receive_alarm_flag|boolFilter}}
                         td {{::row.stop_flag|boolFilter}}
                         td
                             .btn-group

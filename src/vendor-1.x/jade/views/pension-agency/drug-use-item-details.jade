@@ -121,7 +121,7 @@ script(type="text/ng-template", id="drug-use-item.html")
                     <!--一次服用量-->
                     label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-QUANTITY') | translate}}:
                     .col-md-4
-                        input.form-control(type='number',name='quantity' ,ng-model='vm.model.quantity', required='' ui-validate="'$value>=1'" )
+                        input.form-control(type='number',name='quantity' ,ng-model='vm.model.quantity', required='' ui-validate="'$value>0'" )
                         span.text-danger(ng-show="utils.vinput(theForm,'quantity','required')") {{ "validator.REQUIRED" | translate}}
                         span.text-danger(ng-show="utils.vinput(theForm,'quantity','number')") {{ "validator.NUMBER" | translate}}
                         span.text-danger(ng-show="utils.vinput(theForm,'quantity','validator')") {{ "validator.MIN" | translate:{min:1} }}

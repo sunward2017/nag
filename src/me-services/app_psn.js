@@ -667,7 +667,7 @@ module.exports = {
                             var elderlyId = this.request.body.elderlyId;
                             var check_in_time = this.request.body.check_in_time;
 
-                            var where = {};
+                            var where = { status: 1 };
                             if(level) {
                                 where.level = level;
                             }
@@ -681,11 +681,11 @@ module.exports = {
                                 }
                             }
 
-                            var data = app._.extend({
+                            var data = {
                                 select: 'check_in_time title description elderlies level',
-                                where: {status: 1},
+                                where: where,
                                 sort: {check_in_time: -1}
-                            }, where);
+                            };
                             var rows = yield app.modelFactory().model_query(app.models['psn_handoverLog'], data).populate('elderlies');
                             console.log(rows);
                             this.body = app.wrapper.res.rows(rows);

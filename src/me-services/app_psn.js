@@ -663,11 +663,12 @@ module.exports = {
           return function*(next) {
             try {
               console.log("body", this.request.body);
+              var tenantId = this.request.body.tenantId;
               var level = this.request.body.level;
               var elderlyId = this.request.body.elderlyId;
               var check_in_time = this.request.body.check_in_time;
               var page = this.request.body.page;
-              var where = {status: 1};
+              var where = {status: 1, tenantId: tenantId};
               if (level) {
                 where.level = level;
               }
@@ -709,6 +710,63 @@ module.exports = {
               console.log("body", this.request.body);
               yield app.modelFactory().model_create(app.models['psn_handoverLog'], this.request.body);
               this.body = app.wrapper.res.default();
+
+            } catch (e) {
+              self.logger.error(e.message);
+              this.body = app.wrapper.res.error(e);
+            }
+            yield next;
+          }
+        }
+      },
+      {
+        method: 'nursingWorkerSchedule$fetch',
+        verb: 'post',
+        url: this.service_url_prefix + "/nursingWorkerSchedule/fetch",
+        handler: function (app, options) {
+          return function*(next) {
+            try {
+              console.log("body", this.request.body);
+              var tenantId = this.request.body.tenantId;
+
+              // var where = {status: 1, tenantId: tenantId};
+              //
+              // var drugsInStock = yield self.ctx.modelFactory().model_aggregate(self.ctx.models['psn_nursingWorkerSchedule'], [
+              //   {
+              //     $match: where
+              //   },
+              //
+              //   {
+              //     $group: {
+              //       _id: {drugId: '$drugId', unit: '$mini_unit'},
+              //       drugId : { $first: "$drugId" },
+              //       unit : { $first: "$mini_unit" },
+              //       quantity: {$sum: '$quantity'},
+              //       min_expire_in: {$min: '$expire_in'}
+              //     }
+              //   },
+              //   {
+              //     $lookup: {
+              //       from: "psn_drugDirectory",
+              //       localField: "drugId",
+              //       foreignField: "_id",
+              //       as: "drug"
+              //     }
+              //   },
+              //   { $unwind: { path: "$drug" } },
+              //   {
+              //     $project: {
+              //       total: '$quantity',
+              //       min_expire_in: {$dateToString:{ format: "%Y-%m-%d", date:'$min_expire_in' }},
+              //       drugId: "$_id.drugId",
+              //       unit: "$_id.unit",
+              //       drug: "$drug",
+              //       _id: false
+              //     }
+              //   }
+              // ]);
+              var rows = [];
+              this.body = app.wrapper.res.rows(rows);
 
             } catch (e) {
               self.logger.error(e.message);

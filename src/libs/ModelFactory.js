@@ -193,20 +193,14 @@ ModelFactory._one =function (model,data) {
 };
 
 ModelFactory._bulkInsert =function (model,data) {
-    var canInsert = true;
-    if(data.removeWhere) {
-        console.log(1);
-        model.remove(data.removeWhere, function (err) {
-            if (err) {
-                canInsert = false;
-                throw err;
-            }
-        });
-    }
-
-    if(canInsert) { 
-        return model.insertMany(data.rows);
-    }
+  var p = Promise.resolve();
+  if (data.removeWhere) {
+    console.log('bulkInsert: remove=>', data.removeWhere, ' insert=>', data.rows);
+    p = p.then(() => {
+      return model.remove(data.removeWhere);
+    });
+  }
+  return p.then(() => model.insertMany(data.rows));
 };
 
 ModelFactory._bulkUpdate = function (model,data) {

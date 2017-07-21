@@ -334,13 +334,14 @@
             return;
           }
         } else {
+
+          // var needCheckNoTemplate = false;
+          // if (needCheckNoTemplate && !drugUseItem.drugUseTemplateId || !drugUseItem.drugUseTemplateId._id) {
+          //   vm.alertMessage = vm.viewTranslatePath('WARNING-SAME-DRUG-NO-TEMPLATE');
+          //   vmh.alertWarning(vm.alertMessage, true);
+          //   return;
+          // }
           console.log('该药品没有设置模版,但是已经存在');
-          var needCheckNoTemplate = false;
-          if (needCheckNoTemplate && !drugUseItem.drugUseTemplateId || !drugUseItem.drugUseTemplateId._id) {
-            vm.alertMessage = vm.viewTranslatePath('WARNING-SAME-DRUG-NO-TEMPLATE');
-            vmh.alertWarning(vm.alertMessage, true);
-            return;
-          }
         }
       }
       vm.alertMessage = undefined;

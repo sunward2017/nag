@@ -62,7 +62,8 @@ app.conf = {
         toPaths: ['/me-services/psn']
     },
     authWXApp: {
-        toPaths: ['/me-services/het', '/me-services/app', '/me-services/qiniu/open/uploadTokenForWXApp']
+        toPaths: ['/me-services/het', '/me-services/app', '/me-services/qiniu/open/uploadTokenForWXApp'],
+        // ignorePaths: ['/me-services/app/psn']
     },
     crossDomainInterceptor:{
         toPaths:['/me-services/api', '/me-services/trv', '/me-services/weixin/open', '/me-services/weixin/open', '/me-services/qiniu/open/uploadToken']

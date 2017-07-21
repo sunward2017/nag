@@ -688,7 +688,7 @@ module.exports = {
                 page: page,
                 sort: {check_in_time: -1}
               };
-              var rows = yield app.modelFactory().model_query(app.models['psn_handoverLog'], data).populate('elderlies');
+              var rows = yield app.modelFactory().model_query(app.models['psn_handoverLog'], data).populate('elderlies', 'name avatar');
               console.log(rows);
               this.body = app.wrapper.res.rows(rows);
 
@@ -726,46 +726,77 @@ module.exports = {
         handler: function (app, options) {
           return function*(next) {
             try {
-              console.log("body", this.request.body);
               var tenantId = this.request.body.tenantId;
+              var d = this.request.body.date;
+              var start = app.moment(d).toDate(), end = app.moment(d).add(1, 'days').toDate();
+              var nursingWorkerSchedules = yield app.modelFactory().model_aggregate(app.models['psn_nursingWorkerSchedule'], [
+                {
+                  $match: {status:1, tenantId: app.ObjectId(tenantId), x_axis: { '$gte': start, '$lt': end }}
+                },
 
-              // var where = {status: 1, tenantId: tenantId};
-              //
-              // var drugsInStock = yield self.ctx.modelFactory().model_aggregate(self.ctx.models['psn_nursingWorkerSchedule'], [
-              //   {
-              //     $match: where
-              //   },
-              //
-              //   {
-              //     $group: {
-              //       _id: {drugId: '$drugId', unit: '$mini_unit'},
-              //       drugId : { $first: "$drugId" },
-              //       unit : { $first: "$mini_unit" },
-              //       quantity: {$sum: '$quantity'},
-              //       min_expire_in: {$min: '$expire_in'}
-              //     }
-              //   },
-              //   {
-              //     $lookup: {
-              //       from: "psn_drugDirectory",
-              //       localField: "drugId",
-              //       foreignField: "_id",
-              //       as: "drug"
-              //     }
-              //   },
-              //   { $unwind: { path: "$drug" } },
-              //   {
-              //     $project: {
-              //       total: '$quantity',
-              //       min_expire_in: {$dateToString:{ format: "%Y-%m-%d", date:'$min_expire_in' }},
-              //       drugId: "$_id.drugId",
-              //       unit: "$_id.unit",
-              //       drug: "$drug",
-              //       _id: false
-              //     }
-              //   }
-              // ]);
-              var rows = [];
+                {
+                  $group: {
+                    _id: '$y_axis',
+                    nursing_shift_ids : { $addToSet: "$aggr_value" }
+                  }
+                },
+                {
+                  $lookup: {
+                    from: "psn_nursingWorker",
+                    localField: "_id",
+                    foreignField: "_id",
+                    as: "nursing_worker"
+                  }
+                },
+                { $unwind: { path: "$nursing_worker" } },
+                {
+                  $project: {
+                    nursing_worker_id: '$nursing_worker._id',
+                    nursing_worker_name: '$nursing_worker.name',
+                    nursing_shift_ids: '$nursing_shift_ids',
+                    _id: false
+                  }
+                }
+              ]);
+
+              // console.log('nursingWorkerSchedules:', nursingWorkerSchedules);
+
+              var nursingWorkerIds = app._.map(nursingWorkerSchedules, item => item.nursing_worker_id);
+              var nursingSchedules = yield app.modelFactory().model_query(app.models['psn_nursingSchedule'], {
+                select: 'y_axis aggr_value',
+                where: {status:1, x_axis: { '$gte': start, '$lt': end }, aggr_value: {$in: nursingWorkerIds}}
+              }).populate('y_axis', 'name');
+
+              var nursingWorkerMap = {}, nursingSchedule, nursingWorkerId;
+              for (var i=0,len = nursingSchedules.length;i<len;i++) {
+                nursingSchedule = nursingSchedules[i];
+                nursingWorkerId = nursingSchedule.aggr_value.toString();
+                if(nursingWorkerMap[nursingWorkerId]){
+                  nursingWorkerMap[nursingWorkerId] += ',' + nursingSchedule.y_axis.name;
+                } else {
+                  nursingWorkerMap[nursingWorkerId] = nursingSchedule.y_axis.name;
+                }
+              }
+              // console.log('nursingWorkerMapRoom:', nursingWorkerMap);
+
+              var nursingShifts = yield app.modelFactory().model_query(app.models['psn_nursingShift'], {
+                select: 'name',
+                where: {status:1}
+              });
+              var nursingShiftMap = {}, nursingShift;
+              for (var i=0,len = nursingShifts.length;i<len;i++) {
+                nursingShift = nursingShifts[i];
+                nursingShiftMap[nursingShift.id] = nursingShift.name;
+              }
+
+              var rows = app._.map(nursingWorkerSchedules, item => ({
+                nursing_worker: item.nursing_worker_name,
+                nursing_shifts: item.nursing_shift_ids.map(item => nursingShiftMap[item]).join(),
+                rooms: nursingWorkerMap[item.nursing_worker_id] || ''
+              }));
+
+              // console.log('rows:', rows);
+
               this.body = app.wrapper.res.rows(rows);
 
             } catch (e) {

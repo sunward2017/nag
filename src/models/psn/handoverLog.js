@@ -26,7 +26,10 @@ module.exports = function(ctx, name) {
       title: {type: String},
       description: {type: String, maxLength: 200},
       level: {type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3029"])},//报警等级
-      voice_records: [String],
+      voice_records: [{
+        url: {type: String},
+        secords: {type: Number, min: 1, max: 60}
+      }],
       tenantId: {type: mongoose.Schema.Types.ObjectId}
     }, {
       toObject: {

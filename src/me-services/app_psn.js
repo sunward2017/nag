@@ -683,7 +683,7 @@ module.exports = {
               }
 
               var data = {
-                select: 'check_in_time title description elderlies level',
+                select: 'check_in_time title description elderlies level voice_records',
                 where: where,
                 page: page,
                 sort: {check_in_time: -1}

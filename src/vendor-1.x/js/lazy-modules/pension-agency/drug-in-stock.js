@@ -270,7 +270,7 @@
         function queryDrug(keyword) {
             // 过滤已选的药,此处不在弹出列表中过滤,因为业务上可以在不同的用药模版中选择相同的药
             //return vmh.fetch(vmh.psnService.queryDrug(vm.model.tenantId, keyword, {_id: {$nin: addedDrugIds}}, 'barcode full_name short_name dosage_form alias vender'));
-            return vmh.fetch(vmh.psnService.queryDrug(vm.model.tenantId, keyword, null, 'barcode full_name short_name dosage_form alias vender'));
+            return vmh.fetch(vmh.psnService.queryDrug(vm.tenantId, keyword, null, 'barcode full_name short_name dosage_form alias vender'));
         }
 
         function searchForBackFiller (keyword) {

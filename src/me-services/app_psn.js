@@ -504,8 +504,8 @@ module.exports = {
                     if (row.unit) {
                       row.unit_name = D3026[row.unit].name;
                     }
-                    if (row.repeat_type.length > 0) {
-                      row.exec_on_str = D0103[row.repeat_type].name + '' + row.repeat_type.map(o => '' + o + row.repeat_start).join()
+                    if (row.repeat_values.length > 0) {
+                      row.exec_on_str = D0103[row.repeat_type].name + '' + row.repeat_values.map(o => '' + o + row.repeat_start).join()
                     } else {
                       row.exec_on_str = D0103[row.repeat_type].name + '' + row.repeat_start;
                     }

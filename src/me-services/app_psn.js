@@ -287,7 +287,7 @@ module.exports = {
               console.log('dynamicFilter:', dynamicFilter);
 
               var elderly = yield app.modelFactory().model_query(app.models['psn_elderly'], {
-                select: 'name birthday room_summary avatar',
+                select: 'name birthday room_summary avatar room_value',
                 where: dynamicFilter
               });
 

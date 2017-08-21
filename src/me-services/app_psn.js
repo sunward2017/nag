@@ -287,7 +287,7 @@ module.exports = {
               console.log('dynamicFilter:', dynamicFilter);
 
               var elderly = yield app.modelFactory().model_query(app.models['psn_elderly'], {
-                select: 'name birthday room_summary avatar',
+                select: 'name birthday room_summary avatar room_value',
                 where: dynamicFilter
               });
 
@@ -467,7 +467,7 @@ module.exports = {
               if (elderly.tenantId.toString() == tenantId && elderly.room_value && elderly.room_value.roomId && elderly.room_value.roomId.toString() == roomId && elderly.room_value.bed_no == bed_no) {
                 //返回老人当日的用药
                 var drugUseItems = yield app.modelFactory().model_query(app.models['psn_drugUseItem'], {
-                  select: 'drugId name quantity unit drugUseTemplateId repeat_type repeat_start',
+                  select: 'drugId name quantity unit drugUseTemplateId repeat_type repeat_values repeat_start',
                   where: {
                     status: 1,
                     elderlyId: elderlyId,
@@ -504,8 +504,11 @@ module.exports = {
                     if (row.unit) {
                       row.unit_name = D3026[row.unit].name;
                     }
-                    row.exec_on_str = D0103[row.repeat_type].name + '' + row.repeat_start;
-
+                    if (row.repeat_values.length > 0) {
+                      row.exec_on_str = D0103[row.repeat_type].name + '' + row.repeat_values.map(o => '' + o + row.repeat_start).join()
+                    } else {
+                      row.exec_on_str = D0103[row.repeat_type].name + '' + row.repeat_start;
+                    }
                     elderlyDrugUseItems.push(row)
                   }
                 }

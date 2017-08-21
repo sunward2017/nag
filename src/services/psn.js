@@ -6117,7 +6117,7 @@ module.exports = {
                         try {
                             var tenantId = this.request.body.tenantId;
                             var elderlyId = this.request.body.elderlyId;
-                            var drugId = this.request.body.drugId;
+                            var drugId = this.request.body.drugId.id;
                             this.body = yield app.psn_drug_stock_service.elderlyStockSummary(tenantId, elderlyId, drugId);
                         } catch (e) {
                             self.logger.error(e.message);

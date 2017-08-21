@@ -206,6 +206,7 @@
       vm.fetchDrugColumnsPromise = [
         {label: '药品条码', name: 'barcode', width: 150},
         {label: '药品全称', name: 'full_name', width: 300},
+        {label: '库存', name: '$stock', width: 100, align: 'right'},
         {label: '药品简称', name: 'short_name', width: 100},
         {label: '药品别名', name: 'alias', width: 100},
         {label: '生产厂商', name: 'vender', width: 300},
@@ -296,8 +297,9 @@
 
     function queryDrug(keyword) {
       // 过滤已选的药,此处不在弹出列表中过滤,因为业务上可以在不同的用药模版中选择相同的药
+      console.log('queryDrug:', vm.model.elderlyId)
       //return vmh.fetch(vmh.psnService.queryDrug(vm.model.tenantId, keyword, {_id: {$nin: addedDrugIds}}, 'barcode full_name short_name dosage_form alias vender'));
-      return vmh.fetch(vmh.psnService.queryDrug(vm.model.tenantId, keyword, null, 'barcode full_name short_name dosage_form alias vender'));
+      return vmh.fetch(vmh.psnService.queryDrug(vm.model.tenantId, vm.model.elderlyId, keyword, null, '$stock barcode full_name short_name dosage_form alias vender'));
     }
 
     function searchForBackFiller(keyword) {

@@ -12,6 +12,7 @@
         "TITLE": "管理中心-租户-账号-详情",
         "TAB1": "基本信息",
         "TAB2": "缴费历史",
+        "TAB3": "图片",
         "TAB1-LABEL-NAME": "租户名称",
         "TAB1-PLACEHOLDER-NAME": "XX市XX旅行社..",
         "TAB1-LABEL-PHONE": "手机号码",
@@ -26,7 +27,20 @@
         "TAB1-LABEL-VALIDATE_UTIL": "有效期至",
         "TAB1-PLACEHOLDER-VALIDATE_UTIL": "日期..",
         "TAB1-LABEL-LIMIT_TO": "产品发布限额",
-        "TAB1-PLACEHOLDER-LIMIT_TO": "最大可发布的产品数量(0为不限).."
+        "TAB1-PLACEHOLDER-LIMIT_TO": "最大可发布的产品数量(0为不限)..",
+        "TAB1-LABEL-FEE":"收费区间",
+        "TAB1-LABEL-STAR_RANGE":"机构评级",
+        "TAB1-LABEL-BEDS_NUM":"床位数",
+        "TAB1-LABEL-TENANT_PROPERTY":"机构性质",
+        "TAB1-LABEL-TENANT_TYPE":"机构类型",
+        "TAB1-PLACEHOLDER-TENANT_TYPE":"请选择一个机构类型..",
+        "TAB1-LABEL-SERVICE_TARGET":"服务对象",
+        "TAB1-LABEL-AREA":"所在城市",
+        "TAB1-LABEL-FOUNDING_TIME":"成立时间",
+        "TAB1-LABEL-ADDRESS":"机构地址",
+        "TAB1-PLACEHOLDER-ADDRESS":"XX市XX..",
+        "TAB3-LABEL-SPLASH_IMG":"增加图片",
+        "TAB3-PLACEHOLDER-SPLASH_IMG": "https://img2.okertrip.com/splash-image/2016-2-8-0.jpg.."
       }
     },
     "tenant-user-manage": {

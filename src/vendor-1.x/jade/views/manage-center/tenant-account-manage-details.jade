@@ -89,11 +89,11 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-TENANT_PROPERTY') | translate}}:
                         .col-md-10
                             .btn-group
-                                .btn.btn-primary(name='tenant_property',ng-repeat='item in vm.selectBinding.tenantProperty',ng-model='vm.model.tenant_property',btn-radio="item.value") {{item.name}}
+                                .btn.btn-primary(name='tenant_property',ng-repeat='item in vm.selectBinding.tenantProperty',ng-model='vm.model.nature',btn-radio="item.value") {{item.name}}
                     fieldset: .form-group
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-TENANT_TYPE') | translate}}:
                         .col-md-10
-                            ui-select(name="tenant_type",ng-model='vm.model.tenant_type', theme='bootstrap')
+                            ui-select(name="tenant_type",ng-model='vm.model.type2', theme='bootstrap')
                                 ui-select-match(placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-TENANT_TYPE")|translate}}') {{$select.selected.name}}
                                 ui-select-choices(repeat='type.value as type in vm.selectBinding.tenantType | filter: {name: $select.search}')
                                     div(ng-bind-html='type.name | highlight: $select.search')
@@ -101,12 +101,12 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-SERVICE_TARGET') | translate}}:
                         .col-md-10
                             .btn-group
-                                .btn.btn-primary(name='serve_target',ng-repeat='item in vm.selectBinding.serveTarget',ng-model='vm.model.serve_target',btn-radio="item.value") {{item.name}}
+                                .btn.btn-primary(name='serve_target',ng-repeat='item in vm.selectBinding.serveTarget',ng-model='vm.model.service_object',btn-radio="item.value") {{item.name}}
                     fieldset: .form-group
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-FOUNDING_TIME') | translate}}:
                         .col-md-2
                             .input-group
-                                input.form-control(type="text",name='founding_time',is-open="vm.openedDP",datepicker-popup="",ng-model="vm.model.founding_time" ,placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-VALIDATE_UTIL")|translate}}',ng-click="vm.openDP($event)")
+                                input.form-control(type="text",name='founding_time',is-open="vm.openedDP",datepicker-popup="",ng-model="vm.model.published_on" ,placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-VALIDATE_UTIL")|translate}}',ng-click="vm.openDP($event)")
                                 span.input-group-btn
                                     button.btn.btn-primary(ng-click="vm.openDP($event)")
                                         i.glyphicon.glyphicon-calendar

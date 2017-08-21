@@ -75,8 +75,8 @@
             vm.tab2 = {cid: 'contentTab2'};
 
             vm.load().then(function () {
-                vm.tenant_imgs_num =String(vm.model.tenant_imgs ? vm.model.tenant_imgs.length : 0);
-                vm.tenant_imgs = [].concat(vm.model.tenant_imgs);
+                vm.tenant_imgs_num =String(vm.model.imgs ? vm.model.imgs.length : 0);
+                vm.tenant_imgs = [].concat(vm.model.imgs);
                 fillSplashArray();
             });
 
@@ -101,8 +101,7 @@
             if ($scope.theForm.$valid) {
                 //console.log(vm.model);
                 console.log("doSubmit vm.tenant_imgs:",vm.tenant_imgs);
-                vm.model.tenant_imgs = vm.tenant_imgs;
-                vm.model.area=vm.selectedAreaOfDropDown;
+                vm.model.imgs = vm.tenant_imgs;
                 vm.save();
             }
             else {

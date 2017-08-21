@@ -742,7 +742,8 @@
         "TAB1-LABEL-MINI_UNIT": "最小单位",
         "TAB1-LABEL-EXPIRE_IN": "有效期",
         "TAB1-LABEL-DRUG-LIST": "入库药品明细",
-        "TOOLTIP_DRUGS_LIST_CHANGE_NOTIFY": "入库药品信息有变动,点击[保存]按钮后生效"
+        "TOOLTIP_DRUGS_LIST_CHANGE_NOTIFY": "入库药品信息有变动,点击[保存]按钮后生效",
+        "MSG-NO-PICK-ELDERLY": "必须选择一个老人入库"
       }
     },
     "drug-out-stock": {

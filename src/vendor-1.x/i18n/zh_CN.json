@@ -235,6 +235,7 @@
       "------------": "",
       "SYSTEM-MANAGE": "系统管理",
       "USER-MANAGE": "用户管理",
+      "TENANT-INFORMATION":"机构信息",
       "WXA-CONFIG": "微信小程序配置*",
       "INTERFACE-ACCOUNT": "接口账号",
       "OTHER-CONFIG":"其它配置"

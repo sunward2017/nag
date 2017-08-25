@@ -3092,6 +3092,31 @@
                     })
                 }
             })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'tenant-information', {
+                url: '/tenant-information',
+                title: '机构信息',
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath(MODEL_VARIABLES.HEAD_TEMPLATES.PENSION_AGENCY),
+                        controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER_FOR_TENANT
+                    },
+                    "module-content": {
+                        templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.SHARED + 'tenant-information.html'),
+                        controller: 'TenantInformationController',
+                        resolve: {
+                            instanceVM: helper.buildInstanceVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'tenant-information', {
+                                modelName: 'psn-information'
+                            }),
+                            deps: helper.resolveFor2('qiniu', 'qiniu-ng')
+                        }
+                    }
+                },
+                data: {
+                    func_id: MODEL_VARIABLES.BIZ_FUNC_PREFIXS.PENSION_AGENCY + 'TENANT-INFORMATION' //业务系统使用
+                },
+                resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.SHARED + 'tenant-information.js')
+            })
             .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'wxa-config', {
                 url: '/wxa-config',
                 title: '微信小程序*',

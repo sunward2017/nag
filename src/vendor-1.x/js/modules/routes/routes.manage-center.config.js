@@ -149,7 +149,8 @@
                             limit_to: 0
                         }
                         , blockUI: true
-                    })
+                    }),
+                    deps: helper.resolveFor2('qiniu', 'qiniu-ng')
                 }
             })
             .state(MODEL_VARIABLES.STATE_PREFIXS.MANAGE_CENTER + 'tenant-user-manage', {

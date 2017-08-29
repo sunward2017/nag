@@ -8,5 +8,5 @@ h4
         li(ng-if="app.isFullScreen")
             a(href='', ng-click="app.exitFullScreen($event)",title="{{ 'topbar.normal-screen.TITLE' | translate }}" )
                 em.icon-size-actual
-    span.org-name.pull-right
+    a.org-name.pull-right(href='#/')
         | {{ vm.tenantName}}

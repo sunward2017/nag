@@ -1,0 +1,88 @@
+//
+   Created by hcl on 17-8-23.
+form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="vm.doSubmit()")
+    .panel
+        tabset(justified="true")
+            tab(active="vm.tab1.active")
+                tab-heading
+                    | {{ vm.moduleTranslatePath('TAB1') | translate}}
+                    span.text-danger(title="{{'validator.FIELD-INVALID'|translate}}" , ng-show="utils.vtab('contentTab1')")
+                        i.glyphicon.glyphicon-minus-sign
+                div#contentTab1
+                    fieldset: .form-group
+                        <!--收费区间-->
+                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-FEE') | translate}}:
+                        .col-md-10
+                            .btn-group
+                                .btn.btn-primary(name='fee',ng-repeat='item in vm.selectBinding.feeSelection',ng-model='vm.model.other_config.psn_fee_range',btn-radio="item.value") {{item.name}}
+                    fieldset: .form-group
+                        <!--机构评级-->
+                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-STAR_RANGE') | translate}}:
+                        .col-md-10
+                            .btn-group
+                                .btn.btn-primary(name='star_range',ng-repeat='item in vm.selectBinding.starRange',ng-model='vm.model.other_config.psn_star_range',btn-radio="item.value") {{item.name}}
+                    fieldset: .form-group
+                        <!--床位数-->
+                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-BEDS_NUM') | translate}}:
+                        .col-md-10
+                            .btn-group
+                                .btn.btn-primary(name='beds_num',ng-repeat='item in vm.selectBinding.bedsNum',ng-model='vm.model.other_config.psn_beds_num',btn-radio="item.value") {{item.name}}
+                    fieldset: .form-group
+                        <!--机构性质-->
+                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-NATURE') | translate}}:
+                        .col-md-10
+                            .btn-group
+                                .btn.btn-primary(name='tenant_property',ng-repeat='item in vm.selectBinding.nature',ng-model='vm.model.nature',btn-radio="item.value") {{item.name}}
+                    fieldset: .form-group
+                        <!--机构类型-->
+                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-TYPE') | translate}}:
+                        .col-xs-3
+                            ui-select(name="tenant_type",ng-model='vm.model.type2', theme='bootstrap')
+                                ui-select-match(placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-TYPE")|translate}}') {{$select.selected.name}}
+                                ui-select-choices(repeat='type.value as type in vm.selectBinding.type2 | filter: {name: $select.search}')
+                                    div(ng-bind-html='type.name | highlight: $select.search')
+                    fieldset: .form-group
+                        <!--服务对象-->
+                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-SERVICE_OBJECT') | translate}}:
+                        .col-md-10
+                            .btn-group
+                                .btn.btn-primary(name='serve_target',ng-repeat='item in vm.selectBinding.serviceObject',ng-model='vm.model.service_object',btn-radio="item.value") {{item.name}}
+                    fieldset: .form-group
+                        <!--成立时间-->
+                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-PUBLISH_ON') | translate}}:
+                        .col-md-2
+                            .input-group
+                                input.form-control(type="text",name='founding_time',is-open="vm.openedDP",datepicker-popup="",ng-model="vm.model.published_on" ,placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-VALIDATE_UTIL")|translate}}',ng-click="vm.openDP($event)")
+                                span.input-group-btn
+                                    button.btn.btn-primary(ng-click="vm.openDP($event)")
+                                        i.glyphicon.glyphicon-calendar
+                    fieldset: .form-group
+                        <!--所在区域-->
+                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-AREA') | translate}}:
+                        .col-xs-3
+                            .tree.tree-dropdown(s-tree,s-tree-data="vm.areaDataPromise",s-tree-height="vm.size.h-60", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{layout:'dropdown',readonly:false}", ng-model="vm.model.area")
+                    fieldset: .form-group
+                        <!--机构地址-->
+                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-ADDRESS') | translate}}:
+                        .col-md-10
+                            input.form-control(type='text', name='address',ng-model='vm.model.address',placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-ADDRESS")|translate}}')
+                    fieldset: .form-group
+                        <!--添加图片-->
+                        div
+                            label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-SPLASH_IMG') | translate}}:
+                            .col-md-10
+                                .btn-group
+                                    .btn.btn-primary(name='tenant_imgs_num',ng-repeat='item in vm.selectBinding.tenantImgsNum',ng-model='vm.tenant_imgs_num',btn-radio="item.name", ng-change="vm.fillSplashArray()") {{item.name}}
+                        div
+                            .col-md-2
+                            .col-md-10
+                                div(ng-repeat="tenant_img in vm.tenant_imgs track by $index" )
+                                    .img-border
+                                        .img-loader(ng-if="tenant_img")
+                                            img(ng-src="{{tenant_img}}")
+                                        .uploader-area(qiniu-uploader, button-text="选择图片" bucket='4gimg',user='vm.model.name',ng-uploaded-url="vm.tenant_imgs[$index]")
+                                    input.form-control(type='text', name='{{vm.tenant_imgs[$index]}}',ng-model='vm.tenant_imgs[$index]',placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-SPLASH_IMG")|translate}}',required='')
+                                    span.text-danger(ng-if="!tenant_img",ng-show="utils.vinput(this.theForm,vm.tenant_imgs[$index],'required')") {{ "validator.REQUIRED" | translate}}
+
+    .text-right.mt-lg
+        button.btn.btn-success(type="submit") {{'button.SAVE'|translate}}

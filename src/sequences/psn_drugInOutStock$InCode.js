@@ -3,8 +3,8 @@
  * Target:psn_drugInOutStock$Outcode中code使用序列的定义
  */
 
-var object_type = 'psn_nursingRecord';
-var object_key = 'code';
+var object_type = 'psn_drugInOutStock';
+var object_key = 'in-code';
 var prefix = 'IN-';
 var suffix = undefined;
 var date_area_period_format = 'YYMMDD';

@@ -38,6 +38,14 @@ module.exports = function(ctx,name) {
             token_expired: {type: Date},//租户标识过期时间
             validate_util: {type: Date, required: true},
             limit_to:{type: Number, min: 0,default:0},//0不限发布产品数量
+            //99alive 资质相关
+            nature:{type: String, enum: ctx._.rest(ctx.dictionary.keys["D3035"])}, //机构性质
+            type2:{type: String, enum: ctx._.rest(ctx.dictionary.keys["D3036"])}, //机构类型
+            service_object:{type: String, enum: ctx._.rest(ctx.dictionary.keys["D3037"])}, //服务对象
+            published_on:{type: Date}, //成立时间
+            address:{type: String, maxlength: 200}, //机构地址
+            area:{type: String}, //所在城市
+            imgs:[String],//添加图片
             //定价模块
             price_funcs: [{
                 check_in_time: {type: Date, default: Date.now},//最新定价时间
@@ -82,6 +90,9 @@ module.exports = function(ctx,name) {
                 phone:{type: String} //机构负责人电话
             },
             other_config: {
+                psn_fee_range:{type:String,enum: ctx._.rest(ctx.dictionary.keys["D3032"])}, //收费区间
+                psn_star_range:{type:String,enum: ctx._.rest(ctx.dictionary.keys["D3033"])}, //机构评级
+                psn_beds_num:{type:String,enum: ctx._.rest(ctx.dictionary.keys["D3034"])}, //床位数
                 psn_bed_monitor_timeout: {type: Number, default: 5.00},//睡眠带超时时间设置，单位：分钟，默认5分钟
                 psn_bed_monitor_timeout_alarm_begin: {type: String, minlength: 5, maxlength: 5, default: '22:00'},//睡眠带报警时间范围，起始时间,22:00
                 psn_bed_monitor_timeout_alarm_end: {type: String, minlength: 5, maxlength: 5, default: '06:00'},//睡眠带报警时间范围，结束时间,06:00

@@ -22,14 +22,16 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                     fieldset: .form-group
                         label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-HEAD_OF_AGENCY_PHONE') | translate}}:
                         .col-md-10
-                            input.form-control(type='text',name='head_of_agency_phone' , ng-model='vm.head_of_agency.phone',placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-MULTIPLE_PHONES")|translate}}' ,required='' )
+                            input.form-control(type='text',name='head_of_agency_phone' , ng-model='vm.head_of_agency.phone',placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-MULTIPLE_PHONES")|translate}}' ,required='' ,ui-validate="{phone: 'utils.isPhones($value)'}" )
                             span.text-danger(ng-show="utils.vinput(this.theForm,'head_of_agency_phone','required')") {{ "validator.REQUIRED" | translate}}
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'head_of_agency_phone','phone')") {{ "validator.FORMAT" | translate:{item:"手机号码"} }}
                     fieldset: .form-group
                         <!--睡眠带超时时间（分）-->
                         label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-BED_MONITOR_TIMEOUT') | translate}}:
                         .col-md-10
-                            input.form-control(type='number', name='psn_bed_monitor_timeout',ng-model='vm.other_configs.psn_bed_monitor_timeout',placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-BED_MONITOR_TIMEOUT")|translate}}' ,required='',ui-validate="'$value>=1'" )
+                            input.form-control(type='number', name='psn_bed_monitor_timeout',ng-model='vm.other_configs.psn_bed_monitor_timeout',placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-BED_MONITOR_TIMEOUT")|translate}}' ,required='',ui-validate="'$value>=5'" )
                             span.text-danger(ng-show="utils.vinput(this.theForm,'psn_bed_monitor_timeout','required')") {{ "validator.REQUIRED" | translate}}
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'psn_bed_monitor_timeout','validator')") {{ "validator.MIN" | translate:{min:5} }}
                     fieldset: .form-group
                         <!--睡眠带超时报警开始时间-->
                         label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-BED_MONITOR_TIMEOUT_ALARM_BRGIN') | translate}}:

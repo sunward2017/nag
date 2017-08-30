@@ -6,12 +6,15 @@
 
  var job_id = 'sendAlarmCircle';
  var job_name =  '每天每隔时间发送警报(level=橙色,红色)';
- var job_rule = new schedule.RecurrenceRule();
- var times = [];
- for(var i=1; i<60; i+= 30) {
-    times.push(i);
- }
- job_rule.second = times;
+ var job_rule = '*/2 * * * *';//每2分钟
+
+ // var job_rule = new schedule.RecurrenceRule();
+ // var times = [];
+ // for(var i=1; i<60; i+= 30) {
+ //    times.push(i);
+ // }
+ // job_rule.second = times;
+
  var printLog = true;
 
  module.exports = {

@@ -247,6 +247,7 @@
             vtab: vtab,
             vinput: vinput,
             isPhone: isPhone,
+            isPhones:isPhones,
             isBarcode:isBarcode,
             changeProperyName: changeProperyName,
             unescapeHTML: unescapeHTML,
@@ -279,8 +280,18 @@
             return (input.$dirty || form.$submitted) && input.$error[type];
         }
 
+        //^1[3578][0-9]{9}(,1[3578][0-9]{9})*$
         function isPhone(aPhone) {
             var bValidate = RegExp(/^(0|86|17951)?(13[0-9]|15[012356789]|18[0-9]|14[57]|177)[0-9]{8}$/).test(aPhone);
+            if (bValidate) {
+                return true;
+            }
+            else
+                return false;
+        }
+
+        function isPhones(aPhone) {
+            var bValidate = RegExp(/^(1([38]\d|4[57]|5[0-35-9]|7[06-8])\d{8})(,(1([38]\d|4[57]|5[0-35-9]|7[06-8])\d{8}))*$/).test(aPhone);
             if (bValidate) {
                 return true;
             }

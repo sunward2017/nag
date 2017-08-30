@@ -421,9 +421,12 @@ module.exports = {
                   sendTitle = D3016[alarm.reason].name;
                   sendResult = yield self.ctx.send_wodong_service.vms(mode.send_tos, sendTitle, vmsContent);
                 } else if (mode.value == DIC.D3030.SMS) {
-                  smsSuffix = alarm.tenantId.name || '浙江梧斯源'
-                  smsContent = '【' + smsSuffix + '】' + smsContent;
-                  sendResult = yield self.ctx.send_wodong_service.sms(mode.send_tos, smsContent);
+                  if (alarm.sended_count === 0) {
+                    // 短信仅仅在第一次发送,之后久全部忽略了
+                    smsSuffix = alarm.tenantId.name || '浙江梧斯源'
+                    smsContent = '【' + smsSuffix + '】' + smsContent;
+                    sendResult = yield self.ctx.send_wodong_service.sms(mode.send_tos, smsContent);
+                  }
                 }
                 if (sendResult) {
                   //保存发送记录的流水

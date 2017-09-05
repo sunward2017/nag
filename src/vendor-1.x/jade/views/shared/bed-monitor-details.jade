@@ -16,9 +16,15 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                     fieldset: .form-group
                         <!--睡眠带名称-->
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-NAME') | translate}}:
-                        .col-md-10
-                            input.form-control(type='text', name='name',ng-model='vm.model.name',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-NAME")|translate}}' ,required='')
+                        .col-md-8
+                            input.form-control(type='text', name='name',ng-model='vm.model.name',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-NAME")|translate}}' ,required='',ui-validate="{name:'vm.isBedMonitorName($value)'}")
                             span.text-danger(ng-show="utils.vinput(this.theForm,'name','required')") {{ "validator.REQUIRED" | translate}}
+                            span.text-danger(ng-show="vm.tenant_name") 该睡眠带已经被{{vm.tenant_name}}使用;
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'name','name')") {{ "validator.FORMAT" | translate:{item:"睡眠带编号"} }}
+                        .col-md-2
+                            a.btn.btn-sm(ng-class="{'btn-primary':vm.tenant_name===undefined ,'btn-success':vm.tenant_name===false,'btn-danger':vm.tenant_name}",ng-click="vm.isBedMonitorUsed()") {{ vm.viewTranslatePath('TAB1-LABEL-CHECK_DEB_MONITOR_NAME') | translate}}
+                                i.fa.fa-check-circle-o.fa-lg(ng-show="vm.tenant_name===false")
+                                i.fa.fa-minus-circle.fa-lg(ng-show="vm.tenant_name")
                     fieldset: .form-group
                         <!--MAC-->
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-MAC') | translate}}:

@@ -2658,6 +2658,49 @@ module.exports = {
             yield next;
           };
         }
+      },{
+        method: 'bedMonitorUseCheck',
+        verb: 'post',
+        url: this.service_url_prefix + "/bedMonitorUseCheck",
+        handler: function (app, options) {
+          return function*(next) {
+            try{
+              var bedMonitorName = this.request.body.bedMonitorName;
+              var tenantId = this.request.body.tenantId;
+              var resTxt,tenantIdsInUse = [];
+              var bedMonitors = yield app.modelFactory().model_query(app.models['pub_bedMonitor'], {where: {name:bedMonitorName}});
+              console.log('bedMonitors:',bedMonitors,'bedMonitorName:',bedMonitorName);
+              if(bedMonitors.length>0){
+                for(var i=0,len=bedMonitors.length;i<len;i++){
+                  if(!bedMonitors[i].stop_flag){
+                    tenantIdsInUse.push(bedMonitors[i].tenantId);
+                  }
+                }
+              }else {
+                if(bedMonitorName){
+                  resTxt=false;
+                }
+              }
+              if(tenantIdsInUse.length>0){
+                var tenantsInUse = yield app.modelFactory().model_query(app.models['pub_tenant'], {select: '-_id name', where: {_id:{ $in: tenantIdsInUse}}});
+                console.log('tenantsInUse:',tenantsInUse);
+                resTxt=[];
+                for(var i=0,len=tenantsInUse.length;i<len;i++){
+                  resTxt.push(tenantsInUse[i].name);
+                }
+              }else if(bedMonitors.length>0 && tenantIdsInUse.length==0){
+                resTxt=false;
+              }
+
+              this.body = app.wrapper.res.ret(resTxt);
+            }catch(e){
+              console.log(e);
+              self.logger.error(e.message);
+              this.body = app.wrapper.res.error(e);
+            }
+            yield next;
+          };
+        }
       },
       /**********************入院相关*****************************/
       {

@@ -1513,6 +1513,59 @@
                 templateUrl: helper.basepath('manage-center/metadata-param.html'),
                 access_level: AUTH_ACCESS_LEVELS.ADMIN
             })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.MANAGE_CENTER + 'bed-monitor-status', {
+                url: '/bed-monitor-status',
+                title: '睡眠带状态查询',
+                abstract: true,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath(MODEL_VARIABLES.HEAD_TEMPLATES.MANAGE_CENTER),
+                        controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div><div class="clearfix"></div>'
+                    }
+                }
+                , resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.MANAGE_CENTER + 'bed-monitor-status.js')
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.MANAGE_CENTER + 'bed-monitor-status.list', {
+                url: '/list/:action',
+                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.MANAGE_CENTER + 'bed-monitor-status.html'),
+                access_level: AUTH_ACCESS_LEVELS.ADMIN,
+                controller: 'BedMonitorStatusController',
+                resolve: {
+                    entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.MANAGE_CENTER + 'bed-monitor-status.list', {
+                        modelName: 'pub-bedMonitor',
+                        searchForm: { "status": 1 },
+                        serverPaging: true,
+                        columns: [{
+                            label: '名称',
+                            name: 'code',
+                            type: 'string',
+                            width: 100,
+                            sortable: true
+                        }, {
+                            label: '睡眠带编号',
+                            name: 'name',
+                            type: 'string',
+                            width: 100,
+                            sortable: true
+                        }, {
+                            label: 'mac',
+                            name: 'mac',
+                            type: 'string',
+                            width: 100,
+                            sortable: true
+                        },  {
+                            label: '机构使用状态',
+                            name: 'usage_status',
+                            type: 'string',
+                            width: 280
+                            // formatter: { type: 'populate', options: { path: 'tenantId', select: '-_id name' } }
+                        }]
+                    })
+                }
+            })
         ;
 
     } // routesConfig

@@ -280,7 +280,8 @@
           upgradeAppClientSide: upgradeAppClientSide,
           importDrug: importDrug,
           syncDrugToTenants: syncDrugToTenants,
-          clearElderly: clearElderly
+          clearElderly: clearElderly,
+          bedMonitorsAggregateQuery:bedMonitorsAggregateQuery
         };
 
         function tenantInfo(tenantId, select) {
@@ -352,6 +353,10 @@
 
         function clearElderly(elderlyId) {
           return $http.post(baseUrl + 'clearElderly', {elderlyId: elderlyId});
+        }
+        
+        function bedMonitorsAggregateQuery() {
+          return $http.post(baseUrl + 'bedMonitorsAggregateQuery');
         }
       }]
     };
@@ -507,6 +512,7 @@
           roomStatusInfo: roomStatusInfo,
           updateRoomStatusInfo: updateRoomStatusInfo,
           robotRemoveRoomConfig: robotRemoveRoomConfig,
+          bedMonitorUseCheck:bedMonitorUseCheck,
           bedMonitorRemoveRoomConfig: bedMonitorRemoveRoomConfig,
           submitApplicationToExit: submitApplicationToExit,
           submitToAuditItemReturn: submitToAuditItemReturn,
@@ -603,6 +609,13 @@
           return $http.post(baseUrl + 'robotRemoveRoomConfig', {
             tenantId: tenantId,
             robotId: robotId
+          });
+        }
+        
+        function bedMonitorUseCheck(bedMonitorName,tenantId) {
+          return $http.post(baseUrl + 'bedMonitorUseCheck', {
+              bedMonitorName: bedMonitorName,
+              tenantId:tenantId
           });
         }
 

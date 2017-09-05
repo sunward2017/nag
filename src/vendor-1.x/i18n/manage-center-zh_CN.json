@@ -314,6 +314,11 @@
       "PLACEHOLDER-CLEAR-ELDERLY": "老人的_id",
       "MSG-INVALID-ELDERLYID": "老人_id为空或者是无效的老人格式",
       "MSG-CLEAR-ELDERLY" : "点击后将清空老人相关的所有数据,是否需要继续?"
+    },
+    "bed-monitor-status": {
+      "list": {
+        "TITLE": "管理中心-辅助工具-睡眠带状态查询-列表"
+      }
     }
   }
 }

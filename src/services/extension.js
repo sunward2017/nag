@@ -735,6 +735,50 @@ module.exports = {
                         yield next;
                     };
                 }
+            },
+            {
+                method: 'bedMonitorsAggregateQuery',
+                verb: 'post',
+                url: this.service_url_prefix + "/bedMonitorsAggregateQuery",
+                handler: function (app, options) {
+                    return function *(next) {
+                        try {
+                            var rows = yield app.modelFactory().model_aggregate(app.models['pub_bedMonitor'],[
+                                {
+                                    $lookup:{
+                                        from: "pub_tenant",
+                                        localField:"tenantId",
+                                        foreignField:"_id",
+                                        as:"tenantName"
+                                    }
+                                },
+                                {
+                                    $project: {
+                                        code:'$code',
+                                        name: '$name',
+                                        mac:'$mac',
+                                        tenant:{tenantId:'$tenantId',stop_flag:'$stop_flag',name:'$tenantName'}
+                                    }
+                                },
+                                {
+                                    $group:{
+                                        _id:'$name',
+                                        code:{$first:'$code'},
+                                        mac:{$first:'$mac'},
+                                        tenants:{$push:'$tenant'},
+                                    }
+                                }
+                                ]);
+
+                            this.body = app.wrapper.res.rows(rows);
+                        } catch (e) {
+                            console.log(e);
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
             }
 
         ];

@@ -295,7 +295,10 @@
       "------------": "",
       "METADATA-MANAGE": "元数据管理",
       "DICTIONARY-MANAGE": "字典管理",
-      "PARAM": "系统参数"
+      "PARAM": "系统参数",
+      "------------": "",
+      "ASSISTANT-TOOL": "辅助工具",
+      "BED-MONITOR-STATUS":"睡眠带状态查询"
     },
     "demo-center": {
       "GRID": "网格",

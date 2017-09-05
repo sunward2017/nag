@@ -25,7 +25,7 @@ module.exports = function(ctx,name) {
             mac: {type: String, required: true, minlength:12, maxlength: 12},
             device_status: {type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3009"])},//设备状态 在线 离线
             stop_flag: {type: Boolean, default: false},//停用标志 机器是否停用,停用则接触与房间床位的绑定
-            tenantId: {type: mongoose.Schema.Types.ObjectId}
+            tenantId: {type: mongoose.Schema.Types.ObjectId, ref: 'pub_tenant'}
         }, {
             toObject: {
                 virtuals: true

@@ -14,6 +14,7 @@
         $rootScope.app = {
             name: '梧斯源-养老业务集成平台',
             description: '新一代养老业务集成平台平台',
+            ICP:'浙ICP备16039985号-2',
             year: ((new Date()).getFullYear()),
             layout: {
                 isFixed: false,

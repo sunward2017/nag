@@ -10,8 +10,8 @@
         .module('app.pages')
         .controller('LoginFormController', LoginFormController);
 
-    LoginFormController.$inject = ['$scope','$http', '$state','Auth'];
-    function LoginFormController($scope,$http, $state,Auth) {
+    LoginFormController.$inject = ['$scope','$http', '$state','Auth','$rootScope','extensionNode'];
+    function LoginFormController($scope,$http, $state,Auth,$rootScope,extensionNode) {
         var vm = this;
 
         activate();
@@ -39,7 +39,10 @@
                             Auth.setUser(ret.user,vm.account.remember);
                             Auth.setOpenFuncs(ret.open_funcs);
                             Auth.setToken(ret.token);
-                            $state.go('app.dashboard');
+                            extensionNode.primitivePsdAlert(vm.account.password).then(function (ret) {
+                                $rootScope.app.primitivePswd=ret;
+                                $state.go('app.dashboard');
+                            });
                         }, function (err) {
                             vm.authMsg = err;
                         });

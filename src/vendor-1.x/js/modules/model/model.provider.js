@@ -281,7 +281,8 @@
           importDrug: importDrug,
           syncDrugToTenants: syncDrugToTenants,
           clearElderly: clearElderly,
-          bedMonitorsAggregateQuery:bedMonitorsAggregateQuery
+          bedMonitorsAggregateQuery:bedMonitorsAggregateQuery,
+          primitivePsdAlert:primitivePsdAlert
         };
 
         function tenantInfo(tenantId, select) {
@@ -357,6 +358,12 @@
         
         function bedMonitorsAggregateQuery() {
           return $http.post(baseUrl + 'bedMonitorsAggregateQuery');
+        }
+
+        function primitivePsdAlert(password) {
+          return $http.post(baseUrl + 'primitivePsdAlert', {
+            password: password
+          });
         }
       }]
     };

@@ -430,6 +430,24 @@ module.exports = {
                     };
                 }
             },
+            {
+                method: 'primitivePsdAlert',//初始密码提示
+                verb: 'post',
+                url: this.service_url_prefix + "/primitivePsdAlert",
+                handler: function (app, options) {
+                    return function * (next) {
+                        try {
+                            var password = this.request.body.password;
+
+                            this.body = app.wrapper.res.ret(password === '123456');
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
             /******************APP版本*********************************/
             {
                 method: 'upgradeAppServerSide',//管理中心将复制一条服务端端升级记录，并增加一位版本号

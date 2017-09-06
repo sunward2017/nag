@@ -118,5 +118,18 @@
         "sref": "app.manage-center.data-clear"
       }
     ]
+  },
+  {
+    "_id": "menu.manage-center.ASSISTANT-TOOL",
+    "name": "辅助工具",
+    "sref": "#",
+    "icon": "icon-folder",
+    "children": [
+      {
+        "_id": "menu.manage-center.BED-MONITOR-STATUS",
+        "name": "睡眠带状态查询",
+        "sref": "app.manage-center.bed-monitor-status.list"
+      }
+    ]
   }
 ]

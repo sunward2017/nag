@@ -75,10 +75,10 @@
         }
     }
 
-    DashboardDispatcherController.$inject = ['$rootScope','SETTING_KEYS','SettingsManager'];
-    function DashboardDispatcherController($rootScope,SETTING_KEYS,SettingsManager) {
+    DashboardDispatcherController.$inject = ['$rootScope','SETTING_KEYS','SettingsManager','Notify'];
+    function DashboardDispatcherController($rootScope,SETTING_KEYS,SettingsManager,Notify) {
         //console.log('$rootScope.currentSubsystemSref:'+$rootScope.currentSubsystemSref);
-        
+
         var settings = SettingsManager.getInstance();
         var currentSystem = settings && settings.read(SETTING_KEYS.CURRENT_SUBSYSTEM);
         console.log(currentSystem);
@@ -86,6 +86,10 @@
             $rootScope.$state.go(currentSystem.sref + '.dashboard');
         }
         else{
+            // console.log('primitivePswd:',$rootScope.app.primitivePswd);
+            if($rootScope.app.primitivePswd) {
+                Notify.alert('<div class="text-center"><em class="fa fa-warning"></em> ' + '您的密码是初始密码，请重新设置！' + '</div>', 'warning');
+            }
             console.log('no currentSubsystemSref');
         }
     }

@@ -28,9 +28,9 @@
         }
     }
 
-    BedMonitorDetailsController.$inject = ['$scope', 'ngDialog', 'vmh', 'entityVM'];
+    BedMonitorDetailsController.$inject = ['$scope', 'ngDialog', 'vmh', 'entityVM','$timeout'];
 
-    function BedMonitorDetailsController($scope, ngDialog, vmh, vm) {
+    function BedMonitorDetailsController($scope, ngDialog, vmh, vm,$timeout) {
 
         var vm = $scope.vm = vm;
         $scope.utils = vmh.utils.v;
@@ -48,10 +48,29 @@
 
             vm.load().then(function(){
                 vm.raw$stop_flag = !!vm.model.stop_flag;
+                vm.tenant_name=undefined;
             });
 
+            vm.isBedMonitorUsed=isBedMonitorUsed;
+            vm.isBedMonitorName=isBedMonitorName;
         }
-
+        function isBedMonitorUsed() {
+            vmh.psnService.bedMonitorUseCheck(vm.model.name,vm.tenantId).then(function(ret){
+                // console.log('ret:',ret);
+                vm.tenant_name=ret;
+            });
+            $timeout(function () {
+                vm.tenant_name=undefined;
+            },3000);
+        }
+        function isBedMonitorName(name){
+            var bValidate = RegExp(/^A[0-9]{7}$/).test(name);
+            if (bValidate) {
+                return true;
+            }
+            else
+                return false;
+        }
 
         function doSubmit() {
 

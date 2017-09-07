@@ -771,8 +771,13 @@ module.exports = {
                                     }
                                 },
                                 {
+                                    $match:{
+                                        // mac:{$ne:[ '$mac',null ]}
+                                        mac:{$ne:null }
+                                    }
+                                },
+                                {
                                     $project: {
-                                        code:'$code',
                                         name: '$name',
                                         mac:'$mac',
                                         tenant:{tenantId:'$tenantId',stop_flag:'$stop_flag',name:'$tenantName'}
@@ -781,7 +786,6 @@ module.exports = {
                                 {
                                     $group:{
                                         _id:'$name',
-                                        code:{$first:'$code'},
                                         mac:{$first:'$mac'},
                                         tenants:{$push:'$tenant'},
                                     }

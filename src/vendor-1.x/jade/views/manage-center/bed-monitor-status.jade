@@ -1,5 +1,5 @@
 //   Created by hcl on 17-8-30.
-.col-xs-12.text-center
+.col-xs-12.text-center(block-ui="list-block")
     .row-split
     .row
         .panel.panel-default.panel-grid
@@ -21,9 +21,8 @@
                                 label
                                     input(type='checkbox' data="trBubble" ng-model="row.checked" )
                                     span.fa.fa-check(data="trBubble")
-                        td {{::row.code}}
                         td {{::row._id}}
-                        td {{::row.mac}}
+                        //td {{::row.mac}}
                         td.text-left [
                             span(ng-repeat="tenant in row.tenants") {{tenant.name[0].name}}:{{tenant.stop_flag?'停用':'在用'}},
                             span ]

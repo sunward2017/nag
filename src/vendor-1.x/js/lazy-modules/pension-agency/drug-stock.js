@@ -55,6 +55,7 @@
             vm.elderlyId = vm._id_ ;
 
             vm.tab1 = {cid: 'contentTab1'};
+            vm.backoutAllotDrug=backoutAllotDrug;
 
             vmh.parallel([
                 vmh.shareService.d('D1006'),
@@ -72,8 +73,28 @@
         function fetchDrugStock() {
             vmh.psnService.elderlyDrugStockList(vm.tenantId, vm.elderlyId).then(function(rows){
                 vm.elderlyDrugStockList = rows;
+            }).then(function () {
+                vmh.psnService.allotdrugStockInRecordCheck(vm.tenantId, vm.elderlyId).then(function (ret) {
+                    vm.drugsStockStatus = ret;
+                    console.log('drugsStockStatus ret:',ret);
+                });
             });
         }
+
+        function backoutAllotDrug(drugStockRow) {
+            ngDialog.openConfirm({
+                template: 'normalConfirmDialog.html',
+                className: 'ngdialog-theme-default',
+                scope: $scope
+            }).then(function () {
+                // console.log('撤销移库.......drugStockRow:',drugStockRow);
+                vmh.q.all([vmh.translate('notification.NORMAL-SUCCESS'), vmh.psnService.backoutAllotDrug(vm.tenantId, vm.operated_by, drugStockRow)]).then(function (ret) {
+                    vmh.notify.alert('<div class="text-center"><em class="fa fa-check"></em> ' + ret[0] + '</div>', 'success');
+                    fetchDrugStock();
+                });
+            });
+        }
+
     }
 
 })();

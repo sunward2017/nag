@@ -36,9 +36,9 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='')
                             table.grid.table.table-bordered.table-hover.table-striped
                                 thead
                                     tr
-                                        th.text-center(width="80")
+                                        th.text-center(width="70")
                                             | {{ vm.viewTranslatePath('TAB1-LABEL-DRUG-NAME') | translate}}
-                                        th.text-center(width="50")
+                                        th.text-center(width="40")
                                             | {{ vm.viewTranslatePath('TAB1-LABEL-QUANTITY') | translate}}
                                         th.text-center(width="40")
                                             | {{ vm.viewTranslatePath('TAB1-LABEL-MINI_UNIT') | translate}}
@@ -46,6 +46,8 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='')
                                             | {{ vm.viewTranslatePath('TAB1-LABEL-CHECK_IN_TIME') | translate}}
                                         th.text-center(width="40")
                                             | {{ vm.viewTranslatePath('TAB1-LABEL-EXPIRE_IN') | translate}}
+                                        th.text-center(width="20")
+                                            | {{ vm.viewTranslatePath('TAB1-LABEL-ACTION') | translate}}
                                 tbody
                                     tr(ng-repeat="row in vm.elderlyDrugStockList " )
                                         td {{::row.drug_name}}
@@ -53,6 +55,9 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='')
                                         td.text-center {{::row.mini_unit_name }}
                                         td.text-center {{::row.check_in_time | date: 'yyyy-MM-dd HH:mm'}}
                                         td.text-center {{::row.expire_in | date: 'yyyy-MM-dd'}}
+                                        td.text-center
+                                            .btn-group(ng-show="row.drugInStockId.type=='A0100' && vm.drugsStockStatus[row.id]")
+                                                a.btn.btn-primary.btn-xs(ng-click="vm.backoutAllotDrug(row)") {{ vm.viewTranslatePath('ALLOT-BACKOUT') | translate}}
                                     tr(ng-if="vm.paged.length==0")
                                         td(colspan="{{utils.noResultsColspan(vm)}}") {{ 'grid.NO-RESULTS' | translate}}
     .text-right.mt-lg

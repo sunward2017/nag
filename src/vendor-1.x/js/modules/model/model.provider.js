@@ -546,6 +546,8 @@
           elderlyDrugStockList: elderlyDrugStockList,
           elderlyDrugUseWithStockList: elderlyDrugUseWithStockList,
           elderlyDrugStockSummary: elderlyDrugStockSummary,
+          backoutAllotDrug:backoutAllotDrug,
+          allotdrugStockInRecordCheck:allotdrugStockInRecordCheck,
           drugOutStock: drugOutStock,
           updateDrugsOutStock: updateDrugsOutStock,
           queryElderlyDrugStock: queryElderlyDrugStock,
@@ -849,6 +851,21 @@
             tenantId: tenantId,
             elderlyId: elderlyId,
             drugId: drugId
+          });
+        }
+
+        function allotdrugStockInRecordCheck(tenantId, elderlyId) {
+          return $http.post(baseUrl + 'allotdrugStockInRecordCheck', {
+            tenantId: tenantId,
+            elderlyId: elderlyId,
+          });
+        }
+
+        function backoutAllotDrug(tenantId, operated_by, drugStockRowData) {
+          return $http.post(baseUrl + 'backoutAllotDrug', {
+              tenantId: tenantId,
+              operated_by: operated_by,
+              drugStockRowData: drugStockRowData
           });
         }
 

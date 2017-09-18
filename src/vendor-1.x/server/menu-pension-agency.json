@@ -182,6 +182,21 @@
         "_id": "menu.pension-agency.DRUG-OUT-STOCK",
         "name": "出库管理",
         "sref": "app.pension-agency.drug-out-stock.list"
+      },
+      {
+        "_id": "menu.pension-agency.CENTER-DRUG-STOCK",
+        "name": "中央库存",
+        "sref": "app.pension-agency.center-drug-stock.list"
+      },
+      {
+        "_id": "menu.pension-agency.CENTER-DRUG-IN-STOCK",
+        "name": "中央库入库",
+        "sref": "app.pension-agency.center-drug-in-stock.list"
+      },
+      {
+        "_id": "menu.pension-agency.CENTER-DRUG-OUT-STOCK",
+        "name": "中央库移库",
+        "sref": "app.pension-agency.center-drug-out-stock.list"
       }
     ]
   },

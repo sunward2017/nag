@@ -6104,7 +6104,12 @@ module.exports = {
               var tenantId = this.request.body.tenantId;
               var operated_by = this.request.body.operated_by;
               var inStockData = this.request.body.inStockData;
-              this.body = yield app.psn_drug_stock_service.inStock(tenantId, inStockData, operated_by);
+              if(!inStockData.elderlyId && inStockData.type!='A0003'){
+                console.log('中央库入库.........');
+                this.body = yield app.psn_drug_stock_service.centerInStock(tenantId, inStockData, operated_by);
+              }else {
+                this.body = yield app.psn_drug_stock_service.inStock(tenantId, inStockData, operated_by);
+              }
             } catch (e) {
               console.log(e);
               self.logger.error(e.message);
@@ -6214,6 +6219,44 @@ module.exports = {
         }
       },
       {
+          method: 'allotdrugStockInRecordCheck',
+          verb: 'post',
+          url: this.service_url_prefix + "/allotdrugStockInRecordCheck",
+          handler: function (app, options) {
+              return function*(next) {
+                  try {
+                      var tenantId = this.request.body.tenantId;
+                      var elderlyId = this.request.body.elderlyId;
+                      this.body = yield app.psn_drug_stock_service.allotdrugStockInRecordCheck(tenantId, elderlyId);
+                  } catch (e) {
+                      self.logger.error(e.message);
+                      this.body = app.wrapper.res.error(e);
+                  }
+                  yield next;
+              };
+          }
+      },
+      {
+        method: 'backoutAllotDrug',
+        verb: 'post',
+        url: this.service_url_prefix + "/backoutAllotDrug",
+        handler: function (app, options) {
+          return function*(next) {
+            try {
+              var tenantId = this.request.body.tenantId;
+              var operated_by = this.request.body.operated_by;
+              var drugStockRowData = this.request.body.drugStockRowData;
+              this.body = yield app.psn_drug_stock_service.backoutAllotDrug(tenantId, drugStockRowData, operated_by);
+            } catch (e) {
+              console.log(e);
+              self.logger.error(e.message);
+              this.body = app.wrapper.res.error(e);
+            }
+            yield next;
+          };
+        }
+      },
+      {
         method: 'drugOutStock',
         verb: 'post',
         url: this.service_url_prefix + "/outStock",
@@ -6224,7 +6267,12 @@ module.exports = {
               var tenantId = this.request.body.tenantId;
               var operated_by = this.request.body.operated_by;
               var outStockData = this.request.body.outStockData;
-              this.body = yield app.psn_drug_stock_service.outStock(tenantId, outStockData, operated_by);
+              if(outStockData.type=='A0100'){
+                console.log('center outStock.......');
+                this.body = yield app.psn_drug_stock_service.centerOutStock(tenantId, outStockData, operated_by);
+              }else {
+                this.body = yield app.psn_drug_stock_service.outStock(tenantId, outStockData, operated_by);
+              }
             } catch (e) {
               console.log(e);
               self.logger.error(e.message);

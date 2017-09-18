@@ -2011,7 +2011,7 @@
                 resolve: {
                     entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'drug-in-stock.list', {
                         modelName: 'psn-drugInOutStock',
-                        searchForm: { "status": 1, "type": {$in: ['A0001', 'A0003', 'A0005', 'A0099']} },
+                        searchForm: { "status": 1, "type": {$in: ['A0001', 'A0003', 'A0005', 'A0099', 'A0100']},"elderlyId":{$exists: true}},
                         serverPaging: true,
                         blockUI: true,
                         columns: [{
@@ -2064,6 +2064,209 @@
                         modelName: 'psn-drugInOutStock',
                         model: {type: 'A0003', mode: 'A0003', drugs: []},
                         blockUI: true
+                    })
+                }
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'center-drug-stock', {
+                url: '/center-drug-stock',
+                title: '中央库存',
+                abstract: true,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath(MODEL_VARIABLES.HEAD_TEMPLATES.PENSION_AGENCY),
+                        controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER_FOR_TENANT
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div><div class="clearfix"></div>'
+                    }
+                },
+                data: {
+                    func_id: MODEL_VARIABLES.BIZ_FUNC_PREFIXS.PENSION_AGENCY + 'CENTER-DRUG-STOCK' //业务系统使用
+                },
+                resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.PENSION_AGENCY + 'center-drug-stock.js')
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'center-drug-stock.list', {
+                url: '/list/:action',
+                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'center-drug-stock-list.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'CenterDrugStockController',
+                resolve: {
+                    entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'center-drug-stock.list', {
+                        modelName: 'psn-drugStock',
+                        searchForm: { "status": 1,"elderlyId": {$in: [null, undefined]}},
+                        serverPaging: true,
+                        columns: [{
+                            label: '药品名称',
+                            name: 'drug_name',
+                            type: 'date',
+                            width: 150
+                        }, {
+                            label: '药品数量',
+                            name: 'quantity',
+                            type: 'string',
+                            width: 80,
+                            sortable: true
+                        },  {
+                            label: '最小单位',
+                            name: 'mini_unit_name',
+                            type: 'string',
+                            width: 80
+                        }, {
+                            label: '入库日期',
+                            name: 'check_in_time',
+                            type: 'string',
+                            width: 120,
+                            sortable: true
+                        }, {
+                            label: '有效期至',
+                            name: 'expire_in',
+                            sortable: true,
+                            width: 100
+                        }, {
+                            label: '操作',
+                            name: 'actions',
+                            sortable: false,
+                            width: 50
+                        }]
+                    })
+                }
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'center-drug-in-stock', {
+                url: '/center-drug-in-stock',
+                title: '中央库入库',
+                abstract: true,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath(MODEL_VARIABLES.HEAD_TEMPLATES.PENSION_AGENCY),
+                        controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER_FOR_TENANT
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div><div class="clearfix"></div>'
+                    }
+                },
+                data: {
+                    func_id: MODEL_VARIABLES.BIZ_FUNC_PREFIXS.PENSION_AGENCY + 'CENTER-DRUG-IN-STOCK' //业务系统使用
+                },
+                resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.PENSION_AGENCY + 'center-drug-in-stock.js')
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'center-drug-in-stock.list', {
+                url: '/list/:action',
+                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'center-drug-in-stock-list.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'CenterDrugInstockGridController',
+                resolve: {
+                    entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'center-drug-in-stock.list', {
+                        modelName: 'psn-drugInOutStock',
+                        searchForm: { "status": 1, "type": {$in: ['A0001', 'A0005', 'A0099']} ,"elderlyId":{$in: [null, undefined]}},
+                        serverPaging: true,
+                        blockUI: true,
+                        columns: [{
+                            label: '入库单号',
+                            name: 'code',
+                            type: 'string',
+                            width: 80,
+                            sortable: true
+                        },  {
+                            label: '药品',
+                            name: 'drugs',
+                            type: 'string',
+                            width: 120,
+                            sortable: true
+                        }, {
+                            label: '入库类别',
+                            name: 'type_name',
+                            type: 'string',
+                            width: 60,
+                            sortable: false
+                        }, {
+                            label: '入库方式',
+                            name: 'mode_name',
+                            type: 'string',
+                            width: 60,
+                            sortable: false
+                        }, {
+                            label: '操作',
+                            name: 'actions',
+                            sortable: false,
+                            width: 50
+                        }]
+                    })
+                }
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'center-drug-in-stock.details', {
+                url: '/details/:action/:_id',
+                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'center-drug-in-stock-details.html'),
+                controller: 'CenterDrugInstockDetailsController',
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                params: { autoSetTab: null },
+                resolve: {
+                    entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'center-drug-in-stock.details', {
+                        modelName: 'psn-drugInOutStock',
+                        model: {type: 'A0005', mode: 'A0003', drugs: []},
+                        blockUI: true
+                    })
+                }
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'center-drug-out-stock', {
+                url: '/center-drug-out-stock',
+                title: '中央库移库',
+                abstract: true,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath(MODEL_VARIABLES.HEAD_TEMPLATES.PENSION_AGENCY),
+                        controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER_FOR_TENANT
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div><div class="clearfix"></div>'
+                    }
+                },
+                data: {
+                    func_id: MODEL_VARIABLES.BIZ_FUNC_PREFIXS.PENSION_AGENCY + 'CENTER-DRUG-OUT-STOCK' //业务系统使用
+                },
+                resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.PENSION_AGENCY + 'center-drug-out-stock.js')
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'center-drug-out-stock.list', {
+                url: '/list/:action',
+                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'center-drug-out-stock-list.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'CenterDrugOutStockController',
+                resolve: {
+                    entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'center-drug-out-stock.list', {
+                        modelName: 'psn-drugInOutStock',
+                        searchForm: { "status": 1, "type": 'B0100'},
+                        serverPaging: true,
+                        blockUI: true,
+                        columns: [{
+                            label: '出库单号',
+                            name: 'code',
+                            type: 'string',
+                            width: 80,
+                            sortable: true
+                        }, {
+                            label: '老人',
+                            name: 'elderly_name',
+                            type: 'string',
+                            width: 60,
+                            sortable: true
+                        },  {
+                            label: '药品',
+                            name: 'drugs',
+                            type: 'string',
+                            width: 120,
+                            sortable: true
+                        }, {
+                            label: '出库类别',
+                            name: 'type_name',
+                            type: 'string',
+                            width: 60,
+                            sortable: false
+                        }, {
+                            label: '出库方式',
+                            name: 'mode_name',
+                            type: 'string',
+                            width: 60,
+                            sortable: false
+                        }]
                     })
                 }
             })

@@ -262,7 +262,7 @@
             // console.log('in-stock vm.model:',vm.model);
             if ($scope.theForm.$valid) {
                 if (vm._action_ == 'add') {
-                    vmh.psnService.drugInStock(vm.tenantId, vm.operated_by, vm.model).then(function () {
+                    vmh.psnService.centerDrugInStock(vm.tenantId, vm.operated_by, vm.model).then(function () {
                         vmh.alertSuccess();
                         vm.returnBack();
                     });

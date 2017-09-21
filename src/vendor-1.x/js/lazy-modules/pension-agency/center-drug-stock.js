@@ -52,7 +52,7 @@
             }).closePromise.then(function (ret) {
                 if (ret.value != '$document' && ret.value != '$closeButton' && ret.value != '$escape') {
                     console.log('确定调拨.......ret.value:',ret.value);
-                    vmh.psnService.drugOutStock(vm.tenantId, vm.operated_by, ret.value).then(function () {
+                    vmh.psnService.centerDrugOutStock(vm.tenantId, vm.operated_by, ret.value).then(function () {
                         vmh.alertSuccess();
                         vm.query();
                     });

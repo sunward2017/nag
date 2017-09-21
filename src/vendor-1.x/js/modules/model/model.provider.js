@@ -552,6 +552,8 @@
           scrapDrugOutStock:scrapDrugOutStock,
           allotDrugToCenterStock:allotDrugToCenterStock,
           queryCenterStockAllotRecords:queryCenterStockAllotRecords,
+          centerDrugInStock:centerDrugInStock,
+          centerDrugOutStock:centerDrugOutStock,
           drugOutStock: drugOutStock,
           updateDrugsOutStock: updateDrugsOutStock,
           queryElderlyDrugStock: queryElderlyDrugStock,
@@ -900,6 +902,22 @@
           return $http.post(baseUrl + 'queryCenterStockAllotRecords', {
               tenantId: tenantId,
               page:page
+          });
+        }
+
+        function centerDrugInStock(tenantId, operated_by, inStockData) {
+          return $http.post(baseUrl + 'centerDrugInStock', {
+            tenantId: tenantId,
+            operated_by: operated_by,
+            inStockData: inStockData
+          });
+        }
+
+        function centerDrugOutStock(tenantId, operated_by, outStockData) {
+          return $http.post(baseUrl + 'centerDrugOutStock', {
+            tenantId: tenantId,
+            operated_by: operated_by,
+            outStockData: outStockData
           });
         }
 

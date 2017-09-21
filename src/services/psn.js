@@ -6104,12 +6104,7 @@ module.exports = {
               var tenantId = this.request.body.tenantId;
               var operated_by = this.request.body.operated_by;
               var inStockData = this.request.body.inStockData;
-              if(!inStockData.elderlyId && inStockData.type!='A0003'){
-                console.log('中央库入库.........');
-                this.body = yield app.psn_drug_stock_service.centerInStock(tenantId, inStockData, operated_by);
-              }else {
-                this.body = yield app.psn_drug_stock_service.inStock(tenantId, inStockData, operated_by);
-              }
+              this.body = yield app.psn_drug_stock_service.inStock(tenantId, inStockData, operated_by);
             } catch (e) {
               console.log(e);
               self.logger.error(e.message);
@@ -6118,6 +6113,26 @@ module.exports = {
             yield next;
           };
         }
+      },
+      {
+          method: 'centerDrugInStock',
+          verb: 'post',
+          url: this.service_url_prefix + "/centerDrugInStock",
+          handler: function (app, options) {
+              return function*(next) {
+                  try {
+                      var tenantId = this.request.body.tenantId;
+                      var operated_by = this.request.body.operated_by;
+                      var inStockData = this.request.body.inStockData;
+                      this.body = yield app.psn_drug_stock_service.centerInStock(tenantId, inStockData, operated_by);
+                  } catch (e) {
+                      console.log(e);
+                      self.logger.error(e.message);
+                      this.body = app.wrapper.res.error(e);
+                  }
+                  yield next;
+              };
+          }
       },
       {
         method: 'drugStockInRecordCheck',
@@ -6267,12 +6282,7 @@ module.exports = {
               var tenantId = this.request.body.tenantId;
               var operated_by = this.request.body.operated_by;
               var outStockData = this.request.body.outStockData;
-              if(outStockData.type=='A0100'){
-                console.log('center outStock.......');
-                this.body = yield app.psn_drug_stock_service.centerOutStock(tenantId, outStockData, operated_by);
-              }else {
-                this.body = yield app.psn_drug_stock_service.outStock(tenantId, outStockData, operated_by);
-              }
+              this.body = yield app.psn_drug_stock_service.outStock(tenantId, outStockData, operated_by);
             } catch (e) {
               console.log(e);
               self.logger.error(e.message);
@@ -6280,6 +6290,26 @@ module.exports = {
             }
             yield next;
           };
+        }
+      },
+      {
+        method: 'centerDrugOutStock',
+        verb: 'post',
+        url: this.service_url_prefix + "/centerDrugOutStock",
+        handler: function (app, options) {
+            return function*(next) {
+                try {
+                    var tenantId = this.request.body.tenantId;
+                    var operated_by = this.request.body.operated_by;
+                    var outStockData = this.request.body.outStockData;
+                    this.body = yield app.psn_drug_stock_service.centerOutStock(tenantId, outStockData, operated_by);
+                } catch (e) {
+                    console.log(e);
+                    self.logger.error(e.message);
+                    this.body = app.wrapper.res.error(e);
+                }
+                yield next;
+            };
         }
       },
       {

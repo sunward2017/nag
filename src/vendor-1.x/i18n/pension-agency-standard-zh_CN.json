@@ -720,7 +720,9 @@
         "TAB1-LABEL-QUANTITY": "药品数量",
         "TAB1-LABEL-MINI_UNIT": "最小单位",
         "TAB1-LABEL-CHECK_IN_TIME": "入库日期",
-        "TAB1-LABEL-EXPIRE_IN": "有效期至"
+        "TAB1-LABEL-EXPIRE_IN": "有效期至",
+        "TAB1-LABEL-ACTION":"操作",
+        "ALLOT-BACKOUT":"撤销调拨"
       }
     },
     "drug-in-stock": {
@@ -744,6 +746,56 @@
         "TAB1-LABEL-DRUG-LIST": "入库药品明细",
         "TOOLTIP_DRUGS_LIST_CHANGE_NOTIFY": "入库药品信息有变动,点击[保存]按钮后生效",
         "MSG-NO-PICK-ELDERLY": "必须选择一个老人入库"
+      }
+    },
+    "center-drug-stock": {
+      "list": {
+        "TITLE": "养老机构-药品管理-中央库存-列表",
+        "ALLOT":"调拨",
+        "TAB1": "中央库出库信息",
+        "TAB1-LABEL-ELDERLY": "老人",
+        "TAB1-LABEL-DRUG_NAME": "药品",
+        "TAB1-LABEL-QUANTITY": "出库数量",
+        "TAB1-LABEL-STOCK_TOTAL": "库存数量",
+        "TAB1-LABEL-UNIT": "库存单位",
+        "TAB1-PLACEHOLDER-QUANTITY": "大于0...",
+        "TAB1-LABEL-MINI_UNIT": "最小单位",
+        "VALIDATOR-UNIT-NOT-EQUAL": "出库单位必须和库存单位一致"
+      }
+    },
+    "center-drug-in-stock": {
+      "list": {
+        "TITLE": "养老机构-药品管理-中央库入库-列表",
+        "LEFT-ELDERLY-DRUGS-ALLOT-TO-CENTER-STOCK":"出院老人药品处理",
+        "SCRAP-DRUG":"报废",
+        "TAB1":"出院老人药品处理信息列表",
+        "TAB1-LABEL-ELDERLY":"老人名字",
+        "TAB1-LABEL-QUANTITY":"药品数量",
+        "TAB1-LABEL-MINI_UNIT":"最小单位",
+        "TAB1-LABEL-EXPIRE_IN":"有效期至",
+        "TAB1-LABEL-DRUG_NAME":"药品名称",
+        "ALLOT-TO-CENTER-STOCK":"添至中央库"
+      },
+      "details": {
+        "TITLE": "养老机构-药品管理-中央库入库-详情",
+        "HEAD-LABEL-CODE": "入库单号",
+        "HEAD-PLACEHOLDER-CODE": "自动生成",
+        "HEAD-LABEL-STOCK_IN_ON": "入库日期",
+        "TAB1": "入库单信息",
+        "TAB1-LABEL-TYPE": "入库类别",
+        "TAB1-LABEL-MODE": "入库方式",
+        "TAB1-LABEL-DRUG_NAME": "药品",
+        "TAB1-LABEL-QUANTITY": "入库数量",
+        "TAB1-PLACEHOLDER-QUANTITY": "大于0...",
+        "TAB1-LABEL-MINI_UNIT": "最小单位",
+        "TAB1-LABEL-EXPIRE_IN": "有效期",
+        "TAB1-LABEL-DRUG-LIST": "入库药品明细",
+        "TOOLTIP_DRUGS_LIST_CHANGE_NOTIFY": "入库药品信息有变动,点击[保存]按钮后生效"
+      }
+    },
+    "center-drug-out-stock": {
+      "list": {
+        "TITLE": "养老机构-药品管理-移库记录-列表"
       }
     },
     "drug-out-stock": {

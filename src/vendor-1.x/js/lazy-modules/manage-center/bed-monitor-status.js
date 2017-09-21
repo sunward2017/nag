@@ -21,9 +21,11 @@
 
         function init() {
             vm.init({removeDialog: ngDialog});
+            vm.blocker.start();
             vmh.extensionService.bedMonitorsAggregateQuery().then(function (ret) {
                 console.log('ret:',ret);
                 vm.rows=ret;
+                vm.blocker.stop();
             });
         }
 

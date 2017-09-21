@@ -1,5 +1,5 @@
 
-.col-xs-12.text-center
+.col-xs-12.text-center(block-ui="list-block")
     .row
         form.form-search
             .input-group.pull-right.page-search
@@ -32,10 +32,10 @@
                         td {{::row.type_name}}
                         td {{::row.mode_name}}
                         td
-                            .btn-group(ng-if="row.mode=='A0001'")
+                            .btn-group(ng-if="row.mode=='A0001'||row.type=='A0100'")
                                 a.btn.btn-primary.btn-xs(title="{{'button.READ'|translate}}",ng-click="vm.read(row._id)")
                                     i.glyphicon.glyphicon-search
-                            .btn-group(ng-if="row.mode=='A0003'")
+                            .btn-group(ng-if="row.mode=='A0003'&&row.type!='A0100'")
                                 a.btn.btn-primary.btn-xs(title="{{'button.EDIT'|translate}}", ng-click="vm.edit(row._id)")
                                     i.glyphicon.glyphicon-pencil
                     tr(ng-if="vm.paged.length==0")

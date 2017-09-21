@@ -6115,6 +6115,26 @@ module.exports = {
         }
       },
       {
+          method: 'centerDrugInStock',
+          verb: 'post',
+          url: this.service_url_prefix + "/centerDrugInStock",
+          handler: function (app, options) {
+              return function*(next) {
+                  try {
+                      var tenantId = this.request.body.tenantId;
+                      var operated_by = this.request.body.operated_by;
+                      var inStockData = this.request.body.inStockData;
+                      this.body = yield app.psn_drug_stock_service.centerInStock(tenantId, inStockData, operated_by);
+                  } catch (e) {
+                      console.log(e);
+                      self.logger.error(e.message);
+                      this.body = app.wrapper.res.error(e);
+                  }
+                  yield next;
+              };
+          }
+      },
+      {
         method: 'drugStockInRecordCheck',
         verb: 'post',
         url: this.service_url_prefix + "/drugStockInRecordCheck",
@@ -6214,6 +6234,44 @@ module.exports = {
         }
       },
       {
+          method: 'allotdrugStockInRecordCheck',
+          verb: 'post',
+          url: this.service_url_prefix + "/allotdrugStockInRecordCheck",
+          handler: function (app, options) {
+              return function*(next) {
+                  try {
+                      var tenantId = this.request.body.tenantId;
+                      var elderlyId = this.request.body.elderlyId;
+                      this.body = yield app.psn_drug_stock_service.allotdrugStockInRecordCheck(tenantId, elderlyId);
+                  } catch (e) {
+                      self.logger.error(e.message);
+                      this.body = app.wrapper.res.error(e);
+                  }
+                  yield next;
+              };
+          }
+      },
+      {
+        method: 'backoutAllotDrug',
+        verb: 'post',
+        url: this.service_url_prefix + "/backoutAllotDrug",
+        handler: function (app, options) {
+          return function*(next) {
+            try {
+              var tenantId = this.request.body.tenantId;
+              var operated_by = this.request.body.operated_by;
+              var drugStockRowData = this.request.body.drugStockRowData;
+              this.body = yield app.psn_drug_stock_service.backoutAllotDrug(tenantId, drugStockRowData, operated_by);
+            } catch (e) {
+              console.log(e);
+              self.logger.error(e.message);
+              this.body = app.wrapper.res.error(e);
+            }
+            yield next;
+          };
+        }
+      },
+      {
         method: 'drugOutStock',
         verb: 'post',
         url: this.service_url_prefix + "/outStock",
@@ -6235,6 +6293,85 @@ module.exports = {
         }
       },
       {
+        method: 'centerDrugOutStock',
+        verb: 'post',
+        url: this.service_url_prefix + "/centerDrugOutStock",
+        handler: function (app, options) {
+            return function*(next) {
+                try {
+                    var tenantId = this.request.body.tenantId;
+                    var operated_by = this.request.body.operated_by;
+                    var outStockData = this.request.body.outStockData;
+                    this.body = yield app.psn_drug_stock_service.centerOutStock(tenantId, outStockData, operated_by);
+                } catch (e) {
+                    console.log(e);
+                    self.logger.error(e.message);
+                    this.body = app.wrapper.res.error(e);
+                }
+                yield next;
+            };
+        }
+      },
+      {
+        method:'allotDrugToCenterStock',
+        verb:'post',
+        url: this.service_url_prefix +"/allotToCenterStock",
+        handler: function (app, options) {
+          return function*(next) {
+            try {
+              var tenantId = this.request.body.tenantId;
+              var operated_by = this.request.body.operated_by;
+              var allotDrugData = this.request.body.allotDrugData;
+              this.body = yield app.psn_drug_stock_service.allotToCenterStock(tenantId, allotDrugData, operated_by);
+            } catch (e) {
+              console.log(e);
+              self.logger.error(e.message);
+              this.body = app.wrapper.res.error(e);
+            }
+            yield next;
+          };
+        }
+      },
+      {
+        method:'scrapDrugOutStock',
+        verb:'post',
+        url: this.service_url_prefix +"/scrapDrug",
+        handler: function (app, options) {
+          return function*(next) {
+            try {
+              var tenantId = this.request.body.tenantId;
+              var operated_by = this.request.body.operated_by;
+              var scrapDrugData = this.request.body.scrapDrugData;
+              this.body = yield app.psn_drug_stock_service.scrapDrug(tenantId, scrapDrugData, operated_by);
+            } catch (e) {
+              console.log(e);
+              self.logger.error(e.message);
+              this.body = app.wrapper.res.error(e);
+            }
+            yield next;
+          };
+        }
+      },
+      {
+        method: 'leftElderlyDrugStockSummary',
+        verb: 'post',
+        url: this.service_url_prefix + "/leftElderlyDrugStockSummary",
+        handler: function (app, options) {
+          return function*(next) {
+            try {
+              var tenantId = this.request.body.tenantId;
+              var page = this.request.body.page;
+              this.body = yield app.psn_drug_stock_service.leftElderlyDrugStockSummary(tenantId,page);
+            } catch (e) {
+              console.log(e);
+              self.logger.error(e.message);
+              this.body = app.wrapper.res.error(e);
+            }
+            yield next;
+          };
+        }
+      },
+      {
         method: 'updateDrugsOutStock',
         verb: 'post',
         url: this.service_url_prefix + "/updateDrugsOutStock",
@@ -6246,6 +6383,25 @@ module.exports = {
               var outStockData = this.request.body.outStockData;
               var operated_by = this.request.body.operated_by;
               this.body = yield app.psn_drug_stock_service.updateOutStock(tenantId, drugInOutStockId, outStockData, operated_by);
+            } catch (e) {
+              console.log(e);
+              self.logger.error(e.message);
+              this.body = app.wrapper.res.error(e);
+            }
+            yield next;
+          };
+        }
+      },
+      {
+        method:'queryCenterStockAllotRecords',
+        verb: 'post',
+        url: this.service_url_prefix + "/queryCenterStockAllotRecords",
+        handler: function (app, options) {
+          return function*(next) {
+            try {
+              var tenantId = this.request.body.tenantId;
+              var page = this.request.body.page;
+              this.body = yield app.psn_drug_stock_service.queryCenterStockAllotRecords(tenantId,page);
             } catch (e) {
               console.log(e);
               self.logger.error(e.message);

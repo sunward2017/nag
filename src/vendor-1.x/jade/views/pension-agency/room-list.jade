@@ -2,7 +2,7 @@
     .tree.tree-basic#tree1(ng-style="{height:vm.size.h-15}")
         ul
             li.repeat-modify(ng-repeat='node in vm.trees[0].treeData',ng-include="'tree-basic-renderer.html'",ng-init="tIndex=0;nIndex = $index")
-.text-center(ng-class='{"col-xs-10":vm.switches.leftTree,"col-xs-12":!vm.switches.leftTree}')
+.text-center(ng-class='{"col-xs-10":vm.switches.leftTree,"col-xs-12":!vm.switches.leftTree}',block-ui="list-block")
     .row
         form.form-search
             .input-group.pull-right.page-search

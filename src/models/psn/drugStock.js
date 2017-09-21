@@ -18,8 +18,8 @@ module.exports = function(ctx,name) {
             check_in_time: {type: Date, default: Date.now},
             operated_on: {type: Date, default: Date.now},
             status: {type: Number, min: 0, max: 1, default: 1},
-            elderlyId:{type: mongoose.Schema.Types.ObjectId,required: true,ref:'psn_elderly'},//关联老人
-            elderly_name: {type: String, required: true, maxlength: 20},
+            elderlyId:{type: mongoose.Schema.Types.ObjectId,ref:'psn_elderly'},//关联老人
+            elderly_name: {type: String,  maxlength: 20},
             drugId:{type: mongoose.Schema.Types.ObjectId,ref:'psn_drugDirectory'},//关联药品
             drug_name:{type: String, required: true}, //drugDirectory没有short_name时使用full_name
             quantity:{type:Number, required: true},//最小使用单位 当前库存量
@@ -27,6 +27,7 @@ module.exports = function(ctx,name) {
             expire_in: {type: Date}, //效期
             drugInStockId:{type: mongoose.Schema.Types.ObjectId,ref:'psn_drugInOutStock'},//关联入库单Id
             drugOutStockIds:[{type: mongoose.Schema.Types.ObjectId,ref:'psn_drugInOutStock'}],//关联多张出库单Id
+            allotCenterOutStockId:{type: mongoose.Schema.Types.ObjectId,ref:'psn_drugInOutStock'},//由中央库移库到老人库的唯一中央库出库Id，仅中央库移入老人库时有该字段
             tenantId: {type: mongoose.Schema.Types.ObjectId,required: true,ref:'pub_tenant'}//关联机构
         }, {
             toObject: {

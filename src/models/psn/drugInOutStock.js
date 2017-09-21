@@ -48,8 +48,8 @@ module.exports = function(ctx,name) {
             code:{type: String, required: true},//出入库单号
             type:{type: String, minlength: 5, maxlength: 5, required: true,  enum: ctx._.rest(ctx.dictionary.keys["D3014"])},
             mode:{type: String, minlength: 5, maxlength: 5, required: true,  enum: ctx._.rest(ctx.dictionary.keys["D3027"])},
-            elderlyId:{type: mongoose.Schema.Types.ObjectId,required: true,ref:'psn_elderly'},//关联老人
-            elderly_name: {type: String, required: true, maxlength: 20},
+            elderlyId:{type: mongoose.Schema.Types.ObjectId,ref:'psn_elderly'},//关联老人
+            elderly_name: {type: String,  maxlength: 20},
             drugs: [drugInSubDocSchema],
             open_id: {type: String}, // mode == A0001时填入
             tenantId: {type: mongoose.Schema.Types.ObjectId,required: true,ref:'pub_tenant'}//关联机构

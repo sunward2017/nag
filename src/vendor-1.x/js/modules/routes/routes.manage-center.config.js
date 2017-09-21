@@ -80,6 +80,7 @@
                         },
                         //切换客户端还是服务端分页
                         serverPaging: true,
+                        blockUI: true,
                         columns: [
                             {
                                 label: '租户名称',
@@ -184,6 +185,7 @@
                         searchForm: {"status": 1,"type": 'A0002'},//user.type 养老机构用户
                         //切换客户端还是服务端分页
                         serverPaging: true,
+                        blockUI: true,
                         columns: [
                             {
                                 label: '所属',
@@ -307,6 +309,7 @@
                         searchForm: {"type": 'TP'},//养老机构产生的订单
                         //切换客户端还是服务端分页
                         serverPaging: true,
+                        blockUI: true,
                         rowHeight: 60,
                         columns: [
                             {
@@ -431,6 +434,7 @@
                         },
                         //切换客户端还是服务端分页
                         serverPaging: true,
+                        blockUI: true,
                         columns: [
                             {
                                 label: '代理商名称',
@@ -534,6 +538,7 @@
                         searchForm: {"status": 1,"type": 'A0003'},//user.type 代理商用户
                         //切换客户端还是服务端分页
                         serverPaging: true,
+                        blockUI: true,
                         columns: [
                             {
                                 label: '所属',
@@ -656,6 +661,7 @@
                         searchForm: {"type": 'TA'},//代理产生的订单
                         //切换客户端还是服务端分页
                         serverPaging: true,
+                        blockUI: true,
                         rowHeight: 60,
                         columns: [
                             {
@@ -769,6 +775,7 @@
                         modelName: 'pub-jobStatus',
                         //切换客户端还是服务端分页
                         serverPaging: true,
+                        blockUI: true,
                         columns: [
                             {
                                 label: '停用',
@@ -852,6 +859,7 @@
                         searchForm: {"status": 1,"type": 'A0001'},//user.type 平台用户
                         //切换客户端还是服务端分页
                         serverPaging: true,
+                        blockUI: true,
                         columns: [
                             {
                                 label: '所属',
@@ -966,6 +974,7 @@
                         },
                         //切换客户端还是服务端分页
                         serverPaging: true,
+                        blockUI: true,
                         rowHeight: 60,
                         columns: [
                             {
@@ -1064,6 +1073,7 @@
                         },
                         //切换客户端还是服务端分页
                         serverPaging: true,
+                        blockUI: true,
                         rowHeight: 60,
                         columns: [
                             {
@@ -1159,6 +1169,7 @@
                         sortColumn: 'ver_order',
                         //切换客户端还是服务端分页
                         serverPaging: true,
+                        blockUI: true,
                         columns: [
                             {
                                 label: 'App哈希',
@@ -1246,6 +1257,7 @@
                         sortColumn: 'ver_order',
                         //切换客户端还是服务端分页
                         serverPaging: true,
+                        blockUI: true,
                         columns: [
                             {
                                 label: 'App哈希',
@@ -1345,6 +1357,7 @@
                         modelName: 'pub-deviceAccess',
                         //切换客户端还是服务端分页
                         serverPaging: true,
+                        blockUI: true,
                         columns: [
                             {
                                 label: '设备编号',
@@ -1426,6 +1439,7 @@
                         modelName: 'pub-drug',
                         searchForm: { "status": 1 },
                         serverPaging: true,
+                        blockUI: true,
                         columns: [{
                             label: '条形码',
                             name: 'barcode',
@@ -1538,21 +1552,10 @@
                         modelName: 'pub-bedMonitor',
                         searchForm: { "status": 1 },
                         serverPaging: true,
+                        blockUI: true,
                         columns: [{
-                            label: '名称',
-                            name: 'code',
-                            type: 'string',
-                            width: 100,
-                            sortable: true
-                        }, {
                             label: '睡眠带编号',
                             name: 'name',
-                            type: 'string',
-                            width: 100,
-                            sortable: true
-                        }, {
-                            label: 'mac',
-                            name: 'mac',
                             type: 'string',
                             width: 100,
                             sortable: true
@@ -1560,7 +1563,7 @@
                             label: '机构使用状态',
                             name: 'usage_status',
                             type: 'string',
-                            width: 280
+                            width: 480
                             // formatter: { type: 'populate', options: { path: 'tenantId', select: '-_id name' } }
                         }]
                     })

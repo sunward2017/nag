@@ -20,15 +20,24 @@
 
         function init() {
             vm.init({removeDialog: ngDialog});
-            vm.query();
-            console.log('outStock list :',vm.rows);
 
-            vmh.parallel([
-                vmh.shareService.d('D3026')
-            ]).then(function (results) {
-                vm.selectBinding.mini_units = results[0];
-            })
+            vm.pagingChange = pagingChange;
+            vm.page={size:5,no:1};
+            vmh.psnService.queryCenterStockAllotRecords(vm.tenantId,null).then(function (ret) {
+                vm.page.totals=ret.length;
+                queryRecords();
+            });
 
+        }
+
+        function queryRecords() {
+            vmh.psnService.queryCenterStockAllotRecords(vm.tenantId,vm.page).then(function (ret) {
+                vm.rows=ret;
+            });
+        }
+
+        function pagingChange() {
+            queryRecords();
         }
     }
 

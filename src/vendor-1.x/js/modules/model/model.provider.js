@@ -548,6 +548,10 @@
           elderlyDrugStockSummary: elderlyDrugStockSummary,
           backoutAllotDrug:backoutAllotDrug,
           allotdrugStockInRecordCheck:allotdrugStockInRecordCheck,
+          leftElderlyDrugStockSummary:leftElderlyDrugStockSummary,
+          scrapDrugOutStock:scrapDrugOutStock,
+          allotDrugToCenterStock:allotDrugToCenterStock,
+          queryCenterStockAllotRecords:queryCenterStockAllotRecords,
           drugOutStock: drugOutStock,
           updateDrugsOutStock: updateDrugsOutStock,
           queryElderlyDrugStock: queryElderlyDrugStock,
@@ -866,6 +870,36 @@
               tenantId: tenantId,
               operated_by: operated_by,
               drugStockRowData: drugStockRowData
+          });
+        }
+
+        function leftElderlyDrugStockSummary(tenantId,page) {
+          return $http.post(baseUrl + 'leftElderlyDrugStockSummary', {
+              tenantId: tenantId,
+              page:page
+          });
+        }
+
+        function scrapDrugOutStock(tenantId, operated_by, scrapDrugData) {
+          return $http.post(baseUrl + 'scrapDrug', {
+            tenantId: tenantId,
+            operated_by: operated_by,
+            scrapDrugData: scrapDrugData
+          });
+        }
+
+        function allotDrugToCenterStock(tenantId, operated_by, allotDrugData) {
+          return $http.post(baseUrl + 'allotToCenterStock', {
+            tenantId: tenantId,
+            operated_by: operated_by,
+            allotDrugData: allotDrugData
+          });
+        }
+
+        function queryCenterStockAllotRecords(tenantId,page) {
+          return $http.post(baseUrl + 'queryCenterStockAllotRecords', {
+              tenantId: tenantId,
+              page:page
           });
         }
 

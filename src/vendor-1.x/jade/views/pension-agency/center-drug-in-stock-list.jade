@@ -41,11 +41,63 @@
                         td(colspan="{{utils.noResultsColspan(vm)}}") {{ 'grid.NO-RESULTS' | translate}}
             .panel-footer
                 .row
-                    .col-md-4.text-left
+                    .col-md-6.text-left
                         .btn-toolbar
                             .btn-group
                                 a.btn.btn-primary.btn-sm(title="{{'button.ADD'|translate}}",ng-click="vm.add()")
                                     i.glyphicon.glyphicon-plus
-                    .col-md-8
+                            .btn-group
+                                a.btn.btn-success.btn-sm(ng-click="vm.addElderlyDrugs()") {{ vm.viewTranslatePath('LEFT-ELDERLY-DRUGS-ALLOT-TO-CENTER-STOCK') | translate}}
+                    .col-md-6
                         pagination.pagination-sm.pull-right(total-items="vm.page.totals",ng-model="vm.page.no",max-size="5",items-per-page="vm.page.size",boundary-links="true" ,ng-change="vm.paging()")
 
+script(type="text/ng-template", id="left-elderly-drug-allot.html")
+    form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="vm.doSubmit()")
+        .ngdialog-title
+            i.glyphicon.glyphicon-info-sign
+            | {{ vm.viewTranslatePath('TAB1') | translate }}
+        .ngdialog-input
+            .col-md-12
+                fieldset: .form-group
+                fieldset: .form-group
+                    .panel.panel-default.panel-grid
+                        table.grid.table.table-bordered.table-hover.table-striped
+                            thead
+                                tr
+                                    th.text-center(check-all,width="20" , ng-if="!vm.readonly")
+                                        .checkbox.c-checkbox(data-toggle="tooltip",data-title="Check All")
+                                            label
+                                                input(type='checkbox' ng-model="vm.all" ng-change="vm.selectAll()")
+                                                span.fa.fa-check
+                                    th.text-center(width="40")
+                                        | {{ vm.viewTranslatePath('TAB1-LABEL-ELDERLY') | translate}}
+                                    th.text-center(width="60")
+                                        | {{ vm.viewTranslatePath('TAB1-LABEL-DRUG_NAME') | translate}}
+                                    th.text-center(width="50")
+                                        | {{ vm.viewTranslatePath('TAB1-LABEL-QUANTITY') | translate}}
+                                    th.text-center(width="30")
+                                        | {{ vm.viewTranslatePath('TAB1-LABEL-MINI_UNIT') | translate}}
+                                    th.text-center(width="60")
+                                        | {{ vm.viewTranslatePath('TAB1-LABEL-EXPIRE_IN') | translate}}
+                            tbody
+                                tr(ng-repeat="row in vm.stock.drugs " )
+                                    td.text-center
+                                        .checkbox.c-checkbox
+                                            label
+                                                input(type='checkbox',ng-model="row.checked" )
+                                                span.fa.fa-check
+                                    td {{row.elderly_name}}
+                                    td {{row.drug_name}}
+                                    td.text-center {{row.quantity}}
+                                    td.text-center {{row.mini_unit_name }}
+                                    td.text-center {{row.expire_in | date: 'yyyy-MM-dd'}}
+                                tr(ng-if="vm.paged.length==0")
+                                    td(colspan="{{utils.noResultsColspan(vm)}}") {{ 'grid.NO-RESULTS' | translate}}
+                        .panel-footer(ng-if="!vm.readonly")
+                            .row
+                                .col-md-4.text-left
+                                .col-md-8
+                                    pagination.pagination-sm.pull-right(total-items="vm.page.totals",ng-model="vm.page.no",max-size="5",items-per-page="vm.page.size",boundary-links="true",ng-change="vm.pagingChange()")
+        .text-right.mt-lg
+            button.btn.btn-success(type="submit" ) {{vm.viewTranslatePath('ALLOT-TO-CENTER-STOCK') |translate}}
+            button.btn.btn-primary(type="button" ,ng-click="vm.scrapDrug()") {{vm.viewTranslatePath('SCRAP-DRUG') | translate}}

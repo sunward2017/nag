@@ -9,6 +9,7 @@
         .controller('CenterDrugInstockGridController', CenterDrugInstockGridController)
         .controller('CenterDrugInstockDetailsController', CenterDrugInstockDetailsController)
         .controller('StockInDrugPickerController', StockInDrugPickerController)
+        .controller('leftElderlyDrugAllotController',leftElderlyDrugAllotController)
     ;
 
     CenterDrugInstockGridController.$inject = ['$scope', 'ngDialog', 'vmh', 'entryVM'];
@@ -22,7 +23,101 @@
 
         function init() {
             vm.init({removeDialog: ngDialog});
+            vm.addElderlyDrugs=addElderlyDrugs;
+            
             vm.query();
+        }
+        
+        function addElderlyDrugs() {
+            // console.log('open ngDialog');
+            ngDialog.open({
+                template: 'left-elderly-drug-allot.html',
+                controller: 'leftElderlyDrugAllotController',
+                className: 'ngdialog-theme-default ngdialog-backfiller-default-picker',
+                data: {
+                    vmh: vmh,
+                    moduleTranslatePathRoot: vm.viewTranslatePath(),
+                    tenantId: vm.tenantId
+                }
+            }).closePromise.then(function (ret) {
+                // console.log('closePromise ret:',ret);
+                if(ret.value.action == 'click'){
+                    vmh.psnService.scrapDrugOutStock(vm.tenantId, vm.operated_by, ret.value.selectedDrugs).then(function () {
+                        vmh.alertSuccess();
+                    });
+                }else if(ret.value.action == 'submit'){
+                    vmh.psnService.allotDrugToCenterStock(vm.tenantId, vm.operated_by, ret.value.selectedDrugs).then(function () {
+                        vmh.alertSuccess();
+                    });
+                }
+            });
+        }
+    }
+
+    leftElderlyDrugAllotController.$inject = ['$scope', 'ngDialog'];
+    function leftElderlyDrugAllotController($scope,ngDialog) {
+        var vm = $scope.vm = {};
+        var vmh = $scope.ngDialogData.vmh;
+        $scope.utils = vmh.utils.g;
+
+
+        init();
+
+        function init() {
+            vm.moduleTranslatePathRoot = $scope.ngDialogData.moduleTranslatePathRoot;
+            vm.viewTranslatePath = function (key) {
+                return vm.moduleTranslatePathRoot + '.' + key;
+            };
+            vm.tenantId = $scope.ngDialogData.tenantId;
+            vm.scrapDrug = scrapDrug;
+            vm.doSubmit = doSubmit;
+            vm.pagingChange = pagingChange;
+            vm.model={};
+            vm.page={size:5,no:1};
+            //读取离院老人药品库存
+            vmh.psnService.leftElderlyDrugStockSummary(vm.tenantId,null).then(function(ret){
+                vm.page.totals=ret.length;
+                leftElderlyDrugStock();
+            });
+
+        }
+
+        function leftElderlyDrugStock() {
+            vmh.psnService.leftElderlyDrugStockSummary(vm.tenantId,vm.page).then(function(ret){
+                vm.stock={drugs:ret};
+            });
+        }
+
+        function selectedDrugs() {
+            var drugs = vm.stock.drugs;
+            var selected=  _.filter(drugs, function (o) {
+                return o.checked;
+            });
+            vm.model.selectedDrugs = selected;
+        }
+        
+        function scrapDrug() {
+            selectedDrugs();
+            if (vm.model.selectedDrugs.length == 0) {
+                vmh.alertWarning('notification.SELECT-NONE-WARNING', true);
+                return;
+            }
+            vm.model.action = 'click';
+            $scope.closeThisDialog(vm.model);
+        }
+        
+        function pagingChange() {
+            leftElderlyDrugStock();
+        }
+        
+        function doSubmit() {
+            selectedDrugs();
+            if (vm.model.selectedDrugs.length == 0) {
+                vmh.alertWarning('notification.SELECT-NONE-WARNING', true);
+                return;
+            }
+            vm.model.action = 'submit';
+            $scope.closeThisDialog(vm.model);
         }
     }
 

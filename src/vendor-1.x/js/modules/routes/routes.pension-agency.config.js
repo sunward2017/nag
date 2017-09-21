@@ -2233,20 +2233,19 @@
                 resolve: {
                     entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'center-drug-out-stock.list', {
                         modelName: 'psn-drugInOutStock',
-                        searchForm: { "status": 1, "type": 'B0100'},
                         serverPaging: true,
                         blockUI: true,
                         columns: [{
-                            label: '出库单号',
+                            label: '移库单号',
                             name: 'code',
                             type: 'string',
                             width: 80,
                             sortable: true
                         }, {
-                            label: '老人',
-                            name: 'elderly_name',
+                            label: '库存流向',
+                            name: 'source',
                             type: 'string',
-                            width: 60,
+                            width: 80,
                             sortable: true
                         },  {
                             label: '药品',
@@ -2255,16 +2254,16 @@
                             width: 120,
                             sortable: true
                         }, {
-                            label: '出库类别',
+                            label: '移库类别',
                             name: 'type_name',
                             type: 'string',
                             width: 60,
                             sortable: false
                         }, {
-                            label: '出库方式',
+                            label: '移库方式',
                             name: 'mode_name',
                             type: 'string',
-                            width: 60,
+                            width: 40,
                             sortable: false
                         }]
                     })

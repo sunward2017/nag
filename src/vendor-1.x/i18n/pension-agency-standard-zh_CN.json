@@ -765,7 +765,16 @@
     },
     "center-drug-in-stock": {
       "list": {
-        "TITLE": "养老机构-药品管理-中央库入库-列表"
+        "TITLE": "养老机构-药品管理-中央库入库-列表",
+        "LEFT-ELDERLY-DRUGS-ALLOT-TO-CENTER-STOCK":"出院老人药品处理",
+        "SCRAP-DRUG":"报废",
+        "TAB1":"出院老人药品处理信息列表",
+        "TAB1-LABEL-ELDERLY":"老人名字",
+        "TAB1-LABEL-QUANTITY":"药品数量",
+        "TAB1-LABEL-MINI_UNIT":"最小单位",
+        "TAB1-LABEL-EXPIRE_IN":"有效期至",
+        "TAB1-LABEL-DRUG_NAME":"药品名称",
+        "ALLOT-TO-CENTER-STOCK":"添至中央库"
       },
       "details": {
         "TITLE": "养老机构-药品管理-中央库入库-详情",

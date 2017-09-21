@@ -27,7 +27,7 @@
                                     input(type='checkbox' data="trBubble" ng-model="row.checked" )
                                     span.fa.fa-check(data="trBubble")
                         td.text-center {{::row.code}}
-                        td {{::row.elderly_name}}
+                        td {{row.elderlyId?'中央库':row.elderly_name}} --> {{row.elderlyId?row.elderly_name : '中央库'}}
                         td.text-left(ng-bind-html="::row.drugs | safeArrayTemplate: '{drug_name} x {quantity} ({mini_unit_name})'")
                         td {{::row.type_name}}
                         td {{::row.mode_name}}
@@ -37,4 +37,4 @@
                 .row
                     .col-md-4.text-left
                     .col-md-8
-                        pagination.pagination-sm.pull-right(total-items="vm.page.totals",ng-model="vm.page.no",max-size="5",items-per-page="vm.page.size",boundary-links="true" ,ng-change="vm.paging()")
+                        pagination.pagination-sm.pull-right(total-items="vm.page.totals",ng-model="vm.page.no",max-size="5",items-per-page="vm.page.size",boundary-links="true" ,ng-change="vm.pagingChange()")

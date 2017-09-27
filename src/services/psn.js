@@ -5676,8 +5676,8 @@ module.exports = {
                   tenantId: tenantId
                 },
                 sort: 'exec_on'
-              }).populate('assigned_workers').populate('workItemId');
-              // console.log(rows);
+              }).populate('assigned_workers').populate('workItemId', 'name drugId', 'psn_drugUseItem');
+              // console.log('nursingRecordsByElderlyToday:', rows);
               this.body = app.wrapper.res.rows(rows);
             } catch (e) {
               console.log(e);
@@ -6203,6 +6203,26 @@ module.exports = {
               var tenantId = this.request.body.tenantId;
               var elderlyId = this.request.body.elderlyId;
               this.body = yield app.psn_drug_stock_service.elderlyDrugUseWithStockList(tenantId, elderlyId);
+            } catch (e) {
+              self.logger.error(e.message);
+              this.body = app.wrapper.res.error(e);
+            }
+            yield next;
+          };
+        }
+      },
+      {
+        method: 'elderlyStockObject',
+        verb: 'post',
+        url: this.service_url_prefix + "/elderlyStockObject",
+        handler: function (app, options) {
+          return function*(next) {
+            try {
+              var tenantId = this.request.body.tenantId;
+              var elderlyId = this.request.body.elderlyId;
+
+              var elderlyStockObject = yield app.psn_drug_stock_service._elderlyStockObject2(tenantId, elderlyId);
+              this.body = app.wrapper.res.ret(elderlyStockObject);
             } catch (e) {
               self.logger.error(e.message);
               this.body = app.wrapper.res.error(e);

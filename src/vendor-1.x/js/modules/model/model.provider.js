@@ -545,6 +545,7 @@
           updateDrugsInStock: updateDrugsInStock,
           elderlyDrugStockList: elderlyDrugStockList,
           elderlyDrugUseWithStockList: elderlyDrugUseWithStockList,
+          elderlyStockObject: elderlyStockObject,
           elderlyDrugStockSummary: elderlyDrugStockSummary,
           backoutAllotDrug:backoutAllotDrug,
           allotdrugStockInRecordCheck:allotdrugStockInRecordCheck,
@@ -850,6 +851,13 @@
 
         function elderlyDrugUseWithStockList(tenantId, elderlyId) {
           return $http.post(baseUrl + 'elderlyDrugUseWithStockList', {tenantId: tenantId, elderlyId: elderlyId});
+        }
+
+        function elderlyStockObject (tenantId, elderlyId) {
+          return $http.post(baseUrl + 'elderlyStockObject', {
+            tenantId: tenantId,
+            elderlyId: elderlyId
+          });
         }
 
         function elderlyDrugStockSummary(tenantId, elderlyId, drugId) {

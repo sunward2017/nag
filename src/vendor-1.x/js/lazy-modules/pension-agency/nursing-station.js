@@ -467,7 +467,7 @@
         }).join();
         vm.nursingRecords = results[3];
         var elderlyStockObject = results[4];
-        _.each(_.where(vm.nursingRecords, function(o){ return o.workItemId === 'A0003'}), function (o) {
+        _.each(_.where(vm.nursingRecords, function(o){ return o.type === 'A0003'}), function (o) {
           console.log('o.workItemId.drugId:', o)
           o.drugStock = elderlyStockObject[o.workItemId.drugId]
         })

@@ -4593,8 +4593,6 @@ module.exports = {
               console.log(dateString.format('YYYY-MM-DD HH:mm:ss'))
               xAxisValueStart = app.moment(dateString);
 
-              console.log('前置检查完成');
-
               var rows = yield app.modelFactory().model_query(app.models['psn_nursingSchedule'], {
                 select: 'aggr_value',
                 where: {
@@ -4606,7 +4604,6 @@ module.exports = {
                   }
                 }
               }).populate('aggr_value');
-
               // console.log(yAxisData);
               // console.log(rows);
               this.body = app.wrapper.res.rows(rows);
@@ -5666,7 +5663,6 @@ module.exports = {
                 yield next;
                 return;
               }
-
               var today = app.moment(app.moment().format('YYYY-MM-DD') + " 00:00:00");
               var rows = yield app.modelFactory().model_query(app.models['psn_nursingRecord'], {
                 select: 'exec_on executed_flag name type description duration assigned_workers confirmed_flag confirmed_on workItemId',

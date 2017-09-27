@@ -1723,6 +1723,7 @@ module.exports = {
         // 获取药品低库存警戒线
         var stock_alarm_low_day = tenant.other_config.psn_drug_stock_alarm_low_day || self.ctx.modelVariables.DEFAULTS.TENANT_DRUG_STOCK_ALARM_LOW_DAY;
         var drugUseOneDayObject = yield self._elderlyDrugUseOneDay(tenant, elderly);
+        console.log('drugUseOneDayObject:', drugUseOneDayObject)
         var canUseDays, drugUseOneDay;
         var ret = {}, drugInStock, alarm_low_quantity;
         for (var i = 0, len = drugsInStock.length; i < len; i++) {
@@ -1864,10 +1865,11 @@ module.exports = {
         var ret = {}, drugInStock;
         for (var i = 0, len = drugsUseOneDay.length; i < len; i++) {
           drugInStock = drugsUseOneDay[i];
+          // console.log('drugInStock.unit:', drugInStock.unit)
           ret[drugInStock.drugId] = {
             total: drugInStock.total,
             unit: drugInStock.unit,
-            unit_name: D3026[drugInStock.unit].name
+            unit_name: (D3026[drugInStock.unit] || {}).name || ''
           };
         }
         return ret;

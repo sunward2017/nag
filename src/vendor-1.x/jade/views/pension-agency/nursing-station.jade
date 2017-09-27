@@ -98,7 +98,9 @@ script(type="text/ng-template", id="nursing-station-elderly.html")
                                     td.text-center(ng-if="row.workItemId.repeat_type != 'A0001' " width="160") {{::row.exec_on|date: 'HH:mm'}} - {{moment(row.exec_on).add(row.duration,'minutes').format('HH:mm')}}
                                     td.text-center(ng-if="row.workItemId.repeat_type == 'A0001' " width="160") {{::row.workItemId.repeat_type_name}}
                                     td.text-left(width="365") {{::row.name }}
-                                        span.drug-use-item-icon(ng-if=" row.type == 'A0003' ") {{::row.type_name}}
+                                        span.drug-use-item-icon.bg-success(ng-if=" row.type == 'A0003' ") {{::row.type_name}}
+                                        span.drug-use-item-icon.bg-danger(ng-if=" row.type == 'A0003' && row.drugStock.is_danger ") {{vm.moduleTranslatePath('DLG-ELDERLY-TAG-DRUG_STOCK_IS_DANGER') | translate}}
+                                        span.drug-use-item-icon.bg-warning(ng-if=" row.type == 'A0003' && row.drugStock.is_warning ") {{vm.moduleTranslatePath('DLG-ELDERLY-TAG-DRUG_STOCK_IS_WARNING') | translate}}
                                     td.text-center(width="304") {{::row.assigned_workers | safeArrayMember:'name' }}
                                     td.text-center(width="100")
                                         span.glyphicon.glyphicon-ok(ng-if="row.confirmed_flag")

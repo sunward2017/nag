@@ -4593,8 +4593,6 @@ module.exports = {
               console.log(dateString.format('YYYY-MM-DD HH:mm:ss'))
               xAxisValueStart = app.moment(dateString);
 
-              console.log('前置检查完成');
-
               var rows = yield app.modelFactory().model_query(app.models['psn_nursingSchedule'], {
                 select: 'aggr_value',
                 where: {
@@ -4606,7 +4604,6 @@ module.exports = {
                   }
                 }
               }).populate('aggr_value');
-
               // console.log(yAxisData);
               // console.log(rows);
               this.body = app.wrapper.res.rows(rows);
@@ -5666,7 +5663,6 @@ module.exports = {
                 yield next;
                 return;
               }
-
               var today = app.moment(app.moment().format('YYYY-MM-DD') + " 00:00:00");
               var rows = yield app.modelFactory().model_query(app.models['psn_nursingRecord'], {
                 select: 'exec_on executed_flag name type description duration assigned_workers confirmed_flag confirmed_on workItemId',
@@ -5676,8 +5672,8 @@ module.exports = {
                   tenantId: tenantId
                 },
                 sort: 'exec_on'
-              }).populate('assigned_workers').populate('workItemId');
-              // console.log(rows);
+              }).populate('assigned_workers').populate('workItemId', 'name drugId', 'psn_drugUseItem');
+              // console.log('nursingRecordsByElderlyToday:', rows);
               this.body = app.wrapper.res.rows(rows);
             } catch (e) {
               console.log(e);
@@ -6203,6 +6199,26 @@ module.exports = {
               var tenantId = this.request.body.tenantId;
               var elderlyId = this.request.body.elderlyId;
               this.body = yield app.psn_drug_stock_service.elderlyDrugUseWithStockList(tenantId, elderlyId);
+            } catch (e) {
+              self.logger.error(e.message);
+              this.body = app.wrapper.res.error(e);
+            }
+            yield next;
+          };
+        }
+      },
+      {
+        method: 'elderlyStockObject',
+        verb: 'post',
+        url: this.service_url_prefix + "/elderlyStockObject",
+        handler: function (app, options) {
+          return function*(next) {
+            try {
+              var tenantId = this.request.body.tenantId;
+              var elderlyId = this.request.body.elderlyId;
+
+              var elderlyStockObject = yield app.psn_drug_stock_service._elderlyStockObject2(tenantId, elderlyId);
+              this.body = app.wrapper.res.ret(elderlyStockObject);
             } catch (e) {
               self.logger.error(e.message);
               this.body = app.wrapper.res.error(e);

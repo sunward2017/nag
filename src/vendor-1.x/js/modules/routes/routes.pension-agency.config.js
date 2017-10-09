@@ -3562,6 +3562,267 @@
                         blockUI: true
                     }),
                 }
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'meal-dish', {
+                url: '/meal-dish',
+                title: '菜品',
+                abstract: true,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath(MODEL_VARIABLES.HEAD_TEMPLATES.PENSION_AGENCY),
+                        controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER_FOR_TENANT
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div><div class="clearfix"></div>'
+                    }
+                },
+                data: {
+                    func_id: MODEL_VARIABLES.BIZ_FUNC_PREFIXS.PENSION_AGENCY + 'MEAL-DISH' //业务系统使用
+                },
+                resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.PENSION_AGENCY + 'meal-dish.js')
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'meal-dish.list', {
+                url: '/list/:action',
+                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'meal-dish-list.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'MealDishGridController',
+                resolve: {
+                    entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'meal-dish.list', {
+                        modelName: 'psn-mealDish',
+                        searchForm: { "status": 1 },
+                        serverPaging: true,
+                        blockUI: true,
+                        columns: [{
+                            label: '菜品名称',
+                            name: 'name',
+                            type: 'string',
+                            width: 120,
+                            sortable: true
+                        }, {
+                            label: '荤素',
+                            name: 'nature',
+                            type: 'string',
+                            width: 120,
+                            sortable: true
+                        }, {
+                            label: '菜品价格',
+                            name: 'price',
+                            type: 'string',
+                            width: 120,
+                            sortable: true
+                        }, {
+                            label: '停用',
+                            name: 'stop_flag',
+                            type: 'bool',
+                            width: 80
+                        }, {
+                            label: '',
+                            name: 'actions',
+                            sortable: false,
+                            width: 60
+                        }]
+                    })
+                }
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'meal-dish.details', {
+                url: '/details/:action/:_id',
+                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'meal-dish-details.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'MealDishDetailsController',
+                resolve: {
+                    entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'meal-dish.details', {
+                        modelName: 'psn-mealDish',
+                        blockUI: true
+                    })
+                }
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'meal', {
+                url: '/meal',
+                title: '配餐',
+                abstract: true,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath(MODEL_VARIABLES.HEAD_TEMPLATES.PENSION_AGENCY),
+                        controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER_FOR_TENANT
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div><div class="clearfix"></div>'
+                    }
+                },
+                data: {
+                    func_id: MODEL_VARIABLES.BIZ_FUNC_PREFIXS.PENSION_AGENCY + 'MEAL' //业务系统使用
+                },
+                resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.PENSION_AGENCY + 'meal.js')
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'meal.list', {
+                url: '/list/:action',
+                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'meal-list.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'MealGridController',
+                resolve: {
+                    entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'meal.list', {
+                        modelName: 'psn-meal',
+                        searchForm: { "status": 1 },
+                        serverPaging: true,
+                        blockUI: true,
+                        columns: [{
+                            label: '配餐名称',
+                            name: 'name',
+                            type: 'string',
+                            width: 120,
+                            sortable: true
+                        }, {
+                            label: '价格',
+                            name: 'price',
+                            type: 'string',
+                            width: 80,
+                            sortable: true
+                        }, {
+                            label: '配餐组成',
+                            name: 'meal',
+                            type: 'string',
+                            width: 240
+                        }, {
+                            label: '停用',
+                            name: 'stop_flag',
+                            type: 'bool',
+                            width: 80
+                        }, {
+                            label: '',
+                            name: 'actions',
+                            sortable: false,
+                            width: 60
+                        }]
+                    })
+                }
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'meal.details', {
+                url: '/details/:action/:_id',
+                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'meal-details.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'MealDetailsController',
+                resolve: {
+                    entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'meal.details', {
+                        modelName: 'psn-meal',
+                        blockUI: true
+                    })
+                }
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'meal-weekly-menu', {
+                url: '/meal-weekly-menu',
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath(MODEL_VARIABLES.HEAD_TEMPLATES.PENSION_AGENCY),
+                        controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER_FOR_TENANT
+                    },
+                    "module-content": {
+                        templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'meal-weekly-menu.html'),
+                        controller: 'MealWeeklyMenuController',
+                        resolve: {
+                            instanceVM: helper.buildInstanceVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'meal-weekly-menu', {
+                                modelName: 'psn-mealWeeklyMenu',
+                                searchForm: { "status": 1 }
+                            })
+                        }
+                    }
+                },
+                data: {
+                    func_id: MODEL_VARIABLES.BIZ_FUNC_PREFIXS.PENSION_AGENCY + 'MEAL-WEEKLY-MENU' //业务系统使用
+                },
+                resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.PENSION_AGENCY + 'meal-weekly-menu.js')
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'meal-weekly-menu-template', {
+                url: '/meal-weekly-menu-template',
+                title: '排餐模板',
+                abstract: true,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath(MODEL_VARIABLES.HEAD_TEMPLATES.PENSION_AGENCY),
+                        controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER_FOR_TENANT
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div><div class="clearfix"></div>'
+                    }
+                },
+                data: {
+                    func_id: MODEL_VARIABLES.BIZ_FUNC_PREFIXS.PENSION_AGENCY + 'MEAL-WEEKLY-MENU-TEMPLATE' //业务系统使用
+                },
+                resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.PENSION_AGENCY + 'meal-weekly-menu-template.js')
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'meal-weekly-menu-template.list', {
+                url: '/list/:action',
+                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'meal-weekly-menu-template-list.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'MealWeeklyMenuTemplateGridController',
+                resolve: {
+                    entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'meal-weekly-menu-template.list', {
+                        modelName: 'psn-mealWeeklyMenuTemplate',
+                        searchForm: { "status": 1 },
+                        serverPaging: true,
+                        blockUI: true,
+                        columns: [{
+                            label: '模版名称',
+                            name: 'name',
+                            type: 'string',
+                            width: 120,
+                            sortable: true
+                        },  {
+                            label: '停用',
+                            name: 'stop_flag',
+                            type: 'bool',
+                            width: 80
+                        }, {
+                            label: '描述',
+                            name: 'description',
+                            type: 'string',
+                            width: 200,
+                            sortable: true
+                        }, {
+                            label: '',
+                            name: 'actions',
+                            sortable: false,
+                            width: 60
+                        }]
+                    })
+                }
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'meal-weekly-menu-template.details', {
+                url: '/details/:action/:_id',
+                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'meal-weekly-menu-template-details.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'MealWeeklyMenuTemplateDetailsController',
+                resolve: {
+                    entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'meal-weekly-menu-template.details', {
+                        modelName: 'psn-mealWeeklyMenuTemplate',
+                        model: { type: 'A0001' },
+                        blockUI: true
+                    })
+                }
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'meal-order-record', {
+                url: '/meal-order-record',
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath(MODEL_VARIABLES.HEAD_TEMPLATES.PENSION_AGENCY),
+                        controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER_FOR_TENANT
+                    },
+                    "module-content": {
+                        templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'meal-order-record.html'),
+                        controller: 'MealOrderRecordController',
+                        resolve: {
+                            instanceVM: helper.buildInstanceVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'meal-order-record', {
+                                modelName: 'psn-mealOrderRecord',
+                                searchForm: { "status": 1 }
+                            })
+                        }
+                    }
+                },
+                data: {
+                    func_id: MODEL_VARIABLES.BIZ_FUNC_PREFIXS.PENSION_AGENCY + 'MEAL-ORDER-RECORD' //业务系统使用
+                },
+                resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.PENSION_AGENCY + 'meal-order-record.js')
             });
 
     } // routesConfig

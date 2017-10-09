@@ -1,0 +1,40 @@
+form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="vm.doSubmit()")
+    .panel
+        tabset(justified="true")
+            tab(active="vm.tab1.active")
+                tab-heading
+                    | {{ vm.viewTranslatePath('TAB1') | translate}}
+                    span.text-danger(title="{{'validator.FIELD-INVALID'|translate}}" , ng-show="utils.vtab('contentTab1')")
+                        i.glyphicon.glyphicon-minus-sign
+                div#contentTab1
+                    fieldset: .form-group
+                        <!--菜品组名称-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-NAME') | translate}}:
+                        .col-md-10
+                            input.form-control(type='text', name='name',ng-model='vm.model.name',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-NAME")|translate}}' ,required='')
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'name','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset: .form-group
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-MEMBERS') | translate}}:
+                        .col-md-4
+                            .tree.tree-basic(s-tree,s-tree-data="vm.treeDataPromiseOfDishes",s-tree-height="300", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{mode:'check', selectNodeFormat:'object', nodeIdKey: '_id'}",ng-model="vm.model.meal" ,on-check-change="vm.priceChange()")
+                    fieldset: .form-group
+                        <!--菜品组价格-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-PRICE') | translate}}:
+                        .col-md-2
+                            input.form-control(type='number', name='price',ng-model='vm.model.price',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-PRICE")|translate}}' ,required='',ui-validate="'$value>=0' ")
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'price','required')") {{ "validator.REQUIRED" | translate}}
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'price','validator')") {{ "validator.MIN" | translate:{min:0} }}
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'price','number')") {{ "validator.NUMBER" | translate}}
+                    fieldset: .form-group
+                        <!--停用标志-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-FLAG-COLLECTION') | translate}}:
+                        .col-md-2
+                            .checkbox.c-checkbox
+                                label
+                                    input#stopFlag(type='checkbox',ng-model='vm.model.stop_flag')
+                                    span.fa.fa-check
+                            label(for="stopFlag") {{ vm.viewTranslatePath('TAB1-LABEL-STOP_FLAG') | translate}}
+    .text-right.mt-lg
+        button.btn.btn-warning(type="button",ng-click="vm.cancel()") {{'button.CANCEL'|translate}}
+        button.btn.btn-success(type="submit") {{'button.SAVE'|translate}}
+

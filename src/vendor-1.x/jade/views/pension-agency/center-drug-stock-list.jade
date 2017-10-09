@@ -11,11 +11,21 @@
             table.grid.table.table-bordered.table-hover.table-striped
                 thead
                     tr
+                        th.text-center(check-all,width="30")
+                            .checkbox.c-checkbox(data-toggle="tooltip",data-title="Check All")
+                                label(ng-click="vm.selectAll($event)")
+                                    input(type='checkbox')
+                                    span.fa.fa-check
                         th.text-center(ng-repeat="column in vm.columns",width="{{column|width}}",ng-hide="column|hide",ng-click="vm.sort.toggle(column)",ng-class="{sortable: column.sortable !== false}")
                             | {{column.label}}
                             i.glyphicon(ng-if="column.name === vm.sort.column && vm.sort.direction",ng-class="vm.sort.direction|orderClass")
                 tbody
                     tr(ng-repeat="row in vm.rows|filter:vm.filter|orderBy:vm.sort.column:vm.sort.direction===-1|paging:vm", ng-click="vm.selectRow($event,row)",)
+                        td
+                            .checkbox.c-checkbox
+                                label
+                                    input(type='checkbox' data="trBubble" ng-model="row.checked" )
+                                    span.fa.fa-check(data="trBubble")
                         td {{::row.drug_name}}
                         td.text-center {{::row.quantity}}
                         td.text-center {{::row.mini_unit_name }}

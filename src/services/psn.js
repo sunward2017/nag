@@ -6554,6 +6554,299 @@ module.exports = {
             yield next;
           };
         }
+      },
+      /**********************餐饮管理*****************************/
+      {
+        method: 'mealWeeklyMenuSchedule',
+        verb: 'post',
+        url: this.service_url_prefix + "/mealWeeklyMenuSchedule", //按周查找菜单
+        handler: function (app, options) {
+          return function*(next) {
+            var tenant, xAxisValueStart, xAxisValueEnd;
+            try {
+              var tenantId = this.request.body.tenantId;
+              tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], tenantId);
+              if (!tenant || tenant.status == 0) {
+                this.body = app.wrapper.res.error({message: '无法找到养老机构!'});
+                yield next;
+                return;
+              }
+
+              var xAxisRangePoints = this.request.body.x_axis_range_points;
+              xAxisValueStart = app.moment(xAxisRangePoints.start);
+              xAxisValueEnd = app.moment(xAxisRangePoints.end);
+
+              console.log('xAxisRangePoints:',xAxisRangePoints);
+              console.log('前置检查完成-----------------');
+
+              var rows = yield app.modelFactory().model_query(app.models['psn_mealWeeklyMenu'], {
+                  select: 'x_axis y_axis aggr_value',
+                  where: {
+                      tenantId: tenantId,
+                      x_axis: {
+                          '$gte': xAxisValueStart.toDate(),
+                          '$lt': xAxisValueEnd.add(1, 'days').toDate()
+                      }
+                  }
+              });
+              console.log('rows:', rows);
+
+              this.body = app.wrapper.res.ret({
+                  items: rows
+              });
+            } catch (e) {
+              console.log(e);
+              self.logger.error(e.message);
+              this.body = app.wrapper.res.error(e);
+            }
+            yield next;
+          };
+        }
+      },
+      {
+        method: 'mealWeeklyMenuScheduleSave',
+        verb: 'post',
+        url: this.service_url_prefix + "/mealWeeklyMenuScheduleSave",
+        handler: function (app, options) {
+          return function*(next) {
+            var tenant;
+            try {
+              var tenantId = this.request.body.tenantId;
+              tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], tenantId);
+              if (!tenant || tenant.status == 0) {
+                this.body = app.wrapper.res.error({message: '无法找到养老机构!'});
+                yield next;
+                return;
+              }
+
+              var toSaveRows = this.request.body.toSaveRows;
+              app._.each(toSaveRows, (o) => {
+                o.tenantId = tenantId
+              });
+
+              // 查找x_axis range & y_axis_range
+              var xAxisValue;
+              var xAxisRange = app._.uniq(app._.map(toSaveRows, (o) => {
+                  xAxisValue = app.moment(o.x_axis);
+                  return {
+                      'x_axis': {
+                          '$gte': xAxisValue.toDate(),
+                          '$lt': xAxisValue.add(1, 'days').toDate()
+                      }
+                  }
+              }));
+              var yAxisRange = app._.uniq(app._.map(toSaveRows, (o) => {
+                  return o.y_axis;
+              }));
+
+              var removeWhere = {
+                  tenantId: tenantId,
+                  y_axis: {$in: yAxisRange},
+                  $or: xAxisRange
+              };
+
+              console.log('removeWhere:', removeWhere);
+              console.log('xAxisRange:',xAxisRange);
+              console.log('yAxisRange:',yAxisRange);
+
+              console.log('前置检查完成');
+
+              var ret = yield app.modelFactory().model_bulkInsert(app.models['psn_mealWeeklyMenu'], {
+                  rows: toSaveRows,
+                  removeWhere: removeWhere
+              });
+
+              console.log('配餐保存成功....');
+
+              this.body = app.wrapper.res.default();
+            } catch (e) {
+              console.log(e);
+              self.logger.error(e.message);
+              this.body = app.wrapper.res.error(e);
+            }
+            yield next;
+          };
+        }
+      },
+      {
+        method: 'mealWeeklyMenuScheduleRemove',
+        verb: 'post',
+        url: this.service_url_prefix + "/mealWeeklyMenuScheduleRemove",
+        handler: function (app, options) {
+          return function*(next) {
+            var tenant;
+            try {
+              var tenantId = this.request.body.tenantId;
+              tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], tenantId);
+              if (!tenant || tenant.status == 0) {
+                  this.body = app.wrapper.res.error({message: '无法找到养老机构!'});
+                  yield next;
+                  return;
+              }
+
+              var toRemoveRows = this.request.body.toRemoveRows;
+
+
+              console.log('toRemoveRows:',toRemoveRows);
+
+              var xAxisValue;
+              var xAxisRange = app._.uniq(app._.map(toRemoveRows, (o) => {
+                  xAxisValue = app.moment(o.x_axis);
+                  return {
+                      'x_axis': {
+                          '$gte': xAxisValue.toDate(),
+                          '$lt': xAxisValue.add(1, 'days').toDate()
+                      }
+                  }
+              }));
+              var yAxisRange = app._.uniq(app._.map(toRemoveRows, (o) => {
+                  return o.y_axis;
+              }));
+
+              var removeWhere = {
+                  tenantId: tenantId,
+                  y_axis: {$in: yAxisRange},
+                  $or: xAxisRange
+              };
+
+              console.log('前置检查完成');
+
+              var ret = yield app.modelFactory().model_remove(app.models['psn_mealWeeklyMenu'], removeWhere);
+              this.body = app.wrapper.res.default();
+            } catch (e) {
+              console.log(e);
+              self.logger.error(e.message);
+              this.body = app.wrapper.res.error(e);
+            }
+            yield next;
+          };
+        }
+      },
+      {
+        method: 'mealWeeklyMenuTemplateImport',
+        verb: 'post',
+        url: this.service_url_prefix + "/mealWeeklyMenuTemplateImport",
+        handler: function (app, options) {
+          return function*(next) {
+            try {
+              var mealWeeklyMenuTemplateId = this.request.body.mealWeeklyMenuTemplateId;
+              var  mealWeeklyMenuTemplate = yield app.modelFactory().model_read(app.models['psn_mealWeeklyMenuTemplate'], mealWeeklyMenuTemplateId);
+              if (!mealWeeklyMenuTemplate || mealWeeklyMenuTemplate.status == 0) {
+                this.body = app.wrapper.res.error({message: '无法找到排餐模版!'});
+                yield next;
+                return;
+              }
+
+              var toImportXAxisRange = this.request.body.toImportXAxisRange;
+
+              var xAxisValue, xAxisDate;
+              var xAxisDayDateMap = {};
+              var xAxisRange = app._.map(toImportXAxisRange, (o) => {
+                  xAxisValue = app.moment(o);
+                  xAxisDate = xAxisValue.toDate();
+                  xAxisDayDateMap[xAxisValue.day()] = xAxisDate; //xAxisValue.day()为0-6表示的星期几
+                  return {'x_axis': {'$gte': xAxisDate, '$lt': xAxisValue.add(1, 'days').toDate()}}
+              });
+                console.log('xAxisRange:',xAxisRange);
+                console.log('xAxisDayDateMap :',xAxisDayDateMap);
+
+              var templateItems = mealWeeklyMenuTemplate.content;
+              var yAxisRange = app._.uniq(app._.map(templateItems, (o) => {
+                  return o.y_axis;
+              }));
+
+              var removeWhere = {
+                  tenantId: mealWeeklyMenuTemplate.tenantId,
+                  y_axis: {$in: yAxisRange},
+                  $or: xAxisRange
+              };
+
+              var toSaveRows = app._.map(templateItems, (o) => {
+                  var x_axis = xAxisDayDateMap[o.x_axis];
+                  return {
+                      x_axis: x_axis,
+                      y_axis: o.y_axis,
+                      aggr_value: o.aggr_value,
+                      tenantId: mealWeeklyMenuTemplate.tenantId
+                  };
+              });
+
+              var ret = yield app.modelFactory().model_bulkInsert(app.models['psn_mealWeeklyMenu'], {
+                  rows: toSaveRows,
+                  removeWhere: removeWhere
+              });
+
+              console.log('模版导入成功');
+
+              var groupedSaveRows = app._.groupBy(toSaveRows, (o) => {
+                  "use strict";
+                  return o.x_axis + '$' + o.y_axis + '$' + o.tenantId;
+              });
+
+              this.body = app.wrapper.res.default();
+            } catch (e) {
+              console.log(e);
+              self.logger.error(e.message);
+              this.body = app.wrapper.res.error(e);
+            }
+            yield next;
+          };
+        }
+      },
+      {
+        method: 'mealWeeklyMenuSaveAsTemplateWeekly',
+        verb: 'post',
+        url: this.service_url_prefix + "/mealWeeklyMenuSaveAsTemplateWeekly",
+        handler: function (app, options) {
+          return function*(next) {
+            var tenant;
+            try {
+              var tenantId = this.request.body.tenantId;
+              tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], tenantId);
+              if (!tenant || tenant.status == 0) {
+                this.body = app.wrapper.res.error({message: '无法找到养老机构!'});
+                yield next;
+                return;
+              }
+
+              var mealWeeklyMenuTemplateName = this.request.body.mealWeeklyMenuTemplateName;
+              var toSaveRows = this.request.body.toSaveRows;
+              app._.each(toSaveRows, (o) => {
+                  o.tenantId = tenantId
+              });
+
+              console.log('toSaveRows:', toSaveRows);
+
+              var mealWeeklyMenuTemplate = yield app.modelFactory().model_one(app.models['psn_mealWeeklyMenuTemplate'], {
+                  where: {
+                      status: 1,
+                      name: mealWeeklyMenuTemplateName,
+                      tenantId: tenantId
+                  }
+              });
+
+              console.log('前置检查完成');
+              var isCreate = !mealWeeklyMenuTemplate;
+              if (isCreate) {
+                  yield app.modelFactory().model_create(app.models['psn_mealWeeklyMenuTemplate'], {
+                      name: mealWeeklyMenuTemplateName,
+                      content: toSaveRows,
+                      tenantId: tenantId
+                  });
+              } else {
+                  mealWeeklyMenuTemplate.content = toSaveRows;
+                  yield mealWeeklyMenuTemplate.save();
+              }
+
+              this.body = app.wrapper.res.ret(isCreate);
+            } catch (e) {
+              console.log(e);
+              self.logger.error(e.message);
+              this.body = app.wrapper.res.error(e);
+            }
+            yield next;
+          };
+        }
       }
       /**********************其他*****************************/
 

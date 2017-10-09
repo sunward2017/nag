@@ -49,6 +49,11 @@
         modelNode.factory('psn-nursingLevel');
         modelNode.factory('psn-room');
         modelNode.factory('psn-roomOccupancyChangeHistory');
+        modelNode.factory('psn-mealDish');
+        modelNode.factory('psn-meal');
+        modelNode.factory('psn-mealWeeklyMenu');
+        modelNode.factory('psn-mealWeeklyMenuTemplate');
+        modelNode.factory('psn-mealOrderRecord');
 
         //商户机构
         modelNode.factory('trv-scenerySpot');

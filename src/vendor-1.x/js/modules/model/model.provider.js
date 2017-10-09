@@ -604,7 +604,12 @@
           nursingWorkerScheduleRemove: nursingWorkerScheduleRemove,
           nursingWorkerScheduleTemplateImport: nursingWorkerScheduleTemplateImport,
           nursingWorkerScheduleSaveAsTemplateWeekly: nursingWorkerScheduleSaveAsTemplateWeekly,
-          vitalSign$MingZhong$updateElderlyUsers: vitalSign$MingZhong$updateElderlyUsers
+          vitalSign$MingZhong$updateElderlyUsers: vitalSign$MingZhong$updateElderlyUsers,
+          mealWeeklyMenuSchedule:mealWeeklyMenuSchedule,
+          mealWeeklyMenuScheduleSave:mealWeeklyMenuScheduleSave,
+          mealWeeklyMenuScheduleRemove:mealWeeklyMenuScheduleRemove,
+          mealWeeklyMenuTemplateImport:mealWeeklyMenuTemplateImport,
+          mealWeeklyMenuSaveAsTemplateWeekly:mealWeeklyMenuSaveAsTemplateWeekly
         };
 
         function roomStatusInfo(tenantId) {
@@ -1137,6 +1142,39 @@
               start: start,
               end: end
             }
+          });
+        }
+
+        function mealWeeklyMenuSchedule(tenantId, start, end) {
+          return $http.post(baseUrl + 'mealWeeklyMenuSchedule', {
+            tenantId: tenantId,
+            x_axis_range_points: {
+              start: start,
+              end: end
+            }
+          });
+        }
+
+        function mealWeeklyMenuScheduleSave(tenantId, toSaveRows) {
+          return $http.post(baseUrl + 'mealWeeklyMenuScheduleSave', {tenantId: tenantId, toSaveRows: toSaveRows});
+        }
+
+        function mealWeeklyMenuScheduleRemove(tenantId, toRemoveRows) {
+          return $http.post(baseUrl + 'mealWeeklyMenuScheduleRemove', {tenantId: tenantId, toRemoveRows: toRemoveRows});
+        }
+
+        function mealWeeklyMenuTemplateImport(mealWeeklyMenuTemplateId, toImportXAxisRange) {
+          return $http.post(baseUrl + 'mealWeeklyMenuTemplateImport', {
+            mealWeeklyMenuTemplateId: mealWeeklyMenuTemplateId,
+            toImportXAxisRange: toImportXAxisRange
+          });
+        }
+
+        function mealWeeklyMenuSaveAsTemplateWeekly(tenantId, mealWeeklyMenuTemplateName, toSaveRows) {
+          return $http.post(baseUrl + 'mealWeeklyMenuSaveAsTemplateWeekly', {
+            tenantId: tenantId,
+            mealWeeklyMenuTemplateName: mealWeeklyMenuTemplateName,
+            toSaveRows: toSaveRows
           });
         }
 

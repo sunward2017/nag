@@ -1,6 +1,6 @@
 /**
  * Created by hcl on 17-9-21.
- * 养老机构 餐饮管理 ->周餐组模板
+ * 养老机构 餐饮管理 ->排餐模板
  */
 var mongoose = require('mongoose');
 
@@ -14,7 +14,7 @@ module.exports = function(ctx,name) {
     else {
         module.isloaded = true;
 
-        var mealWeeklyMenuTemplateSchema = new mongoose.Schema({
+        var mealMenuTemplateSchema = new mongoose.Schema({
             check_in_time: {type: Date, default: Date.now},
             operated_on: {type: Date, default: Date.now},
             status: {type: Number, min: 0, max: 1, default: 1},
@@ -40,11 +40,11 @@ module.exports = function(ctx,name) {
         });
 
 
-        mealWeeklyMenuTemplateSchema.pre('update', function (next) {
+        mealMenuTemplateSchema.pre('update', function (next) {
             this.update({}, {$set: {operated_on: new Date()}});
             next();
         });
 
-        return mongoose.model(name, mealWeeklyMenuTemplateSchema, name);
+        return mongoose.model(name, mealMenuTemplateSchema, name);
     }
 }

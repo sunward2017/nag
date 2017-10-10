@@ -6,14 +6,14 @@
 
     angular
         .module('subsystem.pension-agency')
-        .controller('MealWeeklyMenuController', MealWeeklyMenuController)
-        .controller('MealWeeklyMenuSaveAsTemplateController', MealWeeklyMenuSaveAsTemplateController)
+        .controller('MealMenuController', MealMenuController)
+        .controller('MealMenuSaveAsTemplateController', MealMenuSaveAsTemplateController)
         .controller('AddMealQuantityController',AddMealQuantityController)
     ;
 
-    MealWeeklyMenuController.$inject = ['$scope', 'ngDialog', 'vmh', 'instanceVM'];
+    MealMenuController.$inject = ['$scope', 'ngDialog', 'vmh', 'instanceVM'];
 
-    function MealWeeklyMenuController($scope, ngDialog, vmh, vm) {
+    function MealMenuController($scope, ngDialog, vmh, vm) {
 
         var vm = $scope.vm = vm;
         $scope.utils = vmh.utils.v;
@@ -39,7 +39,7 @@
             vm.dbClickAddQuantity= dbClickAddQuantity;
             vm.tab1 = {cid: 'contentTab1'};
 
-            fetchMealWeeklyMenuTemplates();
+            fetchMealMenuTemplates();
             vm.aggrValuePromise = vmh.shareService.tmp('T3001/psn-meal', 'name', {tenantId: vm.tenantId, status: 1, stop_flag: false}).then(function (nodes) {
                 vm.selectBinding.mealShifts = nodes;
                 // console.log('mealShifts nodes :',nodes);
@@ -56,9 +56,9 @@
         }
 
 
-        function fetchMealWeeklyMenuTemplates () {
-            vmh.shareService.tmp('T3001/psn-mealWeeklyMenuTemplate', 'name', {tenantId: vm.tenantId, status: 1, stop_flag: false}, null, true).then(function (treeNodes) {
-                vm.selectBinding.mealWeeklyMenuScheduleTemplates = treeNodes;
+        function fetchMealMenuTemplates () {
+            vmh.shareService.tmp('T3001/psn-mealMenuTemplate', 'name', {tenantId: vm.tenantId, status: 1, stop_flag: false}, null, true).then(function (treeNodes) {
+                vm.selectBinding.mealMenuScheduleTemplates = treeNodes;
             });
         }
 
@@ -78,19 +78,19 @@
                     var colId = vm.xAxisData[j]._id; //星期
                     vm.cols[colId] = false;//selectedCol control variable
                 }
-                queryMealWeeklyMenuSchedule();
+                queryMealMenuSchedule();
             }));
         }
 
-        function queryMealWeeklyMenuSchedule() {
+        function queryMealMenuSchedule() {
             var start = vm.xAxisData[0].value; //value为日期(年月日)
             var end = vm.xAxisData[vm.xAxisData.length-1].value;
-            vmh.psnService.mealWeeklyMenuSchedule(vm.tenantId, start, end).then(parseMealWeeklyMenuSchedule);
+            vmh.psnService.mealMenuSchedule(vm.tenantId, start, end).then(parseMealMenuSchedule);
         }
 
-        function parseMealWeeklyMenuSchedule(weeklyMenuSchedule) {
-            console.log("weeklyMenuSchedule ......:",weeklyMenuSchedule);
-            var weeklyMenuScheduleItems = weeklyMenuSchedule.items;
+        function parseMealMenuSchedule(MenuSchedule) {
+            console.log("MenuSchedule ......:",MenuSchedule);
+            var MenuScheduleItems = MenuSchedule.items;
             var mealShifts = vm.selectBinding.mealShifts;
             vm.aggrData = {};
 
@@ -102,24 +102,24 @@
                 }
             }
 
-            for(var i=0,len=weeklyMenuScheduleItems.length;i<len;i++) {
-                var weeklyMenuScheduleItem = weeklyMenuScheduleItems[i];
+            for(var i=0,len=MenuScheduleItems.length;i<len;i++) {
+                var MenuScheduleItem = MenuScheduleItems[i];
                 var mealShiftObject = _.find(mealShifts, function(o){
-                    return o._id == weeklyMenuScheduleItem.aggr_value.mealId
+                    return o._id == MenuScheduleItem.aggr_value.mealId
                 });
                 // console.log('mealShiftObject :',mealShiftObject);
                 if (mealShiftObject) {
-                    if (!vm.aggrData[weeklyMenuScheduleItem.y_axis]) {
-                        vm.aggrData[weeklyMenuScheduleItem.y_axis] = {};
+                    if (!vm.aggrData[MenuScheduleItem.y_axis]) {
+                        vm.aggrData[MenuScheduleItem.y_axis] = {};
                     }
-                    if (!vm.aggrData[weeklyMenuScheduleItem.y_axis][weeklyMenuScheduleItem.x_axis_value]){
-                        vm.aggrData[weeklyMenuScheduleItem.y_axis][weeklyMenuScheduleItem.x_axis_value] = [];
+                    if (!vm.aggrData[MenuScheduleItem.y_axis][MenuScheduleItem.x_axis_value]){
+                        vm.aggrData[MenuScheduleItem.y_axis][MenuScheduleItem.x_axis_value] = [];
                     }
-                    vm.aggrData[weeklyMenuScheduleItem.y_axis][weeklyMenuScheduleItem.x_axis_value].push({
+                    vm.aggrData[MenuScheduleItem.y_axis][MenuScheduleItem.x_axis_value].push({
                         _id:mealShiftObject._id,
                         id:mealShiftObject.id,
                         name:mealShiftObject.name,
-                        quantity:weeklyMenuScheduleItem.aggr_value.quantity
+                        quantity:MenuScheduleItem.aggr_value.quantity
                     });
                 }
             }
@@ -276,7 +276,7 @@
                 }
             }
             if(toSaveRows.length > 0) {
-                vmh.psnService.mealWeeklyMenuScheduleSave(vm.tenantId, toSaveRows).then(function(){
+                vmh.psnService.mealMenuScheduleSave(vm.tenantId, toSaveRows).then(function(){
                     vmh.alertSuccess();
                 });
             }
@@ -306,7 +306,7 @@
                     }
                 }
                 if(toRemoveRows.length > 0) {
-                    vmh.psnService.mealWeeklyMenuScheduleRemove(vm.tenantId, toRemoveRows).then(function(){
+                    vmh.psnService.mealMenuScheduleRemove(vm.tenantId, toRemoveRows).then(function(){
                         vmh.alertSuccess('notification.REMOVE-SUCCESS', true);
                     });
                 }
@@ -369,7 +369,7 @@
                 if(ret.value!='$document' && ret.value!='$closeButton' && ret.value!='$escape' ) {
                     console.log('addQuantity closeDialog ret.value:', ret.value);
                     if (ret.value.length > 0) {
-                        vmh.psnService.mealWeeklyMenuScheduleSave(vm.tenantId, ret.value).then(function () {
+                        vmh.psnService.mealMenuScheduleSave(vm.tenantId, ret.value).then(function () {
                             vmh.alertSuccess();
                             loadWeek();
                         });
@@ -379,8 +379,8 @@
         }
 
         function importTemplate () {
-            if (!vm.selectedMealWeeklyMenuTemplate) {
-                vmh.alertWarning(vm.moduleTranslatePath('MSG-NO-PICK-MEAL_WEEKLY_SCHEDULE_TEMPLATE'), true);
+            if (!vm.selectedMealMenuTemplate) {
+                vmh.alertWarning(vm.moduleTranslatePath('MSG-NO-PICK-MEAL_SCHEDULE_TEMPLATE'), true);
                 return;
             }
 
@@ -393,7 +393,7 @@
             }).then(function () {
                 var toImportXAxisRange = vm.xAxisData.map(function (o) {return o.value });
                 console.log('toImportXAxisRange:',toImportXAxisRange);//["2017-09-27"]
-                vmh.psnService.mealWeeklyMenuTemplateImport(vm.selectedMealWeeklyMenuTemplate._id, toImportXAxisRange).then(function(){
+                vmh.psnService.mealMenuTemplateImport(vm.selectedMealMenuTemplate._id, toImportXAxisRange).then(function(){
                     vmh.alertSuccess('notification.NORMAL-SUCCESS', true);
                     loadWeek();
                 });
@@ -426,29 +426,29 @@
 
             ngDialog.open({
                 template: 'nursing-worker-schedule-save-as-template.html',
-                controller: 'MealWeeklyMenuSaveAsTemplateController',
+                controller: 'MealMenuSaveAsTemplateController',
                 className: 'ngdialog-theme-default ngdialog-nursing-worker-schedule-save-as-template',
                 data: {
                     vmh: vmh,
                     moduleTranslatePathRoot: vm.moduleTranslatePath(),
                     tenantId: vm.tenantId,
-                    mealWeeklyMenuScheduleTemplates: vm.selectBinding.mealWeeklyMenuScheduleTemplates,
+                    mealMenuScheduleTemplates: vm.selectBinding.mealMenuScheduleTemplates,
                     toSaveRows: toSaveRows
                 }
             }).closePromise.then(function (ret) {
                 if(ret.value!='$document' && ret.value!='$closeButton' && ret.value!='$escape' ) {
                     console.log("ret.value",ret.value);
                     if(ret.value === true){
-                        fetchMealWeeklyMenuTemplates();
+                        fetchMealMenuTemplates();
                     }
                 }
             });
         }
     }
 
-    MealWeeklyMenuSaveAsTemplateController.$inject = ['$scope', 'ngDialog'];
+    MealMenuSaveAsTemplateController.$inject = ['$scope', 'ngDialog'];
 
-    function MealWeeklyMenuSaveAsTemplateController($scope, ngDialog) {
+    function MealMenuSaveAsTemplateController($scope, ngDialog) {
 
         var vm = $scope.vm = {};
         var vmh = $scope.ngDialogData.vmh;
@@ -463,20 +463,20 @@
                 return vm.moduleTranslatePathRoot + '.' + key;
             };
             vm.tenantId = $scope.ngDialogData.tenantId;
-            // console.log('mealWeeklyMenuScheduleTemplates :',$scope.ngDialogData.mealWeeklyMenuScheduleTemplates);
-            vm.fetchMealWeeklyMenuScheduleTemplatesPromise = vmh.promiseWrapper($scope.ngDialogData.mealWeeklyMenuScheduleTemplates);
-            console.log('fetchMealWeeklyMenuScheduleTemplatesPromise:',vm.fetchMealWeeklyMenuScheduleTemplatesPromise);
+            // console.log('mealMenuScheduleTemplates :',$scope.ngDialogData.mealMenuScheduleTemplates);
+            vm.fetchMealMenuScheduleTemplatesPromise = vmh.promiseWrapper($scope.ngDialogData.mealMenuScheduleTemplates);
+            console.log('fetchMealMenuScheduleTemplatesPromise:',vm.fetchMealMenuScheduleTemplatesPromise);
             vm.toSaveRows = $scope.ngDialogData.toSaveRows;
 
-            vm.selectMealWeeklyMenuTemplateToSave = selectMealWeeklyMenuTemplateToSave;
+            vm.selectMealMenuTemplateToSave = selectMealMenuTemplateToSave;
             vm.cancel = cancel;
             vm.doSubmit = doSubmit;
         }
 
-        function selectMealWeeklyMenuTemplateToSave(selectedNode) {
+        function selectMealMenuTemplateToSave(selectedNode) {
             console.log(selectedNode);
             vmh.timeout(function(){
-                vm.mealWeeklyMenuTemplateName = selectedNode.name;
+                vm.mealMenuTemplateName = selectedNode.name;
             }, 25);
         }
 
@@ -493,9 +493,9 @@
                         $scopeConfirm.message = vm.moduleTranslatePath('CONFIRM-MESSAGE-SAVE-AS-TEMPLATE')
                     }]
                 }).then(function () {
-                    console.log('mealWeeklyMenuTemplateName :',vm.mealWeeklyMenuTemplateName);
+                    console.log('mealMenuTemplateName :',vm.mealMenuTemplateName);
                     console.log('save template vm.toSaveRows...',vm.toSaveRows);
-                    vmh.psnService.mealWeeklyMenuSaveAsTemplateWeekly(vm.tenantId, vm.mealWeeklyMenuTemplateName, vm.toSaveRows).then(function (isCreate) {
+                    vmh.psnService.mealMenuSaveAsTemplate(vm.tenantId, vm.mealMenuTemplateName, vm.toSaveRows).then(function (isCreate) {
                         $scope.closeThisDialog(isCreate);
                         vmh.alertSuccess();
                     });

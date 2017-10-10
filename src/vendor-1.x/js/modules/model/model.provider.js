@@ -606,11 +606,11 @@
           nursingWorkerScheduleTemplateImport: nursingWorkerScheduleTemplateImport,
           nursingWorkerScheduleSaveAsTemplateWeekly: nursingWorkerScheduleSaveAsTemplateWeekly,
           vitalSign$MingZhong$updateElderlyUsers: vitalSign$MingZhong$updateElderlyUsers,
-          mealWeeklyMenuSchedule:mealWeeklyMenuSchedule,
-          mealWeeklyMenuScheduleSave:mealWeeklyMenuScheduleSave,
-          mealWeeklyMenuScheduleRemove:mealWeeklyMenuScheduleRemove,
-          mealWeeklyMenuTemplateImport:mealWeeklyMenuTemplateImport,
-          mealWeeklyMenuSaveAsTemplateWeekly:mealWeeklyMenuSaveAsTemplateWeekly
+          mealMenuSchedule:mealMenuSchedule,
+          mealMenuScheduleSave:mealMenuScheduleSave,
+          mealMenuScheduleRemove:mealMenuScheduleRemove,
+          mealMenuTemplateImport:mealMenuTemplateImport,
+          mealMenuSaveAsTemplate:mealMenuSaveAsTemplate
         };
 
         function roomStatusInfo(tenantId) {
@@ -1153,8 +1153,8 @@
           });
         }
 
-        function mealWeeklyMenuSchedule(tenantId, start, end) {
-          return $http.post(baseUrl + 'mealWeeklyMenuSchedule', {
+        function mealMenuSchedule(tenantId, start, end) {
+          return $http.post(baseUrl + 'mealMenuSchedule', {
             tenantId: tenantId,
             x_axis_range_points: {
               start: start,
@@ -1163,25 +1163,25 @@
           });
         }
 
-        function mealWeeklyMenuScheduleSave(tenantId, toSaveRows) {
-          return $http.post(baseUrl + 'mealWeeklyMenuScheduleSave', {tenantId: tenantId, toSaveRows: toSaveRows});
+        function mealMenuScheduleSave(tenantId, toSaveRows) {
+          return $http.post(baseUrl + 'mealMenuScheduleSave', {tenantId: tenantId, toSaveRows: toSaveRows});
         }
 
-        function mealWeeklyMenuScheduleRemove(tenantId, toRemoveRows) {
-          return $http.post(baseUrl + 'mealWeeklyMenuScheduleRemove', {tenantId: tenantId, toRemoveRows: toRemoveRows});
+        function mealMenuScheduleRemove(tenantId, toRemoveRows) {
+          return $http.post(baseUrl + 'mealMenuScheduleRemove', {tenantId: tenantId, toRemoveRows: toRemoveRows});
         }
 
-        function mealWeeklyMenuTemplateImport(mealWeeklyMenuTemplateId, toImportXAxisRange) {
-          return $http.post(baseUrl + 'mealWeeklyMenuTemplateImport', {
-            mealWeeklyMenuTemplateId: mealWeeklyMenuTemplateId,
+        function mealMenuTemplateImport(mealMenuTemplateId, toImportXAxisRange) {
+          return $http.post(baseUrl + 'mealMenuTemplateImport', {
+            mealMenuTemplateId: mealMenuTemplateId,
             toImportXAxisRange: toImportXAxisRange
           });
         }
 
-        function mealWeeklyMenuSaveAsTemplateWeekly(tenantId, mealWeeklyMenuTemplateName, toSaveRows) {
-          return $http.post(baseUrl + 'mealWeeklyMenuSaveAsTemplateWeekly', {
+        function mealMenuSaveAsTemplate(tenantId, mealMenuTemplateName, toSaveRows) {
+          return $http.post(baseUrl + 'mealMenuSaveAsTemplate', {
             tenantId: tenantId,
-            mealWeeklyMenuTemplateName: mealWeeklyMenuTemplateName,
+            mealMenuTemplateName: mealMenuTemplateName,
             toSaveRows: toSaveRows
           });
         }

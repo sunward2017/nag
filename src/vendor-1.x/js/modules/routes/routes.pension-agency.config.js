@@ -3708,8 +3708,8 @@
                     })
                 }
             })
-            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'meal-weekly-menu', {
-                url: '/meal-weekly-menu',
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'meal-menu', {
+                url: '/meal-menu',
                 access_level: AUTH_ACCESS_LEVELS.USER,
                 views: {
                     "module-header": {
@@ -3717,23 +3717,23 @@
                         controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER_FOR_TENANT
                     },
                     "module-content": {
-                        templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'meal-weekly-menu.html'),
-                        controller: 'MealWeeklyMenuController',
+                        templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'meal-menu.html'),
+                        controller: 'MealMenuController',
                         resolve: {
-                            instanceVM: helper.buildInstanceVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'meal-weekly-menu', {
-                                modelName: 'psn-mealWeeklyMenu',
+                            instanceVM: helper.buildInstanceVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'meal-menu', {
+                                modelName: 'psn-mealMenu',
                                 searchForm: { "status": 1 }
                             })
                         }
                     }
                 },
                 data: {
-                    func_id: MODEL_VARIABLES.BIZ_FUNC_PREFIXS.PENSION_AGENCY + 'MEAL-WEEKLY-MENU' //业务系统使用
+                    func_id: MODEL_VARIABLES.BIZ_FUNC_PREFIXS.PENSION_AGENCY + 'MEAL-MENU' //业务系统使用
                 },
-                resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.PENSION_AGENCY + 'meal-weekly-menu.js')
+                resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.PENSION_AGENCY + 'meal-menu.js')
             })
-            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'meal-weekly-menu-template', {
-                url: '/meal-weekly-menu-template',
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'meal-menu-template', {
+                url: '/meal-menu-template',
                 title: '排餐模板',
                 abstract: true,
                 views: {
@@ -3746,18 +3746,18 @@
                     }
                 },
                 data: {
-                    func_id: MODEL_VARIABLES.BIZ_FUNC_PREFIXS.PENSION_AGENCY + 'MEAL-WEEKLY-MENU-TEMPLATE' //业务系统使用
+                    func_id: MODEL_VARIABLES.BIZ_FUNC_PREFIXS.PENSION_AGENCY + 'MEAL-MENU-TEMPLATE' //业务系统使用
                 },
-                resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.PENSION_AGENCY + 'meal-weekly-menu-template.js')
+                resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.PENSION_AGENCY + 'meal-menu-template.js')
             })
-            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'meal-weekly-menu-template.list', {
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'meal-menu-template.list', {
                 url: '/list/:action',
-                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'meal-weekly-menu-template-list.html'),
+                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'meal-menu-template-list.html'),
                 access_level: AUTH_ACCESS_LEVELS.USER,
-                controller: 'MealWeeklyMenuTemplateGridController',
+                controller: 'MealMenuTemplateGridController',
                 resolve: {
-                    entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'meal-weekly-menu-template.list', {
-                        modelName: 'psn-mealWeeklyMenuTemplate',
+                    entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'meal-menu-template.list', {
+                        modelName: 'psn-mealMenuTemplate',
                         searchForm: { "status": 1 },
                         serverPaging: true,
                         blockUI: true,
@@ -3787,14 +3787,14 @@
                     })
                 }
             })
-            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'meal-weekly-menu-template.details', {
+            .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'meal-menu-template.details', {
                 url: '/details/:action/:_id',
-                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'meal-weekly-menu-template-details.html'),
+                templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'meal-menu-template-details.html'),
                 access_level: AUTH_ACCESS_LEVELS.USER,
-                controller: 'MealWeeklyMenuTemplateDetailsController',
+                controller: 'MealMenuTemplateDetailsController',
                 resolve: {
-                    entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'meal-weekly-menu-template.details', {
-                        modelName: 'psn-mealWeeklyMenuTemplate',
+                    entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'meal-menu-template.details', {
+                        modelName: 'psn-mealMenuTemplate',
                         model: { type: 'A0001' },
                         blockUI: true
                     })

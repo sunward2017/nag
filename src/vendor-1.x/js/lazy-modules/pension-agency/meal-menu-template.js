@@ -6,14 +6,14 @@
 
     angular
         .module('subsystem.pension-agency')
-        .controller('MealWeeklyMenuTemplateGridController', MealWeeklyMenuTemplateGridController)
-        .controller('MealWeeklyMenuTemplateDetailsController', MealWeeklyMenuTemplateDetailsController)
+        .controller('MealMenuTemplateGridController', MealMenuTemplateGridController)
+        .controller('MealMenuTemplateDetailsController', MealMenuTemplateDetailsController)
     ;
 
 
-    MealWeeklyMenuTemplateGridController.$inject = ['$scope', 'ngDialog', 'vmh', 'entryVM'];
+    MealMenuTemplateGridController.$inject = ['$scope', 'ngDialog', 'vmh', 'entryVM'];
 
-    function MealWeeklyMenuTemplateGridController($scope, ngDialog, vmh, vm) {
+    function MealMenuTemplateGridController($scope, ngDialog, vmh, vm) {
 
         $scope.vm = vm;
         $scope.utils = vmh.utils.g;
@@ -27,9 +27,9 @@
         }
     }
 
-    MealWeeklyMenuTemplateDetailsController.$inject = ['$scope', 'ngDialog', 'vmh', 'entityVM'];
+    MealMenuTemplateDetailsController.$inject = ['$scope', 'ngDialog', 'vmh', 'entityVM'];
 
-    function MealWeeklyMenuTemplateDetailsController($scope, ngDialog, vmh, vm) {
+    function MealMenuTemplateDetailsController($scope, ngDialog, vmh, vm) {
 
         var vm = $scope.vm = vm;
         $scope.utils = vmh.utils.v;
@@ -321,7 +321,7 @@
 
                 var p = vmh.promiseWrapper();
                 p.then(function(){
-                    // console.log('save meal-weekly-menu-template:',vm.model);
+                    // console.log('save meal-menu-template:',vm.model);
                     vm.save();
                 });
             }

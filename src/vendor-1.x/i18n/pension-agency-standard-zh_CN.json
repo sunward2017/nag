@@ -619,16 +619,16 @@
         "TAB1-LABEL-STOP_FLAG": "停用"
       }
     },
-    "meal-weekly-menu": {
+    "meal-menu": {
       "TITLE": "养老机构-餐饮管理-排餐管理",
       "DIALOG-SAVE-AS-TEMPLATE-TITLE": "保存为排餐模版",
       "LABEL-YAXIS_LABEL": "用餐时间段",
-      "PLACEHOLDER-PICK_MEAL_WEEKLY_MENU_TEMPLATE": "选择一个模版导入..",
+      "PLACEHOLDER-PICK_MEAL_MENU_TEMPLATE": "选择一个模版导入..",
       "TITLE-ROW": "点此选中整行",
       "TITLE-COL": "点此选中整列",
       "DIALOG-IMPORT-MESSAGE": "导入模版有可能会覆盖已有的排餐,您确定要导入吗？",
       "CONFIRM-MESSAGE-SAVE-AS-TEMPLATE": "一旦执行将覆盖现有同名模版，您确定要继续执行么？",
-      "MSG-NO-PICK-MEAL_WEEKLY_SCHEDULE_TEMPLATE": "没有选择模版,无法导入",
+      "MSG-NO-PICK-MEAL_SCHEDULE_TEMPLATE": "没有选择模版,无法导入",
       "MSG-SAVE-AS-TEMPLATE-DATA-INVALID": "模板内容为空,无法存为模版",
       "BTN-IMPORT-TEMPLATE": "导入",
       "BTN-SAVE-TEMPLATE": "保存模版",
@@ -647,7 +647,7 @@
       "TAB1-LABEL-QUANTITY":"套餐数量",
       "FINISH-SET-QUANTITY":"提交设置"
     },
-    "meal-weekly-menu-template": {
+    "meal-menu-template": {
       "list": {
         "TITLE": "养老机构-餐饮管理-排餐模板-列表"
       },

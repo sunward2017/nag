@@ -154,14 +154,14 @@
     "icon": "icon-folder",
     "children": [
       {
-        "_id": "menu.pension-agency.MEAL-WEEKLY-MENU",
+        "_id": "menu.pension-agency.MEAL-MENU",
         "name": "排餐",
-        "sref": "app.pension-agency.meal-weekly-menu"
+        "sref": "app.pension-agency.meal-menu"
       },
       {
-        "_id": "menu.pension-agency.MEAL-WEEKLY-MENU-TEMPLATE",
+        "_id": "menu.pension-agency.MEAL-MENU-TEMPLATE",
         "name": "排餐模板",
-        "sref": "app.pension-agency.meal-weekly-menu-template.list"
+        "sref": "app.pension-agency.meal-menu-template.list"
       },
       {
         "_id": "menu.pension-agency.MEAL",
@@ -297,6 +297,11 @@
         "_id": "menu.pension-agency.NURSE",
         "name": "护士",
         "sref": "app.pension-agency.nurse.list"
+      },
+      {
+        "_id": "menu.pension-agency.DOCTOR",
+        "name": "医生管理",
+        "sref": "app.pension-agency.doctor.list"
       },
       {
         "_id": "menu.pension-agency.NURSING-WORKER",

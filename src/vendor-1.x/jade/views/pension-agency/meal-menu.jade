@@ -3,10 +3,10 @@
         .col-md-6.text-left
             .btn-toolbar
                 .btn-group
-                    ui-select(name="mealWeeklyMenuScheduleTemplates",theme='bootstrap', ng-Model="vm.selectedMealWeeklyMenuTemplate" ,ng-style='{width: "180px"}')
-                        ui-select-match(placeholder='{{vm.moduleTranslatePath("PLACEHOLDER-PICK_MEAL_WEEKLY_MENU_TEMPLATE")|translate}}') {{$select.selected.name}}
-                        ui-select-choices(repeat='mealWeeklyMenuScheduleTemplate in vm.selectBinding.mealWeeklyMenuScheduleTemplates | filter: {name: $select.search}')
-                            div(ng-bind-html='mealWeeklyMenuScheduleTemplate.name | highlight: $select.search')
+                    ui-select(name="mealMenuScheduleTemplates",theme='bootstrap', ng-Model="vm.selectedMealMenuTemplate" ,ng-style='{width: "180px"}')
+                        ui-select-match(placeholder='{{vm.moduleTranslatePath("PLACEHOLDER-PICK_MEAL_MENU_TEMPLATE")|translate}}') {{$select.selected.name}}
+                        ui-select-choices(repeat='mealMenuScheduleTemplate in vm.selectBinding.mealMenuScheduleTemplates | filter: {name: $select.search}')
+                            div(ng-bind-html='mealMenuScheduleTemplate.name | highlight: $select.search')
                 .btn-group
                     a.btn.btn-warning.btn-sm(ng-click="vm.importTemplate()") {{ vm.moduleTranslatePath('BTN-IMPORT-TEMPLATE') | translate}}
                 .btn-group
@@ -54,9 +54,9 @@ script(type="text/ng-template", id="nursing-worker-schedule-save-as-template.htm
             h3.mt0 {{ vm.moduleTranslatePath('DIALOG-SAVE-AS-TEMPLATE-TITLE') | translate}}
         .ngdialog-input
             .col-md-12.cover-nursing-worker-schedule-template-c
-                .tree.tree-dropdown(name='mealWeeklyMenuTemplateSelected',s-tree, s-tree-data="vm.fetchMealWeeklyMenuScheduleTemplatesPromise",s-tree-height="400", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{layout:'dropdown',selectNodeFormat:'object'}",ng-model="vm.saveToSelected", on-select="vm.selectMealWeeklyMenuTemplateToSave(selectedNode)")
+                .tree.tree-dropdown(name='mealMenuTemplateSelected',s-tree, s-tree-data="vm.fetchMealMenuScheduleTemplatesPromise",s-tree-height="400", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{layout:'dropdown',selectNodeFormat:'object'}",ng-model="vm.saveToSelected", on-select="vm.selectMealMenuTemplateToSave(selectedNode)")
                 .cover-nursing-worker-schedule-template-tree
-                    input.form-control(type='text', name='name',ng-model='vm.mealWeeklyMenuTemplateName',placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-SAVE-TO-TEMPLATE_NAME")|translate}}')
+                    input.form-control(type='text', name='name',ng-model='vm.mealMenuTemplateName',placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-SAVE-TO-TEMPLATE_NAME")|translate}}')
         .ngdialog-buttons
             .col-md-12.text-right
                 button.btn.btn-warning(type='button',ng-click="vm.cancel()") {{ "button.CANCEL" | translate}}

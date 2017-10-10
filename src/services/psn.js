@@ -6573,9 +6573,9 @@ module.exports = {
       },
       /**********************餐饮管理*****************************/
       {
-        method: 'mealWeeklyMenuSchedule',
+        method: 'mealMenuSchedule',
         verb: 'post',
-        url: this.service_url_prefix + "/mealWeeklyMenuSchedule", //按周查找菜单
+        url: this.service_url_prefix + "/mealMenuSchedule", //按周查找菜单
         handler: function (app, options) {
           return function*(next) {
             var tenant, xAxisValueStart, xAxisValueEnd;
@@ -6595,7 +6595,7 @@ module.exports = {
               console.log('xAxisRangePoints:',xAxisRangePoints);
               console.log('前置检查完成-----------------');
 
-              var rows = yield app.modelFactory().model_query(app.models['psn_mealWeeklyMenu'], {
+              var rows = yield app.modelFactory().model_query(app.models['psn_mealMenu'], {
                   select: 'x_axis y_axis aggr_value',
                   where: {
                       tenantId: tenantId,
@@ -6620,9 +6620,9 @@ module.exports = {
         }
       },
       {
-        method: 'mealWeeklyMenuScheduleSave',
+        method: 'mealMenuScheduleSave',
         verb: 'post',
-        url: this.service_url_prefix + "/mealWeeklyMenuScheduleSave",
+        url: this.service_url_prefix + "/mealMenuScheduleSave",
         handler: function (app, options) {
           return function*(next) {
             var tenant;
@@ -6667,7 +6667,7 @@ module.exports = {
 
               console.log('前置检查完成');
 
-              var ret = yield app.modelFactory().model_bulkInsert(app.models['psn_mealWeeklyMenu'], {
+              var ret = yield app.modelFactory().model_bulkInsert(app.models['psn_mealMenu'], {
                   rows: toSaveRows,
                   removeWhere: removeWhere
               });
@@ -6685,9 +6685,9 @@ module.exports = {
         }
       },
       {
-        method: 'mealWeeklyMenuScheduleRemove',
+        method: 'mealMenuScheduleRemove',
         verb: 'post',
-        url: this.service_url_prefix + "/mealWeeklyMenuScheduleRemove",
+        url: this.service_url_prefix + "/mealMenuScheduleRemove",
         handler: function (app, options) {
           return function*(next) {
             var tenant;
@@ -6727,7 +6727,7 @@ module.exports = {
 
               console.log('前置检查完成');
 
-              var ret = yield app.modelFactory().model_remove(app.models['psn_mealWeeklyMenu'], removeWhere);
+              var ret = yield app.modelFactory().model_remove(app.models['psn_mealMenu'], removeWhere);
               this.body = app.wrapper.res.default();
             } catch (e) {
               console.log(e);
@@ -6739,15 +6739,15 @@ module.exports = {
         }
       },
       {
-        method: 'mealWeeklyMenuTemplateImport',
+        method: 'mealMenuTemplateImport',
         verb: 'post',
-        url: this.service_url_prefix + "/mealWeeklyMenuTemplateImport",
+        url: this.service_url_prefix + "/mealMenuTemplateImport",
         handler: function (app, options) {
           return function*(next) {
             try {
-              var mealWeeklyMenuTemplateId = this.request.body.mealWeeklyMenuTemplateId;
-              var  mealWeeklyMenuTemplate = yield app.modelFactory().model_read(app.models['psn_mealWeeklyMenuTemplate'], mealWeeklyMenuTemplateId);
-              if (!mealWeeklyMenuTemplate || mealWeeklyMenuTemplate.status == 0) {
+              var mealMenuTemplateId = this.request.body.mealMenuTemplateId;
+              var  mealMenuTemplate = yield app.modelFactory().model_read(app.models['psn_mealMenuTemplate'], mealMenuTemplateId);
+              if (!mealMenuTemplate || mealMenuTemplate.status == 0) {
                 this.body = app.wrapper.res.error({message: '无法找到排餐模版!'});
                 yield next;
                 return;
@@ -6766,13 +6766,13 @@ module.exports = {
                 console.log('xAxisRange:',xAxisRange);
                 console.log('xAxisDayDateMap :',xAxisDayDateMap);
 
-              var templateItems = mealWeeklyMenuTemplate.content;
+              var templateItems = mealMenuTemplate.content;
               var yAxisRange = app._.uniq(app._.map(templateItems, (o) => {
                   return o.y_axis;
               }));
 
               var removeWhere = {
-                  tenantId: mealWeeklyMenuTemplate.tenantId,
+                  tenantId: mealMenuTemplate.tenantId,
                   y_axis: {$in: yAxisRange},
                   $or: xAxisRange
               };
@@ -6783,11 +6783,11 @@ module.exports = {
                       x_axis: x_axis,
                       y_axis: o.y_axis,
                       aggr_value: o.aggr_value,
-                      tenantId: mealWeeklyMenuTemplate.tenantId
+                      tenantId: mealMenuTemplate.tenantId
                   };
               });
 
-              var ret = yield app.modelFactory().model_bulkInsert(app.models['psn_mealWeeklyMenu'], {
+              var ret = yield app.modelFactory().model_bulkInsert(app.models['psn_mealMenu'], {
                   rows: toSaveRows,
                   removeWhere: removeWhere
               });
@@ -6810,9 +6810,9 @@ module.exports = {
         }
       },
       {
-        method: 'mealWeeklyMenuSaveAsTemplateWeekly',
+        method: 'mealMenuSaveAsTemplate',
         verb: 'post',
-        url: this.service_url_prefix + "/mealWeeklyMenuSaveAsTemplateWeekly",
+        url: this.service_url_prefix + "/mealMenuSaveAsTemplate",
         handler: function (app, options) {
           return function*(next) {
             var tenant;
@@ -6825,7 +6825,7 @@ module.exports = {
                 return;
               }
 
-              var mealWeeklyMenuTemplateName = this.request.body.mealWeeklyMenuTemplateName;
+              var mealMenuTemplateName = this.request.body.mealMenuTemplateName;
               var toSaveRows = this.request.body.toSaveRows;
               app._.each(toSaveRows, (o) => {
                   o.tenantId = tenantId
@@ -6833,25 +6833,25 @@ module.exports = {
 
               console.log('toSaveRows:', toSaveRows);
 
-              var mealWeeklyMenuTemplate = yield app.modelFactory().model_one(app.models['psn_mealWeeklyMenuTemplate'], {
+              var mealMenuTemplate = yield app.modelFactory().model_one(app.models['psn_mealMenuTemplate'], {
                   where: {
                       status: 1,
-                      name: mealWeeklyMenuTemplateName,
+                      name: mealMenuTemplateName,
                       tenantId: tenantId
                   }
               });
 
               console.log('前置检查完成');
-              var isCreate = !mealWeeklyMenuTemplate;
+              var isCreate = !mealMenuTemplate;
               if (isCreate) {
-                  yield app.modelFactory().model_create(app.models['psn_mealWeeklyMenuTemplate'], {
-                      name: mealWeeklyMenuTemplateName,
+                  yield app.modelFactory().model_create(app.models['psn_mealMenuTemplate'], {
+                      name: mealMenuTemplateName,
                       content: toSaveRows,
                       tenantId: tenantId
                   });
               } else {
-                  mealWeeklyMenuTemplate.content = toSaveRows;
-                  yield mealWeeklyMenuTemplate.save();
+                  mealMenuTemplate.content = toSaveRows;
+                  yield mealMenuTemplate.save();
               }
 
               this.body = app.wrapper.res.ret(isCreate);

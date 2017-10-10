@@ -148,6 +148,39 @@
     ]
   },
   {
+    "_id": "menu.pension-agency.REPAST",
+    "name": "餐饮管理",
+    "sref": "#",
+    "icon": "icon-folder",
+    "children": [
+      {
+        "_id": "menu.pension-agency.MEAL-MENU",
+        "name": "排餐",
+        "sref": "app.pension-agency.meal-menu"
+      },
+      {
+        "_id": "menu.pension-agency.MEAL-MENU-TEMPLATE",
+        "name": "排餐模板",
+        "sref": "app.pension-agency.meal-menu-template.list"
+      },
+      {
+        "_id": "menu.pension-agency.MEAL",
+        "name": "配餐",
+        "sref": "app.pension-agency.meal.list"
+      },
+      {
+        "_id": "menu.pension-agency.MEAL-DISH",
+        "name": "菜品管理",
+        "sref": "app.pension-agency.meal-dish.list"
+      },
+      {
+        "_id": "menu.pension-agency.MEAL-ORDER-RECORD",
+        "name": "订餐汇总",
+        "sref": "app.pension-agency.meal-order-record"
+      }
+    ]
+  },
+  {
     "_id": "menu.pension-agency.DRUG",
     "name": "药品管理",
     "sref": "#",
@@ -264,6 +297,11 @@
         "_id": "menu.pension-agency.NURSE",
         "name": "护士",
         "sref": "app.pension-agency.nurse.list"
+      },
+      {
+        "_id": "menu.pension-agency.DOCTOR",
+        "name": "医生管理",
+        "sref": "app.pension-agency.doctor.list"
       },
       {
         "_id": "menu.pension-agency.NURSING-WORKER",

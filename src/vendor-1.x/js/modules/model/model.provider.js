@@ -605,7 +605,12 @@
           nursingWorkerScheduleRemove: nursingWorkerScheduleRemove,
           nursingWorkerScheduleTemplateImport: nursingWorkerScheduleTemplateImport,
           nursingWorkerScheduleSaveAsTemplateWeekly: nursingWorkerScheduleSaveAsTemplateWeekly,
-          vitalSign$MingZhong$updateElderlyUsers: vitalSign$MingZhong$updateElderlyUsers
+          vitalSign$MingZhong$updateElderlyUsers: vitalSign$MingZhong$updateElderlyUsers,
+          mealMenuSchedule:mealMenuSchedule,
+          mealMenuScheduleSave:mealMenuScheduleSave,
+          mealMenuScheduleRemove:mealMenuScheduleRemove,
+          mealMenuTemplateImport:mealMenuTemplateImport,
+          mealMenuSaveAsTemplate:mealMenuSaveAsTemplate
         };
 
         function roomStatusInfo(tenantId) {
@@ -1145,6 +1150,39 @@
               start: start,
               end: end
             }
+          });
+        }
+
+        function mealMenuSchedule(tenantId, start, end) {
+          return $http.post(baseUrl + 'mealMenuSchedule', {
+            tenantId: tenantId,
+            x_axis_range_points: {
+              start: start,
+              end: end
+            }
+          });
+        }
+
+        function mealMenuScheduleSave(tenantId, toSaveRows) {
+          return $http.post(baseUrl + 'mealMenuScheduleSave', {tenantId: tenantId, toSaveRows: toSaveRows});
+        }
+
+        function mealMenuScheduleRemove(tenantId, toRemoveRows) {
+          return $http.post(baseUrl + 'mealMenuScheduleRemove', {tenantId: tenantId, toRemoveRows: toRemoveRows});
+        }
+
+        function mealMenuTemplateImport(mealMenuTemplateId, toImportXAxisRange) {
+          return $http.post(baseUrl + 'mealMenuTemplateImport', {
+            mealMenuTemplateId: mealMenuTemplateId,
+            toImportXAxisRange: toImportXAxisRange
+          });
+        }
+
+        function mealMenuSaveAsTemplate(tenantId, mealMenuTemplateName, toSaveRows) {
+          return $http.post(baseUrl + 'mealMenuSaveAsTemplate', {
+            tenantId: tenantId,
+            mealMenuTemplateName: mealMenuTemplateName,
+            toSaveRows: toSaveRows
           });
         }
 

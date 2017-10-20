@@ -215,6 +215,7 @@ module.exports = {
         var toAddStockDrugs = [], toModifyStockDrugs = [], toRemoveStockDrugIds = [];
         for (var i = 0, len = drugs.length; i < len; i++) {
           drug = drugs[i];
+          // console.log('in stock data drug:=>', drug);
           drugInRecordIndex = self.ctx._.findIndex(drugsInRecord, (o) => {
             return o.drugId.toString() == drug.drugId;
           });
@@ -239,13 +240,14 @@ module.exports = {
             console.log('在入库记录中的药品信息修改', drug.drug_name);
             if (drugInRecordIndex != -1) {
               drugsInRecord[drugInRecordIndex].quantity = drug.quantity;
-              drugsInRecord[drugInRecordIndex].mint_unit = drug.mint_unit;
+              drugsInRecord[drugInRecordIndex].mini_unit = drug.mini_unit;
               drugsInRecord[drugInRecordIndex].expire_in = drug.expire_in;
+              // console.log('------', drug.mini_unit, drugsInRecord[drugInRecordIndex].mini_unit)
             }
 
             if (drugInStockIndex != -1) {
               drugsInStock[drugInStockIndex].quantity = drug.quantity;
-              drugsInStock[drugInStockIndex].mint_unit = drug.mint_unit;
+              drugsInStock[drugInStockIndex].mini_unit = drug.mini_unit;
               drugsInStock[drugInStockIndex].expire_in = drug.expire_in;
               toModifyStockDrugs.push(drugsInStock[drugInStockIndex]);
             }
@@ -1100,7 +1102,7 @@ module.exports = {
               new_quantity = drugData.quantity;
 
               drugsInRecord[drugInRecordIndex].quantity = drugData.quantity;
-              drugsInRecord[drugInRecordIndex].mint_unit = drugData.mint_unit;
+              drugsInRecord[drugInRecordIndex].mini_unit = drugData.mini_unit;
               drugsInRecord[drugInRecordIndex].expire_in = drugData.expire_in;
             }
 

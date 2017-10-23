@@ -269,7 +269,7 @@
                             });
 
                             _.each(arr, function(o){
-                                toSaveRows.push({ x_axis: date, y_axis: rowId, aggr_value:{mealId:o.id} });
+                                toSaveRows.push({ x_axis: date, y_axis: rowId, aggr_value:{mealId:o.id,quantity:o.quantity} });
                             });
                         }
                     }

@@ -26,7 +26,7 @@
   "dlg-drug-use-list-in-nursing-plan": {
     "html": {
       "TITLE": "查看对话框",
-      "SHEET_TITLE": "老人用药每日请单",
+      "SHEET_TITLE": "老人用药每日清单",
       "SHEET-LABEL-ELDERLY_NAME": "姓名",
       "SHEET-LABEL-ENTER_CODE": "入院号",
       "SHEET-LABEL-ROOM_SUMMARY": "房间床位",

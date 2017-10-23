@@ -19,12 +19,10 @@
                     a.btn.btn-primary.btn-sm(title="{{vm.moduleTranslatePath('BTN-NEXT-WEEK')|translate}}",ng-click="vm.nextWeek()")
                         i.glyphicon.glyphicon-chevron-right
                         | {{vm.moduleTranslatePath('BTN-NEXT-WEEK')|translate}}
-        .col-md-1
+        .col-md-6
             .btn-toolbar.pull-right
                 .btn-group
                     a.btn.btn-warning.btn-sm(ng-click="vm.addQuantity()") {{ vm.moduleTranslatePath('BTN-SET-QUANTITY') | translate}}
-        .col-md-5
-            .btn-toolbar.pull-right
                 .btn-group
                     .tree.tree-dropdown(name='mealShifts',s-tree, s-tree-data="vm.aggrValuePromise",s-tree-height="400", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{mode:'check',layout:'dropdown',selectNodeFormat:'object'}",ng-model="vm.selectedMealShifts")
                 .btn-group

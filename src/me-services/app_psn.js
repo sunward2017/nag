@@ -6,6 +6,7 @@ var rp = require('request-promise-native');
 var DIC = require('../pre-defined/dictionary-constants.json');
 var D0103 = require('../pre-defined/dictionary.json')['D0103'];
 var D3026 = require('../pre-defined/dictionary.json')['D3026'];
+var D3040 = require('../pre-defined/dictionary.json')['D3040'];
 module.exports = {
   init: function (option) {
     var self = this;
@@ -874,6 +875,397 @@ module.exports = {
                 this.body = app.wrapper.res.ret(ret);
               }
 
+            } catch (e) {
+              self.logger.error(e.message);
+              this.body = app.wrapper.res.error(e);
+            }
+            yield next;
+          }
+        }
+      },
+      {
+        method: 'mealOrderRecords$fetch',
+        verb: 'post',
+        url: this.service_url_prefix + "/mealOrderRecords/fetch",
+        handler: function (app, options) {
+          return function*(next) {
+            try {
+              console.log("body", this.request.body);
+              var tenantId = this.request.body.tenantId;
+              var elderlyId = this.request.body.elderlyId;
+              var check_time = app.moment(this.request.body.check_in_time);
+              var thisMoment = app.moment().format();
+              var curMealTime =null,curDay=app.moment().format('YYYY-MM-DD'),resCurMealTime = false;
+
+              if(app.moment(thisMoment).isBetween(curDay+ 'T05', curDay+ 'T09:00:00+08:00')){
+                curMealTime = 'A0000';
+              }else if(app.moment(thisMoment).isBetween(curDay+ 'T09:00:01+08:00', curDay+ 'T13:00:00+08:00')){
+                curMealTime = 'A0001';
+              }else if(app.moment(thisMoment).isBetween(curDay+ 'T13:00:01+08:00', curDay+ 'T19:00:00+08:00')){
+                curMealTime = 'A0002';
+              }else if(app.moment(thisMoment).isBetween(curDay+ 'T19:00:01+08:00', curDay+ 'T21:00:00+08:00')){
+                curMealTime = 'A0003';
+              }
+              if(this.request.body.check_in_time === curDay){
+                resCurMealTime = curMealTime;
+              }
+
+              var where = {tenantId: app.ObjectId(tenantId), x_axis: { '$gte': check_time.toDate(), '$lt': check_time.add(1, 'days').toDate() }};
+
+              if (elderlyId) {
+                where.elderlyId = app.ObjectId(elderlyId);
+              }
+
+              var rows = yield app.modelFactory().model_aggregate(app.models['psn_mealOrderRecord'], [
+                {
+                  $match:where
+                },
+                {
+                  $lookup:{
+                    from: "psn_meal",
+                    localField:"mealId",
+                    foreignField:"_id",
+                    as:"mealName"
+                  }
+                },
+                {
+                  $project: {
+                    elderlyId: '$elderlyId',
+                    elderly_name:'$elderly_name',
+                    x_axis:'$x_axis',
+                    meal:{y_axis:'$y_axis',mealId:'$mealId',quantity:'$quantity',mealName:'$mealName',orderId:'$_id'}
+                  }
+                },
+                {
+                  $group:{
+                    _id:'$elderlyId',
+                    elderly_name:{$first:'$elderly_name'},
+                    x_axis:{$first:'$x_axis'},
+                    orderedMeals:{$push:'$meal'}
+                  }
+                },
+                {
+                  $lookup:{
+                    from: "psn_elderly",
+                    localField:"_id",
+                    foreignField:"_id",
+                    as:"elderly"
+                  }
+                }
+              ]);
+              console.log('mealOrderRecord rows:',rows);
+              app._.each(rows, (o) => {
+                var groupedRows = app._.groupBy(o.orderedMeals, (meal) => {
+                  "use strict";
+                  return meal.y_axis;
+                });
+                o.orderedMeals = groupedRows;
+              });
+
+              this.body = app.wrapper.res.rows({status:resCurMealTime,rows:rows});
+            } catch (e) {
+              self.logger.error(e.message);
+              this.body = app.wrapper.res.error(e);
+            }
+            yield next;
+          }
+        }
+      },
+      {
+        method: 'meals$fetch',
+        verb: 'post',
+        url: this.service_url_prefix + "/meals/fetch",
+        handler: function (app, options) {
+          return function*(next) {
+            try {
+              console.log("body", this.request.body);
+              var tenantId = this.request.body.tenantId;
+              var x_axis = app.moment().format('YYYY-MM-DD'),y_axis,y_axis_value;
+              var thisMoment = app.moment().format();
+              if(app.moment(thisMoment).isBetween(x_axis+ 'T05', x_axis+ 'T09:00:00+08:00')){
+                y_axis = 'A0000';
+              }else if(app.moment(thisMoment).isBetween(x_axis+ 'T09:00:01+08:00', x_axis+ 'T13:00:00+08:00')){
+                y_axis = 'A0001';
+              }else if(app.moment(thisMoment).isBetween(x_axis+ 'T13:00:01+08:00', x_axis+ 'T19:00:00+08:00')){
+                y_axis = 'A0002';
+              }else if(app.moment(thisMoment).isBetween(x_axis+ 'T19:00:01+08:00', x_axis+ 'T21:00:00+08:00')){
+                y_axis = 'A0003';
+              }
+              y_axis_value = D3040[y_axis].name;
+              console.log('thisMoment:',thisMoment,'x_axis:',x_axis,'y_axis:',y_axis,'y_axis_value:',y_axis_value);
+
+              var rows = yield app.modelFactory().model_query(app.models['psn_mealMenu'], {
+                select: 'aggr_value x_axis',
+                where: {
+                  tenantId:tenantId,
+                  x_axis:x_axis,
+                  y_axis:y_axis
+                },
+                sort: {check_in_time: -1}
+              }).populate('aggr_value.mealId', 'name meal');
+              console.log('rows..:',rows);
+              var meals=[];
+              app._.each(rows, (o) => {
+                meals.push({id:o.aggr_value.mealId._id,name:o.aggr_value.mealId.name,quantity:o.aggr_value.quantity,member:o.aggr_value.mealId.meal});
+              });
+              this.body = app.wrapper.res.ret({meals:meals,y_axis:y_axis,y_axis_value:y_axis_value});
+            } catch (e) {
+              self.logger.error(e.message);
+              this.body = app.wrapper.res.error(e);
+            }
+            yield next;
+          }
+        }
+      },
+      {
+        method: 'mealOrderRecord$save',
+        verb: 'post',
+        url: this.service_url_prefix + "/mealOrderRecord/save",
+        handler: function (app, options) {
+          return function*(next) {
+            try {
+              console.log("body", this.request.body);
+              var tenantId = this.request.body.tenantId;
+              var operated_by = this.request.body.operated_by;
+              var mealTime = this.request.body.mealTime;
+              var submitMealMember = this.request.body.submitMealMember;
+              var meals = this.request.body.meals;
+              var x_axis = app.moment().format('YYYY-MM-DD'),y_axis;
+              var thisMoment = app.moment().format();
+              if(app.moment(thisMoment).isBetween(x_axis+ 'T05', x_axis+ 'T09:00:00+08:00')){
+                y_axis = 'A0000';
+              }else if(app.moment(thisMoment).isBetween(x_axis+ 'T09:00:01+08:00', x_axis+ 'T13:00:00+08:00')){
+                y_axis = 'A0001';
+              }else if(app.moment(thisMoment).isBetween(x_axis+ 'T13:00:01+08:00', x_axis+ 'T19:00:00+08:00')){
+                y_axis = 'A0002';
+              }else if(app.moment(thisMoment).isBetween(x_axis+ 'T19:00:01+08:00', x_axis+ 'T21:00:00+08:00')){
+                y_axis = 'A0003';
+              }
+              var resMealMember={},res=false;
+              if(mealTime===y_axis){
+                for(var i=0,len=meals.length;i<len;i++){
+                  var submitMealMemberIdArray = submitMealMember[meals[i].id];
+                  if(submitMealMemberIdArray){
+                    var jLen = submitMealMemberIdArray.length;
+                    console.log('查询套餐数量----');
+                    var mealInMealMenu = yield app.modelFactory().model_query(app.models['psn_mealMenu'], {
+                      select: 'status aggr_value',
+                      where: {
+                        x_axis:x_axis,
+                        y_axis:y_axis,
+                        'aggr_value.mealId':meals[i].id,
+                        tenantId: tenantId
+                      }
+                    });
+                    console.log('mealInMealMenu:',mealInMealMenu);
+                    if(jLen<=mealInMealMenu[0].aggr_value.quantity){
+                      console.log('修改套餐剩余数量-------');
+                      mealInMealMenu[0].aggr_value.quantity -=jLen;
+                      yield mealInMealMenu[0].save();
+
+                      console.log('增加订单记录------');
+                      for(var j=0;j<jLen;j++){
+                        var sameMealOrderRecord = yield app.modelFactory().model_query(app.models['psn_mealOrderRecord'], {
+                          select: 'status mealId quantity',
+                          where: {
+                            elderlyId: submitMealMemberIdArray[j].id,
+                            x_axis:x_axis,
+                            y_axis:y_axis,
+                            mealId:meals[i].id,
+                            tenantId: tenantId
+                          }
+                        });
+                        console.log('sameMealOrderRecord:',sameMealOrderRecord);
+                        if(sameMealOrderRecord.length>=1){
+                          sameMealOrderRecord[0].quantity++;
+                          yield sameMealOrderRecord[0].save();
+                        }else {
+                          yield app.modelFactory().model_create(app.models['psn_mealOrderRecord'], {
+                            operated_by:operated_by,
+                            elderlyId:submitMealMemberIdArray[j].id,
+                            elderly_name:submitMealMemberIdArray[j].name,
+                            x_axis:x_axis,
+                            y_axis:y_axis,
+                            mealId:meals[i].id,
+                            quantity:1,
+                            tenantId:tenantId
+                          });
+                        }
+                      }
+                    }else {
+                      console.log('套餐数量不足，返回重新提交-----');
+                      resMealMember[meals[i].id]=submitMealMemberIdArray;
+                      res = true;
+                    }
+                  }
+                }
+              }else {
+                this.body = app.wrapper.res.error({message: '当前订餐时间已过，请重新订餐!'});
+                yield next;
+                return;
+              }
+
+              this.body = app.wrapper.res.ret({status:res,data:resMealMember});
+            } catch (e) {
+              self.logger.error(e.message);
+              this.body = app.wrapper.res.error(e);
+            }
+            yield next;
+          }
+        }
+      },
+      {
+        method: 'changeMealQuantity$save',
+        verb: 'post',
+        url: this.service_url_prefix + "/changeMealQuantity/save",
+        handler: function (app, options) {
+          return function*(next) {
+            try {
+              console.log("body", this.request.body);
+              var tenantId = this.request.body.tenantId;
+              var num = this.request.body.num;
+              var orderId = this.request.body.orderId;
+              var mealId = this.request.body.mealId;
+              var MealTime = this.request.body.curMealTime;
+              var thisMoment = app.moment().format(),x_axis = app.moment().format('YYYY-MM-DD'),y_axis;
+              if(app.moment(thisMoment).isBetween(x_axis+ 'T05', x_axis+ 'T09:00:00+08:00')){
+                y_axis = 'A0000';
+              }else if(app.moment(thisMoment).isBetween(x_axis+ 'T09:00:01+08:00', x_axis+ 'T13:00:00+08:00')){
+                y_axis = 'A0001';
+              }else if(app.moment(thisMoment).isBetween(x_axis+ 'T13:00:01+08:00', x_axis+ 'T19:00:00+08:00')){
+                y_axis = 'A0002';
+              }else if(app.moment(thisMoment).isBetween(x_axis+ 'T19:00:01+08:00', x_axis+ 'T21:00:00+08:00')){
+                y_axis = 'A0003';
+              }
+              if(MealTime !==y_axis){
+                this.body = app.wrapper.res.error({message: '已过当前点餐时间，刷新重试！'});
+                yield next;
+                return;
+              }
+              var mealInMealMenu = yield app.modelFactory().model_query(app.models['psn_mealMenu'], {
+                select: 'status aggr_value',
+                where: {
+                  x_axis:x_axis,
+                  y_axis:y_axis,
+                  'aggr_value.mealId':mealId,
+                  tenantId: tenantId
+                }
+              });
+              var mealOrderRecord = yield app.modelFactory().model_read(app.models['psn_mealOrderRecord'], orderId);
+              console.log('mealOrderRecord:',mealOrderRecord);
+
+              if(mealOrderRecord.mealId == mealId){
+                if(num>0){
+                  if(mealInMealMenu[0].aggr_value.quantity>=num){
+                    console.log('套餐数量-num -------');
+                    mealInMealMenu[0].aggr_value.quantity -=num;
+                  }else {
+                    console.log('套餐剩余数量不足.....');
+                    this.body = app.wrapper.res.error({message: '套餐剩余数量不足！'});
+                    yield next;
+                    return;
+                  }
+                }else {
+                  console.log('套餐数量+num +++++++++');
+                  mealInMealMenu[0].aggr_value.quantity -=num;
+                }
+                yield mealInMealMenu[0].save();
+                mealOrderRecord.quantity +=num;
+                yield mealOrderRecord.save();
+              }else {
+                var iptNum = mealOrderRecord.quantity+num;
+                if(iptNum>mealInMealMenu[0].aggr_value.quantity){
+                  console.log('修改后套餐剩余数量不足...');
+                  this.body = app.wrapper.res.error({message: '套餐剩余数量不足！'});
+                  yield next;
+                  return;
+                }else {
+                  console.log('套餐数量-iptNum -------');
+                  mealInMealMenu[0].aggr_value.quantity -=iptNum;
+                  yield mealInMealMenu[0].save();
+                  var preMealInMealMenu = yield app.modelFactory().model_one(app.models['psn_mealMenu'], {
+                      select: 'status aggr_value',
+                      where: {
+                          x_axis:x_axis,
+                          y_axis:y_axis,
+                          'aggr_value.mealId':mealOrderRecord.mealId,
+                          tenantId: tenantId
+                      }
+                  });
+                  preMealInMealMenu.aggr_value.quantity += mealOrderRecord.quantity;
+                  yield preMealInMealMenu.save();
+                }
+                var sameMealOrderRecord = yield app.modelFactory().model_one(app.models['psn_mealOrderRecord'], {
+                  select: 'status mealId quantity',
+                  where: {
+                    elderlyId: mealOrderRecord.elderlyId,
+                    x_axis:x_axis,
+                    y_axis:y_axis,
+                    mealId:mealId,
+                    tenantId: tenantId
+                  }
+                });
+                if(sameMealOrderRecord){
+                  sameMealOrderRecord.quantity +=iptNum;
+                  yield sameMealOrderRecord.save();
+                  yield app.modelFactory().model_delete(app.models['psn_mealOrderRecord'], orderId);
+                }else {
+                  mealOrderRecord.quantity =iptNum;
+                  mealOrderRecord.mealId = mealId;
+                  yield mealOrderRecord.save();
+                }
+              }
+
+              this.body = app.wrapper.res.ret(mealOrderRecord);
+            } catch (e) {
+              self.logger.error(e.message);
+              this.body = app.wrapper.res.error(e);
+            }
+            yield next;
+          }
+        }
+      },
+      {
+        method: 'deleteMealOrder$save',
+        verb: 'post',
+        url: this.service_url_prefix + "/deleteMealOrder/save",
+        handler: function (app, options) {
+          return function*(next) {
+            try {
+              console.log("body", this.request.body);
+              var tenantId = this.request.body.tenantId;
+              var meal = this.request.body.meal;
+              var MealTime = this.request.body.curMealTime;
+              var thisMoment = app.moment().format(),x_axis = app.moment().format('YYYY-MM-DD'),y_axis;
+              if(app.moment(thisMoment).isBetween(x_axis+ 'T05', x_axis+ 'T09:00:00+08:00')){
+                  y_axis = 'A0000';
+              }else if(app.moment(thisMoment).isBetween(x_axis+ 'T09:00:01+08:00', x_axis+ 'T13:00:00+08:00')){
+                  y_axis = 'A0001';
+              }else if(app.moment(thisMoment).isBetween(x_axis+ 'T13:00:01+08:00', x_axis+ 'T19:00:00+08:00')){
+                  y_axis = 'A0002';
+              }else if(app.moment(thisMoment).isBetween(x_axis+ 'T19:00:01+08:00', x_axis+ 'T21:00:00+08:00')){
+                  y_axis = 'A0003';
+              }
+              if(MealTime !==y_axis){
+                this.body = app.wrapper.res.error({message: '已过当前点餐时间，刷新重试！'});
+                yield next;
+                return;
+              }
+
+              yield app.modelFactory().model_delete(app.models['psn_mealOrderRecord'], meal.orderId);
+              var mealInMealMenu = yield app.modelFactory().model_one(app.models['psn_mealMenu'], {
+                  select: 'status aggr_value',
+                  where: {
+                      x_axis:x_axis,
+                      y_axis:y_axis,
+                      'aggr_value.mealId':meal.mealId,
+                      tenantId: tenantId
+                  }
+              });
+              mealInMealMenu.aggr_value.quantity +=meal.quantity;
+              yield mealInMealMenu.save();
+
+              this.body = app.wrapper.res.default();
             } catch (e) {
               self.logger.error(e.message);
               this.body = app.wrapper.res.error(e);

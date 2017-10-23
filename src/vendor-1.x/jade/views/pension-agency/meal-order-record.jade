@@ -25,10 +25,11 @@
                     th.text-center(width="50") {{ vm.moduleTranslatePath('LABEL-YAXIS_LABEL') | translate}}
                     th.text-center(ng-repeat="column in vm.xAxisData",width="100") {{::column.name}}
             tbody
-                tr(ng-repeat="row in vm.yAxisData")
-                    td.text-center(height="80")
-                        | {{::row.name}}
-                    td.text-left(ng-repeat="col in vm.xAxisData",width="100",style="vertical-align:top;", ng-class='{"grid-cell-selected": vm.cells[row.value][col._id] }',ng-click="vm.selectGridCell(row.value,col._id)",ng-dblclick="vm.dbClickAddQuantity(row,col,vm.aggrData[row.value][col._id])")
-                        //span {{(vm.aggrData[row.value][col._id]) | mealArrayMember:'name':'quantity' }}
+                tr(ng-repeat="row in vm.rows")
+                    td.text-center
+                        | {{::row.elderly_name}}
+                    td.text-left(ng-repeat="col in vm.xAxisData",width="100")
                         ul.list-unstyled
-                            li(ng-repeat="mealData in vm.aggrData[row.value][col._id] ") • {{ mealData.name+'('+mealData.quantity+')'}}
+                            li(ng-repeat="mealData in row.orderedMeals[col.value] ") • {{ mealData.mealName[0].name+'('+mealData.quantity+')'}}
+                tr(ng-if="vm.rows.length==0")
+                    td.text-center(colspan="{{vm.xAxisData.length + 1}}") {{ 'grid.NO-RESULTS' | translate}}

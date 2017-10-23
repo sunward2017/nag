@@ -610,7 +610,8 @@
           mealMenuScheduleSave:mealMenuScheduleSave,
           mealMenuScheduleRemove:mealMenuScheduleRemove,
           mealMenuTemplateImport:mealMenuTemplateImport,
-          mealMenuSaveAsTemplate:mealMenuSaveAsTemplate
+          mealMenuSaveAsTemplate:mealMenuSaveAsTemplate,
+          mealOrderRecord:mealOrderRecord
         };
 
         function roomStatusInfo(tenantId) {
@@ -1183,6 +1184,13 @@
             tenantId: tenantId,
             mealMenuTemplateName: mealMenuTemplateName,
             toSaveRows: toSaveRows
+          });
+        }
+
+        function mealOrderRecord(tenantId,order_date) {
+          return $http.post(baseUrl + 'mealOrderRecord', {
+            tenantId: tenantId,
+            order_date: order_date
           });
         }
 

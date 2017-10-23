@@ -223,7 +223,7 @@ module.exports = {
             return o.reason == DIC.D3016.DRUG_STOCK_LOW
           }) || {
             reason: DIC.D3016.DRUG_STOCK_LOW,
-            content_template: '截止到${发生时间}${老人姓名}的药品已有不足.请单:${药品请单}',
+            content_template: '截止到${发生时间}${老人姓名}的药品已有不足.清单:${药品清单}',
             level: DIC.D3029.BLUE,
             modes: [DIC.D3030.PHONE, DIC.D3030.SMS, DIC.D3030.WX]
           };
@@ -242,7 +242,7 @@ module.exports = {
             content = content.replace(reg, self.ctx.moment().format('YYYY年MM月DD日HH点mm分'));
           } else if (RegExp.$1 == "老人姓名") {
             content = content.replace(reg, elderly.name);
-          } else if (RegExp.$1 == '药品请单') {
+          } else if (RegExp.$1 == '药品清单') {
             content = content.replace(reg, drugListContent);
           }
         }

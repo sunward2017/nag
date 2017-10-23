@@ -6863,6 +6863,74 @@ module.exports = {
             yield next;
           };
         }
+      },
+      {
+        method: 'mealOrderRecord',
+        verb: 'post',
+        url: this.service_url_prefix + "/mealOrderRecord",
+        handler: function (app, options) {
+          return function*(next) {
+            try {
+                var tenantId = this.request.body.tenantId;
+                var check_time = app.moment(this.request.body.order_date);
+
+                var where = {tenantId: app.ObjectId(tenantId), x_axis: { '$gte': check_time.toDate(), '$lt': check_time.add(1, 'days').toDate() }};
+
+                var rows = yield app.modelFactory().model_aggregate(app.models['psn_mealOrderRecord'], [
+                    {
+                        $match:where
+                    },
+                    {
+                        $lookup:{
+                            from: "psn_meal",
+                            localField:"mealId",
+                            foreignField:"_id",
+                            as:"mealName"
+                        }
+                    },
+                    {
+                        $project: {
+                            elderlyId: '$elderlyId',
+                            elderly_name:'$elderly_name',
+                            x_axis:'$x_axis',
+                            meal:{y_axis:'$y_axis',mealId:'$mealId',quantity:'$quantity',mealName:'$mealName'}
+                        }
+                    },
+                    {
+                        $group:{
+                            _id:'$elderlyId',
+                            elderly_name:{$first:'$elderly_name'},
+                            x_axis:{$first:'$x_axis'},
+                            orderedMeals:{$push:'$meal'}
+                        }
+                    },
+                    {
+                        $lookup:{
+                            from: "psn_elderly",
+                            localField:"_id",
+                            foreignField:"_id",
+                            as:"elderly"
+                        }
+                    }
+                ]);
+                console.log('mealOrderRecord rows:',rows);
+                app._.each(rows, (o) => {
+                    var groupedRows = app._.groupBy(o.orderedMeals, (meal) => {
+                        "use strict";
+                        return meal.y_axis;
+                    });
+                    o.orderedMeals = groupedRows;
+                });
+
+                this.body = app.wrapper.res.rows(rows);
+            } catch (e) {
+              console.log(e);
+              self.logger.error(e.message);
+              this.body = app.wrapper.res.error(e);
+            }
+            yield next;
+          };
+        }
       }
       /**********************其他*****************************/
 

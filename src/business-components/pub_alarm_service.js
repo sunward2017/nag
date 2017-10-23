@@ -181,7 +181,7 @@ module.exports = {
 
         // 设置报警等级和报警方式
 
-        var alarm_modes = yield self._getAlarmModesByD3016SettingForElderly(pub_alarm_D3016_A1000_setting.modes, tenant, elderly);
+        var alarm_modes = yield self._getAlarmModesByD3016SettingForElderly(pub_alarm_D3016_A1000_setting.reason, pub_alarm_D3016_A1000_setting.modes, tenant, elderly);
         console.log('alarm_modes:>>>>>>>>>>>>>>>>>', alarm_modes);
 
         var result = yield self.ctx.modelFactory().model_create(self.ctx.models['pub_alarm'], {
@@ -231,7 +231,7 @@ module.exports = {
 
         lowStockDrugStats.sort((a, b) => a.canUseDays - b.canUseDays);
         var drugListContent = self.ctx._.map(lowStockDrugStats, (o) => {
-          return o.drug_name + '(剩余' + o.canUseDays + '天)';
+          return o.drug_name + '(少于' + o.canUseDays + '天)';
         }).join(';');
 
         // 替换模版内容
@@ -248,7 +248,7 @@ module.exports = {
         }
 
         // 设置报警等级和报警方式
-        var alarm_modes = yield self._getAlarmModesByD3016SettingForElderly(pub_alarm_D3016_A2000_setting.modes, tenant, elderly);
+        var alarm_modes = yield self._getAlarmModesByD3016SettingForElderly(pub_alarm_D3016_A1000_setting.reason, pub_alarm_D3016_A2000_setting.modes, tenant, elderly);
         console.log('alarm_modes:>>>>>>>>>>>>>>>>>', alarm_modes);
 
         var result = yield self.ctx.modelFactory().model_create(self.ctx.models['pub_alarm'], {
@@ -272,7 +272,7 @@ module.exports = {
       }
     }).catch(self.ctx.coOnError);
   },
-  _getAlarmModesByD3016SettingForElderly: function (settingModes, tenant, elderly) {
+  _getAlarmModesByD3016SettingForElderly: function (reason, settingModes, tenant, elderly) {
     var self = this;
     return co(function*() {
       try {
@@ -291,7 +291,9 @@ module.exports = {
                 receiver.value && (mode_send_tos = mode_send_tos.concat(receiver.value.split(',')));
               } else if (receiver.type == DIC.D3031.RELATIVES_AND_FRIENDS) {
                 // 查找老人亲友
-                elderly.family_members.length > 0 && (mode_send_tos = mode_send_tos.concat(self.ctx._.map(elderly.family_members, member => member.phone)));
+                elderly.family_members.length > 0 && (mode_send_tos = mode_send_tos.concat(self.ctx._.map(self.ctx._.filter(elderly.family_members, function(fm){
+                  return _.contains(fm.received_alarm_D3016, reason)
+                }), member => member.phone)));
               } else if (receiver.type == DIC.D3031.NURSING_WORKER_SERVED) {
                 // 根据房间查找值班护工
                 var nursingScheduleItems = yield self.ctx.modelFactory().model_query(self.ctx.models['psn_nursingSchedule'], {

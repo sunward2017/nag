@@ -202,6 +202,8 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                                         | {{ vm.viewTranslatePath('TAB1-LABEL-FAMILY-MEMBER-PHONE') | translate}}
                                     th.text-center(width="200")
                                         | {{ vm.viewTranslatePath('TAB1-LABEL-FAMILY-MEMBER-ADDRESS') | translate}}
+                                    th.text-center(width="200")
+                                        | {{ vm.viewTranslatePath('TAB1-LABEL-FAMILY-RECEIVED_ALARM_D3016') | translate}}
                                     th.text-center(width="50",ng-if="!vm.readonly")
                             tbody
                                 tr(ng-repeat="row in vm.model.family_members" ng-click="vm.grid.selectRow($event,row)",ng-dblclick="vm.grid.dblclickRow(row.id)")
@@ -232,6 +234,14 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                                     td.text-left
                                         span(ng-if="!row.$editing") {{::row.address}}
                                         input.form-control(type="text",ng-if="row.$editing",ng-model='row.address',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-FAMILY-MEMBER-ADDRESS")|translate}}' ,required='')
+                                    td.text-left
+                                        div(ng-if="!row.$editing") {{row.received_alarm_D3016 | diFilter:vm.selectBinding.alarm_reasons}}
+                                        div(ng-if="row.$editing", ng-repeat="reason in vm.selectBinding.alarm_reasons")
+                                            .checkbox.c-checkbox
+                                                label
+                                                    input(id="received_{{reason.value}}", type='checkbox',ng-model='vm.fm_received_alarm_D3016[row._id || row.name+"$"+row.id_no][reason.value]')
+                                                    span.fa.fa-check
+                                            label(for="received_{{reason.value}}") {{ reason.name }}
                                     td(ng-if="!vm.readonly")
                                         .btn-group(ng-if="!vm.readonly && !row.$editing")
                                             a.btn.btn-primary.btn-xs(title="{{'button.EDIT'|translate}}",ng-click="vm.editElderlyFamilyMember(row)")

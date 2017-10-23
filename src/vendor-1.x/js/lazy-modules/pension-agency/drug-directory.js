@@ -4,70 +4,79 @@
  */
 
 (function() {
-    'use strict';
-    
-    angular
-        .module('subsystem.pension-agency')
-        .controller('DrugDirectoryGridController',DrugDirectoryGridController)
-        .controller('DrugDirectoryDetailsController',DrugDirectoryDetailsController)
-    ;
+  'use strict';
 
-    DrugDirectoryGridController.$inject = ['$scope', 'ngDialog', 'vmh', 'entryVM'];
+  angular
+    .module('subsystem.pension-agency')
+    .controller('DrugDirectoryGridController', DrugDirectoryGridController)
+    .controller('DrugDirectoryDetailsController', DrugDirectoryDetailsController)
+  ;
 
-    function  DrugDirectoryGridController($scope, ngDialog, vmh, vm) {
+  DrugDirectoryGridController.$inject = ['$scope', 'ngDialog', 'vmh', 'entryVM'];
 
-        $scope.vm = vm;
-        $scope.utils = vmh.utils.g;
+  function DrugDirectoryGridController($scope, ngDialog, vmh, vm) {
 
-        init();
+    $scope.vm = vm;
+    $scope.utils = vmh.utils.g;
 
-        function init() {
-            vm.init({removeDialog: ngDialog});
-            vm.query();
-        }
+    init();
+
+    function init() {
+      vm.init({removeDialog: ngDialog});
+      vm.query();
     }
-    DrugDirectoryDetailsController.$inject = ['$scope', 'ngDialog', 'vmh', 'entityVM'];
+  }
 
-    function  DrugDirectoryDetailsController($scope, ngDialog, vmh, vm) {
+  DrugDirectoryDetailsController.$inject = ['$scope', 'ngDialog', 'vmh', 'entityVM'];
 
-        var vm = $scope.vm = vm;
-        $scope.utils = vmh.utils.v;
+  function DrugDirectoryDetailsController($scope, ngDialog, vmh, vm) {
 
-
-        init();
-
-        function init() {
-
-            vm.init({removeDialog: ngDialog});
+    var vm = $scope.vm = vm;
+    $scope.utils = vmh.utils.v;
 
 
-            vm.doSubmit = doSubmit;
-            vm.tab1 = {cid: 'contentTab1'};
+    init();
 
-            vmh.parallel([
-                vmh.shareService.d('D3026')
-            ]).then(function (results) {
-                vm.selectBinding.mini_units = results[0];
-            });
-            
-            vm.load();
+    function init() {
 
-        }
+      vm.init({removeDialog: ngDialog});
 
 
-        function doSubmit() {
+      vm.doSubmit = doSubmit;
+      vm.tab1 = {cid: 'contentTab1'};
 
-            if ($scope.theForm.$valid) {
-                vm.save();
-            }
-            else {
-                if ($scope.utils.vtab(vm.tab1.cid)) {
-                    vm.tab1.active = true;
-                }
-            }
-        }
+      vmh.parallel([
+        vmh.shareService.d('D3026')
+      ]).then(function (results) {
+        vm.selectBinding.mini_units = results[0];
+      });
 
+      vm.load().then(function () {
+        vm.old_full_name = vm.model.full_name;
+      });
 
     }
+
+
+    function doSubmit() {
+
+      if ($scope.theForm.$valid) {
+        vm.save().then(function (ret) {
+          console.log('compare:', vm.old_full_name, vm.model.full_name)
+          if (vm.old_full_name != vm.model.full_name && vm._action_ == 'edit') {
+            console.log('notifyDataChange');
+            vmh.shareService.notifyDataChange('psn$drugDirectory$$name', vm.model._id);
+          }
+        });
+      }
+      else {
+        if ($scope.utils.vtab(vm.tab1.cid)) {
+          vm.tab1.active = true;
+        }
+      }
+    }
+
+
+  }
 
 })();

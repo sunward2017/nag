@@ -326,9 +326,7 @@
           var deltaHeight = 35 + 49 + 10.5 + 52;//search.h + thead.h + row.split + panel-footer.h
           this.page.size = Math.floor((this.size.h - deltaHeight) / this.rowHeight);
           if(canRememberPage.bind(this)()){
-            // console.log('>>>$fromState:', $rootScope.$fromState, $rootScope.$listState.page);
-            $rootScope.$listState.page && (this.page = $rootScope.$listState.page)
-            console.log('page:', this.page)
+            $rootScope.$listState.page && (this.page = $rootScope.$listState.page);
           }
 
           //console.log((this.size.h - 35 - 49 - 10.5 - 52) );
@@ -537,7 +535,6 @@
         function query() {
           var self = this;
 
-          console.log('query:>', self.page);
           this.conditionBeforeQuery && this.conditionBeforeQuery();
 
           if (self.serverPaging) {
@@ -811,8 +808,9 @@
 
         function load() {
           var self = this;
+          console.log('this._id_:', this._id_)
           if (this._id_ == 'new') {
-            this.model = _.defaults(this.model, this.toListParams, option.model);
+            this.model = _.extend(this.model, this.toListParams, angular.copy(option.model));
             return $q.when(this.model);
           }
 
@@ -845,7 +843,7 @@
         }
 
         function loadWhenBatchAdd() {
-          return $q.when(_.defaults(this.model, this.toListParams, option.model));
+          return $q.when(_.extend(this.model, this.toListParams, angular.copy(option.model)));
         }
 
         function loadWhenBatchEdit() {

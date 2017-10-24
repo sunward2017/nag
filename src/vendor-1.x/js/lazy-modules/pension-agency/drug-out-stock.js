@@ -79,7 +79,6 @@
                 vm.selectBinding.modes =  results[3];
 
                 vm.load().then(function () {
-                    console.log('vm.model.drugs:', vm.model.drugs);
                     if (vm.model.elderlyId) {
                         vm.selectedElderly = { _id: vm.model.elderlyId, name: vm.model.elderly_name };
                     }

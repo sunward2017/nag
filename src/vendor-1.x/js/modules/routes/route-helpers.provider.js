@@ -285,6 +285,11 @@
           return $stateParams[name];
         }
 
+        function canRememberPage() {
+          return this.rememberPageBy.length > 0 && $rootScope.$fromState && $rootScope.$fromState.name
+            && _.contains(this.rememberPageBy, $rootScope.$fromState.name.substr($rootScope.$fromState.name.lastIndexOf('.')))
+        }
+
         function init(initOption) {
           var self = this;
           this.size = calcWH($window);
@@ -320,6 +325,12 @@
           //计算行数
           var deltaHeight = 35 + 49 + 10.5 + 52;//search.h + thead.h + row.split + panel-footer.h
           this.page.size = Math.floor((this.size.h - deltaHeight) / this.rowHeight);
+          if(canRememberPage.bind(this)()){
+            // console.log('>>>$fromState:', $rootScope.$fromState, $rootScope.$listState.page);
+            $rootScope.$listState.page && (this.page = $rootScope.$listState.page)
+            console.log('page:', this.page)
+          }
+
           //console.log((this.size.h - 35 - 49 - 10.5 - 52) );
           //console.log(this.page.size);
 
@@ -526,6 +537,7 @@
         function query() {
           var self = this;
 
+          console.log('query:>', self.page);
           this.conditionBeforeQuery && this.conditionBeforeQuery();
 
           if (self.serverPaging) {
@@ -536,6 +548,10 @@
             //服务端totals在查询数据时计算
             modelService.totals(self.searchForm).$promise.then(function (ret) {
               self.page.totals = ret.totals;
+
+              //将当前列表的page对象到rootScope供从details返回时直接使用
+              $rootScope.$listState.page = self.page;
+
               if (self.blocker) {
                 self.blocker.stop();
               }
@@ -553,6 +569,7 @@
 
         function paging() {
           if (this.serverPaging) {
+            console.log('paging...', this.page)
             this.query();
           }
         }
@@ -624,6 +641,7 @@
           blocker: option.blockUI ? blockUI.instances.get('list-block') : false,
           serverPaging: option.serverPaging,
           page: _.defaults(option.page || {}, {size: 9, no: 1}),
+          rememberPageBy:  _.union(['.details', '.config'], option.rememberPageBy || []),
           switches: option.switches || {},
           searchForm: {},//因数据会在view或controller中变化，所以在init里出设置。类似buildEntityVM中的model
           transTo: option.transTo || {},//跳转到另外module设置对象

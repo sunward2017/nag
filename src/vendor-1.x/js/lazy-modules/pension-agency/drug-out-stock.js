@@ -47,6 +47,7 @@
             vm.removeDrugOutStock = removeDrugOutStock;
             vm.selectAll = selectAll;
             vm.checkDrugsListChanged = checkDrugsListChanged;
+            vm.importFromDrugUseItem = importFromDrugUseItem;
 
             vm.searchElderlyForBackFiller = searchElderlyForBackFiller;
             vm.selectElderlyForBackFiller = selectElderlyForBackFiller;
@@ -154,6 +155,32 @@
                     drugs.splice(index, 1);
                 }
             });
+        }
+        
+        function importFromDrugUseItem() {
+            if(!vm.model.elderlyId){
+                vmh.alertWarning(vm.viewTranslatePath('WARNING-NOT-SELECT-ELDERLY'), true);
+                return;
+            }
+            vm.modelNode.services['psn-drugUseItem'].query({
+                status: 1,
+                elderlyId: vm.model.elderlyId,
+                repeat_type:'A0003',
+                stop_flag:false,
+                tenantId: vm.model.tenantId
+            }, 'elderly_name drugId quantity unit repeat_type repeat_values', null, [{
+                path: 'drugId',
+                select: '_id full_name short_name mini_unit'
+            }]).$promise.then(function (rows) {
+                console.log('elderlyDrugUseItems rows:',rows);
+                var repeat_value,drug_name;
+                _.each(rows,function (o) {
+                    repeat_value = o.repeat_values.length;
+                    drug_name = o.drugId.short_name || o.drugId.full_name ;
+                    syncToDrugListWhenAdd({drugId:o.drugId._id,drug_name:drug_name,mini_unit:o.drugId.mini_unit,quantity:repeat_value * o.quantity});
+                });
+            });
+
         }
 
         function checkDrugsListChanged () {

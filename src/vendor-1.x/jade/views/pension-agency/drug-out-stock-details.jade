@@ -89,6 +89,8 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                                                     i.glyphicon.glyphicon-plus
                                                 a.btn.btn-primary.btn-sm(title="{{'button.REMOVE'|translate}}",ng-click="vm.removeDrugOutStock()")
                                                     i.glyphicon.glyphicon-minus
+                                            .btn-group(ng-if="!vm.readonly&& vm._action_!='edit' ")
+                                                a.btn.btn-success.btn-sm(ng-click="vm.importFromDrugUseItem()") {{vm.viewTranslatePath('IMPORT-FROM-DRUG-USE-ITEM')|translate}}
 
 
     .text-right.mt-lg(ng-if="!vm.readonly")

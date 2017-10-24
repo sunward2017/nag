@@ -911,7 +911,8 @@
         "WARNING-NOT-SELECT-ELDERLY": "必须先选择老人",
         "TAB1-LABEL-STOCK_TOTAL": "库存数量",
         "TAB1-LABEL-UNIT": "库存单位",
-        "VALIDATOR-UNIT-NOT-EQUAL": "出库单位必须和库存单位一致"
+        "VALIDATOR-UNIT-NOT-EQUAL": "出库单位必须和库存单位一致",
+        "IMPORT-FROM-DRUG-USE-ITEM":"(按日)从用药管理导入"
       }
     },
     "receipts-and-disbursements": {

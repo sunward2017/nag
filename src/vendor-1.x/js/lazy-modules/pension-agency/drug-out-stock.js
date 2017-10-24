@@ -175,7 +175,8 @@
                 console.log('elderlyDrugUseItems rows:',rows);
                 var repeat_value,drug_name;
                 _.each(rows,function (o) {
-                    repeat_value = o.repeat_values.length;
+                    repeat_value = o.repeat_values.length>1? o.repeat_values.length:1;
+                    console.log('repeat_value:',repeat_value);
                     drug_name = o.drugId.short_name || o.drugId.full_name ;
                     syncToDrugListWhenAdd({drugId:o.drugId._id,drug_name:drug_name,mini_unit:o.drugId.mini_unit,quantity:repeat_value * o.quantity});
                 });

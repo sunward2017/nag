@@ -14,6 +14,7 @@
         $rootScope.$stateParams = $stateParams;
         $rootScope.$storage = $window.localStorage;
         $rootScope.$translate = $translate;
+        $rootScope.$listState = {};
 
 
         // Uncomment this to disable template cache

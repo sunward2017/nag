@@ -6089,6 +6089,73 @@ module.exports = {
           }
         }
       },
+      /**************************导出用药管理*******************************/
+      {
+        method: 'excel$elderlyDrugUseItem',
+        verb: 'post',
+        url: this.service_url_prefix + "/excel/elderlyDrugUseItem",
+        handler: function (app, options) {
+          return function*(next) {
+            try {
+              var tenantId = this.request.body.tenantId;
+              var file_name = this.request.body.file_name;
+              var elderlyId = this.request.body.elderlyId;
+              var where;
+              if(elderlyId){
+                where = {
+                  status: 1,
+                  tenantId: tenantId,
+                  elderlyId: elderlyId
+                };
+              }else {
+                var liveInElderlys = yield app.modelFactory().model_query(app.models['psn_elderly'], {
+                  select: 'name ',
+                  where: {
+                    status: 1,
+                    tenantId: tenantId,
+                    live_in_flag:true
+                  }
+                });
+                console.log('liveInElderlys:',liveInElderlys);
+                var elderlyIds=[];
+                app._.each(liveInElderlys, (o) => {
+                    elderlyIds.push(o._id);
+                });
+                where = {
+                  status: 1,
+                  tenantId: tenantId,
+                  elderlyId:{$in:elderlyIds}
+                };
+              }
+
+              var rawRows = yield app.modelFactory().model_query(app.models['psn_drugUseItem'], {
+                select: 'elderly_name drugId quantity unit  description ',
+                where: where
+              }).populate('drugId', 'full_name short_name mini_unit');
+              console.log('rawRows:',rawRows);
+              var drugName;
+              var rows = app._.map(rawRows, (raw) => {
+                drugName =raw.drugId.short_name|| raw.drugId.full_name;
+                if(!raw.description){
+                  raw.description = '';
+                }
+                return {
+                  '姓名': raw.elderly_name,
+                  '药品名称': drugName,
+                  '一次服用量':raw.quantity+raw.drugId.mini_unit_name,
+                  '服用方法':raw.description,
+                };
+              });
+              this.set('Parse', 'no-parse');
+              this.body = yield app.excel_service.build(file_name, rows, ['姓名', '药品名称','一次服用量','服用方法']);
+            } catch (e) {
+              self.logger.error(e.message);
+              this.body = app.wrapper.res.error(e);
+            }
+            yield next;
+          };
+        }
+      },
       /**********************药品出入库*****************************/
       {
         method: 'drugInStock',

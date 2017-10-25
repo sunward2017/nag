@@ -6142,12 +6142,11 @@ module.exports = {
                 return {
                   '姓名': raw.elderly_name,
                   '药品名称': drugName,
-                  '一次服用量':raw.quantity+raw.drugId.mini_unit_name,
                   '服用方法':raw.description,
                 };
               });
               this.set('Parse', 'no-parse');
-              this.body = yield app.excel_service.build(file_name, rows, ['姓名', '药品名称','一次服用量','服用方法']);
+              this.body = yield app.excel_service.build(file_name, rows, ['姓名', '药品名称','服用方法']);
             } catch (e) {
               self.logger.error(e.message);
               this.body = app.wrapper.res.error(e);

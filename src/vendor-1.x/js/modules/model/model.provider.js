@@ -536,6 +536,7 @@
           queryElderly: queryElderly,
           exportExcelForEldelryPrintQRLabel: exportExcelForEldelryPrintQRLabel,
           exportExcelForRoomBedPrintQRLabel: exportExcelForRoomBedPrintQRLabel,
+          exportExcelForDrugUseItem:exportExcelForDrugUseItem,
           queryDrug: queryDrug,
           drugUseItemSave: drugUseItemSave,
           drugUseItemRemove: drugUseItemRemove,
@@ -703,6 +704,17 @@
               select: select,
               sort: sort
             }
+          });
+        }
+
+        function exportExcelForDrugUseItem(file_name, tenantId,elderlyId) {
+          return $http.post(baseUrl + 'excel/elderlyDrugUseItem', {
+              file_name: file_name,
+              tenantId: tenantId,
+              elderlyId:elderlyId
+          }, {responseType: 'blob'}).success(function (res) {
+              console.log('res', res);
+              saveAs(res, decodeURI(file_name + '.xlsx'));
           });
         }
 

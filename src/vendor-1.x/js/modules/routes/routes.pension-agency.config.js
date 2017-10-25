@@ -1694,7 +1694,8 @@
                             sortable: false,
                             width: 30
                         }]
-                    }) 
+                    }) ,
+                    deps: helper.resolveFor2('file-saver')
                 }
             })
             .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'drug-use-item.details', {
@@ -1706,7 +1707,8 @@
                     entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'drug-use-item.details', {
                         modelName: 'psn-elderly',
                         blockUI: true
-                    })
+                    }),
+                    deps: helper.resolveFor2('file-saver')
                 }
             })
             .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'drug-use-template', {

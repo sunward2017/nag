@@ -20,6 +20,7 @@
     $scope.vm = vm;
     $scope.utils = vmh.utils.g;
     vm.onRoomChange = onRoomChange;
+    vm.exportExcelForDrugUseItem = exportExcelForDrugUseItem;
     vm.init({removeDialog: ngDialog});
 
     vm.yAxisDataPromise = vmh.shareService.tmp('T3009', null, {tenantId: vm.tenantId}).then(function (nodes) {
@@ -44,6 +45,10 @@
         return o._id
       }));
     }
+
+    function exportExcelForDrugUseItem() {
+      vmh.psnService.exportExcelForDrugUseItem('老人用药管理信息表(' + vm.tenant_name + '-' + moment().format('YYYY.MM.DD') + ')', vm.tenantId);
+    }
   }
 
   ElderlyByDrugUseController.$inject = ['$scope', 'ngDialog', 'vmh', 'entityVM'];
@@ -57,6 +62,7 @@
     vm.selectAll = selectAll;
     vm.drugUseItemIds = [];
     vm.removeElderlyDrugUseItem = removeElderlyDrugUseItem;
+    vm.exportExcelForDrugUseItem = exportExcelForDrugUseItem;
 
     var drugUseService = vm.modelNode.services['psn-drugUseItem'];
     init();
@@ -182,6 +188,10 @@
           vm.fetchDrugUseItem();
         });
       });
+    }
+    
+    function exportExcelForDrugUseItem() {
+      vmh.psnService.exportExcelForDrugUseItem('老人用药管理信息表(' + vm.tenant_name + '-' + moment().format('YYYY.MM.DD') + ')', vm.tenantId,vm.model._id);
     }
   }
 

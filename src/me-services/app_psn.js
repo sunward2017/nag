@@ -461,7 +461,7 @@ module.exports = {
                 return app.wrapper.res.error({message: '无法找到对应的片区'});
               }
 
-              var elderlys_out_stock_check_mode = DIC.D3028.BY_TIME_TEMPLATE;
+              var elderlys_out_stock_check_mode = DIC.D3028.BY_PERIOD;
               if (district.config && district.config.elderlys_out_stock_check_mode) {
                 elderlys_out_stock_check_mode = district.config.elderlys_out_stock_check_mode;
               }
@@ -557,21 +557,13 @@ module.exports = {
               var tenantId = this.request.body.tenantId;
               var elderlyId = this.request.body.elderlyId;
 
-              var tenant, elderly;
-              tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], tenantId);
-              if (!tenant || tenant.status == 0) {
-                return app.wrapper.res.error({message: '无法找到养老机构'});
-              }
-              elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], elderlyId);
-              if (!elderly || elderly.status == 0) {
-                return app.wrapper.res.error({message: '无法找到入库药品对应的老人资料'});
-              }
-              if (!elderly.live_in_flag || elderly.begin_exit_flow) {
-                return app.wrapper.res.error({message: '当前老人不在院或正在办理出院手续'});
+              var tae = yield app.psn_drug_stock_service._getTenantAndElderly(tenantId, elderlyId);
+              if(!tae.success){
+                return tae
               }
 
+              var tenant = tae.ret.t, elderly = tae.ret.e;
               var elderlyStockObject = yield app.psn_drug_stock_service._elderlyStockObject(tenant, elderly);
-
               var lowStockDrugStats = [], drugStockStat;
               for (var drugId in elderlyStockObject) {
                 drugStockStat = elderlyStockObject[drugId];
@@ -605,12 +597,16 @@ module.exports = {
               var tenantId = this.request.body.tenantId;
               var operated_by = this.request.body.userId;
               var openid = this.openid;
+              var outStockMode = this.request.body.outStockMode;
               var outStockData = this.request.body.outStockData;
 
               console.log("body", this.request.body);
 
-              this.body = yield app.psn_drug_stock_service.outStock(tenantId, outStockData, operated_by, openid);
-
+              if (outStockMode === DIC.D3028.BY_DAY) {
+                this.body = yield app.psn_drug_stock_service.outStockByDay(tenantId, outStockData.type, outStockData.mode, operated_by, openid);
+              } else {
+                this.body = yield app.psn_drug_stock_service.outStockByPeriod(tenantId, outStockData, operated_by, openid);
+              }
             } catch (e) {
               self.logger.error(e.message);
               this.body = app.wrapper.res.error(e);

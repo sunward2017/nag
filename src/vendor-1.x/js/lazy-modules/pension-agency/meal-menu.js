@@ -51,7 +51,14 @@
             });
 
             vm.baseWeek = 0;
-            var p1 = loadWeek();
+            vm.modelNode.services['pub-tenant'].query({
+                status: 1,
+                _id: vm.tenantId
+            },'other_config').$promise.then(function (res) {
+                console.log('tenantService res:',res);
+                vm.mealMode = res[0].other_config.psn_meal_biz_mode;
+                var p1 = loadWeek();
+            });
 
         }
 

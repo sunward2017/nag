@@ -209,6 +209,13 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                         .col-md-10
                             input.form-control(type='number',name='pub_assessment_regular_period',ng-model='vm.other_configs.pub_assessment_regular_period',placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-ASSESSMENT_REGULAR_PERIOD")|translate}}',ui-validate="'$value>=1'")
                             span.text-danger(ng-show="utils.vinput(this.theForm,'pub_assessment_regular_period','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset: .form-group
+                        <!--订餐模式-->
+                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-MEAL_BIZ_MODE') | translate}}:
+                        .col-md-10
+                            .btn-group
+                                .btn.btn-primary(name='meal_biz_mode',ng-repeat='mode in vm.selectBinding.meal_biz_mode',ng-model='vm.other_configs.psn_meal_biz_mode',btn-radio="mode.value",required='') {{mode.name}}
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'meal_biz_mode','required')") {{ "validator.REQUIRED" | translate}}
 
     .text-right.mt-lg
         button.btn.btn-success(type="submit") {{'button.SAVE'|translate}}

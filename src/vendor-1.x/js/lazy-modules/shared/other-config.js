@@ -36,7 +36,8 @@
                 vmh.fetch(tenantService.query({_id: vm.tenantId})),
                 vmh.shareService.d('D3029'),
                 vmh.shareService.d('D3030'),
-                vmh.shareService.d('D3031')
+                vmh.shareService.d('D3031'),
+                vmh.shareService.d('D3041')
             ]).then(function (results) {
                 vm.other_configs = results[0][0].other_config;
                 vm.tenant_name = results[0][0].name;
@@ -98,6 +99,7 @@
                 vm.selectBinding.alarm_mode_A0003_receiver_types = _.filter(results[3], function(o){return _.contains(o.alarm_modes, 'A0003');});
                 vm.selectBinding.alarm_mode_A0005_receiver_types = _.filter(results[3], function(o){return _.contains(o.alarm_modes, 'A0005');});
                 vm.selectBinding.alarm_mode_A0007_receiver_types = _.filter(results[3], function(o){return _.contains(o.alarm_modes, 'A0007');});
+                vm.selectBinding.meal_biz_mode = results[4];
             });
         }
 

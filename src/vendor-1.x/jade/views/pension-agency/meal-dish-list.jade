@@ -27,7 +27,7 @@
                                     span.fa.fa-check(data="trBubble")
                         td.text-left {{::row.name}}
                         td {{::row.nature_name}}
-                        td {{::row.price}}
+                        td.text-right {{::row.price|currency}}
                         td {{::row.stop_flag|boolFilter}}
                         td
                             .btn-group

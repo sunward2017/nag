@@ -16,7 +16,7 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                     fieldset: .form-group
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-MEMBERS') | translate}}:
                         .col-md-4
-                            .tree.tree-basic(s-tree,s-tree-data="vm.treeDataPromiseOfDishes",s-tree-height="300", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{mode:'check', selectNodeFormat:'object', nodeIdKey: '_id'}",ng-model="vm.model.meal" ,on-check-change="vm.priceChange()")
+                            .tree.tree-basic(s-tree,s-tree-data="vm.treeDataPromiseOfDishes",s-tree-height="300", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{mode:'check', selectNodeFormat:'object', nodeIdKey: '_id'}",ng-model="vm.model.dishes" ,on-check-change="vm.priceChange()")
                     fieldset: .form-group
                         <!--菜品组价格-->
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-PRICE') | translate}}:

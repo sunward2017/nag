@@ -26,8 +26,8 @@
                                     input(type='checkbox' data="trBubble" ng-model="row.checked" )
                                     span.fa.fa-check(data="trBubble")
                         td.text-left {{::row.name}}
-                        td.text-left {{::row.price}}
-                        td.text-left {{::row.meal_summary}}
+                        td.text-right {{::row.price|currency}}
+                        td.text-left {{::row.dishes | safeArrayMember:'name'}}
                         td {{::row.stop_flag|boolFilter}}
                         td
                             .btn-group

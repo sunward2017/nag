@@ -112,6 +112,7 @@ module.exports = function(ctx,name) {
         pub_assessment_regular_period: {type: Number, default: 3.00},//定期评估周期，单位：月，默认3个月
         psn_drug_in_stock_expire_date_check_flag: {type: Boolean, default: false}, // 药品入库是否需要检查效期 (扫码时是否要输入效期字段)
         psn_drug_stock_alarm_low_day: {type: Number, default: 3, min: 0},// 药品低库存警戒(剩余天数)
+        psn_drug_stock_out_mode:{type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3042"])}, //出库模式
         psn_meal_biz_mode: {type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3041"])}, //订餐模式
         psn_meal_periods: [String] //D3040
       }

@@ -25,12 +25,16 @@
       vm.init({removeDialog: ngDialog});
       vm.doSubmit = doSubmit;
 
+      vm.tab1 = {cid: 'contentTab1'};
+      vm.tab2 = {cid: 'contentTab2'};
+
       vm.pub_alarm_D3016_A1000_setting_modes = {};
       vm.pub_alarm_D3016_A2000_setting_modes = {};
       vm.pub_alarm_D3016_A1000_modes_receivers_obj = {};
       vm.pub_alarm_D3016_A2000_modes_receivers_obj = {};
       vm.pub_alarm_D3016_A1000_modes_receivers_value = {};
       vm.pub_alarm_D3016_A2000_modes_receivers_value = {};
+      vm.psn_meal_periods = [];
 
       vmh.parallel([
         vmh.fetch(tenantService.query({_id: vm.tenantId})),
@@ -38,15 +42,13 @@
         vmh.shareService.d('D3030'),
         vmh.shareService.d('D3031'),
         vmh.shareService.d('D3040'),
-        vmh.shareService.d('D3041')
+        vmh.shareService.d('D3041'),
+        vmh.shareService.d('D3042')
       ]).then(function (results) {
         vm.other_configs = results[0][0].other_config;
         console.log('--->',vm.other_configs)
         vm.tenant_name = results[0][0].name;
         vm.head_of_agency = results[0][0].head_of_agency || {};
-        if(!vm.other_configs.psn_meal_periods){
-          vm.other_configs.psn_meal_periods = [];
-        }
 
         _.each(results[2], function (mode) {
           vm.pub_alarm_D3016_A1000_modes_receivers_obj[mode.value] = {};
@@ -112,8 +114,10 @@
         vm.selectBinding.alarm_mode_A0007_receiver_types = _.filter(results[3], function (o) {
           return _.contains(o.alarm_modes, 'A0007');
         });
-        vm.selectBinding.meal_periods = results[4];
-        vm.selectBinding.meal_biz_mode = results[5];
+        vm.selectBinding.psn_meal_periods = results[4];
+        vm.selectBinding.psn_meal_biz_modes = results[5];
+        vm.psn_meal_periods = _.map(vm.selectBinding.psn_meal_periods, function(o){return _.contains(vm.other_configs.psn_meal_periods||[], o.value) ? o.value : '';})
+        vm.selectBinding.psn_drug_stock_out_modes = results[6];
       });
     }
 
@@ -156,8 +160,8 @@
           }
         }
         vm.pub_alarm_D3016_A2000_setting.modes = alarm_D3016_A2000_modes;
-        vm.other_configs.psn_meal_periods = _.compact(vm.other_configs.psn_meal_periods);
-        console.log('vm.other_configs.pub_alarm_D3016_settings:', vm.other_configs.pub_alarm_D3016_settings);
+        vm.other_configs.psn_meal_periods = _.compact(vm.psn_meal_periods);
+        // console.log('vm.other_configs.pub_alarm_D3016_settings:', vm.other_configs.pub_alarm_D3016_settings);
         vmh.exec(vmh.extensionService.saveTenantConfig(vm.model['tenantId'], {
           main: {name: vm.tenant_name, head_of_agency: vm.head_of_agency},
           other: vm.other_configs
@@ -166,6 +170,8 @@
       else {
         if ($scope.utils.vtab(vm.tab1.cid)) {
           vm.tab1.active = true;
+        } else if ($scope.utils.vtab(vm.tab2.cid)) {
+          vm.tab2.active = true;
         }
       }
     }

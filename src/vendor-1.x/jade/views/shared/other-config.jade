@@ -194,36 +194,49 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                                         input(id="ALARM_D3016_A2000_MODE_A0007_{{receiver_type.value}}" type='checkbox',ng-model='vm.pub_alarm_D3016_A2000_modes_receivers_obj["A0007"][receiver_type.value]')
                                         span.fa.fa-check
                                 label(for="ALARM_D3016_A2000_MODE_A0007_{{receiver_type.value}}" ) {{ receiver_type.name}}
+            tab(active="vm.tab2.active")
+                tab-heading
+                    | {{ vm.moduleTranslatePath('TAB2') | translate}}
+                    span.text-danger(title="{{'validator.FIELD-INVALID'|translate}}" , ng-show="utils.vtab('contentTab2')")
+                        i.glyphicon.glyphicon-minus-sign
+                div#contentTab2
+                    fieldset: .form-group
+                        <!--评估周期（月）-->
+                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB2-LABEL-ASSESSMENT_REGULAR_PERIOD') | translate}}:
+                        .col-md-10
+                            input.form-control(type='number',name='pub_assessment_regular_period',ng-model='vm.other_configs.pub_assessment_regular_period',placeholder='{{vm.moduleTranslatePath("TAB2-PLACEHOLDER-ASSESSMENT_REGULAR_PERIOD")|translate}}',ui-validate="'$value>=1'")
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'pub_assessment_regular_period','required')") {{ "validator.REQUIRED" | translate}}
                     fieldset: .form-group
                         <!--药品入库时检查效期-->
-                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-FLAG-COLLECTION') | translate}}:
-                        .col-md-2
+                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB2-LABEL-FLAG-COLLECTION') | translate}}:
+                        .col-md-10
                             .checkbox.c-checkbox
                                 label
                                     input#drugInStockExpireDateCheckFlag(type='checkbox',ng-model='vm.other_configs.psn_drug_in_stock_expire_date_check_flag')
                                     span.fa.fa-check
-                            label(for="drugInStockExpireDateCheckFlag") {{ vm.moduleTranslatePath('TAB1-LABEL-PSN_DRUG_IN_STOCK_EXPIRE_DATE_CHECK_FLAG') | translate}}
+                            label(for="drugInStockExpireDateCheckFlag") {{ vm.moduleTranslatePath('TAB2-LABEL-PSN_DRUG_IN_STOCK_EXPIRE_DATE_CHECK_FLAG') | translate}}
                     fieldset: .form-group
-                        <!--评估周期（月）-->
-                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-ASSESSMENT_REGULAR_PERIOD') | translate}}:
-                        .col-md-10
-                            input.form-control(type='number',name='pub_assessment_regular_period',ng-model='vm.other_configs.pub_assessment_regular_period',placeholder='{{vm.moduleTranslatePath("TAB1-PLACEHOLDER-ASSESSMENT_REGULAR_PERIOD")|translate}}',ui-validate="'$value>=1'")
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'pub_assessment_regular_period','required')") {{ "validator.REQUIRED" | translate}}
-                    fieldset: .form-group
-                        <!--订餐模式-->
-                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-MEAL_BIZ_MODE') | translate}}:
+                        <!--药品出库模式-->
+                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB2-LABEL-PSN_DRUG_STOCK_OUT_MODE') | translate}}:
                         .col-md-10
                             .btn-group
-                                .btn.btn-primary(name='meal_biz_mode',ng-repeat='mode in vm.selectBinding.meal_biz_mode',ng-model='vm.other_configs.psn_meal_biz_mode',btn-radio="mode.value",required='') {{mode.name}}
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'meal_biz_mode','required')") {{ "validator.REQUIRED" | translate}}
+                                .btn.btn-primary(name='psn_drug_stock_out_mode',ng-repeat='mode in vm.selectBinding.psn_drug_stock_out_modes',ng-model='vm.other_configs.psn_drug_stock_out_mode',btn-radio="mode.value",required='') {{mode.name}}
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'psn_drug_stock_out_mode','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset: .form-group
+                        <!--订餐模式-->
+                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB2-LABEL-PSN_MEAL_BIZ_MODE') | translate}}:
+                        .col-md-10
+                            .btn-group
+                                .btn.btn-primary(name='psn_meal_biz_mode',ng-repeat='mode in vm.selectBinding.psn_meal_biz_modes',ng-model='vm.other_configs.psn_meal_biz_mode',btn-radio="mode.value",required='') {{mode.name}}
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'psn_meal_biz_mode','required')") {{ "validator.REQUIRED" | translate}}
                     fieldset: .form-group
                         <!--订餐开放时段-->
-                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-MEAL_PERIODS') | translate}}:
+                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB2-LABEL-PSN_MEAL_PERIODS') | translate}}:
                         .col-md-10
-                            .check-list-item(ng-repeat="period in vm.selectBinding.meal_periods ")
+                            .check-list-item(ng-repeat="period in vm.selectBinding.psn_meal_periods ")
                                 .checkbox.c-checkbox
                                     label
-                                        input(id="meal_period_{{period.value}}" type='checkbox',ng-true-value="'{{period.value}}'", ng-model='vm.other_configs.psn_meal_periods[$index]')
+                                        input(id="meal_period_{{period.value}}" type='checkbox',ng-true-value="'{{period.value}}'", ng-model='vm.psn_meal_periods[$index]')
                                         span.fa.fa-check
                                 label(for="meal_period_{{period.value}}" ) {{ period.name}}
     .text-right.mt-lg

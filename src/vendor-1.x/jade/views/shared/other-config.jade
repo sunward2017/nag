@@ -216,6 +216,15 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                             .btn-group
                                 .btn.btn-primary(name='meal_biz_mode',ng-repeat='mode in vm.selectBinding.meal_biz_mode',ng-model='vm.other_configs.psn_meal_biz_mode',btn-radio="mode.value",required='') {{mode.name}}
                             span.text-danger(ng-show="utils.vinput(this.theForm,'meal_biz_mode','required')") {{ "validator.REQUIRED" | translate}}
-
+                    fieldset: .form-group
+                        <!--订餐开放时段-->
+                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-MEAL_PERIODS') | translate}}:
+                        .col-md-10
+                            .check-list-item(ng-repeat="period in vm.selectBinding.meal_periods ")
+                                .checkbox.c-checkbox
+                                    label
+                                        input(id="meal_period_{{period.value}}" type='checkbox',ng-true-value="'{{period.value}}'", ng-model='vm.other_configs.psn_meal_periods[$index]')
+                                        span.fa.fa-check
+                                label(for="meal_period_{{period.value}}" ) {{ period.name}}
     .text-right.mt-lg
         button.btn.btn-success(type="submit") {{'button.SAVE'|translate}}

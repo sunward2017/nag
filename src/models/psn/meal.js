@@ -18,9 +18,9 @@ module.exports = function(ctx,name) {
             operated_on: {type: Date, default: Date.now},
             status: {type: Number, min: 0, max: 1, default: 1},
             name: {type: String, required: true, maxlength: 15},
-            meal: [{
-                dishItemId: { type: mongoose.Schema.Types.ObjectId, ref: 'psn_mealDish' },
-                dish_name: {type: String, required: true, maxlength: 15}
+            dishes: [{
+                mealDishId: { type: mongoose.Schema.Types.ObjectId, ref: 'psn_mealDish' },
+                name: {type: String, required: true, maxlength: 15}
             }], //餐组菜品组成
             price:{type: Number, min: 0}, //餐组价格
             stop_flag: {type: Boolean, default: false},//餐组是否可用
@@ -41,14 +41,14 @@ module.exports = function(ctx,name) {
         });
 
 
-        mealSchema.virtual('meal_summary').get(function () {
-            if (this.meal && this.meal.length > 0) {
-                return ctx._.map(this.meal, (o)=> {
-                    return o.dish_name;
-                }).join();
-            }
-            return '';
-        });
+        // mealSchema.virtual('meal_summary').get(function () {
+        //     if (this.dishes && this.dishes.length > 0) {
+        //         return ctx._.map(this.dishes, (o)=> {
+        //             return o.name;
+        //         }).join();
+        //     }
+        //     return '';
+        // });
 
         return mongoose.model(name, mealSchema, name);
     }

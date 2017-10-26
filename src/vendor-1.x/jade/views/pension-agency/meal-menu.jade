@@ -22,7 +22,7 @@
         .col-md-6
             .btn-toolbar.pull-right
                 .btn-group
-                    a.btn.btn-warning.btn-sm(ng-click="vm.addQuantity()") {{ vm.moduleTranslatePath('BTN-SET-QUANTITY') | translate}}
+                    a.btn.btn-warning.btn-sm(ng-if="vm.mealMode == 'A0002' ",ng-click="vm.addQuantity()") {{ vm.moduleTranslatePath('BTN-SET-QUANTITY') | translate}}
                 .btn-group
                     .tree.tree-dropdown(name='mealShifts',s-tree, s-tree-data="vm.aggrValuePromise",s-tree-height="400", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{mode:'check',layout:'dropdown',selectNodeFormat:'object'}",ng-model="vm.selectedMealShifts")
                 .btn-group
@@ -41,10 +41,13 @@
                 tr(ng-repeat="row in vm.yAxisData")
                     td.text-center(title="{{vm.moduleTranslatePath('TITLE-ROW')|translate}}",ng-click="vm.selectGridRow(row.value)",height="80")
                         | {{::row.name}}
-                    td.text-left(ng-repeat="col in vm.xAxisData",width="100",style="vertical-align:top;", ng-class='{"grid-cell-selected": vm.cells[row.value][col._id] }',ng-click="vm.selectGridCell(row.value,col._id)",ng-dblclick="vm.dbClickAddQuantity(row,col,vm.aggrData[row.value][col._id])")
-                        //span {{(vm.aggrData[row.value][col._id]) | mealArrayMember:'name':'quantity' }}
+                    td.text-left(ng-if="vm.mealMode == 'A0002' ",ng-repeat="col in vm.xAxisData",width="100",style="vertical-align:top;", ng-class='{"grid-cell-selected": vm.cells[row.value][col._id] }',ng-click="vm.selectGridCell(row.value,col._id)",ng-dblclick="vm.dbClickAddQuantity(row,col,vm.aggrData[row.value][col._id])")
                         ul.list-unstyled
                             li(ng-repeat="mealData in vm.aggrData[row.value][col._id] ") • {{ mealData.name+'('+mealData.quantity+')'}}
+                    td.text-left(ng-if="vm.mealMode == 'A0001' ",ng-repeat="col in vm.xAxisData",width="100",style="vertical-align:top;", ng-class='{"grid-cell-selected": vm.cells[row.value][col._id] }',ng-click="vm.selectGridCell(row.value,col._id)")
+                        //span {{(vm.aggrData[row.value][col._id]) | mealArrayMember:'name':'quantity' }}
+                        ul.list-unstyled
+                            li(ng-repeat="mealData in vm.aggrData[row.value][col._id] ") • {{ mealData.name}}
 
 script(type="text/ng-template", id="nursing-worker-schedule-save-as-template.html")
     form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="vm.doSubmit()")

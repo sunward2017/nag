@@ -869,6 +869,7 @@ module.exports = {
                 var ret = {id: user._id, name: user.name, tenantId: tenant.id, tenant_name: tenant.name};
                 if (tenant.other_config) {
                   ret.drug_in_stock_expire_date_check_flag = !!tenant.other_config.psn_drug_in_stock_expire_date_check_flag;
+                  ret.psn_meal_biz_mode = tenant.other_config.psn_meal_biz_mode;
                 } else {
                   ret.drug_in_stock_expire_date_check_flag = false;
                 }

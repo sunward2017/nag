@@ -43,7 +43,7 @@
         vmh.shareService.d('D3031'),
         vmh.shareService.d('D3040'),
         vmh.shareService.d('D3041'),
-        vmh.shareService.d('D3042')
+        vmh.shareService.d('D3028')
       ]).then(function (results) {
         vm.other_configs = results[0][0].other_config;
         console.log('--->',vm.other_configs)

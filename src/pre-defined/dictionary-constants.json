@@ -122,7 +122,7 @@
     "TERMINATED":"A0007"
   },
   "D3028":{
-    "BY_TIME_TEMPLATE":"A0001",
+    "BY_PERIOD":"A0001",
     "BY_DAY":"A0003"
   },
   "D3029":{

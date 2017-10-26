@@ -6364,7 +6364,7 @@ module.exports = {
               var tenantId = this.request.body.tenantId;
               var operated_by = this.request.body.operated_by;
               var outStockData = this.request.body.outStockData;
-              this.body = yield app.psn_drug_stock_service.outStock(tenantId, outStockData, operated_by);
+              this.body = yield app.psn_drug_stock_service.outStockByPeriod(tenantId, outStockData, operated_by);
             } catch (e) {
               console.log(e);
               self.logger.error(e.message);

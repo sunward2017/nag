@@ -845,6 +845,7 @@ module.exports = {
       }).catch(self.ctx.coOnError);
   },
   outStock: function (tenantId, outStockData, operated_by, open_id) {
+    //该方法已经废除
     var self = this;
     return co(function *() {
       try {
@@ -871,7 +872,7 @@ module.exports = {
           return self.ctx.wrapper.res.error({message: '无法找到对应的片区'});
         }
 
-        var elderlys_out_stock_check_mode = DIC.D3028.BY_TIME_TEMPLATE;
+        var elderlys_out_stock_check_mode = DIC.D3028.BY_PERIOD;
         if (district.config && district.config.elderlys_out_stock_check_mode) {
           elderlys_out_stock_check_mode = district.config.elderlys_out_stock_check_mode;
         }
@@ -881,7 +882,7 @@ module.exports = {
           return self.ctx.wrapper.res.error({message: '出库药品不能为空1'});
         }
 
-        if (elderlys_out_stock_check_mode == DIC.D3028.BY_TIME_TEMPLATE) {
+        if (elderlys_out_stock_check_mode == DIC.D3028.BY_PERIOD) {
           console.log('按时间段一般不可能出现相同药');
           var drugObjects = yield self.ctx.modelFactory().model_query(self.ctx.models['psn_drugDirectory'], {
             select: 'full_name short_name',
@@ -1007,6 +1008,215 @@ module.exports = {
         }
         if (lowStockDrugStats.length > 0) {
           self.ctx.pub_alarm_service.saveLowStockDrugsAlarmForElderly(lowStockDrugStats, elderly)
+        }
+
+        return self.ctx.wrapper.res.default();
+      }
+      catch (e) {
+        console.log(e);
+        self.logger.error(e.message);
+        return self.ctx.wrapper.res.error(e.message);
+      }
+    }).catch(self.ctx.coOnError);
+  },
+  _getTenantAndElderly: function (tenantId, elderlyId) {
+    var self = this;
+    return co(function *() {
+      try {
+        var tenant, elderly;
+        tenantId && ( tenant = yield self.ctx.modelFactory().model_read(self.ctx.models['pub_tenant'], tenantId));
+        if (!tenant || tenant.status == 0) {
+          return self.ctx.wrapper.res.error({message: '无法找到养老机构'});
+        }
+        elderlyId && (elderly = yield self.ctx.modelFactory().model_read(self.ctx.models['psn_elderly'], elderlyId));
+        if (!elderly || elderly.status == 0) {
+          return self.ctx.wrapper.res.error({message: '无法找到出库药品对应的老人资料'});
+        }
+        if (!elderly.live_in_flag || elderly.begin_exit_flow) {
+          return self.ctx.wrapper.res.error({message: '当前老人不在院或正在办理出院手续，无法出库'});
+        }
+
+        return self.ctx.wrapper.res.ret({t: tenant, e: elderly});
+      }
+      catch (e) {
+        console.log(e);
+        self.logger.error(e.message);
+        return self.ctx.wrapper.res.error(e.message);
+      }
+    }).catch(self.ctx.coOnError);
+  },
+  outStockByPeriod: function (tenantId, outStockData, operated_by, open_id) {
+    var self = this;
+    return co(function *() {
+      try {
+        console.log('outStockByPeriod---', outStockData);
+        var tae = yield self._getTenantAndElderly(tenantId, outStockData.elderlyId);
+        if(!tae.success){
+          return tae
+        }
+        var tenant = tae.ret.t, elderly = tae.ret.e;
+
+        var drugs = outStockData.drugs;
+        if (!drugs || drugs.length == 0) {
+          return self.ctx.wrapper.res.error({message: 'outStockByPeriod:出库药品不能为空'});
+        }
+
+
+
+        /* 此处将出库药品和药品目录再次对比,考虑到性能原因,将检测前置到客户端
+         console.log('按时间段一般不可能出现相同药');
+        var drugTotals = yield self.ctx.modelFactory().model_totals(self.ctx.models['psn_drugDirectory'], {
+          status: 1,
+          _id: {
+            $in: self.ctx._.map(drugs, (o) => {
+              return o.drugId;
+            })
+          }
+        });
+        if (drugs.length != drugTotals) {
+          return self.ctx.wrapper.res.error({message: 'outStockByPeriod:出库药品中包含无效的药品记录'});
+        }
+        */
+        return yield self._outStockAtom(tenant, elderly, outStockData.type, outStockData.mode, outStockData.drugs, operated_by, open_id);
+      }
+      catch (e) {
+        console.log(e);
+        self.logger.error(e.message);
+        return self.ctx.wrapper.res.error(e.message);
+      }
+    }).catch(self.ctx.coOnError);
+  },
+  outStockByDay: function (tenantId, outStockType, outStockMode, operated_by, open_id) {
+    var self = this;
+    return co(function *() {
+      try {
+        var tae = yield self._getTenantAndElderly(tenantId, outStockData.elderlyId);
+        if (!tae.success) {
+          return tae
+        }
+        var tenant = tae.ret.t, elderly = tae.ret.e;
+        var drugs = [];
+
+        //获取用药计划
+        var elderlyDrugUseItems = yield self.ctx.modelFactory().model_query(self.ctx.models['psn_drugUseItem'], {
+          select: 'drugId name quantity unit repeat_values',
+          where: {
+            status: 1,
+            elderlyId: elderly._id,
+            repeat_type: 'A0003',
+            stop_flag: false,
+            tenantId: tenantId
+          }
+        });
+
+        var drugs = self.ctx._.map(elderlyDrugUseItems, o => ({
+          drugId: o.drugId,
+          drug_name: o.name, //drugDirectory没有short_name时使用full_name
+          quantity: (o.repeat_values || []).length * o.quantity,
+          mini_unit: o.unit
+        }));
+
+        console.log('drugs:', drugs)
+
+        return yield self._outStockAtom(tenant, elderly, outStockType, outStockMode, drugs, operated_by, open_id);
+      }
+      catch (e) {
+        console.log(e);
+        self.logger.error(e.message);
+        return self.ctx.wrapper.res.error(e.message);
+      }
+    }).catch(self.ctx.coOnError);
+  },
+  _outStockAtom: function (tenant, elderly, outStockType, outStockMode, drugs, operated_by, open_id) {
+    var self = this;
+    return co(function *() {
+      try {
+        if (!drugs || drugs.length == 0) {
+          return self.ctx.wrapper.res.error({message: '_outStockAtom:出库药品不能为空'});
+        }
+
+        console.log('检查库存是否满足出库要求...', tenant);
+        var elderlyStockObject = yield self._elderlyStockObject(tenant, elderly);
+        console.log('elderlyStockObject:', elderlyStockObject);
+        var drugData, drugStock;
+        for (var i = 0, len = drugs.length; i < len; i++) {
+          drugData = drugs[i];
+          drugStock = elderlyStockObject[drugData.drugId];
+          if (!drugStock) {
+            return self.ctx.wrapper.res.error({message: '出库药品' + (drugData.drug_name || '') + '库存为0'});
+          }
+          if (drugStock.total < drugData.quantity) {
+            return self.ctx.wrapper.res.error({message: '出库药品' + (drugData.drug_name || '') + '库存不足'});
+          }
+        }
+
+
+        console.log('新增出库记录...');
+        var drugOutStock = yield self.ctx.modelFactory().model_create(self.ctx.models['psn_drugInOutStock'], {
+          code: self.ctx.modelVariables.SERVER_GEN,
+          operated_by: operated_by,
+          type: outStockType,
+          mode: outStockMode,
+          elderlyId: elderly._id,
+          elderly_name: elderly.name,
+          drugs: drugs,
+          open_id: open_id,
+          tenantId: tenant._id
+        });
+
+        console.log('更新库存...');
+        var outStockQuantity, drug, drugStocks, drugOutStockIdsInDrugStock, drugOutStockIdIndex;
+        for (var i = 0, len = drugOutStock.drugs.length; i < len; i++) {
+          drug = drugOutStock.drugs[i];
+
+          outStockQuantity = drug.quantity;
+          drugStocks = yield self.ctx.modelFactory().model_query(self.ctx.models['psn_drugStock'], {
+            select: 'quantity mini_unit drugOutStockIds',
+            where: {
+              status: 1,
+              drugId: drug.drugId,
+              elderlyId: elderly._id,
+              tenantId: tenant._id
+            },
+            sort: {expire_in: 1}
+          });
+          for (var j = 0, jLen = drugStocks.length; j < jLen; j++) {
+            drugStock = drugStocks[j];
+            drugOutStockIdsInDrugStock = drugStock.drugOutStockIds || [];
+            if (outStockQuantity >= drugStock.quantity) {
+              outStockQuantity -= drugStock.quantity;
+              drugStock.quantity = 0;
+              drugStock.status = 0;
+            } else {
+              drugStock.quantity -= outStockQuantity;
+              outStockQuantity = 0;
+            }
+
+            drugOutStockIdIndex = self.ctx._.findIndex(drugOutStockIdsInDrugStock, (o) => {
+              return o.toString() == drugOutStock._id.toString()
+            });
+            if (drugOutStockIdIndex == -1) {
+              drugOutStockIdsInDrugStock.push(drugOutStock._id);
+              drugStock.drugOutStockIds = drugOutStockIdsInDrugStock;
+            }
+
+            yield drugStock.save();
+
+            if (outStockQuantity <= 0) {
+              break;
+            }
+          }
+        }
+        console.log('如果有药品不足,则生成通知...');
+        var lowStockDrugStats = [], drugStockStat;
+        for (var drugId in elderlyStockObject) {
+          drugStockStat = elderlyStockObject[drugId];
+          if (drugStockStat.is_warning) {
+            lowStockDrugStats.push(drugStockStat);
+          }
+        }
+        if (lowStockDrugStats.length > 0) {
+          yield self.ctx.pub_alarm_service.saveLowStockDrugsAlarmForElderly(lowStockDrugStats, elderly)
         }
 
         return self.ctx.wrapper.res.default();

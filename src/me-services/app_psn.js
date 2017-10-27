@@ -1088,9 +1088,9 @@ module.exports = {
                     $sort: {'date': 1}
                   }
                 ]);
-                _.each(rows, (o) => {
+                app._.each(rows, (o) => {
                   o.weekday = app.moment(o.date).format('ddd');
-                  o.periods = _.map(o.periods, (p)=>{
+                  o.periods = app._.map(o.periods, (p)=>{
                     console.log(p.period)
                     return {period: p.period, meals: p.meals}
                   });
@@ -1136,6 +1136,76 @@ module.exports = {
             }
             yield next;
           }
+        }
+      },
+      {
+        method: 'mealOrderRecord$elderly$fetch',
+        verb: 'post',
+        url: this.service_url_prefix + "/mealOrderRecord/elderly/fetch",
+        handler: function (app, options) {
+          return function *(next) {
+            try {
+              var tenantId = this.request.body.tenantId;
+              var districtId = this.request.body.districtId;
+              var floorId = this.request.body.floorId;
+              var roomId = this.request.body.roomId;
+
+              var dynamicFilter = {};
+              if (districtId) {
+                console.log('districtId...')
+                dynamicFilter['room_value.districtId'] = districtId;
+              }
+              if (floorId) {
+                console.log('floorId...')
+                //需要按照
+                var arrFloorParsed = floorId.split('$');
+                dynamicFilter['room_value.districtId'] = arrFloorParsed[0];
+
+                var floor = arrFloorParsed[1];
+                var rooms = yield app.modelFactory().model_query(app.models['psn_room'], {
+                  select: '_id',
+                  where: {
+                    status: 1,
+                    floor: floor,
+                    districtId: arrFloorParsed[0],
+                    tenantId: tenantId
+                  }
+                });
+
+                var roomIds = app._.map(rooms, (o) => {
+                  return o._id;
+                })
+
+                dynamicFilter['room_value.roomId'] = {$in: roomIds};
+              }
+
+              if (roomId) {
+                console.log('roomId...')
+                dynamicFilter['room_value.roomId'] = roomId;
+              }
+              console.log('dynamicFilter:', dynamicFilter);
+              app._.extend(dynamicFilter, {
+                status: 1,
+                tenantId: tenantId,
+                live_in_flag: true,
+                begin_exit_flow: {$ne: true}
+              });
+
+              console.log('dynamicFilter:', dynamicFilter);
+
+              var elderly = yield app.modelFactory().model_query(app.models['psn_elderly'], {
+                select: 'name birthday room_summary avatar room_value',
+                where: dynamicFilter
+              });
+
+              this.body = app.wrapper.res.rows(elderly);
+
+            } catch (e) {
+              self.logger.error(e.message);
+              this.body = app.wrapper.res.error(e);
+            }
+            yield next;
+          };
         }
       },
       {

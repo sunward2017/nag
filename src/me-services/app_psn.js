@@ -1031,7 +1031,7 @@ module.exports = {
                 var rows = yield app.modelFactory().model_aggregate(app.models['psn_mealMenu'], [
                   {
                     $match: {
-                      tenantId: tenantId,
+                      tenantId: app.ObjectId(tenantId),
                       status: 1,
                       x_axis: {$gte: x_axis_start.toDate(), $lt: x_axis_end.toDate()},
                       y_axis: {$in: psn_meal_periods}
@@ -1228,15 +1228,15 @@ module.exports = {
                 var x_axis_end = app.moment(app.moment().weekday(0).add(14, 'days').format('YYYY-MM-DD'));
                 var toSaveRows = [];
                 app._.each(meals, (o) => {
-                  o.elderlyId = elderly.elderlyId;
-                  o.elderly_name = elderly.eldelry_name;
+                  o.elderlyId = elderly.id;
+                  o.elderly_name = elderly.name;
                   o.tenantId = tenantId;
                 });
                 yield app.modelFactory().model_bulkInsert(app.models['psn_mealOrderRecord'], {
                   rows: meals,
                   removeWhere:{
                     tenantId: tenantId,
-                    elderlyId: elderly.elderlyId,
+                    elderlyId: elderly.id,
                     status: 1,
                     x_axis: {$gte: x_axis_start.toDate(), $lt: x_axis_end.toDate()},
                     y_axis: {$in: psn_meal_periods}

@@ -26,6 +26,7 @@ module.exports = {
     }
 
     this.actions = [
+
       {
         method: 'elderly$bloodpressure$fetch',
         verb: 'post',
@@ -224,6 +225,38 @@ module.exports = {
 
               this.body = app.wrapper.res.rows(rooms);
 
+            } catch (e) {
+              self.logger.error(e.message);
+              this.body = app.wrapper.res.error(e);
+            }
+            yield next;
+          };
+        }
+      },
+      {
+        method: 'tenant$config$fetch',
+        verb: 'post',
+        url: this.service_url_prefix + "/tenant/config/fetch",
+        handler: function (app, options) {
+          return function *(next) {
+            try {
+              var tenantId = this.request.body.tenantId;
+              var tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], tenantId);
+              if (!tenant || tenant.status == 0) {
+                return app.wrapper.res.error({message: '无法找到养老机构'});
+              }
+              var config = {};
+              if (tenant.other_config) {
+                config.drug_in_stock_expire_date_check_flag = tenant.other_config.psn_drug_in_stock_expire_date_check_flag;
+                config.psn_drug_stock_out_mode = tenant.other_config.psn_drug_stock_out_mode;
+                config.psn_meal_biz_mode = tenant.other_config.psn_meal_biz_mode;
+                config.psn_meal_periods = tenant.other_config.psn_meal_periods;
+              }
+              config.drug_in_stock_expire_date_check_flag == undefined && (config.drug_in_stock_expire_date_check_flag = false);
+              config.psn_drug_stock_out_mode == undefined && (config.psn_drug_stock_out_mode = DIC.D3028.BY_PERIOD);
+              config.psn_meal_biz_mode == undefined && (config.psn_meal_biz_mode = DIC.D3041.REAL_TIME);
+              (config.psn_meal_periods == undefined || config.psn_meal_periods.length === 0) && (config.psn_meal_periods = [DIC.D3040.Breakfast, DIC.D3040.LUNCH, DIC.D3040.DINNER, DIC.D3040.SUPPER]);
+              this.body = app.wrapper.res.ret(config);
             } catch (e) {
               self.logger.error(e.message);
               this.body = app.wrapper.res.error(e);
@@ -862,13 +895,23 @@ module.exports = {
                 return;
               } else {
                 var tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], user.tenantId);
-                var ret = {id: user._id, name: user.name, tenantId: tenant.id, tenant_name: tenant.name};
-                if (tenant.other_config) {
-                  ret.drug_in_stock_expire_date_check_flag = !!tenant.other_config.psn_drug_in_stock_expire_date_check_flag;
-                  ret.psn_meal_biz_mode = tenant.other_config.psn_meal_biz_mode;
-                } else {
-                  ret.drug_in_stock_expire_date_check_flag = false;
+
+                if (!tenant.active_flag) {
+                  this.body = app.wrapper.res.error({message: '该用户所属的【' + tenant.name + '】未激活!'});
+                  yield next;
+                  return;
                 }
+
+                //检查租户是否到期
+                if (app.moment(tenant.validate_util).diff(app.moment()) < 0) {
+                  //用户所属租户到期
+                  this.body = app.wrapper.res.error({message: '该用户所属的【' + tenant.name + '】已经超过使用有效期!'});
+                  yield next;
+                  return;
+                }
+
+                var ret = {id: user._id, name: user.name, tenantId: tenant.id, tenant_name: tenant.name};
+
                 this.body = app.wrapper.res.ret(ret);
               }
 
@@ -977,35 +1020,42 @@ module.exports = {
             try {
               console.log("body", this.request.body);
               var tenantId = this.request.body.tenantId;
-              var x_axis = app.moment().format('YYYY-MM-DD'),y_axis,y_axis_value;
-              var thisMoment = app.moment().format();
-              if(app.moment(thisMoment).isBetween(x_axis+ 'T05', x_axis+ 'T09:00:00+08:00')){
-                y_axis = 'A0000';
-              }else if(app.moment(thisMoment).isBetween(x_axis+ 'T09:00:01+08:00', x_axis+ 'T13:00:00+08:00')){
-                y_axis = 'A0001';
-              }else if(app.moment(thisMoment).isBetween(x_axis+ 'T13:00:01+08:00', x_axis+ 'T19:00:00+08:00')){
-                y_axis = 'A0002';
-              }else if(app.moment(thisMoment).isBetween(x_axis+ 'T19:00:01+08:00', x_axis+ 'T21:00:00+08:00')){
-                y_axis = 'A0003';
-              }
-              y_axis_value = D3040[y_axis].name;
-              console.log('thisMoment:',thisMoment,'x_axis:',x_axis,'y_axis:',y_axis,'y_axis_value:',y_axis_value);
+              var psn_meal_biz_mode = this.request.body.psn_meal_biz_mode;
+              if(psn_meal_biz_mode === DIC.D3041.PRE_BOOKING) {
+                //提前预订
+              } else {
+                //实时预订
+                var x_axis = app.moment().format('YYYY-MM-DD'),y_axis,y_axis_value;
+                var thisMoment = app.moment().format();
+                if(app.moment(thisMoment).isBetween(x_axis+ 'T05', x_axis+ 'T09:00:00+08:00')){
+                  y_axis = 'A0000';
+                }else if(app.moment(thisMoment).isBetween(x_axis+ 'T09:00:01+08:00', x_axis+ 'T13:00:00+08:00')){
+                  y_axis = 'A0001';
+                }else if(app.moment(thisMoment).isBetween(x_axis+ 'T13:00:01+08:00', x_axis+ 'T19:00:00+08:00')){
+                  y_axis = 'A0002';
+                }else if(app.moment(thisMoment).isBetween(x_axis+ 'T19:00:01+08:00', x_axis+ 'T21:00:00+08:00')){
+                  y_axis = 'A0003';
+                }
+                y_axis_value = D3040[y_axis].name;
+                console.log('thisMoment:',thisMoment,'x_axis:',x_axis,'y_axis:',y_axis,'y_axis_value:',y_axis_value);
 
-              var rows = yield app.modelFactory().model_query(app.models['psn_mealMenu'], {
-                select: 'aggr_value x_axis',
-                where: {
-                  tenantId:tenantId,
-                  x_axis:x_axis,
-                  y_axis:y_axis
-                },
-                sort: {check_in_time: -1}
-              }).populate('aggr_value.mealId', 'name meal');
-              console.log('rows..:',rows);
-              var meals=[];
-              app._.each(rows, (o) => {
-                meals.push({id:o.aggr_value.mealId._id,name:o.aggr_value.mealId.name,quantity:o.aggr_value.quantity,member:o.aggr_value.mealId.meal});
-              });
-              this.body = app.wrapper.res.ret({meals:meals,y_axis:y_axis,y_axis_value:y_axis_value});
+                var rows = yield app.modelFactory().model_query(app.models['psn_mealMenu'], {
+                  select: 'aggr_value x_axis',
+                  where: {
+                    tenantId:tenantId,
+                    x_axis:x_axis,
+                    y_axis:y_axis
+                  },
+                  sort: {check_in_time: -1}
+                }).populate('aggr_value.mealId', 'name meal');
+                console.log('rows..:',rows);
+                var meals=[];
+                app._.each(rows, (o) => {
+                  meals.push({id:o.aggr_value.mealId._id,name:o.aggr_value.mealId.name,quantity:o.aggr_value.quantity,member:o.aggr_value.mealId.meal});
+                });
+                this.body = app.wrapper.res.ret({meals:meals,y_axis:y_axis,y_axis_value:y_axis_value});
+              }
+
             } catch (e) {
               self.logger.error(e.message);
               this.body = app.wrapper.res.error(e);
@@ -1024,85 +1074,91 @@ module.exports = {
               console.log("body", this.request.body);
               var tenantId = this.request.body.tenantId;
               var operated_by = this.request.body.operated_by;
+              var psn_meal_biz_mode = this.request.body.psn_meal_biz_mode;
               var mealTime = this.request.body.mealTime;
               var submitMealMember = this.request.body.submitMealMember;
               var meals = this.request.body.meals;
-              var x_axis = app.moment().format('YYYY-MM-DD'),y_axis;
-              var thisMoment = app.moment().format();
-              if(app.moment(thisMoment).isBetween(x_axis+ 'T05', x_axis+ 'T09:00:00+08:00')){
-                y_axis = 'A0000';
-              }else if(app.moment(thisMoment).isBetween(x_axis+ 'T09:00:01+08:00', x_axis+ 'T13:00:00+08:00')){
-                y_axis = 'A0001';
-              }else if(app.moment(thisMoment).isBetween(x_axis+ 'T13:00:01+08:00', x_axis+ 'T19:00:00+08:00')){
-                y_axis = 'A0002';
-              }else if(app.moment(thisMoment).isBetween(x_axis+ 'T19:00:01+08:00', x_axis+ 'T21:00:00+08:00')){
-                y_axis = 'A0003';
-              }
-              var resMealMember={},res=false;
-              if(mealTime===y_axis){
-                for(var i=0,len=meals.length;i<len;i++){
-                  var submitMealMemberIdArray = submitMealMember[meals[i].id];
-                  if(submitMealMemberIdArray){
-                    var jLen = submitMealMemberIdArray.length;
-                    console.log('查询套餐数量----');
-                    var mealInMealMenu = yield app.modelFactory().model_query(app.models['psn_mealMenu'], {
-                      select: 'status aggr_value',
-                      where: {
-                        x_axis:x_axis,
-                        y_axis:y_axis,
-                        'aggr_value.mealId':meals[i].id,
-                        tenantId: tenantId
-                      }
-                    });
-                    console.log('mealInMealMenu:',mealInMealMenu);
-                    if(jLen<=mealInMealMenu[0].aggr_value.quantity){
-                      console.log('修改套餐剩余数量-------');
-                      mealInMealMenu[0].aggr_value.quantity -=jLen;
-                      yield mealInMealMenu[0].save();
 
-                      console.log('增加订单记录------');
-                      for(var j=0;j<jLen;j++){
-                        var sameMealOrderRecord = yield app.modelFactory().model_query(app.models['psn_mealOrderRecord'], {
-                          select: 'status mealId quantity',
-                          where: {
-                            elderlyId: submitMealMemberIdArray[j].id,
-                            x_axis:x_axis,
-                            y_axis:y_axis,
-                            mealId:meals[i].id,
-                            tenantId: tenantId
-                          }
-                        });
-                        console.log('sameMealOrderRecord:',sameMealOrderRecord);
-                        if(sameMealOrderRecord.length>=1){
-                          sameMealOrderRecord[0].quantity++;
-                          yield sameMealOrderRecord[0].save();
-                        }else {
-                          yield app.modelFactory().model_create(app.models['psn_mealOrderRecord'], {
-                            operated_by:operated_by,
-                            elderlyId:submitMealMemberIdArray[j].id,
-                            elderly_name:submitMealMemberIdArray[j].name,
-                            x_axis:x_axis,
-                            y_axis:y_axis,
-                            mealId:meals[i].id,
-                            quantity:1,
-                            tenantId:tenantId
-                          });
+              if(psn_meal_biz_mode === DIC.D3041.PRE_BOOKING) {
+                //提前预订
+              } else {
+                //实时预订
+                var x_axis = app.moment().format('YYYY-MM-DD'),y_axis;
+                var thisMoment = app.moment().format();
+                if(app.moment(thisMoment).isBetween(x_axis+ 'T05', x_axis+ 'T09:00:00+08:00')){
+                  y_axis = 'A0000';
+                }else if(app.moment(thisMoment).isBetween(x_axis+ 'T09:00:01+08:00', x_axis+ 'T13:00:00+08:00')){
+                  y_axis = 'A0001';
+                }else if(app.moment(thisMoment).isBetween(x_axis+ 'T13:00:01+08:00', x_axis+ 'T19:00:00+08:00')){
+                  y_axis = 'A0002';
+                }else if(app.moment(thisMoment).isBetween(x_axis+ 'T19:00:01+08:00', x_axis+ 'T21:00:00+08:00')){
+                  y_axis = 'A0003';
+                }
+                var resMealMember={},res=false;
+                if(mealTime===y_axis){
+                  for(var i=0,len=meals.length;i<len;i++){
+                    var submitMealMemberIdArray = submitMealMember[meals[i].id];
+                    if(submitMealMemberIdArray){
+                      var jLen = submitMealMemberIdArray.length;
+                      console.log('查询套餐数量----');
+                      var mealInMealMenu = yield app.modelFactory().model_query(app.models['psn_mealMenu'], {
+                        select: 'status aggr_value',
+                        where: {
+                          x_axis:x_axis,
+                          y_axis:y_axis,
+                          'aggr_value.mealId':meals[i].id,
+                          tenantId: tenantId
                         }
+                      });
+                      console.log('mealInMealMenu:',mealInMealMenu);
+                      if(jLen<=mealInMealMenu[0].aggr_value.quantity){
+                        console.log('修改套餐剩余数量-------');
+                        mealInMealMenu[0].aggr_value.quantity -=jLen;
+                        yield mealInMealMenu[0].save();
+
+                        console.log('增加订单记录------');
+                        for(var j=0;j<jLen;j++){
+                          var sameMealOrderRecord = yield app.modelFactory().model_query(app.models['psn_mealOrderRecord'], {
+                            select: 'status mealId quantity',
+                            where: {
+                              elderlyId: submitMealMemberIdArray[j].id,
+                              x_axis:x_axis,
+                              y_axis:y_axis,
+                              mealId:meals[i].id,
+                              tenantId: tenantId
+                            }
+                          });
+                          console.log('sameMealOrderRecord:',sameMealOrderRecord);
+                          if(sameMealOrderRecord.length>=1){
+                            sameMealOrderRecord[0].quantity++;
+                            yield sameMealOrderRecord[0].save();
+                          }else {
+                            yield app.modelFactory().model_create(app.models['psn_mealOrderRecord'], {
+                              operated_by:operated_by,
+                              elderlyId:submitMealMemberIdArray[j].id,
+                              elderly_name:submitMealMemberIdArray[j].name,
+                              x_axis:x_axis,
+                              y_axis:y_axis,
+                              mealId:meals[i].id,
+                              quantity:1,
+                              tenantId:tenantId
+                            });
+                          }
+                        }
+                      }else {
+                        console.log('套餐数量不足，返回重新提交-----');
+                        resMealMember[meals[i].id]=submitMealMemberIdArray;
+                        res = true;
                       }
-                    }else {
-                      console.log('套餐数量不足，返回重新提交-----');
-                      resMealMember[meals[i].id]=submitMealMemberIdArray;
-                      res = true;
                     }
                   }
+                }else {
+                  this.body = app.wrapper.res.error({message: '当前订餐时间已过，请重新订餐!'});
+                  yield next;
+                  return;
                 }
-              }else {
-                this.body = app.wrapper.res.error({message: '当前订餐时间已过，请重新订餐!'});
-                yield next;
-                return;
+                this.body = app.wrapper.res.ret({status:res,data:resMealMember});
               }
-
-              this.body = app.wrapper.res.ret({status:res,data:resMealMember});
             } catch (e) {
               self.logger.error(e.message);
               this.body = app.wrapper.res.error(e);

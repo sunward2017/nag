@@ -1021,6 +1021,7 @@ module.exports = {
               console.log("body", this.request.body);
               var tenantId = this.request.body.tenantId;
               var psn_meal_biz_mode = this.request.body.psn_meal_biz_mode;
+              var psn_meal_periods = this.request.body.psn_meal_periods;
               if(psn_meal_biz_mode === DIC.D3041.PRE_BOOKING) {
                 //提前预订
               } else {
@@ -1075,6 +1076,7 @@ module.exports = {
               var tenantId = this.request.body.tenantId;
               var operated_by = this.request.body.operated_by;
               var psn_meal_biz_mode = this.request.body.psn_meal_biz_mode;
+              var psn_meal_periods = this.request.body.psn_meal_periods;
               var mealTime = this.request.body.mealTime;
               var submitMealMember = this.request.body.submitMealMember;
               var meals = this.request.body.meals;

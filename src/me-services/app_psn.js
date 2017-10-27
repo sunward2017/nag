@@ -1089,7 +1089,7 @@ module.exports = {
                   }
                 ]);
                 _.each(rows, (o) => {
-                  console.log(o.date)
+                  o.weekday = app.moment(o.date).format('ddd');
                   o.periods = _.map(o.periods, (p)=>{
                     console.log(p.period)
                     return {period: p.period, meals: p.meals}

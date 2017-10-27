@@ -1149,13 +1149,33 @@ module.exports = {
               var tenantId = this.request.body.tenantId;
               var operated_by = this.request.body.operated_by;
               var psn_meal_biz_mode = this.request.body.psn_meal_biz_mode;
-              var mealTime = this.request.body.mealTime;
-              var submitMealMember = this.request.body.submitMealMember;
               var meals = this.request.body.meals;
-
               if(psn_meal_biz_mode === DIC.D3041.PRE_BOOKING) {
                 //提前预订
+                var elderly = this.request.body.elderly;
+                var psn_meal_periods = this.request.body.psn_meal_periods.length == 0 || [DIC.D3040.BREAKFAST, DIC.D3040.LUNCH, DIC.D3040.DINNER, DIC.D3040.SUPPER];
+                var x_axis_start = app.moment(app.moment().weekday(0).add(7, 'days').format('YYYY-MM-DD'));
+                var x_axis_end = app.moment(app.moment().weekday(0).add(14, 'days').format('YYYY-MM-DD'));
+                var toSaveRows = [];
+                app._.each(meals, (o) => {
+                  o.elderlyId = elderly.elderlyId;
+                  o.elderly_name = elderly.eldelry_name;
+                  o.tenantId = tenantId;
+                });
+                yield app.modelFactory().model_bulkInsert(app.models['psn_mealOrderRecord'], {
+                  rows: meals,
+                  removeWhere:{
+                    tenantId: tenantId,
+                    elderlyId: elderly.elderlyId,
+                    status: 1,
+                    x_axis: {$gte: x_axis_start.toDate(), $lt: x_axis_end.toDate()},
+                    y_axis: {$in: psn_meal_periods}
+                  }
+                });
+                this.body = app.wrapper.res.default();
               } else {
+                var mealTime = this.request.body.mealTime;
+                var submitMealMember = this.request.body.submitMealMember;
                 //实时预订
                 var x_axis = app.moment().format('YYYY-MM-DD'),y_axis;
                 var thisMoment = app.moment().format();

@@ -21,11 +21,10 @@ module.exports = function(ctx,name) {
             status: {type: Number, min: 0, max: 1, default: 1},
             elderlyId:{type: mongoose.Schema.Types.ObjectId,ref:'psn_elderly'},//关联老人
             elderly_name: {type: String,  maxlength: 20},
-            order_date:{type: Date, default: Date.now},
             x_axis:{type: Date,required: true},
             y_axis: {type: String, minlength: 5, maxlength: 5, required: true, enum: ctx._.rest(ctx.dictionary.keys["D3040"])}, //早中晚夜轴
             mealId:{type: mongoose.Schema.Types.ObjectId, required: true, ref: 'psn_meal'},
-            quantity:{type: Number, required: true,min: 0}, //meal份数
+            quantity:{type: Number, required: true,min: 1, default: 1}, //meal份数
             tenantId: {type: mongoose.Schema.Types.ObjectId}
         }, {
             toObject: {

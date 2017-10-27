@@ -144,5 +144,15 @@
     "NURSING_WORKER_SERVED":"A3003",
     "NURSE_IN_CHARGE":"A3004",
     "HEAD_OF_AGENCY":"A3005"
+  },
+  "D3040": {
+    "Breakfast": "A0000",
+    "LUNCH": "A0002",
+    "DINNER": "A0002",
+    "SUPPER": "A0003"
+  },
+  "D3041": {
+    "PRE_BOOKING": "A0001",
+    "REAL_TIME": "A0003"
   }
 }

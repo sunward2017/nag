@@ -255,7 +255,7 @@ module.exports = {
               config.drug_in_stock_expire_date_check_flag == undefined && (config.drug_in_stock_expire_date_check_flag = false);
               config.psn_drug_stock_out_mode == undefined && (config.psn_drug_stock_out_mode = DIC.D3028.BY_PERIOD);
               config.psn_meal_biz_mode == undefined && (config.psn_meal_biz_mode = DIC.D3041.REAL_TIME);
-              (config.psn_meal_periods == undefined || config.psn_meal_periods.length === 0) && (config.psn_meal_periods = [DIC.D3040.Breakfast, DIC.D3040.LUNCH, DIC.D3040.DINNER, DIC.D3040.SUPPER]);
+              (config.psn_meal_periods == undefined || config.psn_meal_periods.length === 0) && (config.psn_meal_periods = [DIC.D3040.BREAKFAST, DIC.D3040.LUNCH, DIC.D3040.DINNER, DIC.D3040.SUPPER]);
               this.body = app.wrapper.res.ret(config);
             } catch (e) {
               self.logger.error(e.message);
@@ -1021,9 +1021,82 @@ module.exports = {
               console.log("body", this.request.body);
               var tenantId = this.request.body.tenantId;
               var psn_meal_biz_mode = this.request.body.psn_meal_biz_mode;
-              var psn_meal_periods = this.request.body.psn_meal_periods;
+              var psn_meal_periods = this.request.body.psn_meal_periods.length == 0 || [DIC.D3040.BREAKFAST, DIC.D3040.LUNCH, DIC.D3040.DINNER, DIC.D3040.SUPPER];
+
               if(psn_meal_biz_mode === DIC.D3041.PRE_BOOKING) {
                 //提前预订
+                var x_axis_start = app.moment(app.moment().weekday(0).add(7, 'days').format('YYYY-MM-DD'));
+                var x_axis_end = app.moment(app.moment().weekday(0).add(14, 'days').format('YYYY-MM-DD'));
+
+                var rows = yield app.modelFactory().model_aggregate(app.models['psn_mealMenu'], [
+                  {
+                    $match: {
+                      tenantId: tenantId,
+                      status: 1,
+                      x_axis: {$gte: x_axis_start.toDate(), $lt: x_axis_end.toDate()},
+                      y_axis: {$in: psn_meal_periods}
+                    }
+                  },
+                  {
+                    $lookup:{
+                      from: "psn_meal",
+                      localField:"aggr_value.mealId",
+                      foreignField:"_id",
+                      as:"meal"
+                    }
+                  },
+                  {
+                    $unwind: '$meal'
+                  },
+                  {
+                    $project: {
+                      date: { $dateToString: { format: "%Y-%m-%d", date: "$x_axis" } },
+                      period: '$y_axis',
+                      meal:{ id:'$aggr_value.mealId', name: '$meal.name' }
+                    }
+                  },
+                  {
+                    $group:{
+                      _id:{ date: '$date', period: '$period'},
+                      meals:{$push:'$meal'}
+                    }
+                  },
+                  {
+                    $sort: {'_id.period': 1}
+                  },
+                  {
+                    $project: {
+                      date: '$_id.date',
+                      period: '$_id.period',
+                      meals: '$meals'
+                    }
+                  },
+                  {
+                    $group:{
+                      _id: '$date',
+                      periods:{$push: '$$ROOT'}
+                    }
+                  },
+                  {
+                    $project: {
+                      _id: 0,
+                      date: '$_id',
+                      periods: '$periods'
+                    }
+                  },
+                  {
+                    $sort: {'date': 1}
+                  }
+                ]);
+                _.each(rows, (o) => {
+                  console.log(o.date)
+                  o.periods = _.map(o.periods, (p)=>{
+                    console.log(p.period)
+                    return {period: p.period, meals: p.meals}
+                  });
+                });
+                console.log('meals$fetch:PRE_BOOKING>>', rows);
+                this.body = app.wrapper.res.rows(rows);
               } else {
                 //实时预订
                 var x_axis = app.moment().format('YYYY-MM-DD'),y_axis,y_axis_value;
@@ -1038,7 +1111,7 @@ module.exports = {
                   y_axis = 'A0003';
                 }
                 y_axis_value = D3040[y_axis].name;
-                console.log('thisMoment:',thisMoment,'x_axis:',x_axis,'y_axis:',y_axis,'y_axis_value:',y_axis_value);
+                console.log('meals$fetch:thisMoment:',thisMoment,'x_axis:',x_axis,'y_axis:',y_axis,'y_axis_value:',y_axis_value);
 
                 var rows = yield app.modelFactory().model_query(app.models['psn_mealMenu'], {
                   select: 'aggr_value x_axis',
@@ -1049,7 +1122,7 @@ module.exports = {
                   },
                   sort: {check_in_time: -1}
                 }).populate('aggr_value.mealId', 'name meal');
-                console.log('rows..:',rows);
+                console.log('meals$fetch:rows..:',rows);
                 var meals=[];
                 app._.each(rows, (o) => {
                   meals.push({id:o.aggr_value.mealId._id,name:o.aggr_value.mealId.name,quantity:o.aggr_value.quantity,member:o.aggr_value.mealId.meal});
@@ -1076,7 +1149,6 @@ module.exports = {
               var tenantId = this.request.body.tenantId;
               var operated_by = this.request.body.operated_by;
               var psn_meal_biz_mode = this.request.body.psn_meal_biz_mode;
-              var psn_meal_periods = this.request.body.psn_meal_periods;
               var mealTime = this.request.body.mealTime;
               var submitMealMember = this.request.body.submitMealMember;
               var meals = this.request.body.meals;

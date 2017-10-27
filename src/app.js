@@ -216,388 +216,468 @@ app.clog = clog;
 console.log('co...');
 
 co(function*() {
-    //app.conf.serviceFiles = yield thunkify(fs.readdir)(app.conf.dir.service);
-    //console.log('serviceFiles:'+JSON.stringify(app.conf.serviceFiles));
-    console.log('load dictionary...');
-    yield app.wrapper.cb(app.dictionary.readJSON.bind(app.dictionary))('pre-defined/dictionary.json');
+  //app.conf.serviceFiles = yield thunkify(fs.readdir)(app.conf.dir.service);
+  //console.log('serviceFiles:'+JSON.stringify(app.conf.serviceFiles));
+  console.log('load dictionary...');
+  yield app.wrapper.cb(app.dictionary.readJSON.bind(app.dictionary))('pre-defined/dictionary.json');
 
-    //配置数据库
-    console.log('configure mongoose...');
-    //app.db.mongoose = monoogse;
-    var connectStr = 'mongodb://{0}:{1}@{2}:{3}/{4}'.format(app.conf.db.mongodb.user, app.conf.db.mongodb.password, app.conf.db.mongodb.server, app.conf.db.mongodb.port, app.conf.db.mongodb.database)
-    mongoose.connect(connectStr);
-    app.db = mongoose.connection.on('error', function (err) {
-        console.log('mongodb error:');
-        console.error(err);
+  //配置数据库
+  console.log('configure mongoose...');
+  //app.db.mongoose = monoogse;
+  var connectStr = 'mongodb://{0}:{1}@{2}:{3}/{4}'.format(app.conf.db.mongodb.user, app.conf.db.mongodb.password, app.conf.db.mongodb.server, app.conf.db.mongodb.port, app.conf.db.mongodb.database)
+  mongoose.connect(connectStr);
+  app.db = mongoose.connection.on('error', function (err) {
+    console.log('mongodb error:');
+    console.error(err);
+  });
+  mongoose.Promise = global.Promise;
+
+  console.log('configure models...');
+  app.modelsDirStructure = yield app.util.readDirectoryStructure(path.resolve('models'), '.js');
+  var ModelFactory = require('./libs/ModelFactory');
+  ModelFactory.loadModel.bind(app)(app.modelsDirStructure);
+  app.models = ModelFactory.models;
+  app.modelFactory = ModelFactory.bind(app);
+
+
+  console.log('configure schedule sequence defs...');
+  app.conf.sequenceDefNames = _.map((yield app.wrapper.cb(fs.readdir)(app.conf.dir.sequenceDefs)), function (o) {
+    return o.substr(0, o.indexOf('.'))
+  });
+
+
+  console.log('configure business-components...');
+  app.conf.businessComponentNames = _.map((yield app.wrapper.cb(fs.readdir)(app.conf.dir.businessComponents)), function (o) {
+    return o.substr(0, o.indexOf('.'))
+  });
+
+  console.log('configure socket-providers...');
+  app.conf.socketProviderNames = _.map((yield app.wrapper.cb(fs.readdir)(app.conf.dir.socketProviders)), function (o) {
+    return o.substr(0, o.indexOf('.'))
+  });
+
+  console.log('configure schedule jobs...');
+  app.conf.scheduleJobNames = _.map((yield app.wrapper.cb(fs.readdir)(app.conf.dir.scheduleJobs)), function (o) {
+    return o.substr(0, o.indexOf('.'))
+  });
+
+  console.log('configure services...');
+  app.conf.serviceNames = _.map((yield app.wrapper.cb(fs.readdir)(app.conf.dir.service)), function (o) {
+    return o.substr(0, o.indexOf('.'))
+  });
+  app.conf.meServiceNames = _.map((yield app.wrapper.cb(fs.readdir)(app.conf.dir.meServices)), function (o) {
+    return o.substr(0, o.indexOf('.'))
+  });
+
+
+  if (!app.conf.isProduction) {
+    app.conf.debugServiceNames = _.map((yield app.wrapper.cb(fs.readdir)(app.conf.dir.debugServices)), function (o) {
+      return o.substr(0, o.indexOf('.'))
     });
-    mongoose.Promise = global.Promise;
+  }
 
-    console.log('configure models...');
-    app.modelsDirStructure = yield app.util.readDirectoryStructure(path.resolve('models'), '.js');
-    var ModelFactory = require('./libs/ModelFactory');
-    ModelFactory.loadModel.bind(app)(app.modelsDirStructure);
-    app.models = ModelFactory.models;
-    app.modelFactory = ModelFactory.bind(app);
+  console.log('configure logs...');
+  var configAppenders = [];
+  configAppenders = _.union(configAppenders,
+    _.map(app.conf.serviceNames, function (o) {
+      var getLogConfig = require('./services/' + o).getLogConfig;
+      if (getLogConfig && typeof getLogConfig === 'function') {
+        return require('./services/' + o).getLogConfig(app);
+      } else {
+        var logName = 'svc_' + o + '.js';
+        return {
+          type: 'dateFile',
+          filename: path.join(app.conf.dir.log, logName),
+          pattern: '-yyyy-MM-dd.log',
+          alwaysIncludePattern: true,
+          category: logName
+        };
+      }
+    }),
+    _.map(app.conf.meServiceNames, function (o) {
+      var getLogConfig = require('./me-services/' + o).getLogConfig;
+      if (getLogConfig && typeof getLogConfig === 'function') {
+        return require('./me-services/' + o).getLogConfig(app);
+      } else {
+        var logName = 'mesvc_' + o + '.js';
+        return {
+          type: 'dateFile',
+          filename: path.join(app.conf.dir.log, logName),
+          pattern: '-yyyy-MM-dd.log',
+          alwaysIncludePattern: true,
+          category: logName
+        };
+      }
+    }),
+    _.map(app.conf.businessComponentNames, function (o) {
+      var getLogConfig = require('./business-components/' + o).getLogConfig;
+      if (getLogConfig && typeof getLogConfig === 'function') {
+        return require('./business-components/' + o).getLogConfig(app);
+      } else {
+        var logName = 'bc_' + o + '.js';
+        return {
+          type: 'dateFile',
+          filename: path.join(app.conf.dir.log, logName),
+          pattern: '-yyyy-MM-dd.log',
+          alwaysIncludePattern: true,
+          category: logName
+        };
+      }
+    }),
+    _.map(app.conf.socketProviderNames, function (o) {
+      var getLogConfig = require('./socket-providers/' + o).getLogConfig;
+      if (getLogConfig && typeof getLogConfig === 'function') {
+        return require('./socket-providers/' + o).getLogConfig(app);
+      } else {
+        var logName = 'sp_' + o + '.js';
+        return {
+          type: 'dateFile',
+          filename: path.join(app.conf.dir.log, logName),
+          pattern: '-yyyy-MM-dd.log',
+          alwaysIncludePattern: true,
+          category: logName
+        };
+      }
+    }));
+
+  if (!app.conf.isProduction) {
+    configAppenders = _.union(configAppenders, _.map(app.conf.debugServiceNames, function (o) {
+      var getLogConfig = require('./debug-services/' + o).getLogConfig;
+      if (getLogConfig && typeof getLogConfig === 'function') {
+        return require('./debug-services/' + o).getLogConfig(app);
+      } else {
+        var logName = 'dsvc_' + o + '.js';
+        return {
+          type: 'dateFile',
+          filename: path.join(app.conf.dir.log, logName),
+          pattern: '-yyyy-MM-dd.log',
+          alwaysIncludePattern: true,
+          category: logName
+        };
+      }
+    }));
+  }
+
+  //配置日志
+  log4js.configure({
+    appenders: configAppenders
+  });
 
 
-    console.log('configure schedule sequence defs...');
-    app.conf.sequenceDefNames = _.map((yield app.wrapper.cb(fs.readdir)(app.conf.dir.sequenceDefs)), function (o) {
-        return o.substr(0, o.indexOf('.'))
+  console.log('configure sequences...');
+  app.sequenceFactory = require('./libs/SequenceFactory').init(app);
+
+  _.each(app.conf.sequenceDefNames, function (o) {
+    app.sequenceFactory.factory(o);
+  });
+
+  //test the sequence
+  // var code = yield app.sequenceFactory.getSequenceVal(app.modelVariables.SEQUENCE_DEFS.ORDER_OF_PFT);
+  // console.log(code);
+  // var code2 = yield app.sequenceFactory.getSequenceVal(app.modelVariables.SEQUENCE_DEFS.SCENICSPOT,'010101');
+  // console.log(code2);
+
+  console.log('configure business-components... ');
+  //app.CarryOverManager = require('./business-components/CarryOverManager').init(app);
+  //初始化业务组件
+  _.each(app.conf.businessComponentNames, function (o) {
+    app[o] = require('./business-components/' + o).init(app);
+  });
+
+  console.log('configure jobs...');
+  app.jobManger = rfcore.factory('jobManager');
+  _.each(app.conf.scheduleJobNames, function (o) {
+    var jobDef = require('./jobs/' + o);
+    console.log('create job use ' + o + '...');
+    jobDef.register(app).then(function (jobRegInfo) {
+      //更新到作业状态监控
+      co(function*() {
+        var jobStatus = yield app.modelFactory().model_one(app.models['pub_jobStatus'], {where: {job_id: jobRegInfo.job_id}});
+        var stop_flag = !jobRegInfo.success;
+        if (!stop_flag) {
+          console.log('更新到作业状态监控...', jobRegInfo);
+        }
+        if (!jobStatus) {
+          yield app.modelFactory().model_create(app.models['pub_jobStatus'], {
+            job_id: jobRegInfo.job_id,
+            job_name: jobRegInfo.job_name,
+            job_rule: jobRegInfo.job_rule,
+            stop_flag: stop_flag
+          });
+        } else {
+          jobStatus.stop_flag = stop_flag;
+          yield jobStatus.save();
+        }
+      });
     });
+  });
 
 
-    console.log('configure business-components...');
-    app.conf.businessComponentNames = _.map((yield app.wrapper.cb(fs.readdir)(app.conf.dir.businessComponents)), function (o) {
-        return o.substr(0, o.indexOf('.'))
-    });
-
-    console.log('configure socket-providers...');
-    app.conf.socketProviderNames = _.map((yield app.wrapper.cb(fs.readdir)(app.conf.dir.socketProviders)), function (o) {
-        return o.substr(0, o.indexOf('.'))
-    });
-
-    console.log('configure schedule jobs...');
-    app.conf.scheduleJobNames = _.map((yield app.wrapper.cb(fs.readdir)(app.conf.dir.scheduleJobs)), function (o) {
-        return o.substr(0, o.indexOf('.'))
-    });
-
-    console.log('configure services...');
-    app.conf.serviceNames = _.map((yield app.wrapper.cb(fs.readdir)(app.conf.dir.service)), function (o) {
-        return o.substr(0, o.indexOf('.'))
-    });
-    app.conf.meServiceNames = _.map((yield app.wrapper.cb(fs.readdir)(app.conf.dir.meServices)), function (o) {
-        return o.substr(0, o.indexOf('.'))
-    });
-
-
-    if (!app.conf.isProduction) {
-        app.conf.debugServiceNames = _.map((yield app.wrapper.cb(fs.readdir)(app.conf.dir.debugServices)), function (o) {
-            return o.substr(0, o.indexOf('.'))
+  console.log('register router...');
+  //注册服务路由
+  _.each(app.conf.serviceNames, function (o) {
+    var service_module = require('./services/' + o);
+    _.each(service_module.actions, function (action) {
+      var bodyParser;
+      if (app.conf.bodyParser.xml.findIndex(function (o) {
+          return action.url.startsWith(o);
+        }) == -1) {
+        // router.use(action.url, koaBody);
+        bodyParser = koaBody;
+      } else {
+        bodyParser = xmlBodyParser({
+          encoding: 'utf8', // lib will detect it from `content-type`
+          onerror: (err, ctx) => {
+            console.log(err);
+            // ctx.throw(err.status, err.message);
+          }
         });
-    }
-
-    console.log('configure logs...');
-    var configAppenders = [];
-    configAppenders = _.union(configAppenders,
-        _.map(app.conf.serviceNames, function (o) {
-            var getLogConfig = require('./services/' + o).getLogConfig;
-            if (getLogConfig && typeof getLogConfig === 'function') {
-                return require('./services/' + o).getLogConfig(app);
-            } else {
-                var logName = 'svc_' + o + '.js';
-                return {
-                    type: 'dateFile',
-                    filename: path.join(app.conf.dir.log, logName),
-                    pattern: '-yyyy-MM-dd.log',
-                    alwaysIncludePattern: true,
-                    category: logName
-                };
-            }
-        }),
-        _.map(app.conf.meServiceNames, function (o) {
-            var getLogConfig = require('./me-services/' + o).getLogConfig;
-            if (getLogConfig && typeof getLogConfig === 'function') {
-                return require('./me-services/' + o).getLogConfig(app);
-            } else {
-                var logName = 'mesvc_' + o + '.js';
-                return {
-                    type: 'dateFile',
-                    filename: path.join(app.conf.dir.log, logName),
-                    pattern: '-yyyy-MM-dd.log',
-                    alwaysIncludePattern: true,
-                    category: logName
-                };
-            }
-        }),
-        _.map(app.conf.businessComponentNames, function (o) {
-            var getLogConfig = require('./business-components/' + o).getLogConfig;
-            if (getLogConfig && typeof getLogConfig === 'function') {
-                return require('./business-components/' + o).getLogConfig(app);
-            } else {
-                var logName = 'bc_' + o + '.js';
-                return {
-                    type: 'dateFile',
-                    filename: path.join(app.conf.dir.log, logName),
-                    pattern: '-yyyy-MM-dd.log',
-                    alwaysIncludePattern: true,
-                    category: logName
-                };
-            }
-        }),
-        _.map(app.conf.socketProviderNames, function (o) {
-            var getLogConfig = require('./socket-providers/' + o).getLogConfig;
-            if (getLogConfig && typeof getLogConfig === 'function') {
-                return require('./socket-providers/' + o).getLogConfig(app);
-            } else {
-                var logName = 'sp_' + o + '.js';
-                return {
-                    type: 'dateFile',
-                    filename: path.join(app.conf.dir.log, logName),
-                    pattern: '-yyyy-MM-dd.log',
-                    alwaysIncludePattern: true,
-                    category: logName
-                };
-            }
-        }));
-
-    if (!app.conf.isProduction) {
-        configAppenders = _.union(configAppenders, _.map(app.conf.debugServiceNames, function (o) {
-            var getLogConfig = require('./debug-services/' + o).getLogConfig;
-            if (getLogConfig && typeof getLogConfig === 'function') {
-                return require('./debug-services/' + o).getLogConfig(app);
-            } else {
-                var logName = 'dsvc_' + o + '.js';
-                return {
-                    type: 'dateFile',
-                    filename: path.join(app.conf.dir.log, logName),
-                    pattern: '-yyyy-MM-dd.log',
-                    alwaysIncludePattern: true,
-                    category: logName
-                };
-            }
-        }));
-    }
-
-    //配置日志
-    log4js.configure({
-        appenders: configAppenders
+        console.log('xmlBodyParser use to ' + action.url);
+      }
+      Router.prototype[action.verb].apply(router, [service_module.name + "_" + action.method, action.url, bodyParser, action.handler(app)]);
     });
-
-
-    console.log('configure sequences...');
-    app.sequenceFactory = require('./libs/SequenceFactory').init(app);
-
-    _.each(app.conf.sequenceDefNames, function (o) {
-        app.sequenceFactory.factory(o);
-    });
-
-    //test the sequence
-    // var code = yield app.sequenceFactory.getSequenceVal(app.modelVariables.SEQUENCE_DEFS.ORDER_OF_PFT);
-    // console.log(code);
-    // var code2 = yield app.sequenceFactory.getSequenceVal(app.modelVariables.SEQUENCE_DEFS.SCENICSPOT,'010101');
-    // console.log(code2);
-
-    console.log('configure business-components... ');
-    //app.CarryOverManager = require('./business-components/CarryOverManager').init(app);
-    //初始化业务组件
-    _.each(app.conf.businessComponentNames, function (o) {
-        app[o] = require('./business-components/' + o).init(app);
-    });
-
-    console.log('configure jobs...');
-    app.jobManger = rfcore.factory('jobManager');
-    _.each(app.conf.scheduleJobNames, function (o) {
-        var jobDef = require('./jobs/' + o);
-        console.log('create job use ' + o + '...');
-        jobDef.register(app).then(function (jobRegInfo) {
-            //更新到作业状态监控
-            co(function*() {
-                var jobStatus = yield app.modelFactory().model_one(app.models['pub_jobStatus'], {where: {job_id: jobRegInfo.job_id}});
-                var stop_flag = !jobRegInfo.success;
-                if(!stop_flag) {
-                    console.log('更新到作业状态监控...', jobRegInfo);
-                }
-                if (!jobStatus) {
-                    yield app.modelFactory().model_create(app.models['pub_jobStatus'], {
-                        job_id: jobRegInfo.job_id,
-                        job_name: jobRegInfo.job_name,
-                        job_rule: jobRegInfo.job_rule,
-                        stop_flag: stop_flag
-                    });
-                } else {
-                    jobStatus.stop_flag = stop_flag;
-                    yield jobStatus.save();
-                }
-            });
+  });
+  _.each(app.conf.meServiceNames, function (o) {
+    var service_module = require('./me-services/' + o);
+    _.each(service_module.actions, function (action) {
+      //support options for CORS
+      Router.prototype['options'].apply(router, [action.url]);
+      var bodyParser;
+      if (app.conf.bodyParser.xml.findIndex(function (o) {
+          return action.url.startsWith(o);
+        }) == -1) {
+        bodyParser = koaBody;
+      } else {
+        bodyParser = xmlBodyParser({
+          encoding: 'utf8', // lib will detect it from `content-type`
+          onerror: (err, ctx) => {
+            console.log(err);
+            // ctx.throw(err.status, err.message);
+          }
         });
+        console.log('xmlBodyParser use to ' + action.url);
+      }
+
+      Router.prototype[action.verb].apply(router, [service_module.name + "_" + action.method, action.url, bodyParser, action.handler(app)]);
+
     });
-
-
-    console.log('register router...');
-    //注册服务路由
-    _.each(app.conf.serviceNames, function (o) {
-        var service_module = require('./services/' + o);
-        _.each(service_module.actions, function (action) {
-            var bodyParser;
-            if (app.conf.bodyParser.xml.findIndex(function (o) {
-                    return action.url.startsWith(o);
-                }) == -1) {
-                // router.use(action.url, koaBody);
-                bodyParser = koaBody;
-            } else {
-                bodyParser = xmlBodyParser({
-                    encoding: 'utf8', // lib will detect it from `content-type`
-                    onerror: (err, ctx) => {
-                        console.log(err);
-                        // ctx.throw(err.status, err.message);
-                    }
-                });
-                console.log('xmlBodyParser use to ' + action.url);
+  });
+  if (!app.conf.isProduction) {
+    _.each(app.conf.debugServiceNames, function (o) {
+      var service_module = require('./debug-services/' + o);
+      _.each(service_module.actions, function (action) {
+        var bodyParser;
+        if (app.conf.bodyParser.xml.findIndex(function (o) {
+            return action.url.startsWith(o);
+          }) == -1) {
+          bodyParser = koaBody;
+        } else {
+          bodyParser = xmlBodyParser({
+            encoding: 'utf8', // lib will detect it from `content-type`
+            onerror: (err, ctx) => {
+              console.log(err);
+              // ctx.throw(err.status, err.message);
             }
-            Router.prototype[action.verb].apply(router, [service_module.name + "_" + action.method, action.url, bodyParser, action.handler(app)]);
-        });
+          });
+          console.log('xmlBodyParser use to ' + action.url);
+        }
+        Router.prototype[action.verb].apply(router, [service_module.name + "_" + action.method, action.url, bodyParser, action.handler(app)]);
+      });
     });
-    _.each(app.conf.meServiceNames, function (o) {
-        var service_module = require('./me-services/' + o);
-        _.each(service_module.actions, function (action) {
-            //support options for CORS
-            Router.prototype['options'].apply(router, [action.url]);
-            var bodyParser;
-            if (app.conf.bodyParser.xml.findIndex(function (o) {
-                    return action.url.startsWith(o);
-                }) == -1) {
-                bodyParser = koaBody;
-            } else {
-                bodyParser = xmlBodyParser({
-                    encoding: 'utf8', // lib will detect it from `content-type`
-                    onerror: (err, ctx) => {
-                        console.log(err);
-                        // ctx.throw(err.status, err.message);
-                    }
-                });
-                console.log('xmlBodyParser use to ' + action.url);
-            }
+  }
 
-            Router.prototype[action.verb].apply(router, [service_module.name + "_" + action.method, action.url, bodyParser, action.handler(app)]);
 
-        });
-    });
-    if (!app.conf.isProduction) {
-        _.each(app.conf.debugServiceNames, function (o) {
-            var service_module = require('./debug-services/' + o);
-            _.each(service_module.actions, function (action) {
-                var bodyParser;
-                if (app.conf.bodyParser.xml.findIndex(function (o) {
-                        return action.url.startsWith(o);
-                    }) == -1) {
-                    bodyParser = koaBody;
-                } else {
-                    bodyParser = xmlBodyParser({
-                        encoding: 'utf8', // lib will detect it from `content-type`
-                        onerror: (err, ctx) => {
-                            console.log(err);
-                            // ctx.throw(err.status, err.message);
-                        }
-                    });
-                    console.log('xmlBodyParser use to ' + action.url);
-                }
-                Router.prototype[action.verb].apply(router, [service_module.name + "_" + action.method, action.url, bodyParser, action.handler(app)]);
-            });
-        });
+  //注册静态文件（客户端文件）
+  if (app.conf.isProduction) {
+    app.use(staticCache(app.conf.dir.static_production + app.conf.client.bulidtarget, {alias: {'/': '/index.html'}}));
+  }
+  else {
+    // app.use(koaStatic(app.conf.dir.static_develop + app.conf.client.bulidtarget));
+    app.use(staticCache(app.conf.dir.static_develop + app.conf.client.bulidtarget, {alias: {'/': '/index-dev.html'}}));
+    app.use(require('koa-livereload')());
+  }
+
+  //注册其他路由
+  //router
+  //    .get('/', function *(next) {
+  //        this.body = 'hello guest';
+  //        yield next;
+  //    });
+
+  // 注意router.use的middleware有顺序
+  // router.use(koaBody);
+
+  //中间件
+  _.each(app.conf.auth.toPaths, function (o) {
+    router.use(o, auth(app));
+  });
+  _.each(app.conf.crossDomainInterceptor.toPaths, function (o) {
+    router.use(o, crossDomainInterceptor(app));
+  });
+  _.each(app.conf.authApp.toPaths, function (o) {
+    router.use(o, authApp(app));
+  });
+  _.each(app.conf.authAppRobot.toPaths, function (o) {
+    console.log(o);
+    router.use(o, authAppRobot(app));
+  });
+  _.each(app.conf.authWXApp.toPaths, function (o) {
+    console.log(o);
+    router.use(o, authWXApp(app));
+  });
+
+  app.use(router.routes())
+    .use(router.allowedMethods());
+
+
+  var svr = app.listen(app.conf.port);
+  app.socket_service.mountServer(svr);
+  _.each(app.conf.socketProviderNames, function (o) {
+    console.log(o);
+    app.socket_service.registerSocketChannel(o, require('./socket-providers/' + o));
+  });
+  // app.socket_service.addMemberNamespace();
+  // app.socket_service.addGroupNamespace();
+  // //var io = require('socket.io').listen( app.listen(3000) );
+  // app.group_service.joinMonitoring();
+
+  //app.socket$psn_bed_monitor.mountServer(svr);
+
+
+  console.log('listening...');
+
+  // console.log(moment().weekday(0).add(7, 'days').add(6, 'days').format('YYYY.MM.DD'))
+
+  // var net = require('net');
+  //
+  // var HOST = '192.168.10.246';
+  // var PORT = 8060;
+  //
+  // var client = new net.Socket();
+  // client.connect(PORT, HOST, function() {
+  //
+  //     console.log('CONNECTED TO: ' + HOST + ':' + PORT);
+  //     // 建立连接后立即向服务器发送数据，服务器将收到这些数据
+  //     client.write('333333');
+  //     console.log('send data finished');
+  // });
+  //
+  // // 为客户端添加“data”事件处理函数
+  // // data是服务器发回的数据
+  // client.on('data', function(data) {
+  //
+  //     console.log('DATA: ' + data);
+  //     // 完全关闭连接
+  //     client.end('received:' + data);
+  //
+  // });
+  //
+  // // 为客户端添加“close”事件处理函数
+  // client.on('close', function() {
+  //     console.log('Connection closed');
+  // });
+
+
+  // console.log('elderly:', yield  app.modelFactory().model_one(app.models['psn_nursingRecord']).populate('elderlyId', 'birthday').populate('roomId', 'name floor').populate('assigned_worker', 'name'));
+
+  // console.log('test app.spu_service');
+  // var member1 = yield app.modelFactory().model_query(app.models['het_member']);
+  // var member2 = yield app.modelFactory().model_query(app.models['trv_member']);
+  // console.log(member1);
+  // console.log(member2);
+  // yield app.spu_service.appendSaleInfoByOrderPaySuccess(order);
+  // console.log(app.moment(1492705810785).format('YYYY-MM-DD HH:mm:ss'))
+
+  // var xlsx = require('node-xlsx').default;
+  // var worksheets = xlsx.parse(app.conf.dir.root + '/raw-data/drug0921-t.xlsx');
+  // console.dir(worksheets[0].data[0]);
+  // console.dir(worksheets[0].data[1]);
+
+  // var rooms = yield app.modelFactory().model_query(app.models['psn_room'], {
+  //     select: 'name',
+  //     where: {
+  //         robots: {$elemMatch: {$eq: '58fd721e8ef00320ddda341b' }}
+  //     }
+  // });
+
+  /*
+  var DIC = require('./pre-defined/dictionary-constants.json');
+  var tenantId = app.ObjectId('58a6abf9a03cc7229a8f261a');
+  var psn_meal_biz_mode = DIC.D3041.PRE_BOOKING;
+  var psn_meal_periods = [DIC.D3040.BREAKFAST, DIC.D3040.LUNCH, DIC.D3040.DINNER, DIC.D3040.SUPPER];
+
+  var x_axis_start = app.moment(app.moment().weekday(0).add(7, 'days').format('YYYY-MM-DD'));
+  var x_axis_end = app.moment(app.moment().weekday(0).add(14, 'days').format('YYYY-MM-DD'));
+
+  var rows = yield app.modelFactory().model_aggregate(app.models['psn_mealMenu'], [
+    {
+      $match: {
+        tenantId: tenantId,
+        status: 1,
+        x_axis: {$gte: x_axis_start.toDate(), $lt: x_axis_end.toDate()},
+        y_axis: {$in: psn_meal_periods}
+      }
+    },
+    {
+      $lookup:{
+        from: "psn_meal",
+        localField:"aggr_value.mealId",
+        foreignField:"_id",
+        as:"meal"
+      }
+    },
+    {
+      $unwind: '$meal'
+    },
+    {
+      $project: {
+        date: { $dateToString: { format: "%Y-%m-%d", date: "$x_axis" } },
+        period: '$y_axis',
+        meal:{ id:'$aggr_value.mealId', name: '$meal.name' }
+      }
+    },
+    {
+      $group:{
+        _id:{ date: '$date', period: '$period'},
+        meals:{$push:'$meal'}
+      }
+    },
+    {
+      $sort: {'_id.period': 1}
+    },
+    {
+      $project: {
+        date: '$_id.date',
+        period: '$_id.period',
+        meals: '$meals'
+      }
+    },
+    {
+      $group:{
+        _id: '$date',
+        periods:{$push: '$$ROOT'}
+      }
+    },
+    {
+      $project: {
+        _id: 0,
+        date: '$_id',
+        periods: '$periods'
+      }
+    },
+    {
+      $sort: {'date': 1}
     }
-
-
-    //注册静态文件（客户端文件）
-    if (app.conf.isProduction) {
-        app.use(staticCache(app.conf.dir.static_production + app.conf.client.bulidtarget, {alias: {'/': '/index.html'}}));
-    }
-    else {
-        // app.use(koaStatic(app.conf.dir.static_develop + app.conf.client.bulidtarget));
-        app.use(staticCache(app.conf.dir.static_develop + app.conf.client.bulidtarget, {alias: {'/': '/index-dev.html'}}));
-        app.use(require('koa-livereload')());
-    }
-
-    //注册其他路由
-    //router
-    //    .get('/', function *(next) {
-    //        this.body = 'hello guest';
-    //        yield next;
-    //    });
-
-    // 注意router.use的middleware有顺序
-    // router.use(koaBody);
-
-    //中间件
-    _.each(app.conf.auth.toPaths, function (o) {
-        router.use(o, auth(app));
+  ]);
+  _.each(rows, (o) => {
+    console.log(o.date)
+    o.periods = _.map(o.periods, (p)=>{
+      console.log(p.period)
+      return {period: p.period, meals: p.meals}
     });
-    _.each(app.conf.crossDomainInterceptor.toPaths, function (o) {
-        router.use(o, crossDomainInterceptor(app));
-    });
-    _.each(app.conf.authApp.toPaths, function (o) {
-        router.use(o, authApp(app));
-    });
-    _.each(app.conf.authAppRobot.toPaths, function (o) {
-        console.log(o);
-        router.use(o, authAppRobot(app));
-    });
-    _.each(app.conf.authWXApp.toPaths, function (o) {
-        console.log(o);
-        router.use(o, authWXApp(app));
-    });
-
-    app.use(router.routes())
-        .use(router.allowedMethods());
-
-
-    var svr = app.listen(app.conf.port);
-    app.socket_service.mountServer(svr);
-    _.each(app.conf.socketProviderNames, function (o) {
-        console.log(o);
-        app.socket_service.registerSocketChannel(o, require('./socket-providers/' + o));
-    });
-    // app.socket_service.addMemberNamespace();
-    // app.socket_service.addGroupNamespace();
-    // //var io = require('socket.io').listen( app.listen(3000) );
-    // app.group_service.joinMonitoring();
-
-    //app.socket$psn_bed_monitor.mountServer(svr);
-
-
-    console.log('listening...');
-
-    // var net = require('net');
-    //
-    // var HOST = '192.168.10.246';
-    // var PORT = 8060;
-    //
-    // var client = new net.Socket();
-    // client.connect(PORT, HOST, function() {
-    //
-    //     console.log('CONNECTED TO: ' + HOST + ':' + PORT);
-    //     // 建立连接后立即向服务器发送数据，服务器将收到这些数据
-    //     client.write('333333');
-    //     console.log('send data finished');
-    // });
-    //
-    // // 为客户端添加“data”事件处理函数
-    // // data是服务器发回的数据
-    // client.on('data', function(data) {
-    //
-    //     console.log('DATA: ' + data);
-    //     // 完全关闭连接
-    //     client.end('received:' + data);
-    //
-    // });
-    //
-    // // 为客户端添加“close”事件处理函数
-    // client.on('close', function() {
-    //     console.log('Connection closed');
-    // });
-
-
-    // console.log('elderly:', yield  app.modelFactory().model_one(app.models['psn_nursingRecord']).populate('elderlyId', 'birthday').populate('roomId', 'name floor').populate('assigned_worker', 'name'));
-
-    // console.log('test app.spu_service');
-    // var member1 = yield app.modelFactory().model_query(app.models['het_member']);
-    // var member2 = yield app.modelFactory().model_query(app.models['trv_member']);
-    // console.log(member1);
-    // console.log(member2);
-    // yield app.spu_service.appendSaleInfoByOrderPaySuccess(order);
-    // console.log(app.moment(1492705810785).format('YYYY-MM-DD HH:mm:ss'))
-
-    // var xlsx = require('node-xlsx').default;
-    // var worksheets = xlsx.parse(app.conf.dir.root + '/raw-data/drug0921-t.xlsx');
-    // console.dir(worksheets[0].data[0]);
-    // console.dir(worksheets[0].data[1]);
-
-    // var rooms = yield app.modelFactory().model_query(app.models['psn_room'], {
-    //     select: 'name',
-    //     where: {
-    //         robots: {$elemMatch: {$eq: '58fd721e8ef00320ddda341b' }}
-    //     }
-    // });
-
+  });
+  console.log('meals$fetch:PRE_BOOKING>>', rows);
+  */
 
 }).catch(app.coOnError);
 

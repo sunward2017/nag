@@ -146,8 +146,8 @@
     "HEAD_OF_AGENCY":"A3005"
   },
   "D3040": {
-    "Breakfast": "A0000",
-    "LUNCH": "A0002",
+    "BREAKFAST": "A0000",
+    "LUNCH": "A0001",
     "DINNER": "A0002",
     "SUPPER": "A0003"
   },

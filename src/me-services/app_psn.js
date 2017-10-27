@@ -1180,7 +1180,7 @@ module.exports = {
               }
 
               if (roomId) {
-                console.log('roomId...')
+                console.log('mealOrderRecord$elderly$fetch: roomId...')
                 dynamicFilter['room_value.roomId'] = roomId;
               }
               console.log('dynamicFilter:', dynamicFilter);
@@ -1191,8 +1191,32 @@ module.exports = {
                 begin_exit_flow: {$ne: true}
               });
 
-              console.log('dynamicFilter:', dynamicFilter);
+              console.log('mealOrderRecord$elderly$fetch: dynamicFilter:', dynamicFilter);
+              if(psn_meal_biz_mode === DIC.D3041.PRE_BOOKING) {
+                var psn_meal_biz_mode = this.request.body.psn_meal_biz_mode;
+                var psn_meal_periods = this.request.body.psn_meal_periods.length == 0 || [DIC.D3040.BREAKFAST, DIC.D3040.LUNCH, DIC.D3040.DINNER, DIC.D3040.SUPPER];
+                var x_axis_start = app.moment(app.moment().weekday(0).add(7, 'days').format('YYYY-MM-DD'));
+                var x_axis_end = app.moment(app.moment().weekday(0).add(14, 'days').format('YYYY-MM-DD'));
 
+                var rows = yield app.modelFactory().model_aggregate(app.models['psn_mealOrderRecord'], [
+                  {
+                    $match: {
+                      tenantId: tenantId,
+                      status: 1,
+                      x_axis: {$gte: x_axis_start.toDate(), $lt: x_axis_end.toDate()},
+                      y_axis: {$in: psn_meal_periods}
+                    }
+                  },
+                  {
+                    $group: {
+                      _id: '$elderlyId'
+                    }
+                  }
+                ]);
+
+                var elderlyIdsOrdered = app._.map(rows, (o)=> o._id);
+                dynamicFilter['_id'] = { $nin: elderlyIdsOrdered};
+              }
               var elderly = yield app.modelFactory().model_query(app.models['psn_elderly'], {
                 select: 'name birthday room_summary avatar room_value',
                 where: dynamicFilter

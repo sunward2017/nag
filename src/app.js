@@ -546,7 +546,7 @@ co(function*() {
 
   console.log('listening...');
 
-  // console.log(moment().weekday(0).add(7, 'days').add(6, 'days').format('YYYY.MM.DD'))
+  // console.log(moment().weekday(0).add(7, 'days').add(1, 'days').format('ddd'))
 
   // var net = require('net');
   //
@@ -600,84 +600,85 @@ co(function*() {
   //     }
   // });
 
-  /*
-  var DIC = require('./pre-defined/dictionary-constants.json');
-  var tenantId = app.ObjectId('58a6abf9a03cc7229a8f261a');
-  var psn_meal_biz_mode = DIC.D3041.PRE_BOOKING;
-  var psn_meal_periods = [DIC.D3040.BREAKFAST, DIC.D3040.LUNCH, DIC.D3040.DINNER, DIC.D3040.SUPPER];
 
-  var x_axis_start = app.moment(app.moment().weekday(0).add(7, 'days').format('YYYY-MM-DD'));
-  var x_axis_end = app.moment(app.moment().weekday(0).add(14, 'days').format('YYYY-MM-DD'));
+  // var DIC = require('./pre-defined/dictionary-constants.json');
+  // var tenantId = app.ObjectId('58a6abf9a03cc7229a8f261a');
+  // var psn_meal_biz_mode = DIC.D3041.PRE_BOOKING;
+  // var psn_meal_periods = [DIC.D3040.BREAKFAST, DIC.D3040.LUNCH, DIC.D3040.DINNER, DIC.D3040.SUPPER];
+  //
+  // var x_axis_start = app.moment(app.moment().weekday(0).add(7, 'days').format('YYYY-MM-DD'));
+  // var x_axis_end = app.moment(app.moment().weekday(0).add(14, 'days').format('YYYY-MM-DD'));
+  //
+  // var rows = yield app.modelFactory().model_aggregate(app.models['psn_mealMenu'], [
+  //   {
+  //     $match: {
+  //       tenantId: tenantId,
+  //       status: 1,
+  //       x_axis: {$gte: x_axis_start.toDate(), $lt: x_axis_end.toDate()},
+  //       y_axis: {$in: psn_meal_periods}
+  //     }
+  //   },
+  //   {
+  //     $lookup:{
+  //       from: "psn_meal",
+  //       localField:"aggr_value.mealId",
+  //       foreignField:"_id",
+  //       as:"meal"
+  //     }
+  //   },
+  //   {
+  //     $unwind: '$meal'
+  //   },
+  //   {
+  //     $project: {
+  //       date: { $dateToString: { format: "%Y-%m-%d", date: "$x_axis" } },
+  //       period: '$y_axis',
+  //       meal:{ id:'$aggr_value.mealId', name: '$meal.name' }
+  //     }
+  //   },
+  //   {
+  //     $group:{
+  //       _id:{ date: '$date', period: '$period'},
+  //       meals:{$push:'$meal'}
+  //     }
+  //   },
+  //   {
+  //     $sort: {'_id.period': 1}
+  //   },
+  //   {
+  //     $project: {
+  //       date: '$_id.date',
+  //       period: '$_id.period',
+  //       meals: '$meals'
+  //     }
+  //   },
+  //   {
+  //     $group:{
+  //       _id: '$date',
+  //       periods:{$push: '$$ROOT'}
+  //     }
+  //   },
+  //   {
+  //     $project: {
+  //       _id: 0,
+  //       date: '$_id',
+  //       periods: '$periods'
+  //     }
+  //   },
+  //   {
+  //     $sort: {'date': 1}
+  //   }
+  // ]);
+  // _.each(rows, (o) => {
+  //   console.log(o.date)
+  //   o.weekday = app.moment(o.date).format('ddd');
+  //   o.periods = _.map(o.periods, (p)=>{
+  //     console.log(p.period)
+  //     return {period: p.period, meals: p.meals}
+  //   });
+  // });
+  // console.log('meals$fetch:PRE_BOOKING>>', rows);
 
-  var rows = yield app.modelFactory().model_aggregate(app.models['psn_mealMenu'], [
-    {
-      $match: {
-        tenantId: tenantId,
-        status: 1,
-        x_axis: {$gte: x_axis_start.toDate(), $lt: x_axis_end.toDate()},
-        y_axis: {$in: psn_meal_periods}
-      }
-    },
-    {
-      $lookup:{
-        from: "psn_meal",
-        localField:"aggr_value.mealId",
-        foreignField:"_id",
-        as:"meal"
-      }
-    },
-    {
-      $unwind: '$meal'
-    },
-    {
-      $project: {
-        date: { $dateToString: { format: "%Y-%m-%d", date: "$x_axis" } },
-        period: '$y_axis',
-        meal:{ id:'$aggr_value.mealId', name: '$meal.name' }
-      }
-    },
-    {
-      $group:{
-        _id:{ date: '$date', period: '$period'},
-        meals:{$push:'$meal'}
-      }
-    },
-    {
-      $sort: {'_id.period': 1}
-    },
-    {
-      $project: {
-        date: '$_id.date',
-        period: '$_id.period',
-        meals: '$meals'
-      }
-    },
-    {
-      $group:{
-        _id: '$date',
-        periods:{$push: '$$ROOT'}
-      }
-    },
-    {
-      $project: {
-        _id: 0,
-        date: '$_id',
-        periods: '$periods'
-      }
-    },
-    {
-      $sort: {'date': 1}
-    }
-  ]);
-  _.each(rows, (o) => {
-    console.log(o.date)
-    o.periods = _.map(o.periods, (p)=>{
-      console.log(p.period)
-      return {period: p.period, meals: p.meals}
-    });
-  });
-  console.log('meals$fetch:PRE_BOOKING>>', rows);
-  */
 
 }).catch(app.coOnError);
 

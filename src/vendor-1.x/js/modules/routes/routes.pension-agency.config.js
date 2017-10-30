@@ -3535,6 +3535,9 @@
           entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'user-manage.list', {
             modelName: 'pub-user',
             searchForm: {"status": 1, "type": 'A0002'}, //user.type Web商城用户
+            transTo: {
+              "userDataPermissionConfig": MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'user-manage.data-permission'
+            },
             serverPaging: true,
             blockUI: true,
             columns: [{
@@ -3589,6 +3592,20 @@
             blockUI: true,
             toList: ['roles']
           })
+        }
+      })
+      .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'user-manage.data-permission', {
+        url: '/data-permission/config/:_id',
+        templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.SHARED + 'data-permission.html'),
+        access_level: AUTH_ACCESS_LEVELS.USER,
+        controller: MODEL_VARIABLES.CONTROLLER_NAMES.DATA_PERMISSION_CONFIG,
+        resolve: {
+          instanceVM: helper.buildInstanceVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'user-manage.data-permission', {
+            modelName: 'pub-dataPermission',
+            model: {subsystem: MODEL_VARIABLES.SUBSYSTEM_NAMES.PENSION_AGENCY, subject_type: 'A0001', object_type: 'A1001'},
+            blockUI: true
+          })
+          , deps: helper.resolveFor2(MODEL_VARIABLES.RES_PREFIXS.SHARED + 'data-permission.js')
         }
       })
       .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'tenant-information', {

@@ -143,8 +143,8 @@
 
     function buildVMHelper() {
 
-      return ['$timeout', '$q', '$location', '$translate', '$http', 'Browser', 'blockUI', 'cfpLoadingBar', 'modelNode', 'shareNode', 'extensionNode', 'mwsNode', 'psnNode', 'idtNode', 'debugNode', 'clientData', 'treeFactory', 'Notify', 'GridUtils', 'ViewUtils',
-        function ($timeout, $q, $location, $translate, $http, Browser, blockUI, cfpLoadingBar, modelNode, shareNode, extensionNode, mwsNode, psnNode, idtNode, debugNode, clientData, treeFactory, Notify, GridUtils, ViewUtils) {
+      return ['$timeout', '$q', '$location', '$translate', '$http', 'Browser', 'blockUI', 'cfpLoadingBar', 'modelNode', 'shareNode', 'extensionNode', 'mwsNode', 'psnNode', 'idtNode', 'debugNode', 'clientData', 'treeFactory', 'Notify', 'GridUtils', 'ViewUtils', 'MODEL_VARIABLES',
+        function ($timeout, $q, $location, $translate, $http, Browser, blockUI, cfpLoadingBar, modelNode, shareNode, extensionNode, mwsNode, psnNode, idtNode, debugNode, clientData, treeFactory, Notify, GridUtils, ViewUtils, MODEL_VARIABLES) {
 
           function promiseWrapper() {
             if (arguments.length > 0) {
@@ -263,6 +263,7 @@
             translate: $translate,
             stateToTrans: stateToTrans,
             subSystemToTrans: subSystemToTrans,
+            subSystemNames: MODEL_VARIABLES.SUBSYSTEM_NAMES,
             utils: {
               g: GridUtils,
               v: ViewUtils,
@@ -432,6 +433,13 @@
             action: action,
             _id: id
           }, this.toDetailsParams, params));
+        }
+
+        function viewDef(view, action, id, params) {
+          $state.go(this.moduleRoute(view), _.defaults({
+            action: action,
+            _id: id
+          }, params));
         }
 
         function batchAdd() {
@@ -680,6 +688,7 @@
           add: add,
           setOrder: setOrder,
           edit: edit,
+          viewDef: viewDef,
           actionDef: actionDef,
           batchAdd: batchAdd,
           batchEdit: batchEdit,
@@ -1147,6 +1156,10 @@
               this.tenantId = this.model['tenantId'] = tenant._id;
               this.tenant_name = tenant.name;
             }
+          }
+
+          if(option.model){
+            this.model = _.extend(this.model, angular.copy(option.model));
           }
 
           //remote data get

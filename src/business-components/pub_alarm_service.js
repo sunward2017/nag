@@ -176,6 +176,10 @@ module.exports = {
             content = content.replace(reg, arr.join(''));
           } else if (RegExp.$1 == "老人姓名") {
             content = content.replace(reg, elderly.name);
+          } else {
+            if (content.indexOf('${')) {
+              return;
+            }
           }
         }
 
@@ -233,6 +237,7 @@ module.exports = {
         var drugListContent = self.ctx._.map(lowStockDrugStats, (o) => {
           return o.drug_name + '(少于' + o.canUseDays + '天)';
         }).join(';');
+        console.log('sorted lowStockDrugStats:', lowStockDrugStats)
 
         // 替换模版内容
         var content = pub_alarm_D3016_A2000_setting.content_template;
@@ -244,6 +249,10 @@ module.exports = {
             content = content.replace(reg, elderly.name);
           } else if (RegExp.$1 == '药品清单') {
             content = content.replace(reg, drugListContent);
+          } else {
+            if (content.indexOf('${')) {
+              return;
+            }
           }
         }
 

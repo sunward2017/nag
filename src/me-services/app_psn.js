@@ -1038,6 +1038,199 @@ module.exports = {
         }
       },
       {
+        method: 'mealOrderRecords$elderly$fetchByDateRange',
+        verb: 'post',
+        url: this.service_url_prefix + "/mealOrderRecords/elderly/fetchByDateRange",
+        handler: function (app, options) {
+          return function*(next) {
+            try {
+              var userId = this.request.body.userId;
+              var begin_date = this.request.body.begin_date;
+              var end_date = this.request.body.end_date;
+              var tenantId = this.request.body.tenantId;
+              var districtId = this.request.body.districtId;
+              var floorId = this.request.body.floorId;
+              var roomId = this.request.body.roomId;
+              var psn_meal_periods = this.request.body.psn_meal_periods.length == 0 || [DIC.D3040.BREAKFAST, DIC.D3040.LUNCH, DIC.D3040.DINNER, DIC.D3040.SUPPER];
+              var x_axis_start = app.moment(begin_date);
+              var x_axis_end = app.moment(end_date).add(1, 'days');
+
+
+              var dynamicFilter = {
+                status: 1,
+                tenantId: tenantId,
+                live_in_flag: true,
+                begin_exit_flow: {$ne: true}
+              };
+
+              if (districtId) {
+                console.log('districtId...')
+                dynamicFilter['room_value.districtId'] = districtId;
+              }
+              if (floorId) {
+                console.log('floorId...')
+                //需要按照
+                var arrFloorParsed = floorId.split('$');
+                dynamicFilter['room_value.districtId'] = arrFloorParsed[0];
+
+                var floor = arrFloorParsed[1];
+                var rooms = yield app.modelFactory().model_query(app.models['psn_room'], {
+                  select: '_id',
+                  where: {
+                    status: 1,
+                    floor: floor,
+                    districtId: arrFloorParsed[0],
+                    tenantId: tenantId
+                  }
+                });
+
+                var roomIds = app._.map(rooms, (o) => {
+                  return o._id;
+                })
+
+                dynamicFilter['room_value.roomId'] = {$in: roomIds};
+              }
+
+              if (roomId) {
+                console.log('mealOrderRecord$elderly$fetch: roomId...')
+                dynamicFilter['room_value.roomId'] = roomId;
+              } else {
+                //查找有权限访问的房间
+                var dataPermissionRecord = yield app.modelFactory().model_one(app.models['pub_dataPermission'], {
+                  select: 'object_ids',
+                  where: {
+                    status: 1,
+                    subsystem: app.modelVariables["PENSION-AGENCY"]['SUB_SYSTEM'],
+                    subject_model: 'pub-user',
+                    subject_id: userId,
+                    object_type: DIC.D0105.ROOM,
+                    tenantId: tenantId
+                  }
+                });
+                dynamicFilter['room_value.roomId'] = {$in: dataPermissionRecord.object_ids };
+                console.log('mealOrderRecord$elderly$fetch: dynamicFilter:', dynamicFilter);
+              }
+
+              var orderedElderly = yield app.modelFactory().model_aggregate(app.models['psn_mealOrderRecord'], [
+                {
+                  $match: {
+                    tenantId: tenantId,
+                    status: 1,
+                    x_axis: {$gte: x_axis_start.toDate(), $lt: x_axis_end.toDate()},
+                    y_axis: {$in: psn_meal_periods}
+                  }
+                },
+                {
+                  $group: {
+                    _id: '$elderlyId'
+                  }
+                }
+              ]);
+
+              var elderlyIdsOrdered = app._.map(rows, (o) => o._id);
+              dynamicFilter['_id'] = {$in: elderlyIdsOrdered};
+
+              console.log('dynamicFilter:', dynamicFilter);
+
+              var elderly = yield app.modelFactory().model_query(app.models['psn_elderly'], {
+                select: 'name birthday room_summary avatar room_value',
+                where: dynamicFilter
+              });
+
+              this.body = app.wrapper.res.rows(elderly);
+
+            } catch (e) {
+              self.logger.error(e.message);
+              this.body = app.wrapper.res.error(e);
+            }
+            yield next;
+          }
+        }
+      },
+      {
+        method: 'mealOrderRecords$fetchByDateRange',
+        verb: 'post',
+        url: this.service_url_prefix + "/mealOrderRecords/fetchByDateRange",
+        handler: function (app, options) {
+          return function*(next) {
+            try {
+              console.log("body", this.request.body);
+              var userId = this.request.body.userId;
+              var tenantId = this.request.body.tenantId;
+              var begin_date = this.request.body.begin_date;
+              var end_date = this.request.body.end_date;
+
+              var x_axis_start = app.moment(begin_date);
+              var x_axis_end = app.moment(end_date).add(1, 'days');
+              var where = {tenantId: app.ObjectId(tenantId), x_axis: {'$gte': x_axis_start.toDate(), '$lt': x_axis_end.toDate()}};
+
+
+              var dataPermissionRecord = yield app.modelFactory().model_one(app.models['pub_dataPermission'], {
+                select: 'object_ids',
+                where: {
+                  status: 1,
+                  subsystem: app.modelVariables["PENSION-AGENCY"]['SUB_SYSTEM'],
+                  subject_model: 'pub-user',
+                  subject_id: userId,
+                  object_type: DIC.D0105.ROOM,
+                  tenantId: tenantId
+                }
+              });
+              var elderlys = yield app.modelFactory().model_query(app.models['psn_elderly'], {
+                select: '_id',
+                where: {
+                  status: 1,
+                  tenantId: tenantId,
+                  live_in_flag: true,
+                  begin_exit_flow: {$ne: true},
+                  'room_value.roomId': {$in: dataPermissionRecord.object_ids}
+                }
+              });
+              where.elderlyId = {$in: app._.map(elderlys, o => o._id)}
+
+              var rows = yield app.modelFactory().model_aggregate(app.models['psn_mealOrderRecord'], [
+                {
+                  $match: where
+                },
+                {
+                  $lookup: {
+                    from: "psn_meal",
+                    localField: "mealId",
+                    foreignField: "_id",
+                    as: "meal"
+                  }
+                },
+                {
+                  $unwind: '$meal'
+                },
+                {
+                  $project: {
+                    elderlyId: '$elderlyId',
+                    elderly_name: '$elderly_name',
+                    date: {$dateToString: {format: "%Y-%m-%d", date: "$x_axis"}},
+                    period: '$y_axis',
+                    meal: {id: '$aggr_value.mealId', name: '$meal.name'}
+                  }
+                },
+                {
+                  $group: {
+                    _id: {elderlyId: '$elderlyId', elderly_name: '$elderly_name', period: '$period'},
+                    dates: {$push: '$date'},
+                    meals: {$push: '$meal'}
+                  }
+                }
+              ]);
+
+              this.body = app.wrapper.res.rows(rows);
+            } catch (e) {
+              self.logger.error(e.message);
+              this.body = app.wrapper.res.error(e);
+            }
+            yield next;
+          }
+        }
+      },
+      {
         method: 'meals$fetch',
         verb: 'post',
         url: this.service_url_prefix + "/meals/fetch",

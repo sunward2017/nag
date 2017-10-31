@@ -8,6 +8,7 @@
     "start": "./start-app.sh",
     "start-dev": "./dev-app.sh",
     "start-remote": "./dev-remote.sh",
+    "start-zhouyq": "./dev-zhouyq.sh",
     "build": "./start-gulp.sh vendor-1.x",
     "dev": "./start-gulp.sh vendor-1.x dev"
   },

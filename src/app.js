@@ -601,6 +601,159 @@ co(function*() {
   // });
 
 
+  var userId = app.ObjectId("59f13c02e1ca4e177e9f592f");
+  var DIC = require('./pre-defined/dictionary-constants.json');
+  var tenantId = app.ObjectId("599bade9859e102d8b72f2ba");
+  var psn_meal_biz_mode = DIC.D3041.PRE_BOOKING;
+  var psn_meal_periods = [DIC.D3040.BREAKFAST, DIC.D3040.LUNCH, DIC.D3040.DINNER, DIC.D3040.SUPPER];
+
+  var x_axis_start = app.moment(app.moment().weekday(0).add(7, 'days').format('YYYY-MM-DD'));
+  var x_axis_end = app.moment(app.moment().weekday(0).add(14, 'days').format('YYYY-MM-DD'));
+  var where = {tenantId: tenantId, x_axis: {'$gte': x_axis_start.toDate(), '$lt': x_axis_end.toDate()}};
+  console.log('-----|||||||---------');
+
+  var dataPermissionRecord = yield app.modelFactory().model_one(app.models['pub_dataPermission'], {
+    select: 'object_ids',
+    where: {
+      status: 1,
+      subsystem: app.modelVariables["PENSION-AGENCY"]['SUB_SYSTEM'],
+      subject_model: 'pub-user',
+      subject_id: userId,
+      object_type: DIC.D0105.ROOM,
+      tenantId: tenantId
+    }
+  });
+  console.log('dataPermissionRecord:', dataPermissionRecord);
+  var elderlys = yield app.modelFactory().model_query(app.models['psn_elderly'], {
+    select: '_id',
+    where: {
+      status: 1,
+      tenantId: tenantId,
+      live_in_flag: true,
+      begin_exit_flow: {$ne: true},
+      'room_value.roomId': {$in: dataPermissionRecord.object_ids}
+    }
+  });
+  where.elderlyId = {$in: app._.map(elderlys, o => o._id)}
+
+  var rows = yield app.modelFactory().model_aggregate(app.models['psn_mealOrderRecord'], [
+    {
+      $match: where
+    },
+    // {
+    //   $lookup: {
+    //     from: "psn_meal",
+    //     localField: "mealId",
+    //     foreignField: "_id",
+    //     as: "meal"
+    //   }
+    // },
+    // {
+    //   $unwind: '$meal'
+    // },
+    {
+      $project: {
+        elderlyId: '$elderlyId',
+        elderly_name: '$elderly_name',
+        weekDay: {$dayOfWeek: '$x_axis'},
+        date: {$dateToString: {format: "%Y-%m-%d", date: "$x_axis"}},
+        period: '$y_axis',
+        mealId: '$mealId'
+      }
+    },
+    {
+      $group: {
+        _id: {elderlyId: '$elderlyId', period: '$period', weekDay: '$weekDay'},
+        elderly_name: {$first: '$elderly_name'},
+        date: {$first: '$date'},
+        meals: {$push: '$mealId'}
+      }
+    },
+    {
+      $sort: {'_id.period': 1}
+    },
+    {
+      $project: {
+        _id: 0,
+        elderlyId: '$_id.elderlyId',
+        weekDay: { $subtract: [ '$_id.weekDay', 1 ]},
+        period: '$_id.period',
+        elderly_name: '$elderly_name',
+        date: '$date',
+        weekDays: {
+          0: {$cond: {if: {$eq: ['$_id.weekDay', 1]}, then: '$$CURRENT.meals', else: []}},
+          1: {$cond: {if: {$eq: ['$_id.weekDay', 2]}, then: '$$CURRENT.meals', else: []}},
+          2: {$cond: {if: {$eq: ['$_id.weekDay', 3]}, then: '$$CURRENT.meals', else: []}},
+          3: {$cond: {if: {$eq: ['$_id.weekDay', 4]}, then: '$$CURRENT.meals', else: []}},
+          4: {$cond: {if: {$eq: ['$_id.weekDay', 5]}, then: '$$CURRENT.meals', else: []}},
+          5: {$cond: {if: {$eq: ['$_id.weekDay', 6]}, then: '$$CURRENT.meals', else: []}},
+          6: {$cond: {if: {$eq: ['$_id.weekDay', 7]}, then: '$$CURRENT.meals', else: []}}
+        }
+      }
+    },
+    {
+      $group: {
+        _id: {elderlyId: '$elderlyId'},
+        elderly_name: {$first: '$elderly_name'},
+        periods: {$push: { period: '$period', weekDays: '$weekDays'}}
+      }
+    },
+    // {
+    //   $project: {
+    //     _id: 0,
+    //     elderlyId: '$_id.elderlyId',
+    //     elderly_name: '$elderly_name',
+    //     periods: {
+    //       $concatArrays: [
+    //         {
+    //           $filter: {
+    //             input: "$periods",
+    //             as: "item",
+    //             cond: {$eq: ["$$item.period", 'A0000']}
+    //           }
+    //         },
+    //         {
+    //           $filter: {
+    //             input: "$periods",
+    //             as: "item",
+    //             cond: {$eq: ["$$item.period", 'A0001']}
+    //           }
+    //         },
+    //         {
+    //           $filter: {
+    //             input: "$periods",
+    //             as: "item",
+    //             cond: {$eq: ["$$item.period", 'A0002']}
+    //           }
+    //         }
+    //       ]
+    //     },
+    //     // periods: {
+    //     //   A0000: {$cond: {if: {$eq: ['$_id.period', 'A0000']}, then: {periods: '$$CURRENT.periods'}, else: []}},
+    //     //   A0001: {$cond: {if: {$eq: ['$_id.period', 'A0001']}, then: {periods: '$$CURRENT.periods'}, else: []}},
+    //     //   A0002: {$cond: {if: {$eq: ['$_id.period', 'A0002']}, then: {periods: '$$CURRENT.periods'}, else: []}},
+    //     // }
+    //   }
+    // },
+    // {
+    //   $group: {
+    //     _id: {elderlyId: '$elderlyId',  period: '$period'},
+    //     elderly_name: {$first: '$elderly_name'},
+    //     periods: {$push: { period: '$period', weekDays: '$weekDays'}}
+    //   }
+    // },
+    // {
+    //   $project: {
+    //     _id: 0,
+    //     elderlyId: '$_id.elderlyId',
+    //     elderly_name: '$elderly_name',
+    //     date: '$_id.date',
+    //     period: '$_id.period',
+    //     dates: '$dates'
+    //   }
+    // }
+  ]);
+  console.log('meals$fetch:DateRange>>', rows, rows[0], rows[0].periods);
   // var DIC = require('./pre-defined/dictionary-constants.json');
   // var tenantId = app.ObjectId('58a6abf9a03cc7229a8f261a');
   // var psn_meal_biz_mode = DIC.D3041.PRE_BOOKING;

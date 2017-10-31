@@ -2658,42 +2658,42 @@ module.exports = {
             yield next;
           };
         }
-      },{
+      }, {
         method: 'bedMonitorUseCheck',
         verb: 'post',
         url: this.service_url_prefix + "/bedMonitorUseCheck",
         handler: function (app, options) {
           return function*(next) {
-            try{
+            try {
               var bedMonitorName = this.request.body.bedMonitorName;
               var tenantId = this.request.body.tenantId;
-              var resTxt,tenantIdsInUse = [];
-              var bedMonitors = yield app.modelFactory().model_query(app.models['pub_bedMonitor'], {where: {name:bedMonitorName}});
-              console.log('bedMonitors:',bedMonitors,'bedMonitorName:',bedMonitorName);
-              if(bedMonitors.length>0){
-                for(var i=0,len=bedMonitors.length;i<len;i++){
-                  if(!bedMonitors[i].stop_flag){
+              var resTxt, tenantIdsInUse = [];
+              var bedMonitors = yield app.modelFactory().model_query(app.models['pub_bedMonitor'], {where: {name: bedMonitorName}});
+              console.log('bedMonitors:', bedMonitors, 'bedMonitorName:', bedMonitorName);
+              if (bedMonitors.length > 0) {
+                for (var i = 0, len = bedMonitors.length; i < len; i++) {
+                  if (!bedMonitors[i].stop_flag) {
                     tenantIdsInUse.push(bedMonitors[i].tenantId);
                   }
                 }
-              }else {
-                if(bedMonitorName){
-                  resTxt=false;
+              } else {
+                if (bedMonitorName) {
+                  resTxt = false;
                 }
               }
-              if(tenantIdsInUse.length>0){
-                var tenantsInUse = yield app.modelFactory().model_query(app.models['pub_tenant'], {select: '-_id name', where: {_id:{ $in: tenantIdsInUse}}});
-                console.log('tenantsInUse:',tenantsInUse);
-                resTxt=[];
-                for(var i=0,len=tenantsInUse.length;i<len;i++){
+              if (tenantIdsInUse.length > 0) {
+                var tenantsInUse = yield app.modelFactory().model_query(app.models['pub_tenant'], {select: '-_id name', where: {_id: {$in: tenantIdsInUse}}});
+                console.log('tenantsInUse:', tenantsInUse);
+                resTxt = [];
+                for (var i = 0, len = tenantsInUse.length; i < len; i++) {
                   resTxt.push(tenantsInUse[i].name);
                 }
-              }else if(bedMonitors.length>0 && tenantIdsInUse.length==0){
-                resTxt=false;
+              } else if (bedMonitors.length > 0 && tenantIdsInUse.length == 0) {
+                resTxt = false;
               }
 
               this.body = app.wrapper.res.ret(resTxt);
-            }catch(e){
+            } catch (e) {
               console.log(e);
               self.logger.error(e.message);
               this.body = app.wrapper.res.error(e);
@@ -5863,16 +5863,16 @@ module.exports = {
               }
               var drugs = []
               var rows = yield app.modelFactory().model_query(app.models['psn_drugDirectory'], data);
-              if(data.select && data.select.indexOf('$stock') != -1 && elderlyId) {
+              if (data.select && data.select.indexOf('$stock') != -1 && elderlyId) {
                 console.log('need $stock')
                 var elderlyStock = yield app.psn_drug_stock_service._elderlyStockObject2(tenantId, elderlyId);
                 // console.log('elderlyStock:', elderlyStock);
-                app._.each(rows, (o)=>{
+                app._.each(rows, (o) => {
                   var drug = o.toObject()
 
                   var drugStock = elderlyStock[drug.id];
                   console.log('drugStock:', drug.id, drugStock)
-                  if(drugStock) {
+                  if (drugStock) {
                     drug.$stock = drugStock.total + drugStock.unit_name
                   }
                   drugs.push(drug);
@@ -6101,30 +6101,30 @@ module.exports = {
               var file_name = this.request.body.file_name;
               var elderlyId = this.request.body.elderlyId;
               var where;
-              if(elderlyId){
+              if (elderlyId) {
                 where = {
                   status: 1,
                   tenantId: tenantId,
                   elderlyId: elderlyId
                 };
-              }else {
+              } else {
                 var liveInElderlys = yield app.modelFactory().model_query(app.models['psn_elderly'], {
                   select: 'name ',
                   where: {
                     status: 1,
                     tenantId: tenantId,
-                    live_in_flag:true
+                    live_in_flag: true
                   }
                 });
-                console.log('liveInElderlys:',liveInElderlys);
-                var elderlyIds=[];
+                console.log('liveInElderlys:', liveInElderlys);
+                var elderlyIds = [];
                 app._.each(liveInElderlys, (o) => {
-                    elderlyIds.push(o._id);
+                  elderlyIds.push(o._id);
                 });
                 where = {
                   status: 1,
                   tenantId: tenantId,
-                  elderlyId:{$in:elderlyIds}
+                  elderlyId: {$in: elderlyIds}
                 };
               }
 
@@ -6132,21 +6132,21 @@ module.exports = {
                 select: 'elderly_name drugId quantity unit  description ',
                 where: where
               }).populate('drugId', 'full_name short_name mini_unit');
-              console.log('rawRows:',rawRows);
+              console.log('rawRows:', rawRows);
               var drugName;
               var rows = app._.map(rawRows, (raw) => {
-                drugName =raw.drugId.short_name|| raw.drugId.full_name;
-                if(!raw.description){
+                drugName = raw.drugId.short_name || raw.drugId.full_name;
+                if (!raw.description) {
                   raw.description = '';
                 }
                 return {
                   '姓名': raw.elderly_name,
                   '药品名称': drugName,
-                  '服用方法':raw.description,
+                  '服用方法': raw.description,
                 };
               });
               this.set('Parse', 'no-parse');
-              this.body = yield app.excel_service.build(file_name, rows, ['姓名', '药品名称','服用方法']);
+              this.body = yield app.excel_service.build(file_name, rows, ['姓名', '药品名称', '服用方法']);
             } catch (e) {
               self.logger.error(e.message);
               this.body = app.wrapper.res.error(e);
@@ -6177,24 +6177,24 @@ module.exports = {
         }
       },
       {
-          method: 'centerDrugInStock',
-          verb: 'post',
-          url: this.service_url_prefix + "/centerDrugInStock",
-          handler: function (app, options) {
-              return function*(next) {
-                  try {
-                      var tenantId = this.request.body.tenantId;
-                      var operated_by = this.request.body.operated_by;
-                      var inStockData = this.request.body.inStockData;
-                      this.body = yield app.psn_drug_stock_service.centerInStock(tenantId, inStockData, operated_by);
-                  } catch (e) {
-                      console.log(e);
-                      self.logger.error(e.message);
-                      this.body = app.wrapper.res.error(e);
-                  }
-                  yield next;
-              };
-          }
+        method: 'centerDrugInStock',
+        verb: 'post',
+        url: this.service_url_prefix + "/centerDrugInStock",
+        handler: function (app, options) {
+          return function*(next) {
+            try {
+              var tenantId = this.request.body.tenantId;
+              var operated_by = this.request.body.operated_by;
+              var inStockData = this.request.body.inStockData;
+              this.body = yield app.psn_drug_stock_service.centerInStock(tenantId, inStockData, operated_by);
+            } catch (e) {
+              console.log(e);
+              self.logger.error(e.message);
+              this.body = app.wrapper.res.error(e);
+            }
+            yield next;
+          };
+        }
       },
       {
         method: 'drugStockInRecordCheck',
@@ -6316,22 +6316,22 @@ module.exports = {
         }
       },
       {
-          method: 'allotdrugStockInRecordCheck',
-          verb: 'post',
-          url: this.service_url_prefix + "/allotdrugStockInRecordCheck",
-          handler: function (app, options) {
-              return function*(next) {
-                  try {
-                      var tenantId = this.request.body.tenantId;
-                      var elderlyId = this.request.body.elderlyId;
-                      this.body = yield app.psn_drug_stock_service.allotdrugStockInRecordCheck(tenantId, elderlyId);
-                  } catch (e) {
-                      self.logger.error(e.message);
-                      this.body = app.wrapper.res.error(e);
-                  }
-                  yield next;
-              };
-          }
+        method: 'allotdrugStockInRecordCheck',
+        verb: 'post',
+        url: this.service_url_prefix + "/allotdrugStockInRecordCheck",
+        handler: function (app, options) {
+          return function*(next) {
+            try {
+              var tenantId = this.request.body.tenantId;
+              var elderlyId = this.request.body.elderlyId;
+              this.body = yield app.psn_drug_stock_service.allotdrugStockInRecordCheck(tenantId, elderlyId);
+            } catch (e) {
+              self.logger.error(e.message);
+              this.body = app.wrapper.res.error(e);
+            }
+            yield next;
+          };
+        }
       },
       {
         method: 'backoutAllotDrug',
@@ -6379,25 +6379,25 @@ module.exports = {
         verb: 'post',
         url: this.service_url_prefix + "/centerDrugOutStock",
         handler: function (app, options) {
-            return function*(next) {
-                try {
-                    var tenantId = this.request.body.tenantId;
-                    var operated_by = this.request.body.operated_by;
-                    var outStockData = this.request.body.outStockData;
-                    this.body = yield app.psn_drug_stock_service.centerOutStock(tenantId, outStockData, operated_by);
-                } catch (e) {
-                    console.log(e);
-                    self.logger.error(e.message);
-                    this.body = app.wrapper.res.error(e);
-                }
-                yield next;
-            };
+          return function*(next) {
+            try {
+              var tenantId = this.request.body.tenantId;
+              var operated_by = this.request.body.operated_by;
+              var outStockData = this.request.body.outStockData;
+              this.body = yield app.psn_drug_stock_service.centerOutStock(tenantId, outStockData, operated_by);
+            } catch (e) {
+              console.log(e);
+              self.logger.error(e.message);
+              this.body = app.wrapper.res.error(e);
+            }
+            yield next;
+          };
         }
       },
       {
-        method:'allotDrugToCenterStock',
-        verb:'post',
-        url: this.service_url_prefix +"/allotToCenterStock",
+        method: 'allotDrugToCenterStock',
+        verb: 'post',
+        url: this.service_url_prefix + "/allotToCenterStock",
         handler: function (app, options) {
           return function*(next) {
             try {
@@ -6415,9 +6415,9 @@ module.exports = {
         }
       },
       {
-        method:'scrapDrugOutStock',
-        verb:'post',
-        url: this.service_url_prefix +"/scrapDrug",
+        method: 'scrapDrugOutStock',
+        verb: 'post',
+        url: this.service_url_prefix + "/scrapDrug",
         handler: function (app, options) {
           return function*(next) {
             try {
@@ -6443,7 +6443,7 @@ module.exports = {
             try {
               var tenantId = this.request.body.tenantId;
               var page = this.request.body.page;
-              this.body = yield app.psn_drug_stock_service.leftElderlyDrugStockSummary(tenantId,page);
+              this.body = yield app.psn_drug_stock_service.leftElderlyDrugStockSummary(tenantId, page);
             } catch (e) {
               console.log(e);
               self.logger.error(e.message);
@@ -6475,7 +6475,7 @@ module.exports = {
         }
       },
       {
-        method:'queryCenterStockAllotRecords',
+        method: 'queryCenterStockAllotRecords',
         verb: 'post',
         url: this.service_url_prefix + "/queryCenterStockAllotRecords",
         handler: function (app, options) {
@@ -6483,7 +6483,7 @@ module.exports = {
             try {
               var tenantId = this.request.body.tenantId;
               var page = this.request.body.page;
-              this.body = yield app.psn_drug_stock_service.queryCenterStockAllotRecords(tenantId,page);
+              this.body = yield app.psn_drug_stock_service.queryCenterStockAllotRecords(tenantId, page);
             } catch (e) {
               console.log(e);
               self.logger.error(e.message);
@@ -6658,23 +6658,23 @@ module.exports = {
               xAxisValueStart = app.moment(xAxisRangePoints.start);
               xAxisValueEnd = app.moment(xAxisRangePoints.end);
 
-              console.log('xAxisRangePoints:',xAxisRangePoints);
+              console.log('xAxisRangePoints:', xAxisRangePoints);
               console.log('前置检查完成-----------------');
 
               var rows = yield app.modelFactory().model_query(app.models['psn_mealMenu'], {
-                  select: 'x_axis y_axis aggr_value',
-                  where: {
-                      tenantId: tenantId,
-                      x_axis: {
-                          '$gte': xAxisValueStart.toDate(),
-                          '$lt': xAxisValueEnd.add(1, 'days').toDate()
-                      }
+                select: 'x_axis y_axis aggr_value',
+                where: {
+                  tenantId: tenantId,
+                  x_axis: {
+                    '$gte': xAxisValueStart.toDate(),
+                    '$lt': xAxisValueEnd.add(1, 'days').toDate()
                   }
+                }
               });
               console.log('rows:', rows);
 
               this.body = app.wrapper.res.ret({
-                  items: rows
+                items: rows
               });
             } catch (e) {
               console.log(e);
@@ -6709,33 +6709,33 @@ module.exports = {
               // 查找x_axis range & y_axis_range
               var xAxisValue;
               var xAxisRange = app._.uniq(app._.map(toSaveRows, (o) => {
-                  xAxisValue = app.moment(o.x_axis);
-                  return {
-                      'x_axis': {
-                          '$gte': xAxisValue.toDate(),
-                          '$lt': xAxisValue.add(1, 'days').toDate()
-                      }
+                xAxisValue = app.moment(o.x_axis);
+                return {
+                  'x_axis': {
+                    '$gte': xAxisValue.toDate(),
+                    '$lt': xAxisValue.add(1, 'days').toDate()
                   }
+                }
               }));
               var yAxisRange = app._.uniq(app._.map(toSaveRows, (o) => {
-                  return o.y_axis;
+                return o.y_axis;
               }));
 
               var removeWhere = {
-                  tenantId: tenantId,
-                  y_axis: {$in: yAxisRange},
-                  $or: xAxisRange
+                tenantId: tenantId,
+                y_axis: {$in: yAxisRange},
+                $or: xAxisRange
               };
 
               console.log('removeWhere:', removeWhere);
-              console.log('xAxisRange:',xAxisRange);
-              console.log('yAxisRange:',yAxisRange);
+              console.log('xAxisRange:', xAxisRange);
+              console.log('yAxisRange:', yAxisRange);
 
               console.log('前置检查完成');
 
               var ret = yield app.modelFactory().model_bulkInsert(app.models['psn_mealMenu'], {
-                  rows: toSaveRows,
-                  removeWhere: removeWhere
+                rows: toSaveRows,
+                removeWhere: removeWhere
               });
 
               console.log('配餐保存成功....');
@@ -6761,34 +6761,34 @@ module.exports = {
               var tenantId = this.request.body.tenantId;
               tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], tenantId);
               if (!tenant || tenant.status == 0) {
-                  this.body = app.wrapper.res.error({message: '无法找到养老机构!'});
-                  yield next;
-                  return;
+                this.body = app.wrapper.res.error({message: '无法找到养老机构!'});
+                yield next;
+                return;
               }
 
               var toRemoveRows = this.request.body.toRemoveRows;
 
 
-              console.log('toRemoveRows:',toRemoveRows);
+              console.log('toRemoveRows:', toRemoveRows);
 
               var xAxisValue;
               var xAxisRange = app._.uniq(app._.map(toRemoveRows, (o) => {
-                  xAxisValue = app.moment(o.x_axis);
-                  return {
-                      'x_axis': {
-                          '$gte': xAxisValue.toDate(),
-                          '$lt': xAxisValue.add(1, 'days').toDate()
-                      }
+                xAxisValue = app.moment(o.x_axis);
+                return {
+                  'x_axis': {
+                    '$gte': xAxisValue.toDate(),
+                    '$lt': xAxisValue.add(1, 'days').toDate()
                   }
+                }
               }));
               var yAxisRange = app._.uniq(app._.map(toRemoveRows, (o) => {
-                  return o.y_axis;
+                return o.y_axis;
               }));
 
               var removeWhere = {
-                  tenantId: tenantId,
-                  y_axis: {$in: yAxisRange},
-                  $or: xAxisRange
+                tenantId: tenantId,
+                y_axis: {$in: yAxisRange},
+                $or: xAxisRange
               };
 
               console.log('前置检查完成');
@@ -6812,7 +6812,7 @@ module.exports = {
           return function*(next) {
             try {
               var mealMenuTemplateId = this.request.body.mealMenuTemplateId;
-              var  mealMenuTemplate = yield app.modelFactory().model_read(app.models['psn_mealMenuTemplate'], mealMenuTemplateId);
+              var mealMenuTemplate = yield app.modelFactory().model_read(app.models['psn_mealMenuTemplate'], mealMenuTemplateId);
               if (!mealMenuTemplate || mealMenuTemplate.status == 0) {
                 this.body = app.wrapper.res.error({message: '无法找到排餐模版!'});
                 yield next;
@@ -6824,45 +6824,45 @@ module.exports = {
               var xAxisValue, xAxisDate;
               var xAxisDayDateMap = {};
               var xAxisRange = app._.map(toImportXAxisRange, (o) => {
-                  xAxisValue = app.moment(o);
-                  xAxisDate = xAxisValue.toDate();
-                  xAxisDayDateMap[xAxisValue.day()] = xAxisDate; //xAxisValue.day()为0-6表示的星期几
-                  return {'x_axis': {'$gte': xAxisDate, '$lt': xAxisValue.add(1, 'days').toDate()}}
+                xAxisValue = app.moment(o);
+                xAxisDate = xAxisValue.toDate();
+                xAxisDayDateMap[xAxisValue.day()] = xAxisDate; //xAxisValue.day()为0-6表示的星期几
+                return {'x_axis': {'$gte': xAxisDate, '$lt': xAxisValue.add(1, 'days').toDate()}}
               });
-                console.log('xAxisRange:',xAxisRange);
-                console.log('xAxisDayDateMap :',xAxisDayDateMap);
+              console.log('xAxisRange:', xAxisRange);
+              console.log('xAxisDayDateMap :', xAxisDayDateMap);
 
               var templateItems = mealMenuTemplate.content;
               var yAxisRange = app._.uniq(app._.map(templateItems, (o) => {
-                  return o.y_axis;
+                return o.y_axis;
               }));
 
               var removeWhere = {
-                  tenantId: mealMenuTemplate.tenantId,
-                  y_axis: {$in: yAxisRange},
-                  $or: xAxisRange
+                tenantId: mealMenuTemplate.tenantId,
+                y_axis: {$in: yAxisRange},
+                $or: xAxisRange
               };
 
               var toSaveRows = app._.map(templateItems, (o) => {
-                  var x_axis = xAxisDayDateMap[o.x_axis];
-                  return {
-                      x_axis: x_axis,
-                      y_axis: o.y_axis,
-                      aggr_value: o.aggr_value,
-                      tenantId: mealMenuTemplate.tenantId
-                  };
+                var x_axis = xAxisDayDateMap[o.x_axis];
+                return {
+                  x_axis: x_axis,
+                  y_axis: o.y_axis,
+                  aggr_value: o.aggr_value,
+                  tenantId: mealMenuTemplate.tenantId
+                };
               });
 
               var ret = yield app.modelFactory().model_bulkInsert(app.models['psn_mealMenu'], {
-                  rows: toSaveRows,
-                  removeWhere: removeWhere
+                rows: toSaveRows,
+                removeWhere: removeWhere
               });
 
               console.log('模版导入成功');
 
               var groupedSaveRows = app._.groupBy(toSaveRows, (o) => {
-                  "use strict";
-                  return o.x_axis + '$' + o.y_axis + '$' + o.tenantId;
+                "use strict";
+                return o.x_axis + '$' + o.y_axis + '$' + o.tenantId;
               });
 
               this.body = app.wrapper.res.default();
@@ -6894,30 +6894,30 @@ module.exports = {
               var mealMenuTemplateName = this.request.body.mealMenuTemplateName;
               var toSaveRows = this.request.body.toSaveRows;
               app._.each(toSaveRows, (o) => {
-                  o.tenantId = tenantId
+                o.tenantId = tenantId
               });
 
               console.log('toSaveRows:', toSaveRows);
 
               var mealMenuTemplate = yield app.modelFactory().model_one(app.models['psn_mealMenuTemplate'], {
-                  where: {
-                      status: 1,
-                      name: mealMenuTemplateName,
-                      tenantId: tenantId
-                  }
+                where: {
+                  status: 1,
+                  name: mealMenuTemplateName,
+                  tenantId: tenantId
+                }
               });
 
               console.log('前置检查完成');
               var isCreate = !mealMenuTemplate;
               if (isCreate) {
-                  yield app.modelFactory().model_create(app.models['psn_mealMenuTemplate'], {
-                      name: mealMenuTemplateName,
-                      content: toSaveRows,
-                      tenantId: tenantId
-                  });
+                yield app.modelFactory().model_create(app.models['psn_mealMenuTemplate'], {
+                  name: mealMenuTemplateName,
+                  content: toSaveRows,
+                  tenantId: tenantId
+                });
               } else {
-                  mealMenuTemplate.content = toSaveRows;
-                  yield mealMenuTemplate.save();
+                mealMenuTemplate.content = toSaveRows;
+                yield mealMenuTemplate.save();
               }
 
               this.body = app.wrapper.res.ret(isCreate);
@@ -6937,58 +6937,58 @@ module.exports = {
         handler: function (app, options) {
           return function*(next) {
             try {
-                var tenantId = this.request.body.tenantId;
-                var check_time = app.moment(this.request.body.order_date);
+              var tenantId = this.request.body.tenantId;
+              var check_time = app.moment(this.request.body.order_date);
 
-                var where = {tenantId: app.ObjectId(tenantId), x_axis: { '$gte': check_time.toDate(), '$lt': check_time.add(1, 'days').toDate() }};
+              var where = {tenantId: app.ObjectId(tenantId), x_axis: {'$gte': check_time.toDate(), '$lt': check_time.add(1, 'days').toDate()}};
 
-                var rows = yield app.modelFactory().model_aggregate(app.models['psn_mealOrderRecord'], [
-                    {
-                        $match:where
-                    },
-                    {
-                        $lookup:{
-                            from: "psn_meal",
-                            localField:"mealId",
-                            foreignField:"_id",
-                            as:"mealName"
-                        }
-                    },
-                    {
-                        $project: {
-                            elderlyId: '$elderlyId',
-                            elderly_name:'$elderly_name',
-                            x_axis:'$x_axis',
-                            meal:{y_axis:'$y_axis',mealId:'$mealId',quantity:'$quantity',mealName:'$mealName'}
-                        }
-                    },
-                    {
-                        $group:{
-                            _id:'$elderlyId',
-                            elderly_name:{$first:'$elderly_name'},
-                            x_axis:{$first:'$x_axis'},
-                            orderedMeals:{$push:'$meal'}
-                        }
-                    },
-                    {
-                        $lookup:{
-                            from: "psn_elderly",
-                            localField:"_id",
-                            foreignField:"_id",
-                            as:"elderly"
-                        }
-                    }
-                ]);
-                console.log('mealOrderRecord rows:',rows);
-                app._.each(rows, (o) => {
-                    var groupedRows = app._.groupBy(o.orderedMeals, (meal) => {
-                        "use strict";
-                        return meal.y_axis;
-                    });
-                    o.orderedMeals = groupedRows;
+              var rows = yield app.modelFactory().model_aggregate(app.models['psn_mealOrderRecord'], [
+                {
+                  $match: where
+                },
+                {
+                  $lookup: {
+                    from: "psn_meal",
+                    localField: "mealId",
+                    foreignField: "_id",
+                    as: "mealName"
+                  }
+                },
+                {
+                  $project: {
+                    elderlyId: '$elderlyId',
+                    elderly_name: '$elderly_name',
+                    x_axis: '$x_axis',
+                    meal: {y_axis: '$y_axis', mealId: '$mealId', quantity: '$quantity', mealName: '$mealName'}
+                  }
+                },
+                {
+                  $group: {
+                    _id: '$elderlyId',
+                    elderly_name: {$first: '$elderly_name'},
+                    x_axis: {$first: '$x_axis'},
+                    orderedMeals: {$push: '$meal'}
+                  }
+                },
+                {
+                  $lookup: {
+                    from: "psn_elderly",
+                    localField: "_id",
+                    foreignField: "_id",
+                    as: "elderly"
+                  }
+                }
+              ]);
+              console.log('mealOrderRecord rows:', rows);
+              app._.each(rows, (o) => {
+                var groupedRows = app._.groupBy(o.orderedMeals, (meal) => {
+                  "use strict";
+                  return meal.y_axis;
                 });
+                o.orderedMeals = groupedRows;
+              });
 
-                this.body = app.wrapper.res.rows(rows);
+              this.body = app.wrapper.res.rows(rows);
             } catch (e) {
               console.log(e);
               self.logger.error(e.message);

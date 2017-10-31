@@ -38,11 +38,14 @@
                         td.text-left {{::row.roles|formatter:'roles':vm.columns}}
                         td
                             .btn-group
-                                a.btn.btn-primary.btn-xs(title="{{'button.EDIT'|translate}}",ng-click="vm.edit(row._id)")
-                                    i.glyphicon.glyphicon-pencil
+                              a.btn.btn-primary.btn-xs(title="{{'button.EDIT'|translate}}",ng-click="vm.edit(row._id)")
+                                i.glyphicon.glyphicon-pencil
                             .btn-group
-                                a.btn.btn-primary.btn-xs(title="{{'button.RESET-USER-PASSWORD'|translate}}",ng-click="vmc.resetUserPassword(row._id)")
-                                    em.icon-key
+                              a.btn.btn-primary.btn-xs(title="{{'button.RESET-USER-PASSWORD'|translate}}",ng-click="vmc.resetUserPassword(row._id)")
+                                em.icon-key
+                            .btn-group(ng-if="vm._subsystem_ == subsystem_names.PENSION_AGENCY")
+                              a.btn.btn-primary.btn-xs(title="{{'button.SET-DATA-PERMISSION'|translate}}",ng-click="$state.go(vm.transTo.userDataPermissionConfig,{_id:row._id})")
+                                i.glyphicon.glyphicon-th
                     tr(ng-if="vm.paged.length==0")
                         td(colspan="{{utils.noResultsColspan(vm)}}") {{ 'grid.NO-RESULTS' | translate}}
             .panel-footer

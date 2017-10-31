@@ -143,8 +143,8 @@
 
     function buildVMHelper() {
 
-      return ['$timeout', '$q', '$location', '$translate', '$http', 'Browser', 'blockUI', 'cfpLoadingBar', 'modelNode', 'shareNode', 'extensionNode', 'mwsNode', 'psnNode', 'idtNode', 'debugNode', 'clientData', 'treeFactory', 'Notify', 'GridUtils', 'ViewUtils',
-        function ($timeout, $q, $location, $translate, $http, Browser, blockUI, cfpLoadingBar, modelNode, shareNode, extensionNode, mwsNode, psnNode, idtNode, debugNode, clientData, treeFactory, Notify, GridUtils, ViewUtils) {
+      return ['$timeout', '$q', '$location', '$translate', '$http', 'Browser', 'blockUI', 'cfpLoadingBar', 'modelNode', 'shareNode', 'extensionNode', 'mwsNode', 'psnNode', 'idtNode', 'debugNode', 'clientData', 'treeFactory', 'Notify', 'GridUtils', 'ViewUtils', 'MODEL_VARIABLES',
+        function ($timeout, $q, $location, $translate, $http, Browser, blockUI, cfpLoadingBar, modelNode, shareNode, extensionNode, mwsNode, psnNode, idtNode, debugNode, clientData, treeFactory, Notify, GridUtils, ViewUtils, MODEL_VARIABLES) {
 
           function promiseWrapper() {
             if (arguments.length > 0) {
@@ -263,6 +263,7 @@
             translate: $translate,
             stateToTrans: stateToTrans,
             subSystemToTrans: subSystemToTrans,
+            subSystemNames: MODEL_VARIABLES.SUBSYSTEM_NAMES,
             utils: {
               g: GridUtils,
               v: ViewUtils,
@@ -432,6 +433,13 @@
             action: action,
             _id: id
           }, this.toDetailsParams, params));
+        }
+
+        function viewDef(view, action, id, params) {
+          $state.go(this.moduleRoute(view), _.defaults({
+            action: action,
+            _id: id
+          }, params));
         }
 
         function batchAdd() {
@@ -680,6 +688,7 @@
           add: add,
           setOrder: setOrder,
           edit: edit,
+          viewDef: viewDef,
           actionDef: actionDef,
           batchAdd: batchAdd,
           batchEdit: batchEdit,
@@ -1118,6 +1127,10 @@
           return $stateParams[name];
         }
 
+        function toListView() {
+          $state.go(this.moduleRoute('list'), this.toListParams);
+        }
+
         function init(initOption) {
           this.size = calcWH($window);
           this.isFromTheSameRoute = !$rootScope.$fromState.name || moduleParse($state.current.name) === moduleParse($rootScope.$fromState.name);
@@ -1149,6 +1162,14 @@
             }
           }
 
+          if(option.model){
+            this.model = _.extend(this.model, angular.copy(option.model));
+          }
+
+          this.toListParams = _.pick($stateParams, function (v, k) {
+            return v && _.contains(self.toList, k);
+          });
+
           //remote data get
 
           //需要的对象传入，2 通过init(option)传入到entry
@@ -1179,7 +1200,9 @@
           model: {},
           selectBinding: {},
           selectFilterObject: {},
+          toList: option.toList || [],
           getParam: getParam,
+          toListView: toListView,
           init: init,
           openDP: openDP
         };

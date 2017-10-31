@@ -50,7 +50,9 @@
     "APPEND": "追加",
     "QUERY": "查询",
     "SEARCH": "查询",
-    "Export-AS-EXCEL": "导出Excel"
+    "Export-AS-EXCEL": "导出Excel",
+    "SET-DATA-PERMISSION": "设置数据权限",
+    "PERMIT": "授权"
   },
   "label": {
     "NONE": "无",

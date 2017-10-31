@@ -1216,7 +1216,11 @@ module.exports = {
           }
         }
         if (lowStockDrugStats.length > 0) {
-          yield self.ctx.pub_alarm_service.saveLowStockDrugsAlarmForElderly(lowStockDrugStats, elderly)
+          console.log('准备生成通知...', lowStockDrugStats);
+          var retid = yield self.ctx.pub_alarm_service.saveLowStockDrugsAlarmForElderly(lowStockDrugStats, elderly);
+          if(!retid){
+            return self.ctx.wrapper.res.default('出库成功,但是生成通知失败,请检查通知模版是否有不符合的模版字段');
+          }
         }
 
         return self.ctx.wrapper.res.default();

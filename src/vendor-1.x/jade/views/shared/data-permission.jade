@@ -1,9 +1,15 @@
 .col-xs-4.col-fixed
     .row
-        label 授予{{vm.subject_type_name}}[{{vm.subject_name}}] 以下{{vm.object_type_name}}:
+        label
+            | 授予[
+            span.financial-voucher_no-for-red {{vm.subject_name}}
+            | ] 以下
+            span.financial-receipts {{vm.object_type_name}}
+            | 访问权限:
     .row
         .tree.tree-basic(s-tree,s-tree-data="vm.dataPermissionItemsPromise",s-tree-height="vm.size.h-25", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{mode:'check',checkCascade: true}",ng-model="vm.checkedDataPermissionItems")
 .col-xs-8
     .row.row-fixed
-        .col-xs-1
+        .col-xs-4
             button.btn.btn-success(ng-click="vm.saveDataPermission()") {{'button.PERMIT'|translate}}
+            button.btn.btn-primary(ng-click="vm.toListView()") {{'button.RETURN'|translate}}

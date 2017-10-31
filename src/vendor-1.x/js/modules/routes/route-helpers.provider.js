@@ -1127,6 +1127,10 @@
           return $stateParams[name];
         }
 
+        function toListView() {
+          $state.go(this.moduleRoute('list'), this.toListParams);
+        }
+
         function init(initOption) {
           this.size = calcWH($window);
           this.isFromTheSameRoute = !$rootScope.$fromState.name || moduleParse($state.current.name) === moduleParse($rootScope.$fromState.name);
@@ -1162,6 +1166,10 @@
             this.model = _.extend(this.model, angular.copy(option.model));
           }
 
+          this.toListParams = _.pick($stateParams, function (v, k) {
+            return v && _.contains(self.toList, k);
+          });
+
           //remote data get
 
           //需要的对象传入，2 通过init(option)传入到entry
@@ -1192,7 +1200,9 @@
           model: {},
           selectBinding: {},
           selectFilterObject: {},
+          toList: option.toList || [],
           getParam: getParam,
+          toListView: toListView,
           init: init,
           openDP: openDP
         };

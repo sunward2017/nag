@@ -22,26 +22,20 @@
 
       vm.init();
 
-      vm.checkedDataPermissionItems = {};
+      vm.saveDataPermission = saveDataPermission;
+      vm.checkedDataPermissionItems = [];
+      vm.model.tenantId = vm.tenantId;
+      vm.model.subject_id = vm.getParam('_id');
 
       vmh.parallel([
         vmh.shareService.d2('D0105'),
-        vmh.shareService.d2('D0106')
+        vm.modelNode.services[vm.model.subject_model].get({_id: vm.model.subject_id}),
+        vm.modelService.single(_.pick(vm.model, 'tenantId', 'subject_type', 'subject_id', 'object_type'), '_id object_ids')
       ]).then(function (results) {
-        vm.subject_type_name = (results[0][vm.model.subject_type]||{}).name || '未指定授权主体'
-        vm.object_type_name = (results[1][vm.model.object_type]||{}).name || '未指定授权客体'
-
-        switch (vm.model.subject_type) {
-          case 'A0001':
-            //用户
-            vmh.fetch(vm.modelNode.services['pub-user'].get({_id: vm.getParam('_id')})).then(function(user){
-              console.log('user:', user)
-              vm.subject_name = (user || {}).name;
-            });
-            break;
-          default:
-            break;
-        }
+        vm.object_type_name = (results[0][vm.model.object_type] || {}).name || '未指定授权客体'
+        vm.subject_name = (results[1] || {}).name;
+        vm.model._id = results[2]._id;
+        vm.checkedDataPermissionItems = results[2].object_ids;
       });
 
       switch (vm.model.object_type) {
@@ -51,114 +45,28 @@
         default:
           break;
       }
+    }
 
-      //vm.dataPermissionItemsPromise =
-      // vm.dataPermissionItemsPromise = vmh.clientData.getJson('charge-standards-pension-agency').then(function (items) {
-      //   vm.selectBinding.standards = iuser-manage-tems;
-      //   if (vm.selectBinding.standards.length > 0) {
-      //     return vmh.parallel([
-      //       vmh.extensionService.tenantChargeItemCustomizedAsTree(vm.model['tenantId'], PENSION_AGENCY_DEFAULT_CHARGE_STANDARD, vm._subsystem_),
-      //
-      //       vmh.fetch(tenantService.query({_id: vm.model['tenantId']}, 'charge_standards')),
-      //       vmh.extensionService.tenantChargeItemNursingLevelAsTree(vm.model['tenantId'], PENSION_AGENCY_DEFAULT_CHARGE_STANDARD,vm._subsystem_)
-      //
-      //     ]).then(function (results) {
-      //       console.log(results);
-      //       var tenantChargeStandard = _.find(results[1][0].charge_standards, function(o){
-      //         console.log(o.subsystem )
-      //         console.log(vm._subsystem_)
-      //         return o.subsystem == vm._subsystem_
-      //       });
-      //       var selectedStandard;
-      //       if (tenantChargeStandard){
-      //         selectedStandard = _.find(vm.selectBinding.standards, function(o){
-      //           return o._id == tenantChargeStandard.charge_standard
-      //         });
-      //         vm.chargeItems = tenantChargeStandard.charge_items;
-      //       }
-      //
-      //       if (!selectedStandard) {
-      //         selectedStandard = vm.selectBinding.standards[0];
-      //       }
-      //
-      //       if (selectedStandard) {
-      //         vm.selectedStandardId = selectedStandard._id;
-      //       }
-      //
-      //       if(results[0].children.length>0) {
-      //         selectedStandard.children.push(results[0]);
-      //       }
-      //
-      //       if(results[2].children.length>0){
-      //         selectedStandard.children.push(results[2]);
-      //       }
-      //
-      //       setCheckedChargeItems();
-      //
-      //       return vmh.promiseWrapper(selectedStandard.children);
-      //     });
-      //   }
-      // });
-      //
-      //
-      // vm.createChargeItem = createChargeItem;
-      // vm.saveChargeStandard = saveChargeStandard;
-      //
-      // function onStandardChanged() {
-      //   var selectedStandard = _.findWhere(vm.selectBinding.standards, {_id: vm.selectedStandardId});
-      //   if(selectedStandard){
-      //     vm.chargeItemDataPromise = vmh.promiseWrapper(selectedStandard.children);
-      //     setCheckedChargeItems();
-      //   }
-      // }
-      //
-      //
-      // function setCheckedChargeItems(){
-      //   vm.checkedChargeItems = _.map(vm.chargeItems,function(o){
-      //     o._id = o.item_id;
-      //     return o;
-      //   });
-      //   _.each(vm.checkedChargeItems,function(item) {
-      //     vm.charges[item.item_id] = {
-      //       item_id: item.item_id,
-      //       item_name: item.item_name,
-      //       period_price: item.period_price,
-      //       period: item.period
-      //     };
-      //   });
-      // }
-      //
-      //
-      // function createChargeItem(node) {
-      //   var theOne = vm.charges[node._id];
-      //   if (!theOne) {
-      //     console.log(node);
-      //     vm.charges[node._id] = {
-      //       item_id: node._id,
-      //       item_name: node.name,
-      //       period_price: 0,
-      //       period: 'A0005'
-      //     }
-      //   }
-      //   //console.log(vm.charges);
-      // }
-      //
-      // function saveChargeStandard() {
-      //
-      //   var checkedIds = _.map(vm.checkedChargeItems,function(o){return o._id});
-      //   console.log(checkedIds);
-      //
-      //   vm.saveCharges = _.filter(vm.charges,function(o){
-      //     return _.contains(checkedIds,o.item_id);
-      //   });
-      //
-      //   vmh.exec(vmh.extensionService.saveTenantChargeItemCustomized(vm.model['tenantId'], {
-      //     charge_standard: vm.selectedStandardId,
-      //     subsystem: vm._subsystem_,
-      //     charge_items: _.values(vm.saveCharges)
-      //   }));
-      // }
-
+    function saveDataPermission() {
+      var promise;
+      if (vm.blocker) {
+        vm.blocker.start();
+      }
+      vm.model.object_ids = vm.checkedDataPermissionItems;
+      if (vm.model._id) {
+        promise = vm.modelService.update(vm.model._id, vm.model);
+      }
+      else {
+        promise = vm.modelService.save(vm.model);
+      }
+      vmh.fetch(promise).then(function(ret){
+        !vm.model._id && (vm.model._id = ret._id)
+        vmh.alertSuccess();
+      }).finally(function () {
+        if (vm.blocker) {
+          vm.blocker.stop();
+        }
+      });
     }
   }
 

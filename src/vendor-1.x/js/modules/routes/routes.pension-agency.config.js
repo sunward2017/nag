@@ -3602,7 +3602,7 @@
         resolve: {
           instanceVM: helper.buildInstanceVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'user-manage.data-permission', {
             modelName: 'pub-dataPermission',
-            model: {subsystem: MODEL_VARIABLES.SUBSYSTEM_NAMES.PENSION_AGENCY, subject_type: 'A0001', object_type: 'A1001'},
+            model: {status: 1, subsystem: MODEL_VARIABLES.SUBSYSTEM_NAMES.PENSION_AGENCY, subject_model: 'pub-user', object_type: 'A1001'},
             blockUI: true
           })
           , deps: helper.resolveFor2(MODEL_VARIABLES.RES_PREFIXS.SHARED + 'data-permission.js')

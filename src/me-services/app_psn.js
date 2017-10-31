@@ -591,7 +591,7 @@ module.exports = {
               var elderlyId = this.request.body.elderlyId;
 
               var tae = yield app.psn_drug_stock_service._getTenantAndElderly(tenantId, elderlyId);
-              if(!tae.success){
+              if (!tae.success) {
                 return tae
               }
 
@@ -764,13 +764,13 @@ module.exports = {
               var start = app.moment(d).toDate(), end = app.moment(d).add(1, 'days').toDate();
               var nursingWorkerSchedules = yield app.modelFactory().model_aggregate(app.models['psn_nursingWorkerSchedule'], [
                 {
-                  $match: {status:1, tenantId: app.ObjectId(tenantId), x_axis: { '$gte': start, '$lt': end }}
+                  $match: {status: 1, tenantId: app.ObjectId(tenantId), x_axis: {'$gte': start, '$lt': end}}
                 },
 
                 {
                   $group: {
                     _id: '$y_axis',
-                    nursing_shift_ids : { $addToSet: "$aggr_value" }
+                    nursing_shift_ids: {$addToSet: "$aggr_value"}
                   }
                 },
                 {
@@ -781,7 +781,7 @@ module.exports = {
                     as: "nursing_worker"
                   }
                 },
-                { $unwind: { path: "$nursing_worker" } },
+                {$unwind: {path: "$nursing_worker"}},
                 {
                   $project: {
                     nursing_worker_id: '$nursing_worker._id',
@@ -797,14 +797,14 @@ module.exports = {
               var nursingWorkerIds = app._.map(nursingWorkerSchedules, item => item.nursing_worker_id);
               var nursingSchedules = yield app.modelFactory().model_query(app.models['psn_nursingSchedule'], {
                 select: 'y_axis aggr_value',
-                where: {status:1, x_axis: { '$gte': start, '$lt': end }, aggr_value: {$in: nursingWorkerIds}}
+                where: {status: 1, x_axis: {'$gte': start, '$lt': end}, aggr_value: {$in: nursingWorkerIds}}
               }).populate('y_axis', 'name');
 
               var nursingWorkerMap = {}, nursingSchedule, nursingWorkerId;
-              for (var i=0,len = nursingSchedules.length;i<len;i++) {
+              for (var i = 0, len = nursingSchedules.length; i < len; i++) {
                 nursingSchedule = nursingSchedules[i];
                 nursingWorkerId = nursingSchedule.aggr_value.toString();
-                if(nursingWorkerMap[nursingWorkerId]){
+                if (nursingWorkerMap[nursingWorkerId]) {
                   nursingWorkerMap[nursingWorkerId] += ',' + nursingSchedule.y_axis.name;
                 } else {
                   nursingWorkerMap[nursingWorkerId] = nursingSchedule.y_axis.name;
@@ -814,10 +814,10 @@ module.exports = {
 
               var nursingShifts = yield app.modelFactory().model_query(app.models['psn_nursingShift'], {
                 select: 'name',
-                where: {status:1}
+                where: {status: 1}
               });
               var nursingShiftMap = {}, nursingShift;
-              for (var i=0,len = nursingShifts.length;i<len;i++) {
+              for (var i = 0, len = nursingShifts.length; i < len; i++) {
                 nursingShift = nursingShifts[i];
                 nursingShiftMap[nursingShift.id] = nursingShift.name;
               }
@@ -931,69 +931,95 @@ module.exports = {
           return function*(next) {
             try {
               console.log("body", this.request.body);
+              var userId = this.request.body.userId;
               var tenantId = this.request.body.tenantId;
               var elderlyId = this.request.body.elderlyId;
               var check_time = app.moment(this.request.body.check_in_time);
               var thisMoment = app.moment().format();
-              var curMealTime =null,curDay=app.moment().format('YYYY-MM-DD'),resCurMealTime = false;
+              var curMealTime = null, curDay = app.moment().format('YYYY-MM-DD'), resCurMealTime = false;
 
-              if(app.moment(thisMoment).isBetween(curDay+ 'T05', curDay+ 'T09:00:00+08:00')){
+              if (app.moment(thisMoment).isBetween(curDay + 'T05', curDay + 'T09:00:00+08:00')) {
                 curMealTime = 'A0000';
-              }else if(app.moment(thisMoment).isBetween(curDay+ 'T09:00:01+08:00', curDay+ 'T13:00:00+08:00')){
+              } else if (app.moment(thisMoment).isBetween(curDay + 'T09:00:01+08:00', curDay + 'T13:00:00+08:00')) {
                 curMealTime = 'A0001';
-              }else if(app.moment(thisMoment).isBetween(curDay+ 'T13:00:01+08:00', curDay+ 'T19:00:00+08:00')){
+              } else if (app.moment(thisMoment).isBetween(curDay + 'T13:00:01+08:00', curDay + 'T19:00:00+08:00')) {
                 curMealTime = 'A0002';
-              }else if(app.moment(thisMoment).isBetween(curDay+ 'T19:00:01+08:00', curDay+ 'T21:00:00+08:00')){
+              } else if (app.moment(thisMoment).isBetween(curDay + 'T19:00:01+08:00', curDay + 'T21:00:00+08:00')) {
                 curMealTime = 'A0003';
               }
-              if(this.request.body.check_in_time === curDay){
+              if (this.request.body.check_in_time === curDay) {
                 resCurMealTime = curMealTime;
               }
 
-              var where = {tenantId: app.ObjectId(tenantId), x_axis: { '$gte': check_time.toDate(), '$lt': check_time.add(1, 'days').toDate() }};
+              var where = {tenantId: app.ObjectId(tenantId), x_axis: {'$gte': check_time.toDate(), '$lt': check_time.add(1, 'days').toDate()}};
 
               if (elderlyId) {
                 where.elderlyId = app.ObjectId(elderlyId);
+              } else {
+                var dataPermissionRecord = yield app.modelFactory().model_one('pub_dataPermission', {
+                  select: 'object_ids',
+                  where: {
+                    status: 1,
+                    subsystem: app.modelVariables["PENSION-AGENCY"]['SUB_SYSTEM'],
+                    subject_model: 'pub-user',
+                    subject_id: userId,
+                    object_type: DIC.D0105.ROOM,
+                    tenantId: tenantId
+                  }
+                });
+
+                var elderlys = yield app.modelFactory().model_query('psn_elderly', {
+                  select: '_id',
+                  where: {
+                    status: 1,
+                    tenantId: tenantId,
+                    live_in_flag: true,
+                    begin_exit_flow: {$ne: true},
+                    'room_value.roomId': {$in: dataPermissionRecord.object_ids}
+                  }
+                });
+
+                where.elderlyId = {$in: app._.map(elderlys, o => o._id)}
               }
 
               var rows = yield app.modelFactory().model_aggregate(app.models['psn_mealOrderRecord'], [
                 {
-                  $match:where
+                  $match: where
                 },
                 {
-                  $lookup:{
+                  $lookup: {
                     from: "psn_meal",
-                    localField:"mealId",
-                    foreignField:"_id",
-                    as:"mealName"
+                    localField: "mealId",
+                    foreignField: "_id",
+                    as: "mealName"
                   }
                 },
                 {
                   $project: {
                     elderlyId: '$elderlyId',
-                    elderly_name:'$elderly_name',
-                    x_axis:'$x_axis',
-                    meal:{y_axis:'$y_axis',mealId:'$mealId',quantity:'$quantity',mealName:'$mealName',orderId:'$_id'}
+                    elderly_name: '$elderly_name',
+                    x_axis: '$x_axis',
+                    meal: {y_axis: '$y_axis', mealId: '$mealId', quantity: '$quantity', mealName: '$mealName', orderId: '$_id'}
                   }
                 },
                 {
-                  $group:{
-                    _id:'$elderlyId',
-                    elderly_name:{$first:'$elderly_name'},
-                    x_axis:{$first:'$x_axis'},
-                    orderedMeals:{$push:'$meal'}
+                  $group: {
+                    _id: '$elderlyId',
+                    elderly_name: {$first: '$elderly_name'},
+                    x_axis: {$first: '$x_axis'},
+                    orderedMeals: {$push: '$meal'}
                   }
                 },
                 {
-                  $lookup:{
+                  $lookup: {
                     from: "psn_elderly",
-                    localField:"_id",
-                    foreignField:"_id",
-                    as:"elderly"
+                    localField: "_id",
+                    foreignField: "_id",
+                    as: "elderly"
                   }
                 }
               ]);
-              console.log('mealOrderRecord rows:',rows);
+              console.log('mealOrderRecord rows:', rows);
               app._.each(rows, (o) => {
                 var groupedRows = app._.groupBy(o.orderedMeals, (meal) => {
                   "use strict";
@@ -1002,7 +1028,7 @@ module.exports = {
                 o.orderedMeals = groupedRows;
               });
 
-              this.body = app.wrapper.res.rows({status:resCurMealTime,rows:rows});
+              this.body = app.wrapper.res.rows({status: resCurMealTime, rows: rows});
             } catch (e) {
               self.logger.error(e.message);
               this.body = app.wrapper.res.error(e);
@@ -1023,7 +1049,7 @@ module.exports = {
               var psn_meal_biz_mode = this.request.body.psn_meal_biz_mode;
               var psn_meal_periods = this.request.body.psn_meal_periods.length == 0 || [DIC.D3040.BREAKFAST, DIC.D3040.LUNCH, DIC.D3040.DINNER, DIC.D3040.SUPPER];
 
-              if(psn_meal_biz_mode === DIC.D3041.PRE_BOOKING) {
+              if (psn_meal_biz_mode === DIC.D3041.PRE_BOOKING) {
                 //提前预订
                 var x_axis_start = app.moment(app.moment().weekday(0).add(7, 'days').format('YYYY-MM-DD'));
                 var x_axis_end = app.moment(app.moment().weekday(0).add(14, 'days').format('YYYY-MM-DD'));
@@ -1038,11 +1064,11 @@ module.exports = {
                     }
                   },
                   {
-                    $lookup:{
+                    $lookup: {
                       from: "psn_meal",
-                      localField:"aggr_value.mealId",
-                      foreignField:"_id",
-                      as:"meal"
+                      localField: "aggr_value.mealId",
+                      foreignField: "_id",
+                      as: "meal"
                     }
                   },
                   {
@@ -1050,15 +1076,15 @@ module.exports = {
                   },
                   {
                     $project: {
-                      date: { $dateToString: { format: "%Y-%m-%d", date: "$x_axis" } },
+                      date: {$dateToString: {format: "%Y-%m-%d", date: "$x_axis"}},
                       period: '$y_axis',
-                      meal:{ id:'$aggr_value.mealId', name: '$meal.name' }
+                      meal: {id: '$aggr_value.mealId', name: '$meal.name'}
                     }
                   },
                   {
-                    $group:{
-                      _id:{ date: '$date', period: '$period'},
-                      meals:{$push:'$meal'}
+                    $group: {
+                      _id: {date: '$date', period: '$period'},
+                      meals: {$push: '$meal'}
                     }
                   },
                   {
@@ -1072,9 +1098,9 @@ module.exports = {
                     }
                   },
                   {
-                    $group:{
+                    $group: {
                       _id: '$date',
-                      periods:{$push: '$$ROOT'}
+                      periods: {$push: '$$ROOT'}
                     }
                   },
                   {
@@ -1090,7 +1116,7 @@ module.exports = {
                 ]);
                 app._.each(rows, (o) => {
                   o.weekday = app.moment(o.date).format('ddd');
-                  o.periods = app._.map(o.periods, (p)=>{
+                  o.periods = app._.map(o.periods, (p) => {
                     console.log(p.period)
                     return {period: p.period, meals: p.meals}
                   });
@@ -1099,35 +1125,35 @@ module.exports = {
                 this.body = app.wrapper.res.rows(rows);
               } else {
                 //实时预订
-                var x_axis = app.moment().format('YYYY-MM-DD'),y_axis,y_axis_value;
+                var x_axis = app.moment().format('YYYY-MM-DD'), y_axis, y_axis_value;
                 var thisMoment = app.moment().format();
-                if(app.moment(thisMoment).isBetween(x_axis+ 'T05', x_axis+ 'T09:00:00+08:00')){
+                if (app.moment(thisMoment).isBetween(x_axis + 'T05', x_axis + 'T09:00:00+08:00')) {
                   y_axis = 'A0000';
-                }else if(app.moment(thisMoment).isBetween(x_axis+ 'T09:00:01+08:00', x_axis+ 'T13:00:00+08:00')){
+                } else if (app.moment(thisMoment).isBetween(x_axis + 'T09:00:01+08:00', x_axis + 'T13:00:00+08:00')) {
                   y_axis = 'A0001';
-                }else if(app.moment(thisMoment).isBetween(x_axis+ 'T13:00:01+08:00', x_axis+ 'T19:00:00+08:00')){
+                } else if (app.moment(thisMoment).isBetween(x_axis + 'T13:00:01+08:00', x_axis + 'T19:00:00+08:00')) {
                   y_axis = 'A0002';
-                }else if(app.moment(thisMoment).isBetween(x_axis+ 'T19:00:01+08:00', x_axis+ 'T21:00:00+08:00')){
+                } else if (app.moment(thisMoment).isBetween(x_axis + 'T19:00:01+08:00', x_axis + 'T21:00:00+08:00')) {
                   y_axis = 'A0003';
                 }
                 y_axis_value = D3040[y_axis].name;
-                console.log('meals$fetch:thisMoment:',thisMoment,'x_axis:',x_axis,'y_axis:',y_axis,'y_axis_value:',y_axis_value);
+                console.log('meals$fetch:thisMoment:', thisMoment, 'x_axis:', x_axis, 'y_axis:', y_axis, 'y_axis_value:', y_axis_value);
 
                 var rows = yield app.modelFactory().model_query(app.models['psn_mealMenu'], {
                   select: 'aggr_value x_axis',
                   where: {
-                    tenantId:tenantId,
-                    x_axis:x_axis,
-                    y_axis:y_axis
+                    tenantId: tenantId,
+                    x_axis: x_axis,
+                    y_axis: y_axis
                   },
                   sort: {check_in_time: -1}
                 }).populate('aggr_value.mealId', 'name meal');
-                console.log('meals$fetch:rows..:',rows);
-                var meals=[];
+                console.log('meals$fetch:rows..:', rows);
+                var meals = [];
                 app._.each(rows, (o) => {
-                  meals.push({id:o.aggr_value.mealId._id,name:o.aggr_value.mealId.name,quantity:o.aggr_value.quantity,member:o.aggr_value.mealId.meal});
+                  meals.push({id: o.aggr_value.mealId._id, name: o.aggr_value.mealId.name, quantity: o.aggr_value.quantity, member: o.aggr_value.mealId.meal});
                 });
-                this.body = app.wrapper.res.ret({meals:meals,y_axis:y_axis,y_axis_value:y_axis_value});
+                this.body = app.wrapper.res.ret({meals: meals, y_axis: y_axis, y_axis_value: y_axis_value});
               }
 
             } catch (e) {
@@ -1145,6 +1171,7 @@ module.exports = {
         handler: function (app, options) {
           return function *(next) {
             try {
+              var userId = this.request.body.userId;
               var tenantId = this.request.body.tenantId;
               var districtId = this.request.body.districtId;
               var floorId = this.request.body.floorId;
@@ -1182,7 +1209,23 @@ module.exports = {
               if (roomId) {
                 console.log('mealOrderRecord$elderly$fetch: roomId...')
                 dynamicFilter['room_value.roomId'] = roomId;
+              } else {
+                //查找有权限访问的房间
+                var dataPermissionRecord = yield app.modelFactory().model_one('pub_dataPermission', {
+                  select: 'object_ids',
+                  where: {
+                    status: 1,
+                    subsystem: app.modelVariables["PENSION-AGENCY"]['SUB_SYSTEM'],
+                    subject_model: 'pub-user',
+                    subject_id: userId,
+                    object_type: DIC.D0105.ROOM,
+                    tenantId: tenantId
+                  }
+                });
+                dynamicFilter['room_value.roomId'] = {$in: dataPermissionRecord.object_ids };
+                console.log('mealOrderRecord$elderly$fetch: dynamicFilter:', dynamicFilter);
               }
+
               console.log('dynamicFilter:', dynamicFilter);
               app._.extend(dynamicFilter, {
                 status: 1,
@@ -1192,7 +1235,9 @@ module.exports = {
               });
 
               console.log('mealOrderRecord$elderly$fetch: dynamicFilter:', dynamicFilter);
-              if(psn_meal_biz_mode === DIC.D3041.PRE_BOOKING) {
+
+
+              if (psn_meal_biz_mode === DIC.D3041.PRE_BOOKING) {
                 var psn_meal_biz_mode = this.request.body.psn_meal_biz_mode;
                 var psn_meal_periods = this.request.body.psn_meal_periods.length == 0 || [DIC.D3040.BREAKFAST, DIC.D3040.LUNCH, DIC.D3040.DINNER, DIC.D3040.SUPPER];
                 var x_axis_start = app.moment(app.moment().weekday(0).add(7, 'days').format('YYYY-MM-DD'));
@@ -1214,8 +1259,8 @@ module.exports = {
                   }
                 ]);
 
-                var elderlyIdsOrdered = app._.map(rows, (o)=> o._id);
-                dynamicFilter['_id'] = { $nin: elderlyIdsOrdered};
+                var elderlyIdsOrdered = app._.map(rows, (o) => o._id);
+                dynamicFilter['_id'] = {$nin: elderlyIdsOrdered};
               }
               var elderly = yield app.modelFactory().model_query(app.models['psn_elderly'], {
                 select: 'name birthday room_summary avatar room_value',
@@ -1244,7 +1289,7 @@ module.exports = {
               var operated_by = this.request.body.operated_by;
               var psn_meal_biz_mode = this.request.body.psn_meal_biz_mode;
               var meals = this.request.body.meals;
-              if(psn_meal_biz_mode === DIC.D3041.PRE_BOOKING) {
+              if (psn_meal_biz_mode === DIC.D3041.PRE_BOOKING) {
                 //提前预订
                 var elderly = this.request.body.elderly;
                 var psn_meal_periods = this.request.body.psn_meal_periods.length == 0 || [DIC.D3040.BREAKFAST, DIC.D3040.LUNCH, DIC.D3040.DINNER, DIC.D3040.SUPPER];
@@ -1258,7 +1303,7 @@ module.exports = {
                 });
                 yield app.modelFactory().model_bulkInsert(app.models['psn_mealOrderRecord'], {
                   rows: meals,
-                  removeWhere:{
+                  removeWhere: {
                     tenantId: tenantId,
                     elderlyId: elderly.elderlyId,
                     status: 1,
@@ -1271,81 +1316,81 @@ module.exports = {
                 var mealTime = this.request.body.mealTime;
                 var submitMealMember = this.request.body.submitMealMember;
                 //实时预订
-                var x_axis = app.moment().format('YYYY-MM-DD'),y_axis;
+                var x_axis = app.moment().format('YYYY-MM-DD'), y_axis;
                 var thisMoment = app.moment().format();
-                if(app.moment(thisMoment).isBetween(x_axis+ 'T05', x_axis+ 'T09:00:00+08:00')){
+                if (app.moment(thisMoment).isBetween(x_axis + 'T05', x_axis + 'T09:00:00+08:00')) {
                   y_axis = 'A0000';
-                }else if(app.moment(thisMoment).isBetween(x_axis+ 'T09:00:01+08:00', x_axis+ 'T13:00:00+08:00')){
+                } else if (app.moment(thisMoment).isBetween(x_axis + 'T09:00:01+08:00', x_axis + 'T13:00:00+08:00')) {
                   y_axis = 'A0001';
-                }else if(app.moment(thisMoment).isBetween(x_axis+ 'T13:00:01+08:00', x_axis+ 'T19:00:00+08:00')){
+                } else if (app.moment(thisMoment).isBetween(x_axis + 'T13:00:01+08:00', x_axis + 'T19:00:00+08:00')) {
                   y_axis = 'A0002';
-                }else if(app.moment(thisMoment).isBetween(x_axis+ 'T19:00:01+08:00', x_axis+ 'T21:00:00+08:00')){
+                } else if (app.moment(thisMoment).isBetween(x_axis + 'T19:00:01+08:00', x_axis + 'T21:00:00+08:00')) {
                   y_axis = 'A0003';
                 }
-                var resMealMember={},res=false;
-                if(mealTime===y_axis){
-                  for(var i=0,len=meals.length;i<len;i++){
+                var resMealMember = {}, res = false;
+                if (mealTime === y_axis) {
+                  for (var i = 0, len = meals.length; i < len; i++) {
                     var submitMealMemberIdArray = submitMealMember[meals[i].id];
-                    if(submitMealMemberIdArray){
+                    if (submitMealMemberIdArray) {
                       var jLen = submitMealMemberIdArray.length;
                       console.log('查询套餐数量----');
                       var mealInMealMenu = yield app.modelFactory().model_query(app.models['psn_mealMenu'], {
                         select: 'status aggr_value',
                         where: {
-                          x_axis:x_axis,
-                          y_axis:y_axis,
-                          'aggr_value.mealId':meals[i].id,
+                          x_axis: x_axis,
+                          y_axis: y_axis,
+                          'aggr_value.mealId': meals[i].id,
                           tenantId: tenantId
                         }
                       });
-                      console.log('mealInMealMenu:',mealInMealMenu);
-                      if(jLen<=mealInMealMenu[0].aggr_value.quantity){
+                      console.log('mealInMealMenu:', mealInMealMenu);
+                      if (jLen <= mealInMealMenu[0].aggr_value.quantity) {
                         console.log('修改套餐剩余数量-------');
-                        mealInMealMenu[0].aggr_value.quantity -=jLen;
+                        mealInMealMenu[0].aggr_value.quantity -= jLen;
                         yield mealInMealMenu[0].save();
 
                         console.log('增加订单记录------');
-                        for(var j=0;j<jLen;j++){
+                        for (var j = 0; j < jLen; j++) {
                           var sameMealOrderRecord = yield app.modelFactory().model_query(app.models['psn_mealOrderRecord'], {
                             select: 'status mealId quantity',
                             where: {
                               elderlyId: submitMealMemberIdArray[j].id,
-                              x_axis:x_axis,
-                              y_axis:y_axis,
-                              mealId:meals[i].id,
+                              x_axis: x_axis,
+                              y_axis: y_axis,
+                              mealId: meals[i].id,
                               tenantId: tenantId
                             }
                           });
-                          console.log('sameMealOrderRecord:',sameMealOrderRecord);
-                          if(sameMealOrderRecord.length>=1){
+                          console.log('sameMealOrderRecord:', sameMealOrderRecord);
+                          if (sameMealOrderRecord.length >= 1) {
                             sameMealOrderRecord[0].quantity++;
                             yield sameMealOrderRecord[0].save();
-                          }else {
+                          } else {
                             yield app.modelFactory().model_create(app.models['psn_mealOrderRecord'], {
-                              operated_by:operated_by,
-                              elderlyId:submitMealMemberIdArray[j].id,
-                              elderly_name:submitMealMemberIdArray[j].name,
-                              x_axis:x_axis,
-                              y_axis:y_axis,
-                              mealId:meals[i].id,
-                              quantity:1,
-                              tenantId:tenantId
+                              operated_by: operated_by,
+                              elderlyId: submitMealMemberIdArray[j].id,
+                              elderly_name: submitMealMemberIdArray[j].name,
+                              x_axis: x_axis,
+                              y_axis: y_axis,
+                              mealId: meals[i].id,
+                              quantity: 1,
+                              tenantId: tenantId
                             });
                           }
                         }
-                      }else {
+                      } else {
                         console.log('套餐数量不足，返回重新提交-----');
-                        resMealMember[meals[i].id]=submitMealMemberIdArray;
+                        resMealMember[meals[i].id] = submitMealMemberIdArray;
                         res = true;
                       }
                     }
                   }
-                }else {
+                } else {
                   this.body = app.wrapper.res.error({message: '当前订餐时间已过，请重新订餐!'});
                   yield next;
                   return;
                 }
-                this.body = app.wrapper.res.ret({status:res,data:resMealMember});
+                this.body = app.wrapper.res.ret({status: res, data: resMealMember});
               }
             } catch (e) {
               self.logger.error(e.message);
@@ -1368,17 +1413,17 @@ module.exports = {
               var orderId = this.request.body.orderId;
               var mealId = this.request.body.mealId;
               var MealTime = this.request.body.curMealTime;
-              var thisMoment = app.moment().format(),x_axis = app.moment().format('YYYY-MM-DD'),y_axis;
-              if(app.moment(thisMoment).isBetween(x_axis+ 'T05', x_axis+ 'T09:00:00+08:00')){
+              var thisMoment = app.moment().format(), x_axis = app.moment().format('YYYY-MM-DD'), y_axis;
+              if (app.moment(thisMoment).isBetween(x_axis + 'T05', x_axis + 'T09:00:00+08:00')) {
                 y_axis = 'A0000';
-              }else if(app.moment(thisMoment).isBetween(x_axis+ 'T09:00:01+08:00', x_axis+ 'T13:00:00+08:00')){
+              } else if (app.moment(thisMoment).isBetween(x_axis + 'T09:00:01+08:00', x_axis + 'T13:00:00+08:00')) {
                 y_axis = 'A0001';
-              }else if(app.moment(thisMoment).isBetween(x_axis+ 'T13:00:01+08:00', x_axis+ 'T19:00:00+08:00')){
+              } else if (app.moment(thisMoment).isBetween(x_axis + 'T13:00:01+08:00', x_axis + 'T19:00:00+08:00')) {
                 y_axis = 'A0002';
-              }else if(app.moment(thisMoment).isBetween(x_axis+ 'T19:00:01+08:00', x_axis+ 'T21:00:00+08:00')){
+              } else if (app.moment(thisMoment).isBetween(x_axis + 'T19:00:01+08:00', x_axis + 'T21:00:00+08:00')) {
                 y_axis = 'A0003';
               }
-              if(MealTime !==y_axis){
+              if (MealTime !== y_axis) {
                 this.body = app.wrapper.res.error({message: '已过当前点餐时间，刷新重试！'});
                 yield next;
                 return;
@@ -1386,52 +1431,52 @@ module.exports = {
               var mealInMealMenu = yield app.modelFactory().model_query(app.models['psn_mealMenu'], {
                 select: 'status aggr_value',
                 where: {
-                  x_axis:x_axis,
-                  y_axis:y_axis,
-                  'aggr_value.mealId':mealId,
+                  x_axis: x_axis,
+                  y_axis: y_axis,
+                  'aggr_value.mealId': mealId,
                   tenantId: tenantId
                 }
               });
               var mealOrderRecord = yield app.modelFactory().model_read(app.models['psn_mealOrderRecord'], orderId);
-              console.log('mealOrderRecord:',mealOrderRecord);
+              console.log('mealOrderRecord:', mealOrderRecord);
 
-              if(mealOrderRecord.mealId == mealId){
-                if(num>0){
-                  if(mealInMealMenu[0].aggr_value.quantity>=num){
+              if (mealOrderRecord.mealId == mealId) {
+                if (num > 0) {
+                  if (mealInMealMenu[0].aggr_value.quantity >= num) {
                     console.log('套餐数量-num -------');
-                    mealInMealMenu[0].aggr_value.quantity -=num;
-                  }else {
+                    mealInMealMenu[0].aggr_value.quantity -= num;
+                  } else {
                     console.log('套餐剩余数量不足.....');
                     this.body = app.wrapper.res.error({message: '套餐剩余数量不足！'});
                     yield next;
                     return;
                   }
-                }else {
+                } else {
                   console.log('套餐数量+num +++++++++');
-                  mealInMealMenu[0].aggr_value.quantity -=num;
+                  mealInMealMenu[0].aggr_value.quantity -= num;
                 }
                 yield mealInMealMenu[0].save();
-                mealOrderRecord.quantity +=num;
+                mealOrderRecord.quantity += num;
                 yield mealOrderRecord.save();
-              }else {
-                var iptNum = mealOrderRecord.quantity+num;
-                if(iptNum>mealInMealMenu[0].aggr_value.quantity){
+              } else {
+                var iptNum = mealOrderRecord.quantity + num;
+                if (iptNum > mealInMealMenu[0].aggr_value.quantity) {
                   console.log('修改后套餐剩余数量不足...');
                   this.body = app.wrapper.res.error({message: '套餐剩余数量不足！'});
                   yield next;
                   return;
-                }else {
+                } else {
                   console.log('套餐数量-iptNum -------');
-                  mealInMealMenu[0].aggr_value.quantity -=iptNum;
+                  mealInMealMenu[0].aggr_value.quantity -= iptNum;
                   yield mealInMealMenu[0].save();
                   var preMealInMealMenu = yield app.modelFactory().model_one(app.models['psn_mealMenu'], {
-                      select: 'status aggr_value',
-                      where: {
-                          x_axis:x_axis,
-                          y_axis:y_axis,
-                          'aggr_value.mealId':mealOrderRecord.mealId,
-                          tenantId: tenantId
-                      }
+                    select: 'status aggr_value',
+                    where: {
+                      x_axis: x_axis,
+                      y_axis: y_axis,
+                      'aggr_value.mealId': mealOrderRecord.mealId,
+                      tenantId: tenantId
+                    }
                   });
                   preMealInMealMenu.aggr_value.quantity += mealOrderRecord.quantity;
                   yield preMealInMealMenu.save();
@@ -1440,18 +1485,18 @@ module.exports = {
                   select: 'status mealId quantity',
                   where: {
                     elderlyId: mealOrderRecord.elderlyId,
-                    x_axis:x_axis,
-                    y_axis:y_axis,
-                    mealId:mealId,
+                    x_axis: x_axis,
+                    y_axis: y_axis,
+                    mealId: mealId,
                     tenantId: tenantId
                   }
                 });
-                if(sameMealOrderRecord){
-                  sameMealOrderRecord.quantity +=iptNum;
+                if (sameMealOrderRecord) {
+                  sameMealOrderRecord.quantity += iptNum;
                   yield sameMealOrderRecord.save();
                   yield app.modelFactory().model_delete(app.models['psn_mealOrderRecord'], orderId);
-                }else {
-                  mealOrderRecord.quantity =iptNum;
+                } else {
+                  mealOrderRecord.quantity = iptNum;
                   mealOrderRecord.mealId = mealId;
                   yield mealOrderRecord.save();
                 }
@@ -1477,17 +1522,17 @@ module.exports = {
               var tenantId = this.request.body.tenantId;
               var meal = this.request.body.meal;
               var MealTime = this.request.body.curMealTime;
-              var thisMoment = app.moment().format(),x_axis = app.moment().format('YYYY-MM-DD'),y_axis;
-              if(app.moment(thisMoment).isBetween(x_axis+ 'T05', x_axis+ 'T09:00:00+08:00')){
-                  y_axis = 'A0000';
-              }else if(app.moment(thisMoment).isBetween(x_axis+ 'T09:00:01+08:00', x_axis+ 'T13:00:00+08:00')){
-                  y_axis = 'A0001';
-              }else if(app.moment(thisMoment).isBetween(x_axis+ 'T13:00:01+08:00', x_axis+ 'T19:00:00+08:00')){
-                  y_axis = 'A0002';
-              }else if(app.moment(thisMoment).isBetween(x_axis+ 'T19:00:01+08:00', x_axis+ 'T21:00:00+08:00')){
-                  y_axis = 'A0003';
+              var thisMoment = app.moment().format(), x_axis = app.moment().format('YYYY-MM-DD'), y_axis;
+              if (app.moment(thisMoment).isBetween(x_axis + 'T05', x_axis + 'T09:00:00+08:00')) {
+                y_axis = 'A0000';
+              } else if (app.moment(thisMoment).isBetween(x_axis + 'T09:00:01+08:00', x_axis + 'T13:00:00+08:00')) {
+                y_axis = 'A0001';
+              } else if (app.moment(thisMoment).isBetween(x_axis + 'T13:00:01+08:00', x_axis + 'T19:00:00+08:00')) {
+                y_axis = 'A0002';
+              } else if (app.moment(thisMoment).isBetween(x_axis + 'T19:00:01+08:00', x_axis + 'T21:00:00+08:00')) {
+                y_axis = 'A0003';
               }
-              if(MealTime !==y_axis){
+              if (MealTime !== y_axis) {
                 this.body = app.wrapper.res.error({message: '已过当前点餐时间，刷新重试！'});
                 yield next;
                 return;
@@ -1495,15 +1540,15 @@ module.exports = {
 
               yield app.modelFactory().model_delete(app.models['psn_mealOrderRecord'], meal.orderId);
               var mealInMealMenu = yield app.modelFactory().model_one(app.models['psn_mealMenu'], {
-                  select: 'status aggr_value',
-                  where: {
-                      x_axis:x_axis,
-                      y_axis:y_axis,
-                      'aggr_value.mealId':meal.mealId,
-                      tenantId: tenantId
-                  }
+                select: 'status aggr_value',
+                where: {
+                  x_axis: x_axis,
+                  y_axis: y_axis,
+                  'aggr_value.mealId': meal.mealId,
+                  tenantId: tenantId
+                }
               });
-              mealInMealMenu.aggr_value.quantity +=meal.quantity;
+              mealInMealMenu.aggr_value.quantity += meal.quantity;
               yield mealInMealMenu.save();
 
               this.body = app.wrapper.res.default();

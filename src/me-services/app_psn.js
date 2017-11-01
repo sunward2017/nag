@@ -1038,116 +1038,6 @@ module.exports = {
         }
       },
       {
-        method: 'mealOrderRecords$elderly$fetchByDateRange',
-        verb: 'post',
-        url: this.service_url_prefix + "/mealOrderRecords/elderly/fetchByDateRange",
-        handler: function (app, options) {
-          return function*(next) {
-            try {
-              var userId = this.request.body.userId;
-              var begin_date = this.request.body.begin_date;
-              var end_date = this.request.body.end_date;
-              var tenantId = this.request.body.tenantId;
-              var districtId = this.request.body.districtId;
-              var floorId = this.request.body.floorId;
-              var roomId = this.request.body.roomId;
-              var psn_meal_periods = this.request.body.psn_meal_periods.length == 0 || [DIC.D3040.BREAKFAST, DIC.D3040.LUNCH, DIC.D3040.DINNER, DIC.D3040.SUPPER];
-              var x_axis_start = app.moment(begin_date);
-              var x_axis_end = app.moment(end_date).add(1, 'days');
-
-
-              var dynamicFilter = {
-                status: 1,
-                tenantId: tenantId,
-                live_in_flag: true,
-                begin_exit_flow: {$ne: true}
-              };
-
-              if (districtId) {
-                console.log('districtId...')
-                dynamicFilter['room_value.districtId'] = districtId;
-              }
-              if (floorId) {
-                console.log('floorId...')
-                //需要按照
-                var arrFloorParsed = floorId.split('$');
-                dynamicFilter['room_value.districtId'] = arrFloorParsed[0];
-
-                var floor = arrFloorParsed[1];
-                var rooms = yield app.modelFactory().model_query(app.models['psn_room'], {
-                  select: '_id',
-                  where: {
-                    status: 1,
-                    floor: floor,
-                    districtId: arrFloorParsed[0],
-                    tenantId: tenantId
-                  }
-                });
-
-                var roomIds = app._.map(rooms, (o) => {
-                  return o._id;
-                })
-
-                dynamicFilter['room_value.roomId'] = {$in: roomIds};
-              }
-
-              if (roomId) {
-                console.log('mealOrderRecord$elderly$fetch: roomId...')
-                dynamicFilter['room_value.roomId'] = roomId;
-              } else {
-                //查找有权限访问的房间
-                var dataPermissionRecord = yield app.modelFactory().model_one(app.models['pub_dataPermission'], {
-                  select: 'object_ids',
-                  where: {
-                    status: 1,
-                    subsystem: app.modelVariables["PENSION-AGENCY"]['SUB_SYSTEM'],
-                    subject_model: 'pub-user',
-                    subject_id: userId,
-                    object_type: DIC.D0105.ROOM,
-                    tenantId: tenantId
-                  }
-                });
-                dynamicFilter['room_value.roomId'] = {$in: dataPermissionRecord.object_ids };
-                console.log('mealOrderRecord$elderly$fetch: dynamicFilter:', dynamicFilter);
-              }
-
-              var orderedElderly = yield app.modelFactory().model_aggregate(app.models['psn_mealOrderRecord'], [
-                {
-                  $match: {
-                    tenantId: tenantId,
-                    status: 1,
-                    x_axis: {$gte: x_axis_start.toDate(), $lt: x_axis_end.toDate()},
-                    y_axis: {$in: psn_meal_periods}
-                  }
-                },
-                {
-                  $group: {
-                    _id: '$elderlyId'
-                  }
-                }
-              ]);
-
-              var elderlyIdsOrdered = app._.map(rows, (o) => o._id);
-              dynamicFilter['_id'] = {$in: elderlyIdsOrdered};
-
-              console.log('dynamicFilter:', dynamicFilter);
-
-              var elderly = yield app.modelFactory().model_query(app.models['psn_elderly'], {
-                select: 'name birthday room_summary avatar room_value',
-                where: dynamicFilter
-              });
-
-              this.body = app.wrapper.res.rows(elderly);
-
-            } catch (e) {
-              self.logger.error(e.message);
-              this.body = app.wrapper.res.error(e);
-            }
-            yield next;
-          }
-        }
-      },
-      {
         method: 'mealOrderRecords$fetchByDateRange',
         verb: 'post',
         url: this.service_url_prefix + "/mealOrderRecords/fetchByDateRange",
@@ -1155,14 +1045,15 @@ module.exports = {
           return function*(next) {
             try {
               console.log("body", this.request.body);
-              var userId = this.request.body.userId;
-              var tenantId = this.request.body.tenantId;
+              var userId = app.ObjectId(this.request.body.userId);
+              var tenantId = app.ObjectId(this.request.body.tenantId);
               var begin_date = this.request.body.begin_date;
               var end_date = this.request.body.end_date;
+              var psn_meal_periods = this.request.body.psn_meal_periods.length == 0 || [DIC.D3040.BREAKFAST, DIC.D3040.LUNCH, DIC.D3040.DINNER, DIC.D3040.SUPPER];
 
               var x_axis_start = app.moment(begin_date);
               var x_axis_end = app.moment(end_date).add(1, 'days');
-              var where = {tenantId: app.ObjectId(tenantId), x_axis: {'$gte': x_axis_start.toDate(), '$lt': x_axis_end.toDate()}};
+              var where = {tenantId: tenantId, x_axis: {'$gte': x_axis_start.toDate(), '$lt': x_axis_end.toDate()}};
 
 
               var dataPermissionRecord = yield app.modelFactory().model_one(app.models['pub_dataPermission'], {
@@ -1176,6 +1067,7 @@ module.exports = {
                   tenantId: tenantId
                 }
               });
+              console.log('dataPermissionRecord:', dataPermissionRecord);
               var elderlys = yield app.modelFactory().model_query(app.models['psn_elderly'], {
                 select: '_id',
                 where: {
@@ -1186,12 +1078,10 @@ module.exports = {
                   'room_value.roomId': {$in: dataPermissionRecord.object_ids}
                 }
               });
-              where.elderlyId = {$in: app._.map(elderlys, o => o._id)}
-
-              var rows = yield app.modelFactory().model_aggregate(app.models['psn_mealOrderRecord'], [
-                {
-                  $match: where
-                },
+              where.elderlyId = {$in: app._.map(elderlys, o => o._id)};
+              var aggrPipe = [{
+                $match: where
+              },
                 {
                   $lookup: {
                     from: "psn_meal",
@@ -1207,20 +1097,77 @@ module.exports = {
                   $project: {
                     elderlyId: '$elderlyId',
                     elderly_name: '$elderly_name',
+                    weekDay: {$dayOfWeek: '$x_axis'},
                     date: {$dateToString: {format: "%Y-%m-%d", date: "$x_axis"}},
                     period: '$y_axis',
-                    meal: {id: '$aggr_value.mealId', name: '$meal.name'}
+                    meal: '$meal',
+                    quantity: '$quantity'
                   }
                 },
                 {
                   $group: {
-                    _id: {elderlyId: '$elderlyId', elderly_name: '$elderly_name', period: '$period'},
-                    dates: {$push: '$date'},
-                    meals: {$push: '$meal'}
+                    _id: {elderlyId: '$elderlyId', period: '$period', weekDay: '$weekDay'},
+                    elderly_name: {$first: '$elderly_name'},
+                    date: {$first: '$date'},
+                    meals: {$push: { mealId: '$meal._id', name: '$meal.name', x_axis: '$date', quantity: '$quantity'} }
                   }
-                }
-              ]);
+                },
+                {
+                  $sort: {'_id.period': 1}
+                }];
 
+              var g1 = {
+                $project: {
+                  _id: 0,
+                  elderlyId: '$_id.elderlyId',
+                  weekDay: { $subtract: [ '$_id.weekDay', 1 ]},
+                  period: '$_id.period',
+                  elderly_name: '$elderly_name',
+                  date: '$date'
+                }
+              };
+              var g2 =  {
+                $group: {
+                  _id: {elderlyId: '$elderlyId'},
+                  elderly_name: {$first: '$elderly_name'}
+                }
+              };
+
+              app._.each(psn_meal_periods, (periodKey)=> {
+                g1.$project[periodKey] = {
+                  0: {$cond: {if: {$and: [{$eq: ['$_id.period', periodKey]},{$eq: ['$_id.weekDay', 1]}]}, then: '$$CURRENT.meals', else: []}},
+                  1: {$cond: {if: {$and: [{$eq: ['$_id.period', periodKey]},{$eq: ['$_id.weekDay', 2]}]}, then: '$$CURRENT.meals', else: []}},
+                  2: {$cond: {if: {$and: [{$eq: ['$_id.period', periodKey]},{$eq: ['$_id.weekDay', 3]}]}, then: '$$CURRENT.meals', else: []}},
+                  3: {$cond: {if: {$and: [{$eq: ['$_id.period', periodKey]},{$eq: ['$_id.weekDay', 4]}]}, then: '$$CURRENT.meals', else: []}},
+                  4: {$cond: {if: {$and: [{$eq: ['$_id.period', periodKey]},{$eq: ['$_id.weekDay', 5]}]},then: '$$CURRENT.meals', else: []}},
+                  5: {$cond: {if: {$and: [{$eq: ['$_id.period', periodKey]},{$eq: ['$_id.weekDay', 6]}]}, then: '$$CURRENT.meals', else: []}},
+                  6: {$cond: {if: {$and: [{$eq: ['$_id.period', periodKey]},{$eq: ['$_id.weekDay', 7]}]}, then: '$$CURRENT.meals', else: []}}
+                };
+                g2.$group[periodKey] = {$push: '$' + periodKey}
+              });
+
+              console.log('g1>>>',g1);
+              console.log('g2>>>',g2);
+
+              aggrPipe.push(g1);
+              aggrPipe.push(g2);
+              var rows = yield app.modelFactory().model_aggregate(app.models['psn_mealOrderRecord'], aggrPipe);
+              _.each(rows, function(row){
+                app._.each(psn_meal_periods, (periodKey)=> {
+                  row[periodKey] = _.reduce(row[periodKey], (total, row2) => {
+                    total[0] = (total[0] || []).concat(row2[0])
+                    total[1] = (total[1] || []).concat(row2[1])
+                    total[2] = (total[2] || []).concat(row2[2])
+                    total[3] = (total[3] || []).concat(row2[3])
+                    total[4] = (total[4] || []).concat(row2[4])
+                    total[5] = (total[5] || []).concat(row2[5])
+                    total[6] = (total[6] || []).concat(row2[6])
+                    return total;
+                  }, {})
+                });
+              });
+              console.log('meals$fetch:rows[0]>>', rows[0]);
+              console.log('meals$fetch:rows[0].A0000>>', rows[0].A0000);
               this.body = app.wrapper.res.rows(rows);
             } catch (e) {
               self.logger.error(e.message);

@@ -1113,20 +1113,24 @@ module.exports = {
                   }
                 },
                 {
+                  $unwind: '$meal'
+                },
+                {
                   $project: {
                     elderlyId: '$elderlyId',
                     weekDay: {$dayOfWeek: '$x_axis'},
                     date: {$dateToString: {format: "%Y-%m-%d", date: "$x_axis"}},
                     period: '$y_axis',
                     meal: '$meal',
-                    quantity: '$quantity'
+                    quantity: '$quantity',
+                    orderId:'$_id'
                   }
                 },
                 {
                   $group: {
                     _id: {elderlyId: '$elderlyId', period: '$period', weekDay: '$weekDay'},
                     date: {$first: '$date'},
-                    meals: {$push: { mealId: '$meal._id', name: '$meal.name', x_axis: '$date', quantity: '$quantity'} }
+                    meals: {$push: { mealId: '$meal._id', name: '$meal.name', x_axis: '$date', quantity: '$quantity',orderId: '$orderId'} }
                   }
                 },
                 {
@@ -1202,7 +1206,7 @@ module.exports = {
                 });
               });
               console.log('meals$fetch:rows[0]>>', rows[0]);
-              console.log('meals$fetch:rows[0].A0000>>', rows[0].A0000);
+              // console.log('meals$fetch:rows[0].A0000>>', rows[0].A0000);
               this.body = app.wrapper.res.rows(rows);
             } catch (e) {
               self.logger.error(e.message);
@@ -1583,6 +1587,41 @@ module.exports = {
                 }
                 this.body = app.wrapper.res.ret({status: res, data: resMealMember});
               }
+            } catch (e) {
+              self.logger.error(e.message);
+              this.body = app.wrapper.res.error(e);
+            }
+            yield next;
+          }
+        }
+      },
+      {
+        method: 'predetermineEditMeal$save',
+        verb: 'post',
+        url: this.service_url_prefix + "/predetermineEditMeal/save",
+        handler: function (app, options) {
+          return function*(next) {
+            try {
+              console.log("body", this.request.body);
+              var tenantId = this.request.body.tenantId;
+              var num = this.request.body.num;
+              var orderId = this.request.body.orderId;
+              var mealId = this.request.body.mealId;
+
+              var mealOrderRecord = yield app.modelFactory().model_read(app.models['psn_mealOrderRecord'], orderId);
+              console.log('mealOrderRecord:', mealOrderRecord);
+
+              if (mealOrderRecord.mealId == mealId) {
+                mealOrderRecord.quantity += num;
+                yield mealOrderRecord.save();
+              } else {
+                var iptNum = mealOrderRecord.quantity + num;
+                mealOrderRecord.quantity = iptNum;
+                mealOrderRecord.mealId = mealId;
+                yield mealOrderRecord.save();
+              }
+
+              this.body = app.wrapper.res.ret(mealOrderRecord);
             } catch (e) {
               self.logger.error(e.message);
               this.body = app.wrapper.res.error(e);

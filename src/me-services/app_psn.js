@@ -1071,7 +1071,7 @@ module.exports = {
               var tenantId = app.ObjectId(this.request.body.tenantId);
               var begin_date = this.request.body.begin_date;
               var end_date = this.request.body.end_date;
-              var psn_meal_periods = this.request.body.psn_meal_periods.length == 0 || [DIC.D3040.BREAKFAST, DIC.D3040.LUNCH, DIC.D3040.DINNER, DIC.D3040.SUPPER];
+              var psn_meal_periods = this.request.body.psn_meal_periods || [DIC.D3040.BREAKFAST, DIC.D3040.LUNCH, DIC.D3040.DINNER, DIC.D3040.SUPPER];
 
               var x_axis_start = app.moment(begin_date);
               var x_axis_end = app.moment(end_date).add(1, 'days');
@@ -1113,12 +1113,8 @@ module.exports = {
                   }
                 },
                 {
-                  $unwind: '$meal'
-                },
-                {
                   $project: {
                     elderlyId: '$elderlyId',
-                    elderly_name: '$elderly_name',
                     weekDay: {$dayOfWeek: '$x_axis'},
                     date: {$dateToString: {format: "%Y-%m-%d", date: "$x_axis"}},
                     period: '$y_axis',
@@ -1129,7 +1125,6 @@ module.exports = {
                 {
                   $group: {
                     _id: {elderlyId: '$elderlyId', period: '$period', weekDay: '$weekDay'},
-                    elderly_name: {$first: '$elderly_name'},
                     date: {$first: '$date'},
                     meals: {$push: { mealId: '$meal._id', name: '$meal.name', x_axis: '$date', quantity: '$quantity'} }
                   }
@@ -1144,16 +1139,33 @@ module.exports = {
                   elderlyId: '$_id.elderlyId',
                   weekDay: { $subtract: [ '$_id.weekDay', 1 ]},
                   period: '$_id.period',
-                  elderly_name: '$elderly_name',
                   date: '$date'
                 }
               };
               var g2 =  {
                 $group: {
-                  _id: {elderlyId: '$elderlyId'},
-                  elderly_name: {$first: '$elderly_name'}
+                  _id: {elderlyId: '$elderlyId'}
                 }
               };
+
+              var g3 = {
+                $lookup: {
+                  from: "psn_elderly",
+                  localField: "_id.elderlyId",
+                  foreignField: "_id",
+                  as: "elderly"
+                }
+              };
+              var g4 = {
+                $unwind: '$elderly'
+              }
+
+              var g5 = {
+                $project: {
+                  _id: 0,
+                  elderly: { id: '$elderly._id', name: '$elderly.name', avatar: '$elderly.avatar', room_summary: '$elderly.room_summary' }
+                }
+              }
 
               app._.each(psn_meal_periods, (periodKey)=> {
                 g1.$project[periodKey] = {
@@ -1166,17 +1178,18 @@ module.exports = {
                   6: {$cond: {if: {$and: [{$eq: ['$_id.period', periodKey]},{$eq: ['$_id.weekDay', 7]}]}, then: '$$CURRENT.meals', else: []}}
                 };
                 g2.$group[periodKey] = {$push: '$' + periodKey}
+                g5.$project[periodKey] = 1;
               });
 
               console.log('g1>>>',g1);
               console.log('g2>>>',g2);
-
-              aggrPipe.push(g1);
-              aggrPipe.push(g2);
+              console.log('g2>>>',g3);
+              aggrPipe.push(g1, g2, g3, g4, g5);
+              // aggrPipe.push(g2);
               var rows = yield app.modelFactory().model_aggregate(app.models['psn_mealOrderRecord'], aggrPipe);
-              _.each(rows, function(row){
+              app._.each(rows, function(row){
                 app._.each(psn_meal_periods, (periodKey)=> {
-                  row[periodKey] = _.reduce(row[periodKey], (total, row2) => {
+                  row[periodKey] = app._.reduce(row[periodKey], (total, row2) => {
                     total[0] = (total[0] || []).concat(row2[0])
                     total[1] = (total[1] || []).concat(row2[1])
                     total[2] = (total[2] || []).concat(row2[2])

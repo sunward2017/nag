@@ -1,6 +1,6 @@
 {
   "name": "nag",
-  "version": "1.6.6",
+  "version": "1.6.7",
   "description": "",
   "main": "src/app.js",
   "scripts": {
@@ -8,6 +8,7 @@
     "start": "./start-app.sh",
     "start-dev": "./dev-app.sh",
     "start-remote": "./dev-remote.sh",
+    "start-zhouyq": "./dev-zhouyq.sh",
     "build": "./start-gulp.sh vendor-1.x",
     "dev": "./start-gulp.sh vendor-1.x dev"
   },

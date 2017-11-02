@@ -281,8 +281,8 @@
           importDrug: importDrug,
           syncDrugToTenants: syncDrugToTenants,
           clearElderly: clearElderly,
-          bedMonitorsAggregateQuery:bedMonitorsAggregateQuery,
-          primitivePsdAlert:primitivePsdAlert
+          bedMonitorsAggregateQuery: bedMonitorsAggregateQuery,
+          primitivePsdAlert: primitivePsdAlert
         };
 
         function tenantInfo(tenantId, select) {
@@ -355,7 +355,7 @@
         function clearElderly(elderlyId) {
           return $http.post(baseUrl + 'clearElderly', {elderlyId: elderlyId});
         }
-        
+
         function bedMonitorsAggregateQuery() {
           return $http.post(baseUrl + 'bedMonitorsAggregateQuery');
         }
@@ -519,7 +519,7 @@
           roomStatusInfo: roomStatusInfo,
           updateRoomStatusInfo: updateRoomStatusInfo,
           robotRemoveRoomConfig: robotRemoveRoomConfig,
-          bedMonitorUseCheck:bedMonitorUseCheck,
+          bedMonitorUseCheck: bedMonitorUseCheck,
           bedMonitorRemoveRoomConfig: bedMonitorRemoveRoomConfig,
           submitApplicationToExit: submitApplicationToExit,
           submitToAuditItemReturn: submitToAuditItemReturn,
@@ -536,7 +536,7 @@
           queryElderly: queryElderly,
           exportExcelForEldelryPrintQRLabel: exportExcelForEldelryPrintQRLabel,
           exportExcelForRoomBedPrintQRLabel: exportExcelForRoomBedPrintQRLabel,
-          exportExcelForDrugUseItem:exportExcelForDrugUseItem,
+          exportExcelForDrugUseItem: exportExcelForDrugUseItem,
           queryDrug: queryDrug,
           drugUseItemSave: drugUseItemSave,
           drugUseItemRemove: drugUseItemRemove,
@@ -548,14 +548,14 @@
           elderlyDrugUseWithStockList: elderlyDrugUseWithStockList,
           elderlyStockObject: elderlyStockObject,
           elderlyDrugStockSummary: elderlyDrugStockSummary,
-          backoutAllotDrug:backoutAllotDrug,
-          allotdrugStockInRecordCheck:allotdrugStockInRecordCheck,
-          leftElderlyDrugStockSummary:leftElderlyDrugStockSummary,
-          scrapDrugOutStock:scrapDrugOutStock,
-          allotDrugToCenterStock:allotDrugToCenterStock,
-          queryCenterStockAllotRecords:queryCenterStockAllotRecords,
-          centerDrugInStock:centerDrugInStock,
-          centerDrugOutStock:centerDrugOutStock,
+          backoutAllotDrug: backoutAllotDrug,
+          allotdrugStockInRecordCheck: allotdrugStockInRecordCheck,
+          leftElderlyDrugStockSummary: leftElderlyDrugStockSummary,
+          scrapDrugOutStock: scrapDrugOutStock,
+          allotDrugToCenterStock: allotDrugToCenterStock,
+          queryCenterStockAllotRecords: queryCenterStockAllotRecords,
+          centerDrugInStock: centerDrugInStock,
+          centerDrugOutStock: centerDrugOutStock,
           drugOutStock: drugOutStock,
           updateDrugsOutStock: updateDrugsOutStock,
           queryElderlyDrugStock: queryElderlyDrugStock,
@@ -607,12 +607,13 @@
           nursingWorkerScheduleTemplateImport: nursingWorkerScheduleTemplateImport,
           nursingWorkerScheduleSaveAsTemplateWeekly: nursingWorkerScheduleSaveAsTemplateWeekly,
           vitalSign$MingZhong$updateElderlyUsers: vitalSign$MingZhong$updateElderlyUsers,
-          mealMenuSchedule:mealMenuSchedule,
-          mealMenuScheduleSave:mealMenuScheduleSave,
-          mealMenuScheduleRemove:mealMenuScheduleRemove,
-          mealMenuTemplateImport:mealMenuTemplateImport,
-          mealMenuSaveAsTemplate:mealMenuSaveAsTemplate,
-          mealOrderRecord:mealOrderRecord
+          mealMenuSchedule: mealMenuSchedule,
+          mealMenuScheduleSave: mealMenuScheduleSave,
+          mealMenuScheduleRemove: mealMenuScheduleRemove,
+          mealMenuTemplateImport: mealMenuTemplateImport,
+          mealMenuSaveAsTemplate: mealMenuSaveAsTemplate,
+          mealOrderRecord: mealOrderRecord,
+          mealOrderRecordStat: mealOrderRecordStat
         };
 
         function roomStatusInfo(tenantId) {
@@ -634,11 +635,11 @@
             robotId: robotId
           });
         }
-        
-        function bedMonitorUseCheck(bedMonitorName,tenantId) {
+
+        function bedMonitorUseCheck(bedMonitorName, tenantId) {
           return $http.post(baseUrl + 'bedMonitorUseCheck', {
-              bedMonitorName: bedMonitorName,
-              tenantId:tenantId
+            bedMonitorName: bedMonitorName,
+            tenantId: tenantId
           });
         }
 
@@ -707,14 +708,14 @@
           });
         }
 
-        function exportExcelForDrugUseItem(file_name, tenantId,elderlyId) {
+        function exportExcelForDrugUseItem(file_name, tenantId, elderlyId) {
           return $http.post(baseUrl + 'excel/elderlyDrugUseItem', {
-              file_name: file_name,
-              tenantId: tenantId,
-              elderlyId:elderlyId
+            file_name: file_name,
+            tenantId: tenantId,
+            elderlyId: elderlyId
           }, {responseType: 'blob'}).success(function (res) {
-              console.log('res', res);
-              saveAs(res, decodeURI(file_name + '.xlsx'));
+            console.log('res', res);
+            saveAs(res, decodeURI(file_name + '.xlsx'));
           });
         }
 
@@ -871,7 +872,7 @@
           return $http.post(baseUrl + 'elderlyDrugUseWithStockList', {tenantId: tenantId, elderlyId: elderlyId});
         }
 
-        function elderlyStockObject (tenantId, elderlyId) {
+        function elderlyStockObject(tenantId, elderlyId) {
           return $http.post(baseUrl + 'elderlyStockObject', {
             tenantId: tenantId,
             elderlyId: elderlyId
@@ -895,16 +896,16 @@
 
         function backoutAllotDrug(tenantId, operated_by, drugStockRowData) {
           return $http.post(baseUrl + 'backoutAllotDrug', {
-              tenantId: tenantId,
-              operated_by: operated_by,
-              drugStockRowData: drugStockRowData
+            tenantId: tenantId,
+            operated_by: operated_by,
+            drugStockRowData: drugStockRowData
           });
         }
 
-        function leftElderlyDrugStockSummary(tenantId,page) {
+        function leftElderlyDrugStockSummary(tenantId, page) {
           return $http.post(baseUrl + 'leftElderlyDrugStockSummary', {
-              tenantId: tenantId,
-              page:page
+            tenantId: tenantId,
+            page: page
           });
         }
 
@@ -924,10 +925,10 @@
           });
         }
 
-        function queryCenterStockAllotRecords(tenantId,page) {
+        function queryCenterStockAllotRecords(tenantId, page) {
           return $http.post(baseUrl + 'queryCenterStockAllotRecords', {
-              tenantId: tenantId,
-              page:page
+            tenantId: tenantId,
+            page: page
           });
         }
 
@@ -1199,8 +1200,15 @@
           });
         }
 
-        function mealOrderRecord(tenantId,order_date) {
+        function mealOrderRecord(tenantId, order_date) {
           return $http.post(baseUrl + 'mealOrderRecord', {
+            tenantId: tenantId,
+            order_date: order_date
+          });
+        }
+
+        function mealOrderRecordStat(tenantId, order_date) {
+          return $http.post(baseUrl + 'mealOrderRecordStat', {
             tenantId: tenantId,
             order_date: order_date
           });
@@ -1482,6 +1490,5 @@
       }]
     };
   }
-
 
 })();

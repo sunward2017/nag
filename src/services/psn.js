@@ -6997,6 +6997,198 @@ module.exports = {
             yield next;
           };
         }
+      },
+      {
+        method: 'mealOrderRecordStat',
+        verb: 'post',
+        url: this.service_url_prefix + "/mealOrderRecordStat",
+        handler: function (app, options) {
+          return function*(next) {
+            try {
+              var tenantId = this.request.body.tenantId;
+              var order_date = app.moment(this.request.body.order_date);
+              var tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], tenantId);
+              if (!tenant || tenant.status == 0) {
+                this.body = app.wrapper.res.error({message: '无法找到养老机构!'});
+                yield next;
+                return;
+              }
+
+              var psn_meal_periods = tenant.other_config.psn_meal_periods || [DIC.D3040.BREAKFAST, DIC.D3040.LUNCH, DIC.D3040.DINNER, DIC.D3040.SUPPER];
+
+              var where = {tenantId: app.ObjectId(tenantId), x_axis: {'$gte': order_date.toDate(), '$lt': order_date.add(1, 'days').toDate()}};
+
+              var ag1 =  {
+                $project: {
+                  _id: 0,
+                  districtId: '$_id.districtId',
+                  floor: '$_id.floor',
+                  date: '$_id.date',
+                  'A0000': {$cond: {if: {$eq: ['$_id.period', 'A0000']}, then: '$$CURRENT.meals', else: []}},
+                  'A0001': {$cond: {if: {$eq: ['$_id.period', 'A0001']}, then: '$$CURRENT.meals', else: []}},
+                  'A0002': {$cond: {if: {$eq: ['$_id.period', 'A0002']}, then: '$$CURRENT.meals', else: []}}
+                }
+              }, ag2 = {
+                $group: {
+                  _id: {date: '$date', districtId: '$districtId', floor: '$floor'},
+                  A0000: {$push: '$A0000'},
+                  A0001: {$push: '$A0001'},
+                  A0002: {$push: '$A0002'}
+                }
+              }, ag3 = {
+                $project: {
+                  _id: 0,
+                  districtId: '$_id.districtId',
+                  floor: '$_id.floor',
+                  date: '$_id.date',
+                  'A0000': {$concatArrays: [{$arrayElemAt: ['$A0000', 0]}, {$arrayElemAt: ['$A0000', 1]}, {$arrayElemAt: ['$A0000', 2]}]},
+                  'A0001': {$concatArrays: [{$arrayElemAt: ['$A0001', 0]}, {$arrayElemAt: ['$A0001', 1]}, {$arrayElemAt: ['$A0001', 2]}]},
+                  'A0002': {$concatArrays: [{$arrayElemAt: ['$A0002', 0]}, {$arrayElemAt: ['$A0002', 1]}, {$arrayElemAt: ['$A0002', 2]}]}
+                }
+              }, ag4 = {
+                $group: {
+                  _id: {date: '$date', districtId: '$districtId'},
+                  floors: {
+                    $push: {
+                      floor: '$floor',
+                      A0000: '$A0000',
+                      A0001: '$A0001',
+                      A0002: '$A0002'
+                    }
+                  }
+                }
+              };
+
+              app._.each(psn_meal_periods, (periodKey)=> {
+                ag1.$project[periodKey] = {$cond: {if: {$eq: ['$_id.period', periodKey]}, then: '$$CURRENT.meals', else: []}};
+                ag2.$group[periodKey] = {$push: '$' + periodKey};
+                // var concatArrays = app._.map(psn_meal_periods, (k,i) => {
+                //   return {$arrayElemAt: ['$' + periodKey, i]}
+                // });
+                //[{$arrayElemAt: ['$' + periodKey, 0]}, {$arrayElemAt: ['$' + periodKey, 1]}, {$arrayElemAt: ['$' + periodKey, 2]}]
+                ag3.$project[periodKey] = {$concatArrays: app._.map(psn_meal_periods, (k,i) => ({$arrayElemAt: ['$' + periodKey, i]}))};
+                console.log(ag3.$project[periodKey].$concatArrays);
+                ag4.$group.floors.$push[periodKey] = '$' + periodKey;
+              });
+
+              console.log('ag1>>>',ag1);
+              console.log('ag2>>>',ag2);
+              console.log('ag3>>>',ag3);
+              console.log('ag4>>>',ag4);
+
+              var rows = yield app.modelFactory().model_aggregate(app.models['psn_mealOrderRecord'], [
+                {
+                  $match: where
+                },
+                {
+                  $lookup: {
+                    from: "psn_elderly",
+                    localField: "elderlyId",
+                    foreignField: "_id",
+                    as: "elderly"
+                  }
+                },
+                {
+                  $unwind: '$elderly'
+                },
+                {
+                  $project: {
+                    elderly_name: '$elderly.name',
+                    roomId: '$elderly.room_value.roomId',
+                    period: '$y_axis',
+                    date: {$dateToString: {format: "%Y-%m-%d", date: "$x_axis"}},
+                    mealId: 1,
+                    quantity: 1
+                  }
+                },
+                {
+                  $lookup: {
+                    from: "psn_room",
+                    localField: "roomId",
+                    foreignField: "_id",
+                    as: "room"
+                  }
+                },
+                {
+                  $unwind: '$room'
+                },
+                {
+                  $project: {
+                    elderly_name: 1,
+                    districtId: '$room.districtId',
+                    floor: '$room.floor',
+                    date: 1,
+                    period: 1,
+                    mealId: 1,
+                    quantity: 1
+                  }
+                },
+                {
+                  $group: {
+                    _id: {date: '$date', districtId: '$districtId', floor: '$floor', period: '$period', mealId: '$mealId'},
+                    quantity: {$sum: '$quantity'}
+                  }
+                },
+                {
+                  $lookup: {
+                    from: "psn_meal",
+                    localField: "_id.mealId",
+                    foreignField: "_id",
+                    as: "meal"
+                  }
+                },
+                {
+                  $unwind: '$meal'
+                },
+                {
+                  $project: {
+                    _id: 0,
+                    districtId: '$_id.districtId',
+                    floor: '$_id.floor',
+                    date: '$_id.date',
+                    period: '$_id.period',
+                    meal: {name: '$meal.name', quantity: '$quantity'}
+                  }
+                },
+                {
+                  $group: {
+                    _id: {date: '$date', districtId: '$districtId', floor: '$floor', period: '$period'},
+                    meals: {$push: '$meal'}
+                  }
+                },
+                ag1, ag2, ag3, ag4,
+                {
+                  $lookup: {
+                    from: "psn_district",
+                    localField: "_id.districtId",
+                    foreignField: "_id",
+                    as: "district"
+                  }
+                },
+                {
+                  $unwind: '$district'
+                },
+                {
+                  $project: {
+                    _id: 0,
+                    districtId: '$district._id',
+                    district_name: '$district.name',
+                    date: '$_id.date',
+                    floors: '$floors'
+                  }
+                }
+              ]);
+              console.log('mealOrderRecordstat rows:', rows);
+
+              this.body = app.wrapper.res.rows(rows);
+            } catch (e) {
+              console.log(e);
+              self.logger.error(e.message);
+              this.body = app.wrapper.res.error(e);
+            }
+            yield next;
+          };
+        }
       }
       /**********************其他*****************************/
 

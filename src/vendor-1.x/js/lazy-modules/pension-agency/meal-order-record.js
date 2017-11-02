@@ -52,12 +52,17 @@
       console.log('vm.model.order_date:', vm.model.order_date);
 
       fetchMealOrderRecord(vm.tenantId, vm.model.order_date);
+
     }
 
     function fetchMealOrderRecord(tenantId, order_date) {
       vmh.blocking(vmh.psnService.mealOrderRecord(tenantId, order_date).then(function (rows) {
         console.log('rows:', rows);
         vm.rows = rows;
+      }));
+
+      vmh.blocking(vmh.psnService.mealOrderRecordStat(tenantId, order_date).then(function (rows) {
+        console.log('stat rows:', rows);
       }));
     }
 

@@ -181,7 +181,7 @@
           function blocking(promise) {
             var self = this;
             self.blocker.start();
-            $q.when(promise.$promise || promise).finally(function () {
+            return $q.when(promise.$promise || promise).finally(function () {
               self.blocker.stop();
             });
           }

@@ -990,15 +990,21 @@ module.exports = {
                   }
                 });
 
+                var whereElderlys = {
+                  status: 1,
+                  tenantId: tenantId,
+                  live_in_flag: true,
+                  begin_exit_flow: {$ne: true}
+                }
+                if (dataPermissionRecord) {
+                  whereElderlys['room_value.roomId'] = {$in: dataPermissionRecord.object_ids || []};
+                } else{
+                  whereElderlys['room_value.roomId'] = {$in: []};
+                }
+
                 var elderlys = yield app.modelFactory().model_query(app.models['psn_elderly'], {
                   select: '_id',
-                  where: {
-                    status: 1,
-                    tenantId: tenantId,
-                    live_in_flag: true,
-                    begin_exit_flow: {$ne: true},
-                    'room_value.roomId': {$in: dataPermissionRecord.object_ids}
-                  }
+                  where: whereElderlys
                 });
 
                 where.elderlyId = {$in: app._.map(elderlys, o => o._id)}
@@ -1090,15 +1096,20 @@ module.exports = {
                 }
               });
               console.log('dataPermissionRecord:', dataPermissionRecord);
+              var whereElderlys = {
+                status: 1,
+                tenantId: tenantId,
+                live_in_flag: true,
+                begin_exit_flow: {$ne: true}
+              }
+              if (dataPermissionRecord) {
+                whereElderlys['room_value.roomId'] = {$in: dataPermissionRecord.object_ids || []};
+              } else{
+                whereElderlys['room_value.roomId'] = {$in: []};
+              }
               var elderlys = yield app.modelFactory().model_query(app.models['psn_elderly'], {
                 select: '_id',
-                where: {
-                  status: 1,
-                  tenantId: tenantId,
-                  live_in_flag: true,
-                  begin_exit_flow: {$ne: true},
-                  'room_value.roomId': {$in: dataPermissionRecord.object_ids}
-                }
+                where: whereElderlys
               });
               where.elderlyId = {$in: app._.map(elderlys, o => o._id)};
               var aggrPipe = [{
@@ -1419,7 +1430,20 @@ module.exports = {
                     tenantId: tenantId
                   }
                 });
-                dynamicFilter['room_value.roomId'] = {$in: dataPermissionRecord.object_ids };
+
+                var whereElderlys = {
+                  status: 1,
+                  tenantId: tenantId,
+                  live_in_flag: true,
+                  begin_exit_flow: {$ne: true}
+                }
+                if (dataPermissionRecord) {
+                  dynamicFilter['room_value.roomId'] = {$in: dataPermissionRecord.object_ids || []};
+                } else {
+                  dynamicFilter['room_value.roomId'] = {$in: [] };
+                }
+
+                // dynamicFilter['room_value.roomId'] = {$in: dataPermissionRecord.object_ids };
                 console.log('mealOrderRecord$elderly$fetch: dynamicFilter:', dynamicFilter);
               }
 

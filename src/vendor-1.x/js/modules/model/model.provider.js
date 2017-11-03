@@ -558,6 +558,7 @@
           centerDrugOutStock: centerDrugOutStock,
           drugOutStock: drugOutStock,
           updateDrugsOutStock: updateDrugsOutStock,
+          updateMiniUnitOfDrugStockItem: updateMiniUnitOfDrugStockItem,
           queryElderlyDrugStock: queryElderlyDrugStock,
           drugOutStockInvalid: drugOutStockInvalid,
           drugStockEditLogInsert: drugStockEditLogInsert,
@@ -969,6 +970,16 @@
             drugInOutStockId: drugInOutStockId,
             operated_by: operated_by,
             outStockData: outStockData
+          });
+        }
+
+        function updateMiniUnitOfDrugStockItem(tenantId, elderlyId, drugStockId, new_mini_unit, operated_by) {
+          return $http.post(baseUrl + 'updateMiniUnitOfDrugStockItem', {
+            tenantId: tenantId,
+            elderlyId: elderlyId,
+            drugStockId: drugStockId,
+            new_mini_unit: new_mini_unit,
+            operated_by: operated_by
           });
         }
 

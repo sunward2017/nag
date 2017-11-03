@@ -1580,6 +1580,74 @@ module.exports = {
       }
     }).catch(self.ctx.coOnError);
   },
+  updateMiniUnitOfDrugStockItem: function (tenantId, elderlyId, drugStockId, new_mini_unit, operated_by) {
+    var self = this;
+    return co(function *() {
+      try {
+
+        var drugStockItem = yield self.ctx.modelFactory().model_read(self.ctx.models['psn_drugStock'], drugStockId);
+        if (!drugStockItem || drugStockItem.status == 0) {
+          return self.ctx.wrapper.res.error({message: '库存记录不存在或已失效'});
+        }
+        if (drugStockItem.tenantId.toString() != tenantId) {
+          return self.ctx.wrapper.res.error({message: '库存记录所属机构不一致'});
+        }
+        if (drugStockItem.elderlyId.toString() != elderlyId) {
+          return self.ctx.wrapper.res.error({message: '库存记录所属机构下的老人不一致'});
+        }
+        if (drugStockItem.mini_unit == new_mini_unit) {
+          return self.ctx.wrapper.res.error({message: '库存记录最小单位没有变化,无需修改'});
+        }
+        var drugIdOfStockItem = drugStockItem.drugId.toString();
+        var drugInStockId = drugStockItem.drugInStockId;
+        var drugOutStockIds = drugStockItem.drugOutStockIds;
+        drugStockItem.mini_unit = new_mini_unit;
+        if (operated_by) {
+          drugStockItem.operated_by = operated_by;
+        }
+        yield drugStockItem.save()
+
+        console.log('查找库存记录对应的入库单,修改入库记录中的最小单位,...');
+        var drugInStock = yield self.ctx.modelFactory().model_read(self.ctx.models['psn_drugInOutStock'], drugInStockId);
+        var inDrugs = drugInStock.drugs;
+        for(var i=0, len = inDrugs.length;i<len; i++){
+          if(inDrugs[i].drugId.toString() == drugIdOfStockItem){
+            inDrugs[i].mini_unit = new_mini_unit;
+          }
+        }
+        yield drugInStock.save()
+
+        console.log('查找库存记录对应的出库单,修改入库记录中的最小单位,...');
+        var drugOutStocks = yield self.ctx.modelFactory().model_query(self.ctx.models['psn_drugInOutStock'], {
+          select: 'drugs',
+          where: {
+            _id: {$in: drugOutStockIds},
+            elderlyId: elderlyId,
+            tenantId: tenantId
+          }
+        });
+
+        var drugOutStock, outDrugs;
+        for(var i=0, iLen = drugOutStocks.length;i<iLen; i++){
+          drugOutStock = drugOutStocks[i];
+          outDrugs = drugOutStock.drugs;
+          for(var j=0, jLen = outDrugs.length;j<jLen; j++){
+            if(outDrugs[j].drugId.toString() == drugIdOfStockItem){
+              outDrugs[j].mini_unit = new_mini_unit;
+            }
+          }
+          yield drugOutStock.save()
+        }
+
+        return self.ctx.wrapper.res.default();
+      }
+      catch (e) {
+        console.log(e);
+        self.logger.error(e.message);
+        return self.ctx.wrapper.res.error(e.message);
+      }
+    }).catch(self.ctx.coOnError);
+  },
   queryCenterStockAllotRecords:function (tenantId,page) {
       var self = this;
       return co(function *() {
@@ -1851,13 +1919,15 @@ module.exports = {
             var stock_alarm_low_day = tenant.other_config.psn_drug_stock_alarm_low_day || self.ctx.modelVariables.DEFAULTS.TENANT_DRUG_STOCK_ALARM_LOW_DAY;
             var drugUseOneDay = yield self._elderlyDrugUseOneDayForOneDrug(tenant, elderly, drugId);
 
-            if (drugUseOneDay.unit && ret.unit != drugUseOneDay.unit) {
-              return self.ctx.wrapper.res.error({message: '最小用量单位不一致'});
-            }
+
             var canUseDays = Math.floor(ret.total / drugUseOneDay.total);
             ret.is_danger = false;
             ret.is_warning = canUseDays <= stock_alarm_low_day;
             ret.canUseDays = canUseDays;
+
+            if (drugUseOneDay.unit && ret.unit != drugUseOneDay.unit) {
+              return self.ctx.wrapper.res.ret(ret, '最小用量单位不一致');
+            }
           }
         }
 

@@ -46,16 +46,27 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='')
                                             | {{ vm.viewTranslatePath('TAB1-LABEL-CHECK_IN_TIME') | translate}}
                                         th.text-center(width="40")
                                             | {{ vm.viewTranslatePath('TAB1-LABEL-EXPIRE_IN') | translate}}
-                                        th.text-center(width="20")
+                                        th.text-center(width="40")
                                             | {{ vm.viewTranslatePath('TAB1-LABEL-ACTION') | translate}}
                                 tbody
                                     tr(ng-repeat="row in vm.elderlyDrugStockList " )
                                         td {{::row.drug_name}}
                                         td.text-right {{::row.quantity}}
-                                        td.text-center {{::row.mini_unit_name }}
+                                        td.text-center
+                                            span(ng-if="!row.$editing") {{row.mini_unit|diFilter:vm.selectBinding.mini_units}}
+                                            .dropdown(ng-if="row.$editing",s-dropdown,is-button,ng-model="row.mini_unit",s-dropdown-data="vm.selectBinding.mini_units")
                                         td.text-center {{::row.check_in_time | date: 'yyyy-MM-dd HH:mm'}}
                                         td.text-center {{::row.expire_in | date: 'yyyy-MM-dd'}}
                                         td.text-center
+                                            .btn-group(ng-if="!row.$editing")
+                                                a.btn.btn-primary.btn-xs(title="{{'button.EDIT'|translate}}",ng-click="vm.editDrugStockItem(row)")
+                                                    i.glyphicon.glyphicon-pencil
+                                            .btn-group(ng-if="row.$editing")
+                                                a.btn.btn-primary.btn-xs(title="{{'button.SAVE'|translate}}",ng-click="vm.saveDrugStockItem(row)")
+                                                    i.glyphicon.glyphicon-ok-sign
+                                            .btn-group(ng-if="row.$editing")
+                                                a.btn.btn-primary.btn-xs(title="{{'button.CANCEL'|translate}}",ng-click="vm.cancelDrugStockItem(row)")
+                                                    i.glyphicon.glyphicon-remove-sign
                                             .btn-group(ng-show="row.drugInStockId.type=='A0100' && vm.drugsStockStatus[row.id]")
                                                 a.btn.btn-primary.btn-xs(ng-click="vm.backoutAllotDrug(row)") {{ vm.viewTranslatePath('ALLOT-BACKOUT') | translate}}
                                     tr(ng-if="vm.paged.length==0")

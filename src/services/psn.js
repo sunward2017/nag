@@ -6598,6 +6598,28 @@ module.exports = {
           };
         }
       },
+      {
+        method: 'updateMiniUnitOfDrugStockItem',
+        verb: 'post',
+        url: this.service_url_prefix + "/updateMiniUnitOfDrugStockItem",
+        handler: function (app, options) {
+          return function*(next) {
+            try {
+              var tenantId = this.request.body.tenantId;
+              var elderlyId = this.request.body.elderlyId;
+              var drugStockId = this.request.body.drugStockId;
+              var new_mini_unit = this.request.body.new_mini_unit;
+              var operated_by = this.request.body.operated_by;
+              this.body = yield app.psn_drug_stock_service.updateMiniUnitOfDrugStockItem(tenantId, elderlyId, drugStockId, new_mini_unit, operated_by);
+            } catch (e) {
+              console.log(e);
+              self.logger.error(e.message);
+              this.body = app.wrapper.res.error(e);
+            }
+            yield next;
+          };
+        }
+      },
       /**********************生命体征-上海万沣 睡眠带*****************************/
       {
         method: 'getLatestSmbPerMinuteRecord',

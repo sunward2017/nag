@@ -1,35 +1,40 @@
 .col-xs-12
     .row
         .col-md-7.text-left
-            .col-md-2
-                .btn-group
-                    a.btn.btn-primary.btn-xs(title="{{vm.moduleTranslatePath('BTN-PRE-WEEK')|translate}}",ng-click="vm.preDay()")
-                        i.glyphicon.glyphicon-chevron-left
-                        | {{vm.moduleTranslatePath('BTN-PRE-WEEK')|translate}}
             .col-md-4
                 .input-group
-                    input.read-control-underline(type="text",name='order_date',is-open="vm.openedDP",datepicker-popup="",ng-model="vm.model.order_date" ,ng-click="vm.openDP($event)")
+                    input.form-control(type="text",name='order_date',is-open="vm.openedDP",datepicker-popup="",ng-model="vm.model.order_date" ,ng-click="vm.openDP($event)",ng-change="vm.dateChange()")
                     span.input-group-btn
-                        button.btn.btn-primary.btn-xs(ng-click="vm.openDP($event)")
+                        button.btn.btn-primary(ng-click="vm.openDP($event)")
                             i.glyphicon.glyphicon-calendar
-            .col-md-2
+            .col-md-4
                 .btn-group
-                    a.btn.btn-primary.btn-xs(title="{{vm.moduleTranslatePath('BTN-NEXT-WEEK')|translate}}",ng-click="vm.nextDay()")
+                    a.btn.btn-primary.btn-sm(title="{{vm.moduleTranslatePath('BTN-PRE-WEEK')|translate}}",ng-click="vm.preDay()")
+                        i.glyphicon.glyphicon-chevron-left
+                        | {{vm.moduleTranslatePath('BTN-PRE-WEEK')|translate}}
+                .btn-group
+                    a.btn.btn-primary.btn-sm(title="{{vm.moduleTranslatePath('BTN-NEXT-WEEK')|translate}}",ng-click="vm.nextDay()")
                         i.glyphicon.glyphicon-chevron-right
                         | {{vm.moduleTranslatePath('BTN-NEXT-WEEK')|translate}}
+        .col-md-5
+            .btn-toolbar.pull-right
+                .btn-group
+                    a.btn.btn-warning.btn-sm(ng-click="$state.go(vm.transTo.mealOrderRecordDetail,{date:vm.model.order_date})") {{ vm.moduleTranslatePath('BTN-GO-DETAIL') | translate}}
     .row-split
     .panel.panel-default.panel-grid
         table.grid.table.table-bordered.table-striped
             thead
                 tr
-                    th.text-center(width="50") {{ vm.moduleTranslatePath('LABEL-YAXIS_LABEL') | translate}}
+                    th.text-center(width="80",colspan="2") {{ vm.moduleTranslatePath('LABEL-YAXIS_LABEL_DISTRICT') | translate}}
                     th.text-center(ng-repeat="column in vm.xAxisData",width="100") {{::column.name}}
-            tbody
-                tr(ng-repeat="row in vm.rows")
+            tbody(ng-repeat="row in vm.rows")
+                tr(ng-repeat="floor in row.floors track by $index")
+                    td.text-center(ng-if="$index ==0" rowspan="{{row.floors.length}}")
+                        | {{::row.district_name}}
                     td.text-center
-                        | {{::row.elderly_name}}
+                        a.btn.btn-warning.btn-xs(ng-click="$state.go(vm.transTo.mealOrderRecordDetail,{_id:row.districtId,floor:floor.floor,date:vm.model.order_date})") {{floor.floor}}层详情
                     td.text-left(ng-repeat="col in vm.xAxisData",width="100")
                         ul.list-unstyled
-                            li(ng-repeat="mealData in row.orderedMeals[col.value] ") • {{ mealData.mealName[0].name+'('+mealData.quantity+')'}}
+                            li(ng-repeat="meals in floor[col.value] ") • {{::meals.name}} × {{::meals.quantity}}份
                 tr(ng-if="vm.rows.length==0")
                     td.text-center(colspan="{{vm.xAxisData.length + 1}}") {{ 'grid.NO-RESULTS' | translate}}

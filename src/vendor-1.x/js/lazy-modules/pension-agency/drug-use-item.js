@@ -371,6 +371,7 @@
         vmh.alertWarning(vm.alertMessage, true);
         return;
       }
+
       if (vm.drugStockModel.unit && vm.model.unit != vm.drugStockModel.unit) {
         vmh.alertWarning(vm.viewTranslatePath('WARNING-UNIT-IS-DIFFERENT'), true);
         return;

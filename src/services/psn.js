@@ -6937,10 +6937,27 @@ module.exports = {
         handler: function (app, options) {
           return function*(next) {
             try {
+              console.log('mealOrderRecord-detail body:',this.request.body);
               var tenantId = this.request.body.tenantId;
               var check_time = app.moment(this.request.body.order_date);
+              var roomIds = this.request.body.roomIds;
 
               var where = {tenantId: app.ObjectId(tenantId), x_axis: {'$gte': check_time.toDate(), '$lt': check_time.add(1, 'days').toDate()}};
+              if(roomIds){
+                var elderlys = yield app.modelFactory().model_query(app.models['psn_elderly'],{
+                  select: '_id',
+                  where: {
+                    tenantId: tenantId,
+                    "room_value.roomId": {$in:roomIds}
+                  }
+                });
+                console.log('elderlys:',elderlys);
+                var elderlyIds=[];
+                app._.each(elderlys,function (o) {
+                  elderlyIds.push(o._id);
+                });
+                where.elderlyId = {'$in':elderlyIds};
+              }
 
               var rows = yield app.modelFactory().model_aggregate(app.models['psn_mealOrderRecord'], [
                 {
@@ -7151,6 +7168,11 @@ module.exports = {
                   }
                 },
                 {
+                  $sort:{
+                    floor: 1
+                  }
+                },
+                {
                   $group: {
                     _id: {date: '$date', districtId: '$districtId', floor: '$floor', period: '$period'},
                     meals: {$push: '$meal'}
@@ -7175,6 +7197,11 @@ module.exports = {
                     district_name: '$district.name',
                     date: '$_id.date',
                     floors: '$floors'
+                  }
+                },
+                {
+                  $sort:{
+                    district_name: 1
                   }
                 }
               ]);

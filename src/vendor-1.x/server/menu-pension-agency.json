@@ -176,7 +176,7 @@
       {
         "_id": "menu.pension-agency.MEAL-ORDER-RECORD",
         "name": "订餐汇总",
-        "sref": "app.pension-agency.meal-order-record"
+        "sref": "app.pension-agency.meal-order-record.list"
       }
     ]
   },

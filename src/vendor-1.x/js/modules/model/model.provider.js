@@ -1200,10 +1200,11 @@
           });
         }
 
-        function mealOrderRecord(tenantId, order_date) {
+        function mealOrderRecord(tenantId, order_date,roomIds) {
           return $http.post(baseUrl + 'mealOrderRecord', {
             tenantId: tenantId,
-            order_date: order_date
+            order_date: order_date,
+            roomIds:roomIds
           });
         }
 

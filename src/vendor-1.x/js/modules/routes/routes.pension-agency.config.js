@@ -1787,27 +1787,52 @@
       })
       .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'meal-order-record', {
         url: '/meal-order-record',
-        access_level: AUTH_ACCESS_LEVELS.USER,
+        title: '订餐汇总',
+        abstract: true,
         views: {
           "module-header": {
             templateUrl: helper.basepath(MODEL_VARIABLES.HEAD_TEMPLATES.PENSION_AGENCY),
             controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER_FOR_TENANT
           },
           "module-content": {
-            templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'meal-order-record.html'),
-            controller: 'MealOrderRecordController',
-            resolve: {
-              instanceVM: helper.buildInstanceVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'meal-order-record', {
-                modelName: 'psn-mealOrderRecord',
-                searchForm: {"status": 1}
-              })
-            }
+            template: '<div class="data-ui-view"></div><div class="clearfix"></div>'
           }
         },
         data: {
           func_id: MODEL_VARIABLES.BIZ_FUNC_PREFIXS.PENSION_AGENCY + 'MEAL-ORDER-RECORD' //业务系统使用
         },
         resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.PENSION_AGENCY + 'meal-order-record.js')
+      })
+      .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'meal-order-record.list', {
+        url: '/list/:action',
+        access_level: AUTH_ACCESS_LEVELS.USER,
+        templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'meal-order-record.html'),
+        controller: 'MealOrderRecordController',
+        resolve: {
+          instanceVM: helper.buildInstanceVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'meal-order-record.list', {
+            modelName: 'psn-mealOrderRecord',
+            searchForm: {"status": 1},
+            transTo: {
+              "mealOrderRecordDetail": MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'meal-order-record.details'
+            }
+          })
+        }
+      })
+      .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'meal-order-record.details', {
+        url: '/details/:_id,:floor,:date',
+        templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'meal-order-record-detail.html'),
+        access_level: AUTH_ACCESS_LEVELS.USER,
+        controller: 'MealOrderRecordDetailController',
+        resolve: {
+          instanceVM: helper.buildInstanceVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'meal-order-record.details', {
+            modelName: 'psn-mealOrderRecord',
+            switches: {leftTree: true},
+            blockUI: true,
+            transTo: {
+              "mealOrderRecordDetail": MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'meal-order-record.details'
+            }
+          })
+        }
       })
       .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'drug-use-item', {
         url: '/drug-use-item',

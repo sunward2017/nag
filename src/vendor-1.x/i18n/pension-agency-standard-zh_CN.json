@@ -672,10 +672,17 @@
       }
     },
     "meal-order-record":{
-      "TITLE": "养老机构-餐饮管理-订餐汇总",
-      "LABEL-YAXIS_LABEL": "老人",
+      "list":{
+        "TITLE": "养老机构-餐饮管理-订餐汇总"
+      },
+      "LABEL-YAXIS_LABEL_DISTRICT": "楼层",
       "BTN-PRE-WEEK": "上一日",
-      "BTN-NEXT-WEEK": "下一日"
+      "BTN-NEXT-WEEK": "下一日",
+      "BTN-GO-DETAIL":"查询订餐详情",
+      "LABEL-YAXIS_LABEL": "老人",
+      "details": {
+        "TITLE": "养老机构-餐饮管理-订餐汇总-订餐详情"
+      }
     },
     "drug-use-item": {
       "list": {

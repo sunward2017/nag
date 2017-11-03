@@ -8,24 +8,108 @@
   angular
     .module('subsystem.pension-agency')
     .controller('MealOrderRecordController', MealOrderRecordController)
+    .controller('MealOrderRecordDetailController', MealOrderRecordDetailController)
   ;
 
-
   MealOrderRecordController.$inject = ['$scope', 'ngDialog', 'vmh', 'instanceVM'];
-
   function MealOrderRecordController($scope, ngDialog, vmh, vm) {
-
     var vm = $scope.vm = vm;
     $scope.utils = vmh.utils.v;
     var tenantService = vm.modelNode.services['pub-tenant'];
     init();
+    vm.dateChange = dateChange;
 
     function init() {
 
       vm.init({removeDialog: ngDialog});
-
       vm.preDay = preDay;
       vm.nextDay = nextDay;
+
+      vmh.parallel([
+        vmh.shareService.d('D3040'),
+        tenantService.query({_id: vm.model['tenantId']}, 'other_config')
+      ]).then(function (results) {
+        var nodes = results[0];
+        var meal_periods = results[1][0].other_config.psn_meal_periods || [];
+        var len = meal_periods.length;
+        if (len > 0 && len < nodes.length) {
+          vm.xAxisData = _.filter(nodes, function (node) {
+            return _.contains(meal_periods, node.value)
+          });
+        } else {
+          vm.xAxisData = nodes;
+        }
+      });
+
+      vm.model.order_date = moment(new Date()).format('YYYY-MM-DD');
+      fetchMealOrderRecordSummary(vm.tenantId, vm.model.order_date);
+
+    }
+
+    function fetchMealOrderRecordSummary(tenantId, order_date) {
+      vmh.blocking(vmh.psnService.mealOrderRecordStat(tenantId, order_date).then(function (rows) {
+        console.log('stat rows:', rows);
+        vm.rows = rows;
+      }));
+    }
+
+    function preDay(){
+      vm.model.order_date = moment(vm.model.order_date).subtract(1, 'd').format('YYYY-MM-DD');
+      console.log('pre date:', vm.model.order_date);
+      fetchMealOrderRecordSummary(vm.tenantId, vm.model.order_date);
+    }
+
+    function nextDay(){
+      vm.model.order_date = moment(vm.model.order_date).add(1, 'd').format('YYYY-MM-DD');
+      console.log('next day:', vm.model.order_date);
+      fetchMealOrderRecordSummary(vm.tenantId, vm.model.order_date);
+    }
+
+    function dateChange() {
+      vm.model.order_date=moment(vm.model.order_date).format('YYYY-MM-DD');
+      fetchMealOrderRecordSummary(vm.tenantId, vm.model.order_date);
+    }
+  }
+
+
+  MealOrderRecordDetailController.$inject = ['$scope', 'ngDialog', 'vmh', 'instanceVM','$state'];
+
+  function MealOrderRecordDetailController($scope, ngDialog, vmh, vm, $state) {
+
+    var vm = $scope.vm = vm;
+    $scope.utils = vmh.utils.v;
+    var tenantService = vm.modelNode.services['pub-tenant'];
+    vm.onRoomChange = onRoomChange;
+    vm.dateChange = dateChange;
+    vm.preDay = preDay;
+    vm.nextDay = nextDay;
+    init();
+
+    function init() {
+      vm.model={
+        districtId:vm.getParam('_id'),
+        floor:vm.getParam('floor'),
+        order_date:vm.getParam('date')
+      };
+      console.log('vm.model:',vm.model);
+      vm.init({removeDialog: ngDialog});
+      vm.yAxisDataPromise = vmh.shareService.tmp('T3009', null, {tenantId: vm.tenantId}).then(function (nodes) {
+        if(vm.model.districtId){
+          var districtNode = _.find(nodes,function (node) {
+            return node._id == vm.model.districtId
+          });
+          var floorNode =_.find(districtNode.children,function (node) {
+            return node._id == 'floor' + vm.model.floor + '#';
+          });
+          vm.yAxisData = floorNode.children;
+          console.log('vm.yAxisData:',vm.yAxisData);
+
+          fetchMealOrderRecord(vm.tenantId, vm.model.order_date, _.map(vm.yAxisData, function (o) {
+            return o._id
+          }));
+        }
+        return nodes;
+      });
 
       // vmh.shareService.d('D3040').then(function (nodes) {
       //   // console.log('xAxisData:',nodes);
@@ -47,38 +131,47 @@
           vm.xAxisData = nodes;
         }
       });
-
-      vm.model.order_date = moment(new Date()).format('YYYY-MM-DD');
-      console.log('vm.model.order_date:', vm.model.order_date);
-
-      fetchMealOrderRecord(vm.tenantId, vm.model.order_date);
-
     }
 
-    function fetchMealOrderRecord(tenantId, order_date) {
-      vmh.blocking(vmh.psnService.mealOrderRecord(tenantId, order_date).then(function (rows) {
-        console.log('rows:', rows);
+    function fetchMealOrderRecord(tenantId, order_date,roomIds) {
+      vmh.blocking(vmh.psnService.mealOrderRecord(tenantId, order_date,roomIds).then(function (rows) {
+        console.log('mealOrderRecord rows:', rows);
         vm.rows = rows;
       }));
+    }
 
-      vmh.blocking(vmh.psnService.mealOrderRecordStat(tenantId, order_date).then(function (rows) {
-        console.log('stat rows:', rows);
+    function onRoomChange() {
+      console.log('vm.yAxisData:',vm.yAxisData);
+      fetchMealOrderRecord(vm.tenantId, vm.model.order_date, _.map(vm.yAxisData, function (o) {
+        return o._id
       }));
     }
 
-    function preDay() {
+    function preDay(){
       vm.model.order_date = moment(vm.model.order_date).subtract(1, 'd').format('YYYY-MM-DD');
       console.log('pre date:', vm.model.order_date);
-      fetchMealOrderRecord(vm.tenantId, vm.model.order_date);
+      $state.go(vm.transTo.mealOrderRecordDetail,{date:vm.model.order_date});
+      fetchMealOrderRecord(vm.tenantId, vm.model.order_date,_.map(vm.yAxisData, function (o) {
+        return o._id
+      }));
     }
 
-    function nextDay() {
+    function nextDay(){
       vm.model.order_date = moment(vm.model.order_date).add(1, 'd').format('YYYY-MM-DD');
       console.log('next day:', vm.model.order_date);
-      fetchMealOrderRecord(vm.tenantId, vm.model.order_date);
+      $state.go(vm.transTo.mealOrderRecordDetail,{date:vm.model.order_date});
+      fetchMealOrderRecord(vm.tenantId, vm.model.order_date,_.map(vm.yAxisData, function (o) {
+        return o._id
+      }));
     }
 
-
+    function dateChange() {
+      vm.model.order_date=moment(vm.model.order_date).format('YYYY-MM-DD');
+      $state.go(vm.transTo.mealOrderRecordDetail,{date:vm.model.order_date});
+      fetchMealOrderRecord(vm.tenantId, vm.model.order_date,_.map(vm.yAxisData, function (o) {
+        return o._id
+      }));
+    }
   }
 
 

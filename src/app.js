@@ -600,7 +600,7 @@ co(function*() {
   //     }
   // });
 
-  /* 多级分组 查询关键词:mealOrderRecordStat
+  /* // 多级分组 查询关键词:mealOrderRecordStat2
   var DIC = require('./pre-defined/dictionary-constants.json');
   var tenantId = app.ObjectId("599bade9859e102d8b72f2ba");
   var psn_meal_periods = [DIC.D3040.BREAKFAST, DIC.D3040.LUNCH, DIC.D3040.DINNER, DIC.D3040.SUPPER];
@@ -624,7 +624,9 @@ co(function*() {
     {
       $project: {
         elderly_name: '$elderly.name',
+        districtId: '$elderly.room_value.districtId',
         roomId: '$elderly.room_value.roomId',
+        bed_no: '$elderly.room_value.bed_no',
         period: '$y_axis',
         date: {$dateToString: {format: "%Y-%m-%d", date: "$x_axis"}},
         mealId: 1,
@@ -646,7 +648,9 @@ co(function*() {
       $project: {
         elderly_name: 1,
         districtId: '$room.districtId',
-        floor: '$room.floor',
+        roomId: 1,
+        room_name: '$room.name',
+        bed_no: 1,
         date: 1,
         period: 1,
         mealId: 1,
@@ -654,80 +658,28 @@ co(function*() {
       }
     },
     {
+      $sort: {'room_name': 1}
+    },
+    {
       $group: {
-        _id: {date: '$date', districtId: '$districtId', floor: '$floor', period: '$period', mealId: '$mealId'},
+        _id: {elderly_name:'$elderly_name', date: '$date', districtId: '$districtId', roomId: '$roomId', room_name:'$room_name', bed_no: '$bed_no', period: '$period', mealId: '$mealId'},
         quantity: {$sum: '$quantity'}
       }
     },
     {
-      $lookup: {
-        from: "psn_meal",
-          localField: "_id.mealId",
-          foreignField: "_id",
-          as: "meal"
-      }
-    },
-    {
-      $unwind: '$meal'
-    },
-    {
       $project: {
         _id: 0,
         districtId: '$_id.districtId',
-        floor: '$_id.floor',
         date: '$_id.date',
         period: '$_id.period',
-        meal:  { name: '$meal.name', quantity: '$quantity'}
-      }
-    },
-    // {
-    //   $sort: {'_id.period': 1}
-    // },
-    {
-      $group: {
-        _id: {date: '$date', districtId: '$districtId', floor: '$floor', period: '$period'},
-        meals: {$push: '$meal' }
-      }
-    },
-    {
-      $project: {
-        _id: 0,
-        districtId: '$_id.districtId',
-        floor: '$_id.floor',
-        date: '$_id.date',
-        'A0000': {$cond: {if: {$eq: ['$_id.period', 'A0000']}, then: '$$CURRENT.meals', else: []}},
-        'A0001': {$cond: {if: {$eq: ['$_id.period', 'A0001']}, then: '$$CURRENT.meals', else: []}},
-        'A0002': {$cond: {if: {$eq: ['$_id.period', 'A0002']}, then: '$$CURRENT.meals', else: []}}
+        mealId: '$_id.mealId',
+        elderly: {roomId: '$_id.roomId', room_name: '$_id.room_name', bed_no: '$_id.bed_no', name: '$_id.elderly_name', quantity: '$quantity'}
       }
     },
     {
       $group: {
-        _id: {date: '$date', districtId: '$districtId', floor: '$floor'},
-        A0000: {$push: '$A0000' },
-        A0001: {$push: '$A0001' },
-        A0002: {$push: '$A0002' }
-      }
-    },
-    {
-      $project: {
-        _id: 0,
-        districtId: '$_id.districtId',
-        floor: '$_id.floor',
-        date: '$_id.date',
-        'A0000': {$concatArrays: [{$arrayElemAt: ['$A0000', 0]}, {$arrayElemAt: ['$A0000', 1]}, {$arrayElemAt: ['$A0000', 2]}]},
-        'A0001': {$concatArrays: [{$arrayElemAt: ['$A0001', 0]}, {$arrayElemAt: ['$A0001', 1]}, {$arrayElemAt: ['$A0001', 2]}]},
-        'A0002': {$concatArrays: [{$arrayElemAt: ['$A0002', 0]}, {$arrayElemAt: ['$A0002', 1]}, {$arrayElemAt: ['$A0002', 2]}]}
-      }
-    },
-    {
-      $group: {
-        _id: {date: '$date', districtId: '$districtId'},
-        floors: {$push: {
-          floor: '$floor',
-          A0000: '$A0000',
-          A0001: '$A0001',
-          A0002: '$A0002'
-        }}
+        _id: {date: '$date', districtId: '$districtId', period: '$period', mealId: '$mealId'},
+        elderlys: {$push: '$elderly'}
       }
     },
     {
@@ -746,16 +698,230 @@ co(function*() {
         _id: 0,
         districtId: '$district._id',
         district_name: '$district.name',
+        period: '$_id.period',
         date: '$_id.date',
-        floors: '$floors'
+        mealId: '$_id.mealId',
+        elderlys: 1
       }
     },
-    ];
-
+    {
+      $group: {
+        _id: {date: '$date', mealId: '$mealId', period: '$period'},
+        districts: {
+          $push: {
+            districtId: '$districtId',
+            district_name: '$district_name',
+            elderlys: '$elderlys'
+          }
+        }
+      }
+    },
+    {
+      $lookup: {
+        from: "psn_meal",
+        localField: "_id.mealId",
+        foreignField: "_id",
+        as: "meal"
+      }
+    },
+    {
+      $unwind: '$meal'
+    },
+    {
+      $project: {
+        _id: 0,
+        date: '$_id.date',
+        period: '$_id.period',
+        mealId: '$_id.mealId',
+        meal_name: '$meal.name',
+        districts: 1
+      }
+    },
+    {
+      $group: {
+        _id: {date: '$date', period: '$period'},
+        meals: {
+          $push: {
+            mealId: '$mealId',
+            meal_name: '$meal_name',
+            districts: '$districts'
+          }
+        }
+      }
+    },
+    {
+      $sort: {'_id.period': 1}
+    },
+    {
+      $project: {
+        _id: 0,
+        date: '$_id.date',
+        period: '$_id.period',
+        meals: 1
+      }
+    }
+  ];
 
   var rows = yield app.modelFactory().model_aggregate(app.models['psn_mealOrderRecord'], aggrPipe);
-  console.log('meals$fetch:rows[0]>>', rows[0]);
+  console.log('meals$fetch:rows[0]>>', rows, '>>',rows[1],'>>>',rows[1].meals[0].districts[0]);
   */
+
+  /* 多级分组 查询关键词:mealOrderRecordStat
+   var DIC = require('./pre-defined/dictionary-constants.json');
+   var tenantId = app.ObjectId("599bade9859e102d8b72f2ba");
+   var psn_meal_periods = [DIC.D3040.BREAKFAST, DIC.D3040.LUNCH, DIC.D3040.DINNER, DIC.D3040.SUPPER];
+   var x_axis_start = app.moment(app.moment().weekday(0).add(7, 'days').format('YYYY-MM-DD'));
+   var x_axis_end = app.moment(app.moment().weekday(0).add(8, 'days').format('YYYY-MM-DD'));
+   var where = {tenantId: tenantId, x_axis: {'$gte': x_axis_start.toDate(), '$lt': x_axis_end.toDate()}};
+   var aggrPipe = [{
+   $match: where
+   },
+   {
+   $lookup: {
+   from: "psn_elderly",
+   localField: "elderlyId",
+   foreignField: "_id",
+   as: "elderly"
+   }
+   },
+   {
+   $unwind: '$elderly'
+   },
+   {
+   $project: {
+   elderly_name: '$elderly.name',
+   roomId: '$elderly.room_value.roomId',
+   period: '$y_axis',
+   date: {$dateToString: {format: "%Y-%m-%d", date: "$x_axis"}},
+   mealId: 1,
+   quantity: 1
+   }
+   },
+   {
+   $lookup: {
+   from: "psn_room",
+   localField: "roomId",
+   foreignField: "_id",
+   as: "room"
+   }
+   },
+   {
+   $unwind: '$room'
+   },
+   {
+   $project: {
+   elderly_name: 1,
+   districtId: '$room.districtId',
+   floor: '$room.floor',
+   date: 1,
+   period: 1,
+   mealId: 1,
+   quantity: 1
+   }
+   },
+   {
+   $group: {
+   _id: {date: '$date', districtId: '$districtId', floor: '$floor', period: '$period', mealId: '$mealId'},
+   quantity: {$sum: '$quantity'}
+   }
+   },
+   {
+   $lookup: {
+   from: "psn_meal",
+   localField: "_id.mealId",
+   foreignField: "_id",
+   as: "meal"
+   }
+   },
+   {
+   $unwind: '$meal'
+   },
+   {
+   $project: {
+   _id: 0,
+   districtId: '$_id.districtId',
+   floor: '$_id.floor',
+   date: '$_id.date',
+   period: '$_id.period',
+   meal:  { name: '$meal.name', quantity: '$quantity'}
+   }
+   },
+   // {
+   //   $sort: {'_id.period': 1}
+   // },
+   {
+   $group: {
+   _id: {date: '$date', districtId: '$districtId', floor: '$floor', period: '$period'},
+   meals: {$push: '$meal' }
+   }
+   },
+   {
+   $project: {
+   _id: 0,
+   districtId: '$_id.districtId',
+   floor: '$_id.floor',
+   date: '$_id.date',
+   'A0000': {$cond: {if: {$eq: ['$_id.period', 'A0000']}, then: '$$CURRENT.meals', else: []}},
+   'A0001': {$cond: {if: {$eq: ['$_id.period', 'A0001']}, then: '$$CURRENT.meals', else: []}},
+   'A0002': {$cond: {if: {$eq: ['$_id.period', 'A0002']}, then: '$$CURRENT.meals', else: []}}
+   }
+   },
+   {
+   $group: {
+   _id: {date: '$date', districtId: '$districtId', floor: '$floor'},
+   A0000: {$push: '$A0000' },
+   A0001: {$push: '$A0001' },
+   A0002: {$push: '$A0002' }
+   }
+   },
+   {
+   $project: {
+   _id: 0,
+   districtId: '$_id.districtId',
+   floor: '$_id.floor',
+   date: '$_id.date',
+   'A0000': {$concatArrays: [{$arrayElemAt: ['$A0000', 0]}, {$arrayElemAt: ['$A0000', 1]}, {$arrayElemAt: ['$A0000', 2]}]},
+   'A0001': {$concatArrays: [{$arrayElemAt: ['$A0001', 0]}, {$arrayElemAt: ['$A0001', 1]}, {$arrayElemAt: ['$A0001', 2]}]},
+   'A0002': {$concatArrays: [{$arrayElemAt: ['$A0002', 0]}, {$arrayElemAt: ['$A0002', 1]}, {$arrayElemAt: ['$A0002', 2]}]}
+   }
+   },
+   {
+   $group: {
+   _id: {date: '$date', districtId: '$districtId'},
+   floors: {$push: {
+   floor: '$floor',
+   A0000: '$A0000',
+   A0001: '$A0001',
+   A0002: '$A0002'
+   }}
+   }
+   },
+   {
+   $lookup: {
+   from: "psn_district",
+   localField: "_id.districtId",
+   foreignField: "_id",
+   as: "district"
+   }
+   },
+   {
+   $unwind: '$district'
+   },
+   {
+   $project: {
+   _id: 0,
+   districtId: '$district._id',
+   district_name: '$district.name',
+   date: '$_id.date',
+   floors: '$floors'
+   }
+   },
+   ];
+
+
+   var rows = yield app.modelFactory().model_aggregate(app.models['psn_mealOrderRecord'], aggrPipe);
+   console.log('meals$fetch:rows[0]>>', rows[0]);
+   */
 
   /* 多级分组 查询关键词:mealOrderRecords$fetchByDateRange
    // var userId = app.ObjectId("59f13c02e1ca4e177e9f592f");

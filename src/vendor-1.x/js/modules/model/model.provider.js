@@ -614,7 +614,8 @@
           mealMenuTemplateImport: mealMenuTemplateImport,
           mealMenuSaveAsTemplate: mealMenuSaveAsTemplate,
           mealOrderRecord: mealOrderRecord,
-          mealOrderRecordStat: mealOrderRecordStat
+          mealOrderRecordStat: mealOrderRecordStat,
+          mealOrderRecordStat2:mealOrderRecordStat2
         };
 
         function roomStatusInfo(tenantId) {
@@ -1221,6 +1222,13 @@
 
         function mealOrderRecordStat(tenantId, order_date) {
           return $http.post(baseUrl + 'mealOrderRecordStat', {
+            tenantId: tenantId,
+            order_date: order_date
+          });
+        }
+
+        function mealOrderRecordStat2(tenantId, order_date) {
+          return $http.post(baseUrl + 'mealOrderRecordStat2', {
             tenantId: tenantId,
             order_date: order_date
           });

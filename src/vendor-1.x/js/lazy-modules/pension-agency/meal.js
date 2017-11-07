@@ -45,14 +45,27 @@
 
       vm.tab1 = {cid: 'contentTab1'};
 
-      vm.treeDataPromiseOfDishes = vmh.shareService.tmp('T3001/psn-mealDish', 'name price', {tenantId: vm.tenantId, status: 1, stop_flag: false}, null, true).then(function (nodes) {
+      vm.treeDataPromiseOfDishesMeat=vmh.shareService.tmp('T3001/psn-mealDish', 'name price nature', {tenantId: vm.tenantId, status: 1, stop_flag: false}, null, true).then(function (nodes) {
         console.log('mealDish nodes:', nodes);
-        // for(var i=0,len=nodes.length;i<len;i++){
-        //     if(nodes[i].stop_flag){
-        //         nodes[i].disableCheck =true;
+        var meat=[];
+        _.each(nodes,function (o) {
+        //     if(o.stop_flag){
+        //         o.disableCheck =true;
         //     }
-        // }
-        return nodes;
+          if(o.nature == 'A0000'){
+            meat.push(o);
+          }
+        });
+        return meat;
+      });
+      vm.treeDataPromiseOfDishesVegetable=vmh.shareService.tmp('T3001/psn-mealDish', 'name price nature', {tenantId: vm.tenantId, status: 1, stop_flag: false}, null, true).then(function (nodes) {
+        var vegetable=[];
+        _.each(nodes,function (o) {
+          if(o.nature == 'A0001'){
+            vegetable.push(o);
+          }
+        });
+        return vegetable;
       });
 
       vm.load();
@@ -61,7 +74,8 @@
 
     function priceChange() {
       vm.model.price = 0;
-      console.log('-->', vm.model)
+      vm.model.dishes = vm.meat.concat(vm.vegetable);
+      console.log('-->', vm.model);
       for (var i = 0, len = vm.model.dishes.length; i < len; i++) {
         vm.model.price += vm.model.dishes[i].price;
       }

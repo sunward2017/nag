@@ -7349,6 +7349,9 @@ module.exports = {
                   }
                 },
                 {
+                  $sort: {'district_name': 1}
+                },
+                {
                   $group: {
                     _id: {date: '$date', mealId: '$mealId', period: '$period'},
                     districts: {

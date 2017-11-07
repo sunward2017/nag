@@ -7238,6 +7238,184 @@ module.exports = {
             yield next;
           };
         }
+      },
+      {
+        method: 'mealOrderRecordStat2',
+        verb: 'post',
+        url: this.service_url_prefix + "/mealOrderRecordStat2",
+        handler: function (app, options) {
+          return function*(next) {
+            try {
+              var tenantId = this.request.body.tenantId;
+              var order_date = app.moment(this.request.body.order_date);
+
+              var where = {tenantId: app.ObjectId(tenantId), x_axis: {'$gte': order_date.toDate(), '$lt': order_date.add(1, 'days').toDate()}};
+
+              var rows = yield app.modelFactory().model_aggregate(app.models['psn_mealOrderRecord'], [{
+                $match: where
+              },
+                {
+                  $lookup: {
+                    from: "psn_elderly",
+                    localField: "elderlyId",
+                    foreignField: "_id",
+                    as: "elderly"
+                  }
+                },
+                {
+                  $unwind: '$elderly'
+                },
+                {
+                  $project: {
+                    elderly_name: '$elderly.name',
+                    districtId: '$elderly.room_value.districtId',
+                    roomId: '$elderly.room_value.roomId',
+                    bed_no: '$elderly.room_value.bed_no',
+                    period: '$y_axis',
+                    date: {$dateToString: {format: "%Y-%m-%d", date: "$x_axis"}},
+                    mealId: 1,
+                    quantity: 1
+                  }
+                },
+                {
+                  $lookup: {
+                    from: "psn_room",
+                    localField: "roomId",
+                    foreignField: "_id",
+                    as: "room"
+                  }
+                },
+                {
+                  $unwind: '$room'
+                },
+                {
+                  $project: {
+                    elderly_name: 1,
+                    districtId: '$room.districtId',
+                    roomId: 1,
+                    room_name: '$room.name',
+                    bed_no: 1,
+                    date: 1,
+                    period: 1,
+                    mealId: 1,
+                    quantity: 1
+                  }
+                },
+                {
+                  $sort: {'room_name': 1}
+                },
+                {
+                  $group: {
+                    _id: {elderly_name:'$elderly_name', date: '$date', districtId: '$districtId', roomId: '$roomId', room_name:'$room_name', bed_no: '$bed_no', period: '$period', mealId: '$mealId'},
+                    quantity: {$sum: '$quantity'}
+                  }
+                },
+                {
+                  $project: {
+                    _id: 0,
+                    districtId: '$_id.districtId',
+                    date: '$_id.date',
+                    period: '$_id.period',
+                    mealId: '$_id.mealId',
+                    elderly: {roomId: '$_id.roomId', room_name: '$_id.room_name', bed_no: '$_id.bed_no', name: '$_id.elderly_name', quantity: '$quantity'}
+                  }
+                },
+                {
+                  $group: {
+                    _id: {date: '$date', districtId: '$districtId', period: '$period', mealId: '$mealId'},
+                    elderlys: {$push: '$elderly'}
+                  }
+                },
+                {
+                  $lookup: {
+                    from: "psn_district",
+                    localField: "_id.districtId",
+                    foreignField: "_id",
+                    as: "district"
+                  }
+                },
+                {
+                  $unwind: '$district'
+                },
+                {
+                  $project: {
+                    _id: 0,
+                    districtId: '$district._id',
+                    district_name: '$district.name',
+                    period: '$_id.period',
+                    date: '$_id.date',
+                    mealId: '$_id.mealId',
+                    elderlys: 1
+                  }
+                },
+                {
+                  $group: {
+                    _id: {date: '$date', mealId: '$mealId', period: '$period'},
+                    districts: {
+                      $push: {
+                        districtId: '$districtId',
+                        district_name: '$district_name',
+                        elderlys: '$elderlys'
+                      }
+                    }
+                  }
+                },
+                {
+                  $lookup: {
+                    from: "psn_meal",
+                    localField: "_id.mealId",
+                    foreignField: "_id",
+                    as: "meal"
+                  }
+                },
+                {
+                  $unwind: '$meal'
+                },
+                {
+                  $project: {
+                    _id: 0,
+                    date: '$_id.date',
+                    period: '$_id.period',
+                    mealId: '$_id.mealId',
+                    meal_name: '$meal.name',
+                    districts: 1
+                  }
+                },
+                {
+                  $group: {
+                    _id: {date: '$date', period: '$period'},
+                    meals: {
+                      $push: {
+                        mealId: '$mealId',
+                        meal_name: '$meal_name',
+                        districts: '$districts'
+                      }
+                    }
+                  }
+                },
+                {
+                  $sort: {'_id.period': 1}
+                },
+                {
+                  $project: {
+                    _id: 0,
+                    date: '$_id.date',
+                    period: '$_id.period',
+                    meals: 1
+                  }
+                }
+              ]);
+              console.log('mealOrderRecordStat2 rows:', rows);
+
+              this.body = app.wrapper.res.rows(rows);
+            } catch (e) {
+              console.log(e);
+              self.logger.error(e.message);
+              this.body = app.wrapper.res.error(e);
+            }
+            yield next;
+          };
+        }
       }
       /**********************其他*****************************/
 

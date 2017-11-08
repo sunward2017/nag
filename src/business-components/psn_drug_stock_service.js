@@ -1744,7 +1744,7 @@ module.exports = {
         var tenant = tae.ret.t, elderly = tae.ret.e;
 
         //按天汇总
-        var drugUseItems = yield self.ctx.modelFactory().model_aggregate(self.ctx.models['psn_drugUseItem'], [
+        var drugUseItemsOfDay = yield self.ctx.modelFactory().model_aggregate(self.ctx.models['psn_drugUseItem'], [
           {
             $match: {
               status: 1, // 隐式包含了quantity>0
@@ -1793,12 +1793,89 @@ module.exports = {
             }
           }
         ]);
-        // console.log('drugUseItems:', drugUseItems);
+        // console.log('drugUseItemsOfDay:', drugUseItemsOfDay);
         //按周汇总
-
+        var weekDay = self.ctx.moment().day();
+        // console.log('weekDay:', weekDay);
+        var drugUseItemsOfWeek = yield self.ctx.modelFactory().model_aggregate(self.ctx.models['psn_drugUseItem'], [
+          {
+            $match: {
+              status: 1, // 隐式包含了quantity>0
+              repeat_type: DIC.D0103.DAY_IN_WEEK,
+              elderlyId: elderly._id,
+              stop_flag: false,
+              tenantId: tenant._id
+            }
+          },
+          {
+            $project: {
+              drugId: 1,
+              quantity: 1,
+              unit_name: 1,
+              description: 1,
+              repeat_week_day: {
+                $size: {
+                  $filter: {
+                    input: "$repeat_values",
+                    as: "repeat_value",
+                    cond: {$eq: ["$$repeat_value", weekDay]}
+                  }
+                }
+              }
+            }
+          },
+          {
+            $match: {
+              repeat_week_day: {$gt: 0}
+            }
+          },
+          {
+            $group: {
+              _id: {drugId:'$drugId', unit_name: '$unit_name'},
+              // repeat_week_day:  {$first: '$repeat_week_day'},
+              description: {$first: '$description'},
+              quantity: {$sum: '$quantity'}
+            }
+          },
+          {
+            $lookup: {
+              from: "psn_drugDirectory",
+              localField: "_id.drugId",
+              foreignField: "_id",
+              as: "drug"
+            }
+          },
+          {
+            $unwind: '$drug'
+          },
+          {
+            $project: {
+              _id: 0,
+              drugId: '$_id.drugId',
+              mini_unit_name: '$_id.unit_name',
+              name: '$drug.full_name',
+              img: '$drug.img',
+              // repeat_week_day: 1,
+              description: 1,
+              quantity: 1,
+            }
+          }
+        ]);
+        // console.log('drugUseItemsOfWeek:', drugUseItemsOfWeek);
         var elderlyStockObject = yield self._elderlyStockObject(tenant, elderly);
 
-        var rows = self.ctx._.map(drugUseItems, (o) => {
+        self.ctx._.each(drugUseItemsOfWeek, (o) => {
+          if(o.quantity > 0) {
+            var row = self.ctx._.find(drugUseItemsOfDay, (o2)=> o2.drugId.toString() == o.drugId.toString());
+            if(row){
+              row.quantity += o.quantity
+            } else {
+              drugUseItemsOfDay.push(o);
+            }
+          }
+        });
+
+        var rows = self.ctx._.map(drugUseItemsOfDay, (o) => {
           o.stock_num = (elderlyStockObject[o.drugId] || { total:0 }).total;
           // console.log('map -> ',o)
           return o;

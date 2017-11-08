@@ -599,9 +599,8 @@ co(function*() {
   //         robots: {$elemMatch: {$eq: '58fd721e8ef00320ddda341b' }}
   //     }
   // });
-
-  // var ret = yield app.psn_drug_stock_service.elderlyDrugUseMergedWithStockList('591e9d730d904a7f1c3589e9', '5923c326c541547215f8cb4d')
-  // console.log('elderlyDrugUseMergedWithStockList: >>> ', ret)
+  var ret = yield app.psn_drug_stock_service.elderlyDrugUseMergedWithStockList('58a6abf9a03cc7229a8f261a', '58cb68b69e6ed631d3ac0605')
+  console.log('elderlyDrugUseMergedWithStockList: >>> ', ret)
   /* // 多级分组 查询关键词:mealOrderRecordStat2
   var DIC = require('./pre-defined/dictionary-constants.json');
   var tenantId = app.ObjectId("599bade9859e102d8b72f2ba");

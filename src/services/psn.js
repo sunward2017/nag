@@ -7418,35 +7418,19 @@ module.exports = {
         }
       },
       {
-        method: 'excel$mealOrderRecordStst2',
+        method: 'excel$dataByClient',
         verb: 'post',
-        url: this.service_url_prefix + "/excel/mealOrderRecordStst2",
+        url: this.service_url_prefix + "/excel/dataByClient",
         handler: function (app, options) {
           return function*(next) {
             try {
               var file_name = this.request.body.file_name;
-              var rowData = this.request.body.rowData;
-              var districts = this.request.body.districts;
-              console.log('rowData:', rowData,'districts:',districts);
-              var title=['餐名'];
-              app._.each(districts,(o)=>{
-                title.push(o.name);
-              });
-
-              var rows = app._.map(rowData,(meal)=>{
-                var row={};
-                row[title[0]] = meal.meal_name;
-                app._.each(meal.districts,(district,idx)=>{
-                  var rooms=[];
-                  app._.each(district.elderlys,(elderly)=>{
-                    rooms.push(elderly.room_name+'-'+elderly.bed_no);
-                  });
-                  row[title[idx+1]] =rooms.join();
-                });
-                return row
-              });
-              console.log('excel rows:',rows,'title:',title);
-
+              var rows = this.request.body.rows;
+              var title = this.request.body.title;
+              console.log('body:',this.request.body);
+              if(!rows){
+                this.body = app.wrapper.res.error({message: '导出数据为空!'});
+              }
               this.set('Parse', 'no-parse');
               this.body = yield app.excel_service.build(file_name, rows,title);
             } catch (e) {

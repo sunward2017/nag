@@ -26,9 +26,9 @@
         }
     }
 
-    MealDishDetailsController.$inject = ['$scope', 'ngDialog', 'vmh', 'entityVM','$timeout'];
+    MealDishDetailsController.$inject = ['$scope', 'ngDialog', 'vmh', 'entityVM'];
 
-    function MealDishDetailsController($scope, ngDialog, vmh, vm,$timeout) {
+    function MealDishDetailsController($scope, ngDialog, vmh, vm) {
 
         var vm = $scope.vm = vm;
         $scope.utils = vmh.utils.v;
@@ -62,9 +62,6 @@
               vm.nameUsed=false;
             }
           });
-          $timeout(function () {
-            vm.nameUsed=undefined;
-          },3000);
         }
 
         function doSubmit() {

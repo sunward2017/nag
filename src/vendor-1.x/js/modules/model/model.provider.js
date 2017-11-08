@@ -616,7 +616,7 @@
           mealOrderRecord: mealOrderRecord,
           mealOrderRecordStat: mealOrderRecordStat,
           mealOrderRecordStat2:mealOrderRecordStat2,
-          exportExcelForMealOrderRecord:exportExcelForMealOrderRecord
+          dataByClient:dataByClient
         };
 
         function roomStatusInfo(tenantId) {
@@ -1235,11 +1235,11 @@
           });
         }
 
-        function exportExcelForMealOrderRecord(file_name, rowData,districts) {
-          return $http.post(baseUrl + 'excel/mealOrderRecordStst2', {
+        function dataByClient(file_name, rows,title) {
+          return $http.post(baseUrl + 'excel/dataByClient', {
             file_name: file_name,
-            rowData: rowData,
-            districts:districts
+            rows: rows,
+            title:title
           }, {responseType: 'blob'}).success(function (res) {
             console.log('res', res);
             saveAs(res, decodeURI(file_name + '.xlsx'));

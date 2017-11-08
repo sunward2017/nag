@@ -7,7 +7,7 @@
                     span.input-group-btn
                         button.btn.btn-primary(ng-click="vm.openDP($event)")
                             i.glyphicon.glyphicon-calendar
-            .col-md-4
+            .col-md-8
                 .btn-group
                     a.btn.btn-primary.btn-sm(title="{{vm.moduleTranslatePath('BTN-PRE-WEEK')|translate}}",ng-click="vm.preDay()")
                         i.glyphicon.glyphicon-chevron-left
@@ -19,10 +19,12 @@
         .col-md-5
             .btn-toolbar.pull-right
                 .btn-group
+                    a.btn.btn-success.btn-sm(ng-click="vm.changeViewPoint()") {{vm.cookerView? vm.moduleTranslatePath('NORMAL-VIEW'):vm.moduleTranslatePath('COOKER-VIEW')| translate}}
+                .btn-group
                     a.btn.btn-warning.btn-sm(ng-click="$state.go(vm.transTo.mealOrderRecordDetail,{date:vm.model.order_date})") {{ vm.moduleTranslatePath('BTN-GO-DETAIL') | translate}}
     .row-split
     .panel.panel-default.panel-grid
-        table.grid.table.table-bordered.table-striped
+        table.grid.table.table-bordered.table-striped(ng-if="!vm.cookerView")
             thead
                 tr
                     th.text-center(width="80",colspan="2") {{ vm.moduleTranslatePath('LABEL-YAXIS_LABEL_DISTRICT') | translate}}
@@ -37,4 +39,21 @@
                         ul.list-unstyled
                             li(ng-repeat="meals in floor[col.value] ") • {{::meals.name}} × {{::meals.quantity}}份
                 tr(ng-if="vm.rows.length==0")
-                    td.text-center(colspan="{{vm.xAxisData.length + 1}}") {{ 'grid.NO-RESULTS' | translate}}
+                    td.text-center(colspan="{{vm.xAxisData.length+2}}") {{ 'grid.NO-RESULTS' | translate}}
+        table.grid.table.table-bordered.table-striped(ng-if="vm.cookerView")
+            thead
+                tr
+                    th.text-center(width="80",colspan="2" ,rowspan="2",style="line-height:60px;") {{vm.moduleTranslatePath('LABEL-YAXIS_LABEL_MEAL') | translate}}
+                    th.text-center(width="120",colspan="{{vm.districts.length}}") {{ vm.moduleTranslatePath('LABEL-YAXIS_LABEL_DISTRICT') | translate}}
+                tr
+                    th.text-center(ng-repeat="district in vm.districts") {{::district.name}}
+            tbody(ng-repeat="row2 in vm.rows2")
+                tr(ng-repeat="meal in row2.meals track by $index")
+                    td.text-center(ng-if="$index ==0" rowspan="{{row2.meals.length}}")
+                        | {{::vm.y[row2.period]}}
+                    td.text-center
+                        | {{::meal.meal_name}}
+                    td.text-left(ng-repeat="district in meal.districts")
+                        | {{(district.elderlys) | cookerViewDistrictCellFilter:'room_name':'bed_no'}}
+                tr(ng-if="vm.rows2.length==0")
+                    td.text-center(colspan="4") {{ 'grid.NO-RESULTS' | translate}}

@@ -9,25 +9,29 @@
     .module('subsystem.pension-agency')
     .controller('MealOrderRecordController', MealOrderRecordController)
     .controller('MealOrderRecordDetailController', MealOrderRecordDetailController)
+    .filter('cookerViewDistrictCellFilter', cookerViewDistrictCellFilter)
   ;
 
   MealOrderRecordController.$inject = ['$scope', 'ngDialog', 'vmh', 'instanceVM'];
   function MealOrderRecordController($scope, ngDialog, vmh, vm) {
     var vm = $scope.vm = vm;
-    $scope.utils = vmh.utils.v;
+    $scope.utils = vmh.utils.g;
     var tenantService = vm.modelNode.services['pub-tenant'];
     init();
     vm.dateChange = dateChange;
+    vm.changeViewPoint = changeViewPoint;
 
     function init() {
 
       vm.init({removeDialog: ngDialog});
       vm.preDay = preDay;
       vm.nextDay = nextDay;
+      vm.cookerView = false;
 
       vmh.parallel([
         vmh.shareService.d('D3040'),
-        tenantService.query({_id: vm.model['tenantId']}, 'other_config')
+        tenantService.query({_id: vm.model['tenantId']}, 'other_config'),
+        vm.modelNode.services['psn-district'].query({tenantId: vm.model['tenantId']}, 'name',{'name': 1})
       ]).then(function (results) {
         var nodes = results[0];
         var meal_periods = results[1][0].other_config.psn_meal_periods || [];
@@ -39,11 +43,16 @@
         } else {
           vm.xAxisData = nodes;
         }
+        vm.y={};
+        _.each(vm.xAxisData ,function (o) {
+          vm.y[o.value]=o.name;
+        });
+        vm.districts = results[2];
+        console.log('vm.districts:',vm.districts);
+        vm.model.order_date = moment(new Date()).format('YYYY-MM-DD');
+        fetchMealOrderRecordSummary(vm.tenantId, vm.model.order_date);
       });
-
-      vm.model.order_date = moment(new Date()).format('YYYY-MM-DD');
-      fetchMealOrderRecordSummary(vm.tenantId, vm.model.order_date);
-
+      
     }
 
     function fetchMealOrderRecordSummary(tenantId, order_date) {
@@ -51,6 +60,24 @@
         console.log('stat rows:', rows);
         vm.rows = rows;
       }));
+      vmh.psnService.mealOrderRecordStat2(tenantId, order_date).then(function (rows) {
+        _.each(rows,function (period) {
+          _.each(period.meals,function (meal) {
+            var mealDistrictIds=_.map(meal.districts,function (d) {
+              return d.districtId;
+            });
+            // console.log('mealDistrictIds:',mealDistrictIds);
+            _.each(vm.districts,function (district,idx) {
+              if(mealDistrictIds.indexOf(district.id)==-1){
+                meal.districts.splice(idx,0,{});
+                console.log('meal.districts:',period.period+meal.meal_name,meal.districts);
+              }
+            });
+          });
+        });
+        console.log('stat2 rows:', rows);
+        vm.rows2 = rows;
+      });
     }
 
     function preDay(){
@@ -68,6 +95,10 @@
     function dateChange() {
       vm.model.order_date=moment(vm.model.order_date).format('YYYY-MM-DD');
       fetchMealOrderRecordSummary(vm.tenantId, vm.model.order_date);
+    }
+    
+    function changeViewPoint() {
+      vm.cookerView=!vm.cookerView;
     }
   }
 
@@ -174,5 +205,16 @@
     }
   }
 
+  function cookerViewDistrictCellFilter() {
+    return cookerViewDistrictCellFormatter;
+  }
+
+  function cookerViewDistrictCellFormatter(cellObject, key, key2) {
+    if (!cellObject || !angular.isArray(cellObject) || cellObject.length === 0)
+      return '';
+    return cellObject.map(function (o) {
+        return o[key]+'-'+o[key2]+'('+o.name+')'
+    }).join()
+  }
 
 })();

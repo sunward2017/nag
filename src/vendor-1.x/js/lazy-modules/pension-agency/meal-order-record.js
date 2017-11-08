@@ -213,7 +213,7 @@
     if (!cellObject || !angular.isArray(cellObject) || cellObject.length === 0)
       return '';
     return cellObject.map(function (o) {
-        return o[key]+'-'+o[key2]+'('+o.name+')'
+        return o[key]+'-'+o[key2]
     }).join()
   }
 

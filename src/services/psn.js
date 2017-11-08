@@ -7308,9 +7308,6 @@ module.exports = {
                   }
                 },
                 {
-                  $sort: {'_id.room_name': 1}
-                },
-                {
                   $project: {
                     _id: 0,
                     districtId: '$_id.districtId',

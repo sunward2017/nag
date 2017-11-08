@@ -1733,6 +1733,88 @@ module.exports = {
       }
     }).catch(self.ctx.coOnError);
   },
+  elderlyDrugUseMergedWithStockList: function (tenantId, elderlyId) {
+    var self = this;
+    return co(function *() {
+      try {
+        var tae = yield self._getTenantAndElderly(tenantId, elderlyId);
+        if (!tae.success) {
+          return tae
+        }
+        var tenant = tae.ret.t, elderly = tae.ret.e;
+
+        //按天汇总
+        var drugUseItems = yield self.ctx.modelFactory().model_aggregate(self.ctx.models['psn_drugUseItem'], [
+          {
+            $match: {
+              status: 1, // 隐式包含了quantity>0
+              repeat_type: DIC.D0103.TIME_IN_DAY,
+              elderlyId: elderly._id,
+              stop_flag: false,
+              tenantId: tenant._id
+            }
+          },
+          {
+            $project: {
+              drugId: 1,
+              repeat_count: {$cond: {if: {$eq: [{$size: '$repeat_values'}, 0]}, then: 1, else: {$size: '$repeat_values'}}},
+              quantity: 1,
+              unit_name: 1,
+              description: 1
+            }
+          },
+          {
+            $group: {
+              _id: {drugId:'$drugId', unit_name: '$unit_name'},
+              description: {$first: '$description'},
+              quantity: {$sum: {$multiply: [ "$repeat_count", "$quantity" ]}}
+            }
+          },
+          {
+            $lookup: {
+              from: "psn_drugDirectory",
+              localField: "_id.drugId",
+              foreignField: "_id",
+              as: "drug"
+            }
+          },
+          {
+            $unwind: '$drug'
+          },
+          {
+            $project: {
+              _id: 0,
+              drugId: '$_id.drugId',
+              mini_unit_name: '$_id.unit_name',
+              name: '$drug.full_name',
+              img: '$drug.img',
+              description: 1,
+              quantity: 1,
+            }
+          }
+        ]);
+        // console.log('drugUseItems:', drugUseItems);
+        //按周汇总
+
+        var elderlyStockObject = yield self._elderlyStockObject(tenant, elderly);
+
+        var rows = self.ctx._.map(drugUseItems, (o) => {
+          o.stock_num = (elderlyStockObject[o.drugId] || { total:0 }).total;
+          // console.log('map -> ',o)
+          return o;
+        });
+
+        // console.log('elderlyDrugUseMergedWithStockList:', rows);
+
+        return self.ctx.wrapper.res.rows(rows);
+      }
+      catch (e) {
+        console.log(e);
+        self.logger.error(e.message);
+        return self.ctx.wrapper.res.error(e.message);
+      }
+    }).catch(self.ctx.coOnError);
+  },
   elderlyDrugUseWithStockList: function (tenantId, elderlyId) {
     var self = this;
     return co(function *() {

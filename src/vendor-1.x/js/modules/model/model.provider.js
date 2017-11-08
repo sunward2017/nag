@@ -615,7 +615,8 @@
           mealMenuSaveAsTemplate: mealMenuSaveAsTemplate,
           mealOrderRecord: mealOrderRecord,
           mealOrderRecordStat: mealOrderRecordStat,
-          mealOrderRecordStat2:mealOrderRecordStat2
+          mealOrderRecordStat2:mealOrderRecordStat2,
+          exportExcelForMealOrderRecord:exportExcelForMealOrderRecord
         };
 
         function roomStatusInfo(tenantId) {
@@ -1231,6 +1232,17 @@
           return $http.post(baseUrl + 'mealOrderRecordStat2', {
             tenantId: tenantId,
             order_date: order_date
+          });
+        }
+
+        function exportExcelForMealOrderRecord(file_name, rowData,districts) {
+          return $http.post(baseUrl + 'excel/mealOrderRecordStst2', {
+            file_name: file_name,
+            rowData: rowData,
+            districts:districts
+          }, {responseType: 'blob'}).success(function (res) {
+            console.log('res', res);
+            saveAs(res, decodeURI(file_name + '.xlsx'));
           });
         }
 

@@ -26,12 +26,13 @@
         }
     }
 
-    MealDishDetailsController.$inject = ['$scope', 'ngDialog', 'vmh', 'entityVM'];
+    MealDishDetailsController.$inject = ['$scope', 'ngDialog', 'vmh', 'entityVM','$timeout'];
 
-    function MealDishDetailsController($scope, ngDialog, vmh, vm) {
+    function MealDishDetailsController($scope, ngDialog, vmh, vm,$timeout) {
 
         var vm = $scope.vm = vm;
         $scope.utils = vmh.utils.v;
+        vm.isDishNameUsed = isDishNameUsed;
 
 
         init();
@@ -52,6 +53,19 @@
 
         }
 
+        function isDishNameUsed() {
+          vm.modelService.query({tenantId: vm.tenantId,name:vm.model.name},'name').$promise.then(function (ret) {
+            console.log('ret:',ret);
+            if(ret.length>0){
+              vm.nameUsed = true;
+            }else {
+              vm.nameUsed=false;
+            }
+          });
+          $timeout(function () {
+            vm.nameUsed=undefined;
+          },3000);
+        }
 
         function doSubmit() {
 

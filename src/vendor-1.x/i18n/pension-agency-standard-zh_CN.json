@@ -597,6 +597,7 @@
         "TAB1": "基本信息",
         "TAB1-LABEL-NAME": "菜品名称",
         "TAB1-PLACEHOLDER-NAME": "菜品名称...",
+        "TAB1-LABEL-CHECK_DISH_NAME":"检测可用",
         "TAB1-LABEL-NATURE": "荤素",
         "TAB1-LABEL-PRICE": "菜品价格",
         "TAB1-PLACEHOLDER-PRICE": "XX 元/份",

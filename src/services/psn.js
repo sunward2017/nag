@@ -7419,6 +7419,46 @@ module.exports = {
             yield next;
           };
         }
+      },
+      {
+        method: 'excel$mealOrderRecordStst2',
+        verb: 'post',
+        url: this.service_url_prefix + "/excel/mealOrderRecordStst2",
+        handler: function (app, options) {
+          return function*(next) {
+            try {
+              var file_name = this.request.body.file_name;
+              var rowData = this.request.body.rowData;
+              var districts = this.request.body.districts;
+              console.log('rowData:', rowData,'districts:',districts);
+              var title=['餐名'];
+              app._.each(districts,(o)=>{
+                title.push(o.name);
+              });
+
+              var rows = app._.map(rowData,(meal)=>{
+                var row={};
+                row[title[0]] = meal.meal_name;
+                app._.each(meal.districts,(district,idx)=>{
+                  var rooms=[];
+                  app._.each(district.elderlys,(elderly)=>{
+                    rooms.push(elderly.room_name+'-'+elderly.bed_no);
+                  });
+                  row[title[idx+1]] =rooms.join();
+                });
+                return row
+              });
+              console.log('excel rows:',rows,'title:',title);
+
+              this.set('Parse', 'no-parse');
+              this.body = yield app.excel_service.build(file_name, rows,title);
+            } catch (e) {
+              self.logger.error(e.message);
+              this.body = app.wrapper.res.error(e);
+            }
+            yield next;
+          };
+        }
       }
       /**********************其他*****************************/
 

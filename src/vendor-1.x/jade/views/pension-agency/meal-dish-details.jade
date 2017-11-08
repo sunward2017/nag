@@ -10,9 +10,14 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                     fieldset: .form-group
                         <!--菜品名称-->
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-NAME') | translate}}:
-                        .col-md-10
+                        .col-md-8
                             input.form-control(type='text', name='name',ng-model='vm.model.name',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-NAME")|translate}}' ,required='')
                             span.text-danger(ng-show="utils.vinput(this.theForm,'name','required')") {{ "validator.REQUIRED" | translate}}
+                            span.text-danger(ng-show="vm.nameUsed") {{ "validator.ALREADY-EXISTS" | translate:{item:"菜名"} }}
+                        .col-md-2
+                            a.btn.btn-sm(ng-class="{'btn-primary':vm.nameUsed===undefined ,'btn-success':vm.nameUsed===false,'btn-danger':vm.nameUsed}",ng-click="vm.isDishNameUsed()") {{ vm.viewTranslatePath('TAB1-LABEL-CHECK_DISH_NAME') | translate}}
+                                i.fa.fa-check-circle-o.fa-lg(ng-show="vm.nameUsed===false")
+                                i.fa.fa-minus-circle.fa-lg(ng-show="vm.nameUsed")
                     fieldset: .form-group
                         <!--荤素-->
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-NATURE') | translate}}:

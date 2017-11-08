@@ -20,6 +20,7 @@
     init();
     vm.dateChange = dateChange;
     vm.changeViewPoint = changeViewPoint;
+    vm.exportExcelForMealOrderRecord = exportExcelForMealOrderRecord;
 
     function init() {
 
@@ -99,6 +100,11 @@
     
     function changeViewPoint() {
       vm.cookerView=!vm.cookerView;
+    }
+
+    function exportExcelForMealOrderRecord(rowData) {
+      console.log('rowData:',rowData);
+      vmh.psnService.exportExcelForMealOrderRecord('订餐记录信息表(' + vm.tenant_name + '-' + vm.model.order_date+'-' +vm.y[rowData.period]+')', rowData.meals,vm.districts);
     }
   }
 
@@ -213,7 +219,7 @@
     if (!cellObject || !angular.isArray(cellObject) || cellObject.length === 0)
       return '';
     return cellObject.map(function (o) {
-        return o[key]+'-'+o[key2]+'('+o.name+')'
+        return o[key]+'-'+o[key2]
     }).join()
   }
 

@@ -615,7 +615,8 @@
           mealMenuSaveAsTemplate: mealMenuSaveAsTemplate,
           mealOrderRecord: mealOrderRecord,
           mealOrderRecordStat: mealOrderRecordStat,
-          mealOrderRecordStat2:mealOrderRecordStat2
+          mealOrderRecordStat2:mealOrderRecordStat2,
+          dataByClient:dataByClient
         };
 
         function roomStatusInfo(tenantId) {
@@ -1231,6 +1232,17 @@
           return $http.post(baseUrl + 'mealOrderRecordStat2', {
             tenantId: tenantId,
             order_date: order_date
+          });
+        }
+
+        function dataByClient(file_name, rows,title) {
+          return $http.post(baseUrl + 'excel/dataByClient', {
+            file_name: file_name,
+            rows: rows,
+            title:title
+          }, {responseType: 'blob'}).success(function (res) {
+            console.log('res', res);
+            saveAs(res, decodeURI(file_name + '.xlsx'));
           });
         }
 

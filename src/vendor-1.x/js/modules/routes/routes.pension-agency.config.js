@@ -1815,7 +1815,8 @@
             transTo: {
               "mealOrderRecordDetail": MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'meal-order-record.details'
             }
-          })
+          }),
+          deps: helper.resolveFor2('file-saver')
         }
       })
       .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'meal-order-record.details', {

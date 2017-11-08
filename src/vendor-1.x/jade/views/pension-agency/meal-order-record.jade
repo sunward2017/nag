@@ -51,9 +51,11 @@
                 tr(ng-repeat="meal in row2.meals track by $index")
                     td.text-center(ng-if="$index ==0" rowspan="{{row2.meals.length}}")
                         | {{::vm.y[row2.period]}}
+                        .btn-group
+                            a.btn.btn-success.btn-xs(ng-click="vm.exportExcelForMealOrderRecord(row2)") 导出Excel
                     td.text-center
                         | {{::meal.meal_name}}
-                    td.text-left(ng-repeat="district in meal.districts")
+                    td.text-left.break-word(ng-repeat="district in meal.districts")
                         | {{(district.elderlys) | cookerViewDistrictCellFilter:'room_name':'bed_no'}}
                 tr(ng-if="vm.rows2.length==0")
                     td.text-center(colspan="4") {{ 'grid.NO-RESULTS' | translate}}

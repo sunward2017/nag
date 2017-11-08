@@ -7416,6 +7416,30 @@ module.exports = {
             yield next;
           };
         }
+      },
+      {
+        method: 'excel$dataByClient',
+        verb: 'post',
+        url: this.service_url_prefix + "/excel/dataByClient",
+        handler: function (app, options) {
+          return function*(next) {
+            try {
+              var file_name = this.request.body.file_name;
+              var rows = this.request.body.rows;
+              var title = this.request.body.title;
+              console.log('body:',this.request.body);
+              if(!rows){
+                this.body = app.wrapper.res.error({message: '导出数据为空!'});
+              }
+              this.set('Parse', 'no-parse');
+              this.body = yield app.excel_service.build(file_name, rows,title);
+            } catch (e) {
+              self.logger.error(e.message);
+              this.body = app.wrapper.res.error(e);
+            }
+            yield next;
+          };
+        }
       }
       /**********************其他*****************************/
 

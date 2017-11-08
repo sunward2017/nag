@@ -32,6 +32,7 @@
 
         var vm = $scope.vm = vm;
         $scope.utils = vmh.utils.v;
+        vm.isDishNameUsed = isDishNameUsed;
 
 
         init();
@@ -52,6 +53,16 @@
 
         }
 
+        function isDishNameUsed() {
+          vm.modelService.query({tenantId: vm.tenantId,name:vm.model.name},'name').$promise.then(function (ret) {
+            console.log('ret:',ret);
+            if(ret.length>0){
+              vm.nameUsed = true;
+            }else {
+              vm.nameUsed=false;
+            }
+          });
+        }
 
         function doSubmit() {
 

@@ -7302,13 +7302,13 @@ module.exports = {
                   }
                 },
                 {
-                  $sort: {'room_name': 1}
-                },
-                {
                   $group: {
                     _id: {elderly_name:'$elderly_name', date: '$date', districtId: '$districtId', roomId: '$roomId', room_name:'$room_name', bed_no: '$bed_no', period: '$period', mealId: '$mealId'},
                     quantity: {$sum: '$quantity'}
                   }
+                },
+                {
+                  $sort: {'_id.room_name': 1}
                 },
                 {
                   $project: {

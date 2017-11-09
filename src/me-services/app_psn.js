@@ -593,79 +593,7 @@ module.exports = {
               // console.log("request", this.request.body.drug);
               var tenantId = this.request.body.tenantId;
               var elderlyId = this.request.body.elderlyId;
-              var elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], elderlyId);
-              if (!elderly || elderly.status == 0) {
-                return app.wrapper.res.error({message: '无法找到对应的老人资料'});
-              }
-              if (!elderly.live_in_flag || elderly.begin_exit_flow) {
-                return app.wrapper.res.error({message: '当前老人不在院或正在办理出院手续'});
-              }
-
-              // 按片区配置 获取药品扫码出库方式
-              var district = yield app.modelFactory().model_read(app.models['psn_district'], elderly.room_value.districtId);
-              if (!district || district.status == 0) {
-                return app.wrapper.res.error({message: '无法找到对应的片区'});
-              }
-
-              var elderlys_out_stock_check_mode = DIC.D3028.BY_PERIOD;
-              if (district.config && district.config.elderlys_out_stock_check_mode) {
-                elderlys_out_stock_check_mode = district.config.elderlys_out_stock_check_mode;
-              }
-              if (elderly.tenantId.toString() == tenantId && elderly.room_value && elderly.room_value.roomId && elderly.room_value.roomId.toString() == roomId && elderly.room_value.bed_no == bed_no) {
-                //返回老人当日的用药
-                var drugUseItems = yield app.modelFactory().model_query(app.models['psn_drugUseItem'], {
-                  select: 'drugId name quantity unit drugUseTemplateId repeat_type repeat_values repeat_start',
-                  where: {
-                    status: 1,
-                    elderlyId: elderlyId,
-                    stop_flag: false,
-                    tenantId: tenantId
-                  }
-                }).populate('drugId', 'img', 'psn_drugDirectory').populate('drugUseTemplateId', 'name order_no', 'psn_drugUseTemplate');
-
-                var groupObject = app._.groupBy(drugUseItems, function (o) {
-                  if (o.drugUseTemplateId) {
-                    return o.drugUseTemplateId._id;
-                  } else {
-                    return o._id;
-                  }
-                });
-                var elderlyDrugUseItems = [], groupValue, row;
-                for (var key in groupObject) {
-                  groupValue = groupObject[key];
-                  for (var i = 0, len = groupValue.length; i < len; i++) {
-                    row = groupValue[i].toObject();
-                    if (row.drugUseTemplateId) {
-                      row.group_order = row.drugUseTemplateId.order_no;
-                      row.template_name = row.drugUseTemplateId.name;
-                      row.templateId = row.drugUseTemplateId.id;
-                    } else {
-                      row.group_order = 99999;
-                      row.template_name = '无';
-                    }
-                    row.drugUseTemplateId = undefined;
-
-                    row.drug_img = row.drugId.img;
-                    row.drugId = row.drugId.id;
-
-                    if (row.unit) {
-                      row.unit_name = D3026[row.unit].name;
-                    }
-                    if (row.repeat_values.length > 0) {
-                      row.exec_on_str = D0103[row.repeat_type].name + '' + row.repeat_values.map(o => '' + o + row.repeat_start).join()
-                    } else {
-                      row.exec_on_str = D0103[row.repeat_type].name + '' + row.repeat_start;
-                    }
-                    elderlyDrugUseItems.push(row)
-                  }
-                }
-
-                var ret = {elderlys_out_stock_check_mode: elderlys_out_stock_check_mode, drugs: elderlyDrugUseItems};
-
-                this.body = app.wrapper.res.ret(ret);
-              } else {
-                this.body = app.wrapper.res.error({message: '老人与房间床位不匹配,请仔细检查核对'});
-              }
+              this.body = yield app.psn_drug_stock_service.elderlyDrugUseMergedWithStockList(tenantId, elderlyId);
             } catch (e) {
               self.logger.error(e.message);
               this.body = app.wrapper.res.error(e);
@@ -683,7 +611,7 @@ module.exports = {
             try {
               var tenantId = this.request.body.tenantId;
               var elderlyId = this.request.body.elderlyId;
-              this.body = yield app.psn_drug_stock_service.elderlyDrugUseWithStockList(tenantId, elderlyId);
+              this.body = yield app.psn_drug_stock_service.elderlyStockQuery(tenantId, elderlyId);
             } catch (e) {
               console.log(e);
               self.logger.error(e.message);

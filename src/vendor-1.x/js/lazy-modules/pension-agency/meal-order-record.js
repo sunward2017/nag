@@ -107,12 +107,12 @@
       _.each(vm.districts, function (o) {
         title.push(o.name);
       });
-      var rows = _.map(rowData.meals,(meal)=>{
+      var rows = _.map(rowData.meals,function(meal){
         var row={};
         row[title[0]] = meal.meal_name;
-        _.each(meal.districts,(district,idx)=>{
+        _.each(meal.districts,function(district,idx){
           var rooms=[];
-          _.each(district.elderlys,(elderly)=>{
+          _.each(district.elderlys,function(elderly){
             rooms.push(elderly.room_name+'-'+elderly.bed_no);
           });
           row[title[idx+1]] =rooms.join();

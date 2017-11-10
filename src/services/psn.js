@@ -7053,7 +7053,7 @@ module.exports = {
                 return;
               }
 
-              var psn_meal_periods = tenant.other_config.psn_meal_periods || [DIC.D3040.BREAKFAST, DIC.D3040.LUNCH, DIC.D3040.DINNER, DIC.D3040.SUPPER];
+              var psn_meal_periods = tenant.other_config.psn_meal_periods.length > 0 ? tenant.other_config.psn_meal_periods : [DIC.D3040.BREAKFAST, DIC.D3040.LUNCH, DIC.D3040.DINNER, DIC.D3040.SUPPER];
 
               var where = {tenantId: app.ObjectId(tenantId), x_axis: {'$gte': order_date.toDate(), '$lt': order_date.add(1, 'days').toDate()}};
 
@@ -7063,16 +7063,18 @@ module.exports = {
                   districtId: '$_id.districtId',
                   floor: '$_id.floor',
                   date: '$_id.date',
-                  'A0000': {$cond: {if: {$eq: ['$_id.period', 'A0000']}, then: '$$CURRENT.meals', else: []}},
-                  'A0001': {$cond: {if: {$eq: ['$_id.period', 'A0001']}, then: '$$CURRENT.meals', else: []}},
-                  'A0002': {$cond: {if: {$eq: ['$_id.period', 'A0002']}, then: '$$CURRENT.meals', else: []}}
+                  // 'A0000': {$cond: {if: {$eq: ['$_id.period', 'A0000']}, then: '$$CURRENT.meals', else: []}},
+                  // 'A0001': {$cond: {if: {$eq: ['$_id.period', 'A0001']}, then: '$$CURRENT.meals', else: []}},
+                  // 'A0002': {$cond: {if: {$eq: ['$_id.period', 'A0002']}, then: '$$CURRENT.meals', else: []}},
+                  // 'A0003': {$cond: {if: {$eq: ['$_id.period', 'A0003']}, then: '$$CURRENT.meals', else: []}}
                 }
               }, ag2 = {
                 $group: {
                   _id: {date: '$date', districtId: '$districtId', floor: '$floor'},
-                  A0000: {$push: '$A0000'},
-                  A0001: {$push: '$A0001'},
-                  A0002: {$push: '$A0002'}
+                  // 'A0000': {$push: '$A0000'},
+                  // 'A0001': {$push: '$A0001'},
+                  // 'A0002': {$push: '$A0002'},
+                  // 'A0003': {$push: '$A0003'}
                 }
               }, ag3 = {
                 $project: {
@@ -7080,9 +7082,10 @@ module.exports = {
                   districtId: '$_id.districtId',
                   floor: '$_id.floor',
                   date: '$_id.date',
-                  'A0000': {$concatArrays: [{$arrayElemAt: ['$A0000', 0]}, {$arrayElemAt: ['$A0000', 1]}, {$arrayElemAt: ['$A0000', 2]}]},
-                  'A0001': {$concatArrays: [{$arrayElemAt: ['$A0001', 0]}, {$arrayElemAt: ['$A0001', 1]}, {$arrayElemAt: ['$A0001', 2]}]},
-                  'A0002': {$concatArrays: [{$arrayElemAt: ['$A0002', 0]}, {$arrayElemAt: ['$A0002', 1]}, {$arrayElemAt: ['$A0002', 2]}]}
+                  // 'A0000': {$concatArrays: [{$ifNull: [ {$arrayElemAt: ['$A0000', 0]}, []]}, {$ifNull: [ {$arrayElemAt: ['$A0000', 1]}, []]}, {$ifNull: [ {$arrayElemAt: ['$A0000', 2]}, []]}, {$ifNull: [ {$arrayElemAt: ['$A0000', 3]}, []]}]},
+                  // 'A0001': {$concatArrays: [{$ifNull: [ {$arrayElemAt: ['$A0001', 0]}, []]}, {$ifNull: [ {$arrayElemAt: ['$A0001', 1]}, []]}, {$ifNull: [ {$arrayElemAt: ['$A0001', 2]}, []]}, {$ifNull: [ {$arrayElemAt: ['$A0001', 3]}, []]}]},
+                  // 'A0002': {$concatArrays: [{$ifNull: [ {$arrayElemAt: ['$A0002', 0]}, []]}, {$ifNull: [ {$arrayElemAt: ['$A0002', 1]}, []]}, {$ifNull: [ {$arrayElemAt: ['$A0002', 2]}, []]}, {$ifNull: [ {$arrayElemAt: ['$A0002', 3]}, []]}]},
+                  // 'A0003': {$concatArrays: [{$ifNull: [ {$arrayElemAt: ['$A0003', 0]}, []]}, {$ifNull: [ {$arrayElemAt: ['$A0003', 1]}, []]}, {$ifNull: [ {$arrayElemAt: ['$A0003', 2]}, []]}, {$ifNull: [ {$arrayElemAt: ['$A0003', 3]}, []]}]}
                 }
               }, ag4 = {
                 $group: {
@@ -7090,9 +7093,10 @@ module.exports = {
                   floors: {
                     $push: {
                       floor: '$floor',
-                      A0000: '$A0000',
-                      A0001: '$A0001',
-                      A0002: '$A0002'
+                      // A0000: '$A0000',
+                      // A0001: '$A0001',
+                      // A0002: '$A0002',
+                      // A0003: '$A0003'
                     }
                   }
                 }
@@ -7104,16 +7108,16 @@ module.exports = {
                 // var concatArrays = app._.map(psn_meal_periods, (k,i) => {
                 //   return {$arrayElemAt: ['$' + periodKey, i]}
                 // });
-                //[{$arrayElemAt: ['$' + periodKey, 0]}, {$arrayElemAt: ['$' + periodKey, 1]}, {$arrayElemAt: ['$' + periodKey, 2]}]
-                ag3.$project[periodKey] = {$concatArrays: app._.map(psn_meal_periods, (k,i) => ({$arrayElemAt: ['$' + periodKey, i]}))};
-                console.log(ag3.$project[periodKey].$concatArrays);
+                //[{$arrayElemAt: [{$ifNull: [ {$arrayElemAt: ['$A0000', 0]}, []]}, {$ifNull: [ {$arrayElemAt: ['$A0000', 1]}, []]}, {$ifNull: [ {$arrayElemAt: ['$A0000', 2]}, []]}, {$ifNull: [ {$arrayElemAt: ['$A0000', 3]}, []]}]}]
+                ag3.$project[periodKey] = {$concatArrays: app._.map(psn_meal_periods, (k,i) => ({$ifNull: [{$arrayElemAt: ['$' + periodKey, i]}, []]}))};
+                console.log('===========', ag3.$project[periodKey].$concatArrays);
                 ag4.$group.floors.$push[periodKey] = '$' + periodKey;
               });
 
-              console.log('ag1>>>',ag1);
-              console.log('ag2>>>',ag2);
-              console.log('ag3>>>',ag3);
-              console.log('ag4>>>',ag4);
+              // console.log('ag1>>>',ag1);
+              // console.log('ag2>>>',ag2);
+              // console.log('ag3>>>',ag3);
+              // console.log('ag4>>>',ag4);
 
               var rows = yield app.modelFactory().model_aggregate(app.models['psn_mealOrderRecord'], [
                 {
@@ -7200,7 +7204,10 @@ module.exports = {
                     meals: {$push: '$meal'}
                   }
                 },
-                ag1, ag2, ag3, ag4,
+                ag1,
+                ag2,
+                ag3,
+                ag4,
                 {
                   $lookup: {
                     from: "psn_district",

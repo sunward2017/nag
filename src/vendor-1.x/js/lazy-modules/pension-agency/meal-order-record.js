@@ -104,7 +104,7 @@
 
     function exportExcelForMealOrderRecord(rowData) {
       var title=['餐名'];
-      _.each(vm.districts,(o)=>{
+      _.each(vm.districts, function (o) {
         title.push(o.name);
       });
       var rows = _.map(rowData.meals,(meal)=>{

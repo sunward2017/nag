@@ -1759,13 +1759,13 @@ module.exports = {
               drugId: 1,
               repeat_count: {$cond: {if: {$eq: [{$size: '$repeat_values'}, 0]}, then: 1, else: {$size: '$repeat_values'}}},
               quantity: 1,
-              unit_name: 1,
+              unit: 1,
               description: 1
             }
           },
           {
             $group: {
-              _id: {drugId:'$drugId', unit_name: '$unit_name'},
+              _id: {drugId:'$drugId', unit: '$unit'},
               description: {$first: '$description'},
               quantity: {$sum: {$multiply: [ "$repeat_count", "$quantity" ]}}
             }
@@ -1785,7 +1785,7 @@ module.exports = {
             $project: {
               _id: 0,
               drugId: '$_id.drugId',
-              mini_unit_name: '$_id.unit_name',
+              mini_unit: '$_id.unit',
               name: '$drug.full_name',
               img: '$drug.img',
               description: 1,
@@ -1811,7 +1811,7 @@ module.exports = {
             $project: {
               drugId: 1,
               quantity: 1,
-              unit_name: 1,
+              unit: 1,
               description: 1,
               repeat_week_day: {
                 $size: {
@@ -1831,7 +1831,7 @@ module.exports = {
           },
           {
             $group: {
-              _id: {drugId:'$drugId', unit_name: '$unit_name'},
+              _id: {drugId:'$drugId', unit: '$unit'},
               // repeat_week_day:  {$first: '$repeat_week_day'},
               description: {$first: '$description'},
               quantity: {$sum: '$quantity'}
@@ -1852,7 +1852,7 @@ module.exports = {
             $project: {
               _id: 0,
               drugId: '$_id.drugId',
-              mini_unit_name: '$_id.unit_name',
+              mini_unit: '$_id.unit',
               name: '$drug.full_name',
               img: '$drug.img',
               // repeat_week_day: 1,

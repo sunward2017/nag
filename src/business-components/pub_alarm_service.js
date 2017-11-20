@@ -301,7 +301,7 @@ module.exports = {
               } else if (receiver.type == DIC.D3031.RELATIVES_AND_FRIENDS) {
                 // 查找老人亲友
                 elderly.family_members.length > 0 && (mode_send_tos = mode_send_tos.concat(self.ctx._.map(self.ctx._.filter(elderly.family_members, function(fm){
-                  return _.contains(fm.received_alarm_D3016, reason)
+                  return self.ctx._.contains(fm.received_alarm_D3016, reason)
                 }), member => member.phone)));
               } else if (receiver.type == DIC.D3031.NURSING_WORKER_SERVED) {
                 // 根据房间查找值班护工

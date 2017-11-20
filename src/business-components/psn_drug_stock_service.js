@@ -1937,7 +1937,7 @@ module.exports = {
       }
     }).catch(self.ctx.coOnError);
   },
-  elderlyStockQuery: function (tenantId, elderlyId, keyword) { //同类药品合并显示
+  elderlyStockQuery: function (tenantId, elderlyId, keyword,statusFlag) { //同类药品合并显示
     var self = this;
     return co(function *() {
       try {
@@ -1955,10 +1955,12 @@ module.exports = {
           return self.ctx.wrapper.res.error({message: '当前老人不在院或正在办理出院手续'});
         }
         var where = {
-          status: 1,// 隐式包含了quantity>0
           elderlyId: elderly._id,
           tenantId: tenant._id
         };
+        if(!statusFlag){
+          where.status=1; // 隐式包含了quantity>0
+        }
         if (tenant.other_config.psn_drug_in_stock_expire_date_check_flag) {
           where.expire_in = {'$gte': self.ctx.moment(self.ctx.moment(), 'YYYY-MM-DD').toDate()};
         }

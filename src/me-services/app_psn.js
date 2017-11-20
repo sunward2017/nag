@@ -611,7 +611,7 @@ module.exports = {
             try {
               var tenantId = this.request.body.tenantId;
               var elderlyId = this.request.body.elderlyId;
-              this.body = yield app.psn_drug_stock_service.elderlyStockQuery(tenantId, elderlyId);
+              this.body = yield app.psn_drug_stock_service.elderlyStockQuery(tenantId, elderlyId,keyword,statusFlag);
             } catch (e) {
               console.log(e);
               self.logger.error(e.message);

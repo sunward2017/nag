@@ -6,7 +6,7 @@
 
 var job_id = 'sendAlarmAtMoment';
 var job_name =  '每天指定时刻发送通知(level=蓝色,黄色)';
-var job_rule = '30 0 * * *';//每天 几点:几分 '30 0 * * *' 零点30分执行
+var job_rule = '30 12 * * *';//每天 几点:几分 '30 0 * * *' 12点30分执行
 var printLog = true;
 
  module.exports = {

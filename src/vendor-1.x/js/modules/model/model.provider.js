@@ -578,6 +578,7 @@
           checkCanChangeBookingOrUnbookingRedToElderlyRecharge: checkCanChangeBookingOrUnbookingRedToElderlyRecharge,
           disableRedAndUnbookingToElderlyRecharge: disableRedAndUnbookingToElderlyRecharge,
           changeRedBookingAmountToElderlyRecharge: changeRedBookingAmountToElderlyRecharge,
+          doctorGenerateUser:doctorGenerateUser,
           nurseGenerateUser: nurseGenerateUser,
           nursingScheduleWeekly: nursingScheduleWeekly,
           nursingScheduleSave: nursingScheduleSave,
@@ -607,6 +608,11 @@
           nursingWorkerScheduleRemove: nursingWorkerScheduleRemove,
           nursingWorkerScheduleTemplateImport: nursingWorkerScheduleTemplateImport,
           nursingWorkerScheduleSaveAsTemplateWeekly: nursingWorkerScheduleSaveAsTemplateWeekly,
+          doctorNurseScheduleWeekly:doctorNurseScheduleWeekly,
+          doctorNurseScheduleSave:doctorNurseScheduleSave,
+          doctorNurseScheduleRemove:doctorNurseScheduleRemove,
+          doctorNurseScheduleTemplateImport:doctorNurseScheduleTemplateImport,
+          doctorNurseScheduleSaveAsTemplateWeekly:doctorNurseScheduleSaveAsTemplateWeekly,
           vitalSign$MingZhong$updateElderlyUsers: vitalSign$MingZhong$updateElderlyUsers,
           mealMenuSchedule: mealMenuSchedule,
           mealMenuScheduleSave: mealMenuScheduleSave,
@@ -1029,6 +1035,10 @@
           return $http.post(baseUrl + 'changeRedBookingAmountToElderlyRecharge/' + redId, data);
         }
 
+        function doctorGenerateUser(doctorId) {
+          return $http.post(baseUrl + 'doctorGenerateUser', {doctorId: doctorId});
+        }
+
         function nurseGenerateUser(nurseId) {
           return $http.post(baseUrl + 'nurseGenerateUser', {nurseId: nurseId});
         }
@@ -1265,6 +1275,39 @@
           return $http.post(baseUrl + 'nursingWorkerScheduleSaveAsTemplateWeekly', {
             tenantId: tenantId,
             nursingWorkerScheduleTemplateName: nursingWorkerScheduleTemplateName,
+            toSaveRows: toSaveRows
+          });
+        }
+
+        function doctorNurseScheduleWeekly(tenantId, start, end) {
+          return $http.post(baseUrl + 'doctorNurseScheduleWeekly', {
+            tenantId: tenantId,
+            x_axis_range_points: {
+              start: start,
+              end: end
+            }
+          });
+        }
+
+        function doctorNurseScheduleSave(tenantId, toSaveRows) {
+          return $http.post(baseUrl + 'doctorNurseScheduleSave', {tenantId: tenantId, toSaveRows: toSaveRows});
+        }
+
+        function doctorNurseScheduleRemove(tenantId, toRemoveRows) {
+          return $http.post(baseUrl + 'doctorNurseScheduleRemove', {tenantId: tenantId, toRemoveRows: toRemoveRows});
+        }
+
+        function doctorNurseScheduleTemplateImport(doctorNurseScheduleTemplateId, toImportXAxisRange) {
+          return $http.post(baseUrl + 'doctorNurseScheduleTemplateImport', {
+            doctorNurseScheduleTemplateId: doctorNurseScheduleTemplateId,
+            toImportXAxisRange: toImportXAxisRange
+          });
+        }
+
+        function doctorNurseScheduleSaveAsTemplateWeekly(tenantId, doctorNurseScheduleTemplateName, toSaveRows) {
+          return $http.post(baseUrl + 'doctorNurseScheduleSaveAsTemplateWeekly', {
+            tenantId: tenantId,
+            doctorNurseScheduleTemplateName: doctorNurseScheduleTemplateName,
             toSaveRows: toSaveRows
           });
         }

@@ -1151,6 +1151,104 @@
           })
         }
       })
+      .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'doctor-nurse-schedule', {
+        url: '/doctor-nurse-schedule',
+        access_level: AUTH_ACCESS_LEVELS.USER,
+        views: {
+          "module-header": {
+            templateUrl: helper.basepath(MODEL_VARIABLES.HEAD_TEMPLATES.PENSION_AGENCY),
+            controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER_FOR_TENANT
+          },
+          "module-content": {
+            templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'doctor-nurse-schedule.html'),
+            controller: 'DoctorNurseScheduleController',
+            resolve: {
+              instanceVM: helper.buildInstanceVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'doctor-nurse-schedule', {
+                modelName: 'psn-doctorNurseSchedule',
+                searchForm: {"status": 1}
+              })
+            }
+          }
+        },
+        data: {
+          func_id: MODEL_VARIABLES.BIZ_FUNC_PREFIXS.PENSION_AGENCY + 'DOCTOR-NURSE-SCHEDULE' //业务系统使用
+        },
+        resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.PENSION_AGENCY + 'doctor-nurse-schedule.js')
+      })
+      .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'doctor-nurse-schedule-template', {
+        url: '/doctor-nurse-schedule-template',
+        title: '医护排班模版',
+        abstract: true,
+        views: {
+          "module-header": {
+            templateUrl: helper.basepath(MODEL_VARIABLES.HEAD_TEMPLATES.PENSION_AGENCY),
+            controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER_FOR_TENANT
+          },
+          "module-content": {
+            template: '<div class="data-ui-view"></div><div class="clearfix"></div>'
+          }
+        },
+        data: {
+          func_id: MODEL_VARIABLES.BIZ_FUNC_PREFIXS.PENSION_AGENCY + 'DOCTOR-NURSE-SCHEDULE-TEMPLATE' //业务系统使用
+        },
+        resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.PENSION_AGENCY + 'doctor-nurse-schedule-template.js')
+      })
+      .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'doctor-nurse-schedule-template.list', {
+        url: '/list/:action',
+        templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'doctor-nurse-schedule-template-list.html'),
+        access_level: AUTH_ACCESS_LEVELS.USER,
+        controller: 'DoctorNurseScheduleTemplateGridController',
+        resolve: {
+          entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'doctor-nurse-schedule-template.list', {
+            modelName: 'psn-doctorNurseScheduleTemplate',
+            searchForm: {"status": 1},
+            serverPaging: true,
+            blockUI: true,
+            columns: [{
+              label: '模版名称',
+              name: 'name',
+              type: 'string',
+              width: 120,
+              sortable: true
+            }, {
+              label: '类型',
+              name: 'type_name',
+              type: 'string',
+              width: 80,
+              sortable: true
+            }, {
+              label: '停用',
+              name: 'stop_flag',
+              type: 'bool',
+              width: 80
+            }, {
+              label: '停用原因',
+              name: 'stop_result_name',
+              type: 'string',
+              width: 120,
+              sortable: true
+            }, {
+              label: '',
+              name: 'actions',
+              sortable: false,
+              width: 60
+            }]
+          })
+        }
+      })
+      .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'doctor-nurse-schedule-template.details', {
+        url: '/details/:action/:_id',
+        templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'doctor-nurse-schedule-template-details.html'),
+        access_level: AUTH_ACCESS_LEVELS.USER,
+        controller: 'DoctorNurseScheduleTemplateDetailsController',
+        resolve: {
+          entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'doctor-nurse-schedule-template.details', {
+            modelName: 'psn-doctorNurseScheduleTemplate',
+            model: {templateType: 'A0001'},
+            blockUI: true
+          })
+        }
+      })
       .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'enter-payment', {
         url: '/enter-payment',
         title: '老人入院缴费',
@@ -2637,6 +2735,80 @@
               sortable: false,
               width: 40
             }]
+          })
+        }
+      })
+      .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'doctor', {
+        url: '/doctor',
+        title: '医生管理',
+        abstract: true,
+        views: {
+          "module-header": {
+            templateUrl: helper.basepath(MODEL_VARIABLES.HEAD_TEMPLATES.PENSION_AGENCY),
+            controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER_FOR_TENANT
+          },
+          "module-content": {
+            template: '<div class="data-ui-view"></div><div class="clearfix"></div>'
+          }
+        },
+        data: {
+          func_id: MODEL_VARIABLES.BIZ_FUNC_PREFIXS.PENSION_AGENCY + 'DOCTOR' //业务系统使用
+        },
+        resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.PENSION_AGENCY + 'doctor.js')
+      })
+      .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'doctor.list', {
+        url: '/list/:action',
+        templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'doctor-list.html'),
+        access_level: AUTH_ACCESS_LEVELS.USER,
+        controller: 'DoctorGridController',
+        resolve: {
+          entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'doctor.list', {
+            modelName: 'psn-doctor',
+            searchForm: {"status": 1},
+            serverPaging: true,
+            blockUI: true,
+            notifyRowDisabled: 'psn$doctor$$disabled',
+            columns: [{
+              label: '医生工号',
+              name: 'code',
+              type: 'string',
+              width: 120,
+              sortable: true
+            }, {
+              label: '医生名称',
+              name: 'name',
+              type: 'string',
+              width: 120,
+              sortable: true
+            }, {
+              label: '手机号码',
+              name: 'phone',
+              type: 'string',
+              width: 120,
+              sortable: true
+            }, {
+              label: '停用',
+              name: 'stop_flag',
+              type: 'bool',
+              width: 80
+            }, {
+              label: '',
+              name: 'actions',
+              sortable: false,
+              width: 60
+            }]
+          })
+        }
+      })
+      .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'doctor.details', {
+        url: '/details/:action/:_id',
+        templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'doctor-details.html'),
+        access_level: AUTH_ACCESS_LEVELS.USER,
+        controller: 'DoctorDetailsController',
+        resolve: {
+          entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'doctor.details', {
+            modelName: 'psn-doctor',
+            blockUI: true
           })
         }
       })

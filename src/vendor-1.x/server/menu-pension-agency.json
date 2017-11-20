@@ -106,6 +106,16 @@
         "_id": "menu.pension-agency.ALARM-A1000",
         "name": "离床报警",
         "sref": "app.pension-agency.alarm-a1000.list"
+      },
+      {
+        "_id": "menu.pension-agency.DOCTOR-NURSE-SCHEDULE",
+        "name": "医护排班",
+        "sref": "app.pension-agency.doctor-nurse-schedule"
+      },
+      {
+        "_id": "menu.pension-agency.DOCTOR-NURSE-SCHEDULE-TEMPLATE",
+        "name": "医护排班模版",
+        "sref": "app.pension-agency.doctor-nurse-schedule-template.list"
       }
     ]
   },
@@ -294,14 +304,14 @@
     "icon": "fa fa-file-o",
     "children": [
       {
-        "_id": "menu.pension-agency.NURSE",
-        "name": "护士",
-        "sref": "app.pension-agency.nurse.list"
-      },
-      {
         "_id": "menu.pension-agency.DOCTOR",
         "name": "医生管理",
         "sref": "app.pension-agency.doctor.list"
+      },
+      {
+        "_id": "menu.pension-agency.NURSE",
+        "name": "护士",
+        "sref": "app.pension-agency.nurse.list"
       },
       {
         "_id": "menu.pension-agency.NURSING-WORKER",

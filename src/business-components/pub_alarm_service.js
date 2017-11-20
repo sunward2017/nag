@@ -257,7 +257,7 @@ module.exports = {
         }
 
         // 设置报警等级和报警方式
-        var alarm_modes = yield self._getAlarmModesByD3016SettingForElderly(pub_alarm_D3016_A1000_setting.reason, pub_alarm_D3016_A2000_setting.modes, tenant, elderly);
+        var alarm_modes = yield self._getAlarmModesByD3016SettingForElderly(pub_alarm_D3016_A2000_setting.reason, pub_alarm_D3016_A2000_setting.modes, tenant, elderly);
         console.log('alarm_modes:>>>>>>>>>>>>>>>>>', alarm_modes);
 
         var result = yield self.ctx.modelFactory().model_create(self.ctx.models['pub_alarm'], {

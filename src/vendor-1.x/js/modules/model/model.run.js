@@ -36,11 +36,14 @@
     modelNode.factory('psn-nursingGroup');
     modelNode.factory('psn-recharge');
     modelNode.factory('psn-nursingRecord');
+    modelNode.factory('psn-doctorNurseSchedule');
+    modelNode.factory('psn-doctorNurseScheduleTemplate');
     modelNode.factory('psn-drugUseItem');
     modelNode.factory('psn-drugUseTemplate');
     modelNode.factory('psn-drugDirectory');
     modelNode.factory('psn-drugStock');
     modelNode.factory('psn-drugInOutStock');
+    modelNode.factory('psn-doctor');
     modelNode.factory('psn-nurse');
     modelNode.factory('psn-nursingWorker');
     modelNode.factory('psn-workItem');

@@ -611,6 +611,8 @@ module.exports = {
             try {
               var tenantId = this.request.body.tenantId;
               var elderlyId = this.request.body.elderlyId;
+              var keyword = this.request.body.keyword;
+              var statusFlag = this.request.body.statusFlag;
               this.body = yield app.psn_drug_stock_service.elderlyStockQuery(tenantId, elderlyId,keyword,statusFlag);
             } catch (e) {
               console.log(e);

@@ -593,7 +593,7 @@ module.exports = {
               console.log('drugStockRelatedCenterOutStockRecord', drugStockRelatedCenterOutStockRecord);
               var centerDrugStock = drugStockRelatedCenterOutStockRecord[0];
               var drugStockRelatedCenterOutStockRecordIndex = self.ctx._.findIndex(drugStockRelatedCenterOutStockRecord, (o) => {
-                  return o.drugId.toString() == drugStockRowData.drugId;
+                  return o.drugId.toString() == drugStockRowData.drugId._id; // 前台传入数据的drugId因为被populate了 drugStockRowData.drugId
               });
               if (drugStockRelatedCenterOutStockRecordIndex != -1) {
                   console.log('中央库库存量修改(修改药品数量).....');
@@ -1722,7 +1722,7 @@ module.exports = {
             tenantId: tenantId
           },
           sort: {check_in_time: 1, expire_in: 1}
-        }).populate('drugInStockId', 'type');
+        }).populate('drugInStockId', 'type').populate('drugId', 'full_name');
 
         return self.ctx.wrapper.res.rows(drugsInStock);
       }
@@ -2217,17 +2217,35 @@ module.exports = {
           {
             $match: where
           },
+          // {
+          //   $group: {
+          //     _id: {drugId: '$drugId', drug_name: '$drug_name', unit: '$mini_unit'},
+          //     quantity: {$sum: '$quantity'}
+          //   }
+          // },
+          /// 修复当是同一个drugId但是因为改名导致drug_name不一致产生groupBy不一致
           {
             $group: {
-              _id: {drugId: '$drugId', drug_name: '$drug_name', unit: '$mini_unit'},
+              _id: {drugId: '$drugId', unit: '$mini_unit'},
               quantity: {$sum: '$quantity'}
             }
+          },
+          {
+            $lookup: {
+              from: "psn_drugDirectory",
+              localField: "_id.drugId",
+              foreignField: "_id",
+              as: "drug"
+            }
+          },
+          {
+            $unwind: '$drug'
           },
           {
             $project: {
               total: '$quantity',
               drugId: "$_id.drugId",
-              drug_name: "$_id.drug_name",
+              drug_name: "$drug.full_name",
               unit: "$_id.unit"
             }
           }

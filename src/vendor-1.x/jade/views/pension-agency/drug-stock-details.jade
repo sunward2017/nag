@@ -50,7 +50,8 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='')
                                             | {{ vm.viewTranslatePath('TAB1-LABEL-ACTION') | translate}}
                                 tbody
                                     tr(ng-repeat="row in vm.elderlyDrugStockList " )
-                                        td {{::row.drug_name}}
+                                        td {{::row.drugId.full_name}}
+                                            span(ng-if="row.drugId.full_name != row.drug_name") ({{::row.drug_name}})
                                         td.text-right {{::row.quantity}}
                                         td.text-center
                                             span(ng-if="!row.$editing") {{row.mini_unit|diFilter:vm.selectBinding.mini_units}}

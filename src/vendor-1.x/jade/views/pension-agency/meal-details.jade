@@ -18,10 +18,10 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-MEMBERS') | translate}}:
                         .col-md-3
                             span.text-center 荤菜:
-                            .tree.tree-basic(s-tree,s-tree-data="vm.treeDataPromiseOfDishesMeat",s-tree-height="300", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{mode:'check', selectNodeFormat:'object', nodeIdKey: '_id'}",ng-model="vm.meat" ,on-check-change="vm.priceChange()")
+                            .tree.tree-basic(s-tree,s-tree-data="vm.treeDataPromiseOfDishesMeat",s-tree-height="300", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{mode:'check', selectNodeFormat:'object', nodeIdKey: '_id'}",ng-model="vm.meats" ,on-check-change="vm.priceChange()")
                         .col-md-3
                             span.text-center 素菜:
-                            .tree.tree-basic(s-tree,s-tree-data="vm.treeDataPromiseOfDishesVegetable",s-tree-height="300", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{mode:'check', selectNodeFormat:'object', nodeIdKey: '_id'}",ng-model="vm.vegetable" ,on-check-change="vm.priceChange()")
+                            .tree.tree-basic(s-tree,s-tree-data="vm.treeDataPromiseOfDishesVegetable",s-tree-height="300", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{mode:'check', selectNodeFormat:'object', nodeIdKey: '_id'}",ng-model="vm.vegetables" ,on-check-change="vm.priceChange()")
                     fieldset: .form-group
                         <!--菜品组价格-->
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-PRICE') | translate}}:

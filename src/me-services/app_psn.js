@@ -344,10 +344,20 @@ module.exports = {
 
               var elderly = yield app.modelFactory().model_query(app.models['psn_elderly'], {
                 select: 'name birthday room_summary avatar room_value',
-                where: dynamicFilter
+                where: dynamicFilter,
+                sort:{'room_value.districtId': 1}
               });
-
-              this.body = app.wrapper.res.rows(elderly);
+              var elderlyToObj = [];
+              app._.each(elderly,function (oneElderly) {
+                var o = oneElderly.toObject();
+                console.log('sss:---', o);
+                var oRoom = o.room_summary.split('-');
+                o.district = oRoom[0];
+                o.room = oRoom[1] + '-' + oRoom[2] + '-' + oRoom[3];
+                o.age = app.age(o.birthday);
+                elderlyToObj.push(o);
+              });
+              this.body = app.wrapper.res.rows(elderlyToObj);
 
             } catch (e) {
               self.logger.error(e.message);

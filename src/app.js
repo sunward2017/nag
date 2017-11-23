@@ -183,6 +183,10 @@ app.util = rfcore.util;
 app.utcNow  = function() {
     return moment().add(8, 'h');
 };
+//moment age
+app.age  = function(birthday) {
+  return moment().diff(birthday, 'years');
+};
 
 //mongoose string to objectId function
 app.ObjectId = mongoose.Types.ObjectId;

@@ -44,37 +44,59 @@
       vm.priceChange = priceChange;
 
       vm.tab1 = {cid: 'contentTab1'};
-
-      vm.treeDataPromiseOfDishesMeat=vmh.shareService.tmp('T3001/psn-mealDish', 'name price nature', {tenantId: vm.tenantId, status: 1, stop_flag: false}, null, true).then(function (nodes) {
+      var meats=[];
+      vm.treeDataPromiseOfDishesMeat=vmh.shareService._tmp('T3001/psn-mealDish', 'name price nature', {tenantId: vm.tenantId, status: 1, stop_flag: false}, {'name':1},null, true).then(function (nodes) {
         console.log('mealDish nodes:', nodes);
-        var meat=[];
         _.each(nodes,function (o) {
         //     if(o.stop_flag){
         //         o.disableCheck =true;
         //     }
           if(o.nature == 'A0000'){
-            meat.push(o);
+            meats.push(o);
           }
         });
-        return meat;
+        return meats;
       });
-      vm.treeDataPromiseOfDishesVegetable=vmh.shareService.tmp('T3001/psn-mealDish', 'name price nature', {tenantId: vm.tenantId, status: 1, stop_flag: false}, null, true).then(function (nodes) {
-        var vegetable=[];
+      var vegetables=[];
+      vm.treeDataPromiseOfDishesVegetable=vmh.shareService._tmp('T3001/psn-mealDish', 'name price nature', {tenantId: vm.tenantId, status: 1, stop_flag: false},{'name':1}, null, true).then(function (nodes) {
         _.each(nodes,function (o) {
           if(o.nature == 'A0001'){
-            vegetable.push(o);
+            vegetables.push(o);
           }
         });
-        return vegetable;
+        return vegetables;
       });
 
-      vm.load();
+      vmh.q.all([vm.treeDataPromiseOfDishesMeat,
+        vm.treeDataPromiseOfDishesVegetable,
+        vm.load()
+      ]).then(function () {
+        console.log('vm._action_ :',vm._action_);
+        if(vm._action_ == 'edit'){
+          console.log('vm.model.dishes:',vm.model.dishes);
+          vm.meats=[];
+          vm.vegetables =[];
+          _.each(vm.model.dishes,function (o) {
+            var isMeat = _.findIndex(meats,function (meat) {
+              return meat._id == o.mealDishId;
+            });
+            var isVegetable = _.findIndex(vegetables,function (vg) {
+              return vg._id == o.mealDishId;
+            });
+            if(isMeat!=-1){
+              vm.meats.push(o);
+            }else if(isVegetable!=-1){
+              vm.vegetables.push(o);
+            }
+          });
+        }
+      });
 
     }
 
     function priceChange() {
       vm.model.price = 0;
-      vm.model.dishes = vm.meat.concat(vm.vegetable);
+      vm.model.dishes = vm.meats.concat(vm.vegetables);
       console.log('-->', vm.model);
       for (var i = 0, len = vm.model.dishes.length; i < len; i++) {
         vm.model.price += vm.model.dishes[i].price;

@@ -33,6 +33,7 @@
         var vm = $scope.vm = vm;
         $scope.utils = vmh.utils.v;
         vm.isDishNameUsed = isDishNameUsed;
+        console.log('vm._action_:',vm._action_);
 
 
         init();
@@ -54,27 +55,40 @@
         }
 
         function isDishNameUsed() {
-          vm.modelService.query({tenantId: vm.tenantId,name:vm.model.name},'name').$promise.then(function (ret) {
+          return vm.modelService.query({tenantId: vm.tenantId,name:vm.model.name,status:1},'name').$promise.then(function (ret) {
             console.log('ret:',ret);
             if(ret.length>0){
               vm.nameUsed = true;
+              if(vm._action_ == 'edit'){
+                var isSelf = _.find(ret,function (o) {
+                  return o._id == vm._id_;
+                });
+                console.log('isSelf:',isSelf);
+                if(isSelf){
+                  vm.nameUsed = false;
+                }
+              }
             }else {
               vm.nameUsed=false;
             }
+            return vm.nameUsed;
           });
         }
 
         function doSubmit() {
-
-            if ($scope.theForm.$valid) {
+            var p=vm.isDishNameUsed().then(function (nameRet) {
+              console.log('nameRet:',nameRet);
+              if ($scope.theForm.$valid && nameRet===false) {
                 console.log('submit vm.model:',vm.model);
                 vm.save();
-            }
-            else {
+              }
+              else {
                 if ($scope.utils.vtab(vm.tab1.cid)) {
-                    vm.tab1.active = true;
+                  vm.tab1.active = true;
                 }
-            }
+              }
+            });
+            // console.log('p:',p);
         }
 
 

@@ -1138,7 +1138,7 @@ module.exports = {
         console.log('检查库存是否满足出库要求...', tenant);
         var elderlyStockObject = yield self._elderlyStockObject(tenant, elderly);
         console.log('elderlyStockObject:', elderlyStockObject);
-        var drugData, drugStock, drugIds;
+        var drugData, drugStock, drugIds=[];
         for (var i = 0, len = drugs.length; i < len; i++) {
           drugData = drugs[i];
           drugIds.push(drugData.drugId.toString())
@@ -2171,7 +2171,7 @@ module.exports = {
       try {
 
         var drugsInStock = yield self._elderlyStockListAsSameDrugMerged(tenant, elderly);
-
+        console.log('drugsInStock:', drugsInStock)
         // 获取药品低库存警戒线
         var stock_alarm_low_day = tenant.other_config.psn_drug_stock_alarm_low_day || self.ctx.modelVariables.DEFAULTS.TENANT_DRUG_STOCK_ALARM_LOW_DAY;
         var drugUseOneDayObject = yield self._elderlyDrugUseOneDay(tenant, elderly);
@@ -2192,11 +2192,13 @@ module.exports = {
             drug_name: drugInStock.drug_name,
             total: drugInStock.total,
             canUseDays: canUseDays,
-            is_warning: drugInStock.total > 0 && canUseDays > 0 && canUseDays <= stock_alarm_low_day,
+            is_warning: drugInStock.total > 0 && canUseDays >= 0 && canUseDays <= stock_alarm_low_day,
             is_danger: drugInStock.total <= 0,
             unit_name: D3026[drugInStock.unit].name
           };
         }
+
+        console.log('_elderlyStockObject:', ret)
 
         return ret;
       }
@@ -2312,6 +2314,7 @@ module.exports = {
         var where = {
           status: 1,// 隐式包含了quantity>0
           elderlyId: elderly._id,
+          stop_flag: false, // 停用的药排除
           tenantId: tenant._id
         };
         var drugsUseOneDay = yield self.ctx.modelFactory().model_aggregate(self.ctx.models['psn_drugUseItem'], [

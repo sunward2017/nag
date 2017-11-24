@@ -649,8 +649,8 @@ module.exports = {
               }
 
               var tenant = tae.ret.t, elderly = tae.ret.e;
-              var elderlyDrugUseItems = yield self.ctx.modelFactory().model_query(self.ctx.models['psn_drugUseItem'], {
-                select: 'drugId',
+              var elderlyDrugUseItems = yield app.modelFactory().model_query(app.models['psn_drugUseItem'], {
+                select: 'drugId name',
                 where: {
                   status: 1,
                   elderlyId: elderly._id,

@@ -75,10 +75,18 @@
           });
         }
 
+        function getInitial() {
+            var initialArr = slugify(vm.model.name).split('-');
+            vm.model.py = _.map(initialArr,function (o) {
+              return o[0];
+            }).join('');
+            console.log('vm.model.py:',vm.model.py);
+        }
         function doSubmit() {
             var p=vm.isDishNameUsed().then(function (nameRet) {
               console.log('nameRet:',nameRet);
               if ($scope.theForm.$valid && nameRet===false) {
+                getInitial();
                 console.log('submit vm.model:',vm.model);
                 vm.save();
               }

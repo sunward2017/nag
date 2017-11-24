@@ -16,11 +16,19 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                             span.text-danger(ng-show="utils.vinput(this.theForm,'name','alreadyExists')") {{ "validator.ALREADY-EXISTS" | translate:{item:"餐名"} }}
                     fieldset: .form-group
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-MEMBERS') | translate}}:
-                        .col-md-3
+                        .col-md-4
+                            //.col-md-12
+                            //    span.col-md-4.text-left  荤菜:
+                            //    .col-md-8
+                            //        input.form-control(type='text', name='meatsPy',ng-model='vm.meatsPy',placeholder='{{vm.viewTranslatePath("TAB1-INITIAL-SEARCH")|translate}}',ng-change="vm.meatsSearch()")
                             span.text-center 荤菜:
                             .tree.tree-basic(s-tree,s-tree-data="vm.treeDataPromiseOfDishesMeat",s-tree-height="300", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{mode:'check', selectNodeFormat:'object', nodeIdKey: '_id'}",ng-model="vm.meats" ,on-check-change="vm.priceChange()")
-                        .col-md-3
-                            span.text-center 素菜:
+                        .col-md-4
+                            //.col-md-12
+                            //    span.col-md-4.text-left  蔬菜:
+                            //    .col-md-8
+                            //        input.form-control(type='text', name='vegetablesPy',ng-model='vm.vegetablesPy',placeholder='{{vm.viewTranslatePath("TAB1-INITIAL-SEARCH")|translate}}',ng-change="vm.vegetablesSearch()")
+                            span.text-center 蔬菜:
                             .tree.tree-basic(s-tree,s-tree-data="vm.treeDataPromiseOfDishesVegetable",s-tree-height="300", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{mode:'check', selectNodeFormat:'object', nodeIdKey: '_id'}",ng-model="vm.vegetables" ,on-check-change="vm.priceChange()")
                     fieldset: .form-group
                         <!--菜品组价格-->

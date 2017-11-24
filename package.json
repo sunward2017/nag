@@ -79,7 +79,6 @@
     "node-schedule": "^1.1.1",
     "node-xlsx": "^0.7.4",
     "nodemailer": "^2.6.4",
-    "pinyinlite": "^1.2.1",
     "qiniu": "^6.1.11",
     "rand-token": "0.2.1",
     "request": "^2.76.0",
@@ -88,6 +87,7 @@
     "soap": "^0.17.0",
     "socket.io": "^1.7.2",
     "thunkify": "^2.1.2",
+    "transliteration": "^1.6.2",
     "underscore": "^1.8.3",
     "xml2js": "^0.4.17"
   }

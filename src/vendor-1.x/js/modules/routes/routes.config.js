@@ -45,7 +45,7 @@
                     }
                 },
                 //templateUrl: helper.basepath('app.html'),
-                resolve: helper.resolveFor('modernizr', 'icons', 'eonasdan-bootstrap-datetimepicker', 'locale_zh-cn','ui.select', 'ngDialog', 'pinyinlite')
+                resolve: helper.resolveFor('modernizr', 'icons', 'eonasdan-bootstrap-datetimepicker', 'locale_zh-cn','ui.select', 'ngDialog')
             })
             .state('app.dashboard', {
                 url: '/dashboard',

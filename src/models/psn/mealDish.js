@@ -23,6 +23,7 @@ module.exports = function(ctx,name) {
             price: {type: Number, required: true,min: 0}, //菜品价格
             stop_flag: {type: Boolean, default: false},//是否可用
             img:{type:String},
+            py: {type: String},//拼音首字母，用于排序
             tenantId: {type: mongoose.Schema.Types.ObjectId}
         }, {
             toObject: {

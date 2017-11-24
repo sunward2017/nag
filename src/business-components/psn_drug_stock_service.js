@@ -1138,9 +1138,10 @@ module.exports = {
         console.log('检查库存是否满足出库要求...', tenant);
         var elderlyStockObject = yield self._elderlyStockObject(tenant, elderly);
         console.log('elderlyStockObject:', elderlyStockObject);
-        var drugData, drugStock;
+        var drugData, drugStock, drugIds;
         for (var i = 0, len = drugs.length; i < len; i++) {
           drugData = drugs[i];
+          drugIds.push(drugData.drugId.toString())
           drugStock = elderlyStockObject[drugData.drugId];
           if (!drugStock) {
             return self.ctx.wrapper.res.error({message: '出库药品' + (drugData.drug_name || '') + '库存为0'});
@@ -1212,10 +1213,14 @@ module.exports = {
         for (var drugId in elderlyStockObject) {
           drugStockStat = elderlyStockObject[drugId];
           if (drugStockStat.is_warning) {
-            lowStockDrugStats.push(drugStockStat);
+            //判断库存不足后还需要判断该药没有被停用,还在出库
+            if (self.ctx._.contains(drugIds, drugId.toString())) {
+              lowStockDrugStats.push(drugStockStat);
+            }
           }
         }
         if (lowStockDrugStats.length > 0) {
+
           console.log('准备生成通知...', lowStockDrugStats);
           var retid = yield self.ctx.pub_alarm_service.saveLowStockDrugsAlarmForElderly(lowStockDrugStats, elderly);
           if(!retid){
@@ -2268,6 +2273,7 @@ module.exports = {
       try {
         var where = {
           status: 1,// 隐式包含了quantity>0
+          stop_flag: false, //停用的不计算
           elderlyId: elderly._id,
           drugId: drugId,
           tenantId: tenant._id

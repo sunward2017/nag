@@ -649,12 +649,27 @@ module.exports = {
               }
 
               var tenant = tae.ret.t, elderly = tae.ret.e;
+              var elderlyDrugUseItems = yield self.ctx.modelFactory().model_query(self.ctx.models['psn_drugUseItem'], {
+                select: 'drugId',
+                where: {
+                  status: 1,
+                  elderlyId: elderly._id,
+                  stop_flag: false,
+                  tenantId: tenantId
+                }
+              });
+
+              var drugIds = app._.map(elderlyDrugUseItems, o => o.drugId.toString());
+
               var elderlyStockObject = yield app.psn_drug_stock_service._elderlyStockObject(tenant, elderly);
               var lowStockDrugStats = [], drugStockStat;
               for (var drugId in elderlyStockObject) {
                 drugStockStat = elderlyStockObject[drugId];
                 if (drugStockStat.is_warning) {
-                  lowStockDrugStats.push(drugStockStat);
+                  //判断库存不足后还需要判断该药没有被停用,还在出库
+                  if (app._.contains(drugIds, drugId.toString())) {
+                    lowStockDrugStats.push(drugStockStat);
+                  }
                 }
               }
               if (lowStockDrugStats.length == 0) {

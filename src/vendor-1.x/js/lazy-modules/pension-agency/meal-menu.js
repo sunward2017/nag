@@ -41,10 +41,13 @@
       vm.tab1 = {cid: 'contentTab1'};
 
       fetchMealMenuTemplates();
-      vm.aggrValuePromise = vmh.shareService.tmp('T3001/psn-meal', 'name', {tenantId: vm.tenantId, status: 1, stop_flag: false}).then(function (nodes) {
+      vm.aggrValuePromise = vmh.shareService.tmp('T3014', 'name py', {tenantId: vm.tenantId, status: 1, stop_flag: false}).then(function (nodes) {
+        console.log('nodes :',nodes);
+        return nodes;
+      });
+      vmh.shareService.tmp('T3001/psn-meal', 'name py', {tenantId: vm.tenantId, status: 1, stop_flag: false}).then(function (nodes) {
         vm.selectBinding.mealShifts = nodes;
         // console.log('mealShifts nodes :',nodes);
-        return nodes;
       });
       // vmh.shareService.d('D3040').then(function (nodes) {
       //   // console.log('yAxisData:',nodes);
@@ -146,7 +149,8 @@
             _id: mealShiftObject._id,
             id: mealShiftObject.id,
             name: mealShiftObject.name,
-            quantity: MenuScheduleItem.aggr_value.quantity
+            quantity: MenuScheduleItem.aggr_value.quantity,
+            py:mealShiftObject.py
           });
         }
       }
@@ -263,7 +267,10 @@
       }
       // console.log('vm.selectedMealShifts:', vm.selectedMealShifts);
       var selectedMealShifts = _.map(vm.selectedMealShifts, function (o) {
-        return {_id: o._id, id: o.id, name: o.name};
+        return {_id: o._id, id: o.id, name: o.name,py:o.py};
+      });
+      selectedMealShifts =_.sortBy(selectedMealShifts,function (o) {
+        return o.py
       });
       var toSaveRows = [];
       for (var i = 0, ylen = vm.yAxisData.length; i < ylen; i++) {
@@ -279,7 +286,7 @@
             if (isReplace) {
               vm.aggrData[rowId][colId] = [];
               _.each(selectedMealShifts, function (o) {
-                vm.aggrData[rowId][colId].push({_id: o._id, id: o.id, name: o.name, quantity: 1});
+                vm.aggrData[rowId][colId].push({_id: o._id, id: o.id, name: o.name, quantity: 1,py:o.py});
                 toSaveRows.push({x_axis: date, y_axis: rowId, aggr_value: {mealId: o.id}});
               });
             } else {
@@ -292,10 +299,13 @@
                 console.log('findIndex:', findIndex);
                 if (findIndex == -1) {
                   console.log('o:', o);
-                  arr.push({_id: o._id, id: o.id, name: o.name, quantity: 1});
+                  arr.push({_id: o._id, id: o.id, name: o.name, quantity: 1,py:o.py});
                 }
               });
-
+              arr =vm.aggrData[rowId][colId]= _.sortBy(arr,function (o) {
+                return o.py;
+              });
+              console.log('arr after sort:',arr);
               _.each(arr, function (o) {
                 toSaveRows.push({x_axis: date, y_axis: rowId, aggr_value: {mealId: o.id, quantity: o.quantity}});
               });

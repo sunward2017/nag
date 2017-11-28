@@ -165,6 +165,7 @@
             },
             serverPaging: true,
             blockUI: true,
+            keyword_match_cols: ['name', 'enter_code', 'py'],
             columns: [{
               label: '老人',
               name: 'name',

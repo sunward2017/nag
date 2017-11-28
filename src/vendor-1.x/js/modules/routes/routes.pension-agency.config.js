@@ -1753,7 +1753,7 @@
         data: {
           func_id: MODEL_VARIABLES.BIZ_FUNC_PREFIXS.PENSION_AGENCY + 'MEAL' //业务系统使用
         },
-        resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.PENSION_AGENCY + 'meal.js')
+        resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.PENSION_AGENCY + 'meal.js','transliteration')
       })
       .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'meal.list', {
         url: '/list/:action',
@@ -1807,7 +1807,8 @@
             modelName: 'psn-meal',
             model: {dishes: []},
             blockUI: true
-          })
+          }),
+          deps: helper.resolveFor2('qiniu', 'qiniu-ng')
         }
       })
       .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'meal-dish', {
@@ -1826,7 +1827,7 @@
         data: {
           func_id: MODEL_VARIABLES.BIZ_FUNC_PREFIXS.PENSION_AGENCY + 'MEAL-DISH' //业务系统使用
         },
-        resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.PENSION_AGENCY + 'meal-dish.js')
+        resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.PENSION_AGENCY + 'meal-dish.js','transliteration')
       })
       .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'meal-dish.list', {
         url: '/list/:action',
@@ -2208,7 +2209,8 @@
             model: {},
             notifySaved: 'psn$drugDirectory$$syncToPubDrug',
             blockUI: true
-          })
+          }),
+          deps: helper.resolveFor2('qiniu', 'qiniu-ng')
         }
       })
       .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'drug-stock', {

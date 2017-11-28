@@ -55,15 +55,14 @@
       vm.tab1 = {cid: 'contentTab1'};
 
 
-      vm.aggrValuePromise = vmh.shareService.tmp('T3001/psn-meal', 'name', {tenantId: vm.tenantId, status: 1, stop_flag: false}).then(function (treeNodes) {
-        vm.selectBinding.meals = treeNodes;
+      vm.aggrValuePromise = vmh.shareService.tmp('T3014', 'name py', {tenantId: vm.tenantId, status: 1, stop_flag: false}).then(function (treeNodes) {
         return treeNodes;
       });
+      vmh.shareService.tmp('T3001/psn-meal', 'name py', {tenantId: vm.tenantId, status: 1, stop_flag: false}).then(function (nodes) {
+        vm.selectBinding.meals = nodes;
+        // console.log('meals nodes :',nodes);
+      });
 
-      // vmh.shareService.d('D3040').then(function (nodes) {
-      //   console.log('vm.yAxisData nodes :', nodes);
-      //   vm.yAxisData = nodes;
-      // });
       vmh.parallel([
         vmh.shareService.d('D3040'),
         tenantService.query({_id: vm.model['tenantId']}, 'other_config')
@@ -123,6 +122,7 @@
         }
 
       }
+      console.log('vm.aggrData:',vm.aggrData);
     }
 
     function enterGridEditMode() {
@@ -251,7 +251,7 @@
         return;
       }
       var selectedMeals = _.map(vm.selectedMeals, function (o) {
-        return {_id: o._id, id: o.id, name: o.name};
+        return {_id: o._id, id: o.id, name: o.name,py:o.py};
       });
       for (var i = 0, ylen = vm.yAxisData.length; i < ylen; i++) {
         var rowId = vm.yAxisData[i].value;
@@ -276,6 +276,9 @@
                   console.log('o:', o);
                   arr.push(o);
                 }
+              });
+              vm.aggrData[rowId][colId]= _.sortBy(arr,function (o) {
+                return o.py;
               });
             }
           }

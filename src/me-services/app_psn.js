@@ -1314,7 +1314,7 @@ module.exports = {
                     $project: {
                       date: {$dateToString: {format: "%Y-%m-%d", date: "$x_axis"}},
                       period: '$y_axis',
-                      meal: {id: '$aggr_value.mealId', name: '$meal.name'}
+                      meal: {id: '$aggr_value.mealId', name: '$meal.name',img:'$meal.img'}
                     }
                   },
                   {

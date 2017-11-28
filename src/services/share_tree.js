@@ -664,6 +664,64 @@ module.exports = {
                         yield next;
                     };
                 }
+            },
+            {
+                method: 'fetch-T3014',
+                verb: 'post',
+                url: this.service_url_prefix + "/T3014", //排餐表- 套餐选择树
+                handler: function (app, options) {
+                    return function * (next) {
+                        try {
+                            var data = this.request.body;
+                            var tenantId = data.where.tenantId;
+                            console.log('data:',data);
+
+                            var initials = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];
+                            var meals = yield app.modelFactory().model_query(app.models['psn_meal'], {
+                                where: {
+                                  status: 1,
+                                  stop_flag: false,
+                                  tenantId: tenantId
+                                },
+                                select: 'name py',
+                                sort:{py:1}
+                            });
+                            console.log('meals:',meals);
+
+                            var mealGroupNodes,mealGroupNodesObj={};
+                            app._.each(meals,(o) => {
+                                "use strict";
+                                var firstLetter = o.py[0];
+                                if(initials.indexOf(firstLetter)!= -1){
+                                    if(!mealGroupNodesObj[firstLetter]){
+                                        mealGroupNodesObj[firstLetter]=[];
+                                    }
+                                    mealGroupNodesObj[firstLetter].push(o);
+                                }else {
+                                    if(!mealGroupNodesObj['其他']){
+                                        mealGroupNodesObj['其他']=[];
+                                    }
+                                    mealGroupNodesObj['其他'].push(o);
+                                }
+                            });
+
+                            mealGroupNodes = app._.map(mealGroupNodesObj,function (o,key) {
+                                return {
+                                  _id:key,
+                                  name:key,
+                                  children:o
+                                }
+                            });
+                            console.log('mealGroupNodes:',mealGroupNodes);
+
+                            this.body = app.wrapper.res.rows(mealGroupNodes);
+                        } catch (e) {
+                            self.logger.error(e);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
             }
         ];
 

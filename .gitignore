@@ -54,3 +54,4 @@ dev-*.sh
 
 #raw-data
 *.xlsx
+package-lock.json

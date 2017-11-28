@@ -37,6 +37,15 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                         .col-md-10
                             input.form-control(type='text', name='english_name',ng-model='vm.model.english_name',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-MODEL")|translate}}' )
                     fieldset: .form-group
+                        <!--图片-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-DRUG-IMG') | translate}}:
+                        .col-md-10
+                            .img-border
+                                .img-loader(ng-if="vm.model.img")
+                                    img(ng-src="{{vm.model.img}}")
+                                .uploader-area(qiniu-uploader, button-text="选择图片" bucket='4gimg',user='vm.model.id',ng-uploaded-url="vm.model.img")
+                            input.form-control(type='text', name='img',ng-model='vm.model.img',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-IMG")|translate}}')
+                    fieldset: .form-group
                         <!--最小消耗单位-->
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-MINI_UNIT') | translate}}:
                         .col-md-10

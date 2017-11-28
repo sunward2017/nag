@@ -1807,7 +1807,8 @@
             modelName: 'psn-meal',
             model: {dishes: []},
             blockUI: true
-          })
+          }),
+          deps: helper.resolveFor2('qiniu', 'qiniu-ng')
         }
       })
       .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'meal-dish', {
@@ -2208,7 +2209,8 @@
             model: {},
             notifySaved: 'psn$drugDirectory$$syncToPubDrug',
             blockUI: true
-          })
+          }),
+          deps: helper.resolveFor2('qiniu', 'qiniu-ng')
         }
       })
       .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'drug-stock', {

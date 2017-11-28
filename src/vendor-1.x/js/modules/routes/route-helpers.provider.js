@@ -333,9 +333,13 @@
           //console.log((this.size.h - 35 - 49 - 10.5 - 52) );
           //console.log(this.page.size);
 
+          this.keyword_match_cols = option.keyword_match_cols;
           //remote data get
           _.each(this.columns, function (column) {
             if (column) {
+              if (column.keyword) {
+                self.keyword_match_cols.push(column.name);
+              }
               if (column.type == 'bool') {
                 column.formatterData = {"1": "是", "0": "否", "true": "是", "false": "否"};
               }
@@ -540,6 +544,18 @@
           return modelService.find(id);
         }
 
+        function searchByKeyword(keyword, e) {
+          // console.log('searchByKeyword:', e);
+          if(e && e.keyCode !== 13) return;
+          if (keyword){
+            if(keyword.trim) keyword = keyword.trim();
+            this.searchForm._matches_ = {keyword: keyword, col_names: this.keyword_match_cols}
+          } else {
+            this.searchForm._matches_ = undefined;
+          }
+          this.query()
+        }
+
         function query() {
           var self = this;
 
@@ -549,6 +565,7 @@
             if (self.blocker) {
               self.blocker.start();
             }
+            console.log('this.searchForm._matches_', self.searchForm._matches_)
             self.rows = modelService.page(self.page, self.searchForm, null, (self.sort.direction > 0 ? '' : '-') + self.sort.column, self.populates);
             //服务端totals在查询数据时计算
             modelService.totals(self.searchForm).$promise.then(function (ret) {
@@ -695,6 +712,7 @@
           read: read,
           remove: remove,
           disable: disable,
+          searchByKeyword: searchByKeyword,
           query: query,
           paging: paging,
           selectAll: selectAll,

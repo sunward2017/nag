@@ -153,7 +153,7 @@ module.exports = {
                 });
                 this.request.body.where._matches_ = undefined;
               }
-              console.log('query request.body2:', this.request.body)
+              console.log('query request.body2:', this.request.body.where)
 
               var rows = app.modelFactory().query(modelOption.model_name, modelOption.model_path, this.request.body);
               var populates = this.request.body.populates;
@@ -168,7 +168,10 @@ module.exports = {
                   rows = rows.populate(populates);
                 }
               }
-              this.body = app.wrapper.res.rows(yield rows);
+
+              rows = yield rows;
+              console.log('query:', rows);
+              this.body = app.wrapper.res.rows(rows);
             } catch (e) {
               self.logger.error(e.message);
               this.body = app.wrapper.res.error(e);
@@ -215,6 +218,19 @@ module.exports = {
           return function *(next) {
             try {
               var modelOption = app.getModelOption(this);
+
+              var _matches_ = this.request.body._matches_;
+              if(_matches_ && _matches_.keyword && _matches_.col_names && _matches_.col_names.length > 0) {
+                var keywordReg = new RegExp(_matches_.keyword);
+                this.request.body.$or = app._.map(_matches_.col_names, function (col_name) {
+                  var keywordRegObj = {};
+                  keywordRegObj[col_name] = keywordReg;
+                  return keywordRegObj;
+                });
+                this.request.body._matches_ = undefined;
+              }
+              console.log('totals request.body2:', this.request.body)
+
               this.body = app.wrapper.res.ret({totals: (yield app.modelFactory().totals(modelOption.model_name, modelOption.model_path, this.request.body)).length});
               //this.set('page-totals', 10);response head set
             } catch (e) {

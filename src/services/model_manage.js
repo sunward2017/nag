@@ -143,7 +143,8 @@ module.exports = {
 
               console.log('query request.body:', this.request.body)
               //解析keyword字段
-              var _matches_ = this.request.body.where._matches_;
+
+              var _matches_ = this.request.body.where && this.request.body.where._matches_;
               if(_matches_ && _matches_.keyword && _matches_.col_names && _matches_.col_names.length > 0) {
                 var keywordReg = new RegExp(_matches_.keyword);
                 this.request.body.where.$or = app._.map(_matches_.col_names, function (col_name) {

@@ -3,7 +3,10 @@
         form.form-search
             .input-group.pull-right.page-search
                 label.input-group-addon {{'grid.LABEL-SEARACH'|translate}}
-                input.form-control(type="text",ng-model="vm.filter.$")
+                input.form-control(type="text",ng-model="vm.filter.$", ng-keypress="vm.searchByKeyword(vm.filter.$, $event)")
+                a.input-group-addon.btn.btn-primary(ng-click="vm.searchByKeyword(vm.filter.$)")
+                    i.glyphicon.glyphicon-search
+                    | {{'button.QUERY'|translate}}
     .row-split
     .row
         .panel.panel-default.panel-grid
@@ -19,7 +22,7 @@
                             | {{column.label}}
                             i.glyphicon(ng-if="column.name === vm.sort.column && vm.sort.direction",ng-class="vm.sort.direction|orderClass")
                 tbody
-                    tr(ng-repeat="row in vm.rows|filter:vm.filter|orderBy:vm.sort.column:vm.sort.direction===-1|paging:vm" , ng-click="vm.selectRow($event,row)",ng-dblclick="vm.dblclickRow(row.id)")
+                    tr(ng-repeat="row in vm.rows|orderBy:vm.sort.column:vm.sort.direction===-1|paging:vm" , ng-click="vm.selectRow($event,row)",ng-dblclick="vm.dblclickRow(row.id)")
                         td
                             .checkbox.c-checkbox(ng-if="!row.unselectable")
                                 label

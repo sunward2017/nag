@@ -80,6 +80,7 @@
                         },
                         //切换客户端还是服务端分页
                         serverPaging: true,
+                        keyword_match_cols: ['name','phone','email'],
                         blockUI: true,
                         columns: [
                             {
@@ -185,6 +186,7 @@
                         searchForm: {"status": 1,"type": 'A0002'},//user.type 养老机构用户
                         //切换客户端还是服务端分页
                         serverPaging: true,
+                        keyword_match_cols: ['name','phone','code'],
                         blockUI: true,
                         columns: [
                             {
@@ -309,6 +311,7 @@
                         searchForm: {"type": 'TP'},//养老机构产生的订单
                         //切换客户端还是服务端分页
                         serverPaging: true,
+                        keyword_match_cols: ['code'],
                         blockUI: true,
                         rowHeight: 60,
                         columns: [
@@ -434,6 +437,7 @@
                         },
                         //切换客户端还是服务端分页
                         serverPaging: true,
+                        keyword_match_cols: ['name','phone','email'],
                         blockUI: true,
                         columns: [
                             {
@@ -538,6 +542,7 @@
                         searchForm: {"status": 1,"type": 'A0003'},//user.type 代理商用户
                         //切换客户端还是服务端分页
                         serverPaging: true,
+                        keyword_match_cols: ['name','phone','code'],
                         blockUI: true,
                         columns: [
                             {
@@ -661,6 +666,7 @@
                         searchForm: {"type": 'TA'},//代理产生的订单
                         //切换客户端还是服务端分页
                         serverPaging: true,
+                        keyword_match_cols: ['code'],
                         blockUI: true,
                         rowHeight: 60,
                         columns: [
@@ -775,6 +781,7 @@
                         modelName: 'pub-jobStatus',
                         //切换客户端还是服务端分页
                         serverPaging: true,
+                        keyword_match_cols: ['job_id','job_name'],
                         blockUI: true,
                         columns: [
                             {
@@ -859,6 +866,7 @@
                         searchForm: {"status": 1,"type": 'A0001'},//user.type 平台用户
                         //切换客户端还是服务端分页
                         serverPaging: true,
+                        keyword_match_cols: ['code','name','phone'],
                         blockUI: true,
                         columns: [
                             {
@@ -974,6 +982,7 @@
                         },
                         //切换客户端还是服务端分页
                         serverPaging: true,
+                        keyword_match_cols: ['code'],
                         blockUI: true,
                         rowHeight: 60,
                         columns: [
@@ -1073,6 +1082,7 @@
                         },
                         //切换客户端还是服务端分页
                         serverPaging: true,
+                        keyword_match_cols: ['code'],
                         blockUI: true,
                         rowHeight: 60,
                         columns: [
@@ -1169,6 +1179,7 @@
                         sortColumn: 'ver_order',
                         //切换客户端还是服务端分页
                         serverPaging: true,
+                        keyword_match_cols: ['_id','ver','app_id'],
                         blockUI: true,
                         columns: [
                             {
@@ -1439,6 +1450,7 @@
                         modelName: 'pub-drug',
                         searchForm: { "status": 1 },
                         serverPaging: true,
+                        keyword_match_cols: ['barcode','name'],
                         blockUI: true,
                         columns: [{
                             label: '条形码',

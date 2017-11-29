@@ -75,6 +75,7 @@
             modelName: 'psn-enter',
             searchForm: {"status": 1},
             serverPaging: true,
+            keyword_match_cols: ['elderly_summary','code'],
             blockUI: true,
             columns: [{
               label: '入院登记号',
@@ -288,6 +289,7 @@
             modelName: 'psn-exit',
             searchForm: {"status": 1},
             serverPaging: true,
+            keyword_match_cols: ['elderly_name', 'enter_code'],
             blockUI: true,
             columns: [{
               label: '老人',
@@ -376,6 +378,7 @@
             modelName: 'psn-reception',
             searchForm: {"status": 1},
             serverPaging: true,
+            keyword_match_cols: ['elderly_name','visit_summary'],
             blockUI: true,
             columns: [{
               label: '接待登记号',
@@ -462,6 +465,7 @@
             searchForm: {"status": 1},
             serverPaging: true,
             blockUI: true,
+            keyword_match_cols: ['elderly_name'],
             columns: [{
               label: '外出登记号',
               name: 'code',
@@ -547,6 +551,7 @@
             searchForm: {"status": 1, "type": 'A0001'},
             serverPaging: true,
             blockUI: true,
+            keyword_match_cols: ['elderly_name','code','current_nursing_level_name'],
             columns: [{
               label: '评估号',
               name: 'code',
@@ -629,6 +634,7 @@
             modelName: 'psn-elderly',
             searchForm: {"status": 1},
             serverPaging: true,
+            keyword_match_cols: ['name','py','nursing_level_name'],
             blockUI: true,
             sortColumn: 'last_assessment_time',
             sortDirection: 1,
@@ -784,6 +790,7 @@
             modelName: 'psn-nursingScheduleTemplate',
             searchForm: {"status": 1},
             serverPaging: true,
+            keyword_match_cols: ['name','type_name'],
             blockUI: true,
             columns: [{
               label: '模版名称',
@@ -883,6 +890,7 @@
             modelName: 'psn-nursingWorkerScheduleTemplate',
             searchForm: {"status": 1},
             serverPaging: true,
+            keyword_match_cols: ['name'],
             blockUI: true,
             columns: [{
               label: '模版名称',
@@ -958,6 +966,7 @@
             modelName: 'psn-nursingGroup',
             searchForm: {"status": 1},
             serverPaging: true,
+            keyword_match_cols: ['name'],
             blockUI: true,
             columns: [{
               label: '照护组名称',
@@ -1031,6 +1040,7 @@
             modelName: 'psn-nursingRecord',
             searchForm: {"status": 1},
             serverPaging: true,
+            keyword_match_cols: ['elderly_name','name'],
             blockUI: true,
             columns: [{
               label: '房间号',
@@ -1107,6 +1117,7 @@
             modelName: 'pub-alarm',
             searchForm: {"status": 1, reason: 'A1000'},
             serverPaging: true,
+            keyword_match_cols: ['subject_name','object_name','reason_name','level_name'],
             blockUI: true,
             columns: [{
               label: '报警设备',
@@ -1204,6 +1215,7 @@
             modelName: 'psn-doctorNurseScheduleTemplate',
             searchForm: {"status": 1},
             serverPaging: true,
+            keyword_match_cols: ['name','type_name'],
             blockUI: true,
             columns: [{
               label: '模版名称',
@@ -1279,6 +1291,7 @@
             searchForm: {"status": 1, "current_register_step": {"$in": ['A0003', 'A0005', 'A0007']}},
             transTo: MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'enter.details',
             serverPaging: true,
+            keyword_match_cols: ['code','elderly_summary'],
             blockUI: true,
             columns: [{
               label: '入院登记号',
@@ -1347,6 +1360,7 @@
             modelName: 'psn-recharge',
             searchForm: {"status": 1},
             serverPaging: true,
+            keyword_match_cols: ['voucher_no','elderly_name'],
             blockUI: true,
             columns: [{
               label: '充值日期',
@@ -1451,6 +1465,7 @@
             searchForm: {"status": 1, "current_step": {"$in": ['A0005', 'A0007', 'A0009']}},
             transTo: MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'exit.details',
             serverPaging: true,
+            keyword_match_cols: ['elderly_name','enter_code','current_step_name'],
             blockUI: true,
             columns: [{
               label: '老人',
@@ -1525,6 +1540,7 @@
             modelName: 'pub-red',
             searchForm: {"status": 1},
             serverPaging: true,
+            keyword_match_cols: ['voucher_no','voucher_no_to_red','remark'],
             blockUI: true,
             columns: [{
               label: '冲红日期',
@@ -1603,6 +1619,7 @@
             modelName: 'pub-tenantJournalAccount',
             searchForm: {"status": 1},
             serverPaging: true,
+            keyword_match_cols: ['voucher_no','digest'],
             blockUI: true,
             columns: [{
               label: '记账日期',
@@ -1698,6 +1715,7 @@
             modelName: 'psn-mealMenuTemplate',
             searchForm: {"status": 1},
             serverPaging: true,
+            keyword_match_cols: ['name','description'],
             blockUI: true,
             columns: [{
               label: '模版名称',
@@ -1766,6 +1784,7 @@
             modelName: 'psn-meal',
             searchForm: {"status": 1},
             serverPaging: true,
+            keyword_match_cols: ['name'],
             blockUI: true,
             columns: [{
               label: '配餐名称',
@@ -1840,6 +1859,7 @@
             modelName: 'psn-mealDish',
             searchForm: {"status": 1},
             serverPaging: true,
+            keyword_match_cols: ['name'],
             blockUI: true,
             columns: [{
               label: '菜品名称',
@@ -2053,6 +2073,7 @@
             modelName: 'psn-drugUseTemplate',
             searchForm: {"status": 1},
             serverPaging: true,
+            keyword_match_cols: ['name'],
             blockUI: true,
             sortColumn: 'order_no',
             sortDirection: 1,
@@ -2152,6 +2173,7 @@
             modelName: 'psn-drugDirectory',
             searchForm: {"status": 1},
             serverPaging: true,
+            keyword_match_cols: ['barcode','full_name'],
             blockUI: true,
             columns: [{
               label: '药品条形码',
@@ -2329,6 +2351,7 @@
             modelName: 'psn-drugInOutStock',
             searchForm: {"status": 1, "type": {$in: ['A0001', 'A0003', 'A0005', 'A0099', 'A0100']}, "elderlyId": {$exists: true}},
             serverPaging: true,
+            keyword_match_cols: ['code','elderly_name','drugs.drug_name'],
             blockUI: true,
             columns: [{
               label: '入库单号',
@@ -2411,6 +2434,7 @@
             modelName: 'psn-drugStock',
             searchForm: {"status": 1, "elderlyId": {$in: [null, undefined]}},
             serverPaging: true,
+            keyword_match_cols: ['drug_name'],
             columns: [{
               label: '药品名称',
               name: 'drug_name',
@@ -2475,6 +2499,7 @@
             modelName: 'psn-drugInOutStock',
             searchForm: {"status": 1, "type": {$in: ['A0001', 'A0005', 'A0099']}, "elderlyId": {$in: [null, undefined]}},
             serverPaging: true,
+            keyword_match_cols: ['code','drugs.drug_name'],
             blockUI: true,
             columns: [{
               label: '入库单号',
@@ -2550,6 +2575,7 @@
           entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'center-drug-out-stock.list', {
             modelName: 'psn-drugInOutStock',
             serverPaging: true,
+            keyword_match_cols: ['code','drugs.drug_name','elderly_name'],
             blockUI: true,
             columns: [{
               label: '移库单号',
@@ -2613,6 +2639,7 @@
             modelName: 'psn-drugInOutStock',
             searchForm: {"status": 1, "type": {$in: ['B0001', 'B0003', 'B0099']}},
             serverPaging: true,
+            keyword_match_cols: ['code','elderly_name','drugs.drug_name'],
             blockUI: true,
             columns: [{
               label: '出库单号',
@@ -2695,6 +2722,7 @@
             searchForm: {"status": 1, "current_step": {"$in": ['A0003', 'A0005', 'A0007', 'A0009']}},
             transTo: MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'exit.details',
             serverPaging: true,
+            keyword_match_cols: ['elderly_name','enter_code'],
             blockUI: true,
             columns: [{
               label: '老人',
@@ -2769,6 +2797,7 @@
             modelName: 'psn-doctor',
             searchForm: {"status": 1},
             serverPaging: true,
+            keyword_match_cols: ['code','name','phone'],
             blockUI: true,
             notifyRowDisabled: 'psn$doctor$$disabled',
             columns: [{
@@ -2843,6 +2872,7 @@
             modelName: 'psn-nurse',
             searchForm: {"status": 1},
             serverPaging: true,
+            keyword_match_cols: ['code','name','phone'],
             blockUI: true,
             notifyRowDisabled: 'psn$nurse$$disabled',
             columns: [{
@@ -2923,6 +2953,7 @@
             modelName: 'psn-nursingWorker',
             searchForm: {"status": 1},
             serverPaging: true,
+            keyword_match_cols: ['code','name','phone'],
             blockUI: true,
             columns: [{
               label: '护工编号',
@@ -2998,6 +3029,7 @@
             modelName: 'psn-workItem',
             searchForm: {"status": 1, customize_flag: false},
             serverPaging: true,
+            keyword_match_cols: ['nursingLevelId.name','name'],
             blockUI: true,
             columns: [{
               label: '照护级别',
@@ -3098,6 +3130,7 @@
             modelName: 'psn-nursingShift',
             searchForm: {"status": 1},
             serverPaging: true,
+            keyword_match_cols: ['code','name'],
             blockUI: true,
             columns: [{
               label: '照护班简称',
@@ -3171,6 +3204,7 @@
             modelName: 'pub-robot',
             searchForm: {"status": 1},
             serverPaging: true,
+            keyword_match_cols: ['code','name'],
             blockUI: true,
             notifyRowDisabled: 'pub$robot$$disabled',
             columns: [{
@@ -3253,6 +3287,7 @@
             modelName: 'pub-bedMonitor',
             searchForm: {"status": 1},
             serverPaging: true,
+            keyword_match_cols: ['code','name','mac'],
             blockUI: true,
             notifyRowDisabled: 'pub$bedMonitor$$disabled',
             columns: [{
@@ -3341,6 +3376,7 @@
               "roomConfig": MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'room.config'
             },
             serverPaging: true,
+            keyword_match_cols: ['name','bedMonitors.bedMonitorId.name'],
             blockUI: true,
             // populates: [{path:'nursing_workers', select:'-_id name'}, {path:'robots', select:'-_id name'}],
             columns: [{
@@ -3490,6 +3526,7 @@
               "config": MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'district.config'
             },
             serverPaging: true,
+            keyword_match_cols: ['name'],
             blockUI: true,
             columns: [
               {
@@ -3569,6 +3606,7 @@
             modelName: 'psn-nursingLevel',
             searchForm: {"status": 1},
             serverPaging: true,
+            keyword_match_cols: ['name','short_name'],
             blockUI: true,
             columns: [{
               label: '评估等级',
@@ -3665,6 +3703,7 @@
             modelName: 'pub-tenantChargeItemCustomized',
             searchForm: {"status": 1},
             serverPaging: true,
+            keyword_match_cols: ['name'],
             blockUI: true,
             columns: [{
               label: '服务名称',
@@ -3740,6 +3779,7 @@
               "userDataPermissionConfig": MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'user-manage.data-permission'
             },
             serverPaging: true,
+            keyword_match_cols: ['code','name','phone'],
             blockUI: true,
             columns: [{
               label: '用户编码',
@@ -3862,6 +3902,7 @@
             modelName: 'pub-wxaConfig',
             searchForm: {"status": 1},
             serverPaging: true,
+            keyword_match_cols: ['app_id','app_name'],
             blockUI: true,
             columns: [{
               label: 'appid',

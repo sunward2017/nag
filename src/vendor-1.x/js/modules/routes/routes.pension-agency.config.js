@@ -149,7 +149,7 @@
         data: {
           func_id: MODEL_VARIABLES.BIZ_FUNC_PREFIXS.PENSION_AGENCY + 'IN' //业务系统使用
         },
-        resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.PENSION_AGENCY + 'in.js')
+        resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.PENSION_AGENCY + 'in.js','transliteration')
       })
       .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'in.list', {
         url: '/list/:action',
@@ -1784,7 +1784,7 @@
             modelName: 'psn-meal',
             searchForm: {"status": 1},
             serverPaging: true,
-            keyword_match_cols: ['name'],
+            keyword_match_cols: ['name','py'],
             blockUI: true,
             columns: [{
               label: '配餐名称',
@@ -1859,7 +1859,7 @@
             modelName: 'psn-mealDish',
             searchForm: {"status": 1},
             serverPaging: true,
-            keyword_match_cols: ['name'],
+            keyword_match_cols: ['name','py'],
             blockUI: true,
             columns: [{
               label: '菜品名称',

@@ -10,10 +10,13 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                     fieldset: .form-group
                         <!--菜品名称-->
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-NAME') | translate}}:
-                        .col-md-8
-                            input.form-control(type='text', name='name',ng-model='vm.model.name',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-NAME")|translate}}' ,required='')
+                        .col-md-6
+                            input.form-control(type='text', name='name',ng-model='vm.model.name',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-NAME")|translate}}' ,required='',ng-change="vm.getInitial()")
                             span.text-danger(ng-show="utils.vinput(this.theForm,'name','required')") {{ "validator.REQUIRED" | translate}}
                             span.text-danger(ng-show="vm.nameUsed") {{ "validator.ALREADY-EXISTS" | translate:{item:"菜名"} }}
+                        .col-md-2
+                            input.form-control(type='text', name='py',ng-model='vm.model.py',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-PY")|translate}}' ,required='')
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'py','required')") {{ "validator.REQUIRED" | translate}}
                         .col-md-2
                             a.btn.btn-sm(ng-class="{'btn-primary':vm.nameUsed===undefined ,'btn-success':vm.nameUsed===false,'btn-danger':vm.nameUsed}",ng-click="vm.isDishNameUsed()") {{ vm.viewTranslatePath('TAB1-LABEL-CHECK_DISH_NAME') | translate}}
                                 i.fa.fa-check-circle-o.fa-lg(ng-show="vm.nameUsed===false")

@@ -74,6 +74,7 @@
       vm.changeBoard = changeBoard;
       vm.changeRoom = changeRoom;
       vm.changeOtherAndCustomized = changeOtherAndCustomized;
+      vm.getInitial = getInitial;
 
 
       vm.tab1 = {cid: 'contentTab1'};
@@ -175,6 +176,12 @@
       //vm.subGrid.journal_account.order = {};
     }
 
+    function getInitial() {
+      var initialArr = slugify(vm.model.name).split('-');
+      vm.model.py = _.map(initialArr,function (o) {
+        return o[0];
+      }).join('');
+    }
 
     function serverSideCheck(id_no) {
       if ((vm._action_ == 'add' && vm._id_ == 'new' && (id_no.length == 18 || id_no.length == 15))

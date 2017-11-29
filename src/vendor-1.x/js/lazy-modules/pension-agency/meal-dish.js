@@ -33,6 +33,7 @@
         var vm = $scope.vm = vm;
         $scope.utils = vmh.utils.v;
         vm.isDishNameUsed = isDishNameUsed;
+        vm.getInitial = getInitial;
         console.log('vm._action_:',vm._action_);
 
 
@@ -86,7 +87,6 @@
             var p=vm.isDishNameUsed().then(function (nameRet) {
               console.log('nameRet:',nameRet);
               if ($scope.theForm.$valid && nameRet===false) {
-                getInitial();
                 console.log('submit vm.model:',vm.model);
                 vm.save();
               }

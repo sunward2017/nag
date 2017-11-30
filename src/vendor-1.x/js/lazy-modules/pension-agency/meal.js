@@ -34,6 +34,7 @@
     $scope.utils = vmh.utils.v;
     vm.meatsSearch = meatsSearch;
     vm.vegetablesSearch = vegetablesSearch;
+    vm.getInitial = getInitial;
     var meats=[],vegetables=[];
 
     init();
@@ -153,7 +154,6 @@
         for (var i = 0, len = vm.model.dishes.length; i < len; i++) {
           vm.model.dishes[i].mealDishId = vm.model.dishes[i]._id;
         }
-        getInitial();
         console.log('vm.model:', vm.model);
         vm.save();
       }

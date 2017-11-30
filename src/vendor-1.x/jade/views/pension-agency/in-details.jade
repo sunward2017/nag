@@ -23,11 +23,16 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                     fieldset: .form-group
                         <!--姓名-->
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-NAME') | translate}}:
-                        .col-md-10(ng-if="!vm.readonly")
-                            input.form-control(type='text', name='name',ng-model='vm.model.name',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-NAME")|translate}}' ,required='')
+                        .col-md-8(ng-if="!vm.readonly")
+                            input.form-control(type='text', name='name',ng-model='vm.model.name',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-NAME")|translate}}' ,required='',ng-change="vm.getInitial()")
                             span.text-danger(ng-show="utils.vinput(this.theForm,'name','required')") {{ "validator.REQUIRED" | translate}}
-                        .col-md-10(ng-if="vm.readonly")
+                        .col-md-8(ng-if="vm.readonly")
                             .form-readable {{vm.model.name}}
+                        .col-md-2(ng-if="!vm.readonly")
+                            input.form-control(type='text', name='py',ng-model='vm.model.py',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-PY")|translate}}' ,required='')
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'py','required')") {{ "validator.REQUIRED" | translate}}
+                        .col-md-2(ng-if="vm.readonly")
+                            .form-readable {{vm.model.py}}
                     fieldset: .form-group
                         <!--身份证号-->
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-ID_NO') | translate}}:

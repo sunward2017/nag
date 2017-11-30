@@ -164,7 +164,7 @@ module.exports = {
         var reg = /\${([^}]+)}/, result;
         while ((result = reg.exec(content)) != null) {
           if (RegExp.$1 == "发生时间") {
-            content = content.replace(reg, self.ctx.moment().format('YYYY年MM月DD日HH点mm分'));
+            content = content.replace(reg, '['+self.ctx.moment().format('YYYY年MM月DD日HH点mm分')+ ']');
           } else if (RegExp.$1 == "房间床位") {
             var arr = elderly.room_summary.split('-');
             if (arr.length == 4) {
@@ -173,9 +173,9 @@ module.exports = {
               arr[2] = arr[2] + '室';
               arr[3] = arr[3].replace(/#/g, '号');
             }
-            content = content.replace(reg, arr.join(''));
+            content = content.replace(reg, '['+arr.join('')+ ']');
           } else if (RegExp.$1 == "老人姓名") {
-            content = content.replace(reg, elderly.name);
+            content = content.replace(reg, '['+elderly.name+ ']');
           } else {
             if (content.indexOf('${')) {
               return;
@@ -244,11 +244,11 @@ module.exports = {
         var reg = /\${([^}]+)}/, result;
         while ((result = reg.exec(content)) != null) {
           if (RegExp.$1 == "发生时间") {
-            content = content.replace(reg, self.ctx.moment().format('YYYY年MM月DD日HH点mm分'));
+            content = content.replace(reg, '['+self.ctx.moment().format('YYYY年MM月DD日HH点mm分')+ ']');
           } else if (RegExp.$1 == "老人姓名") {
-            content = content.replace(reg, elderly.name);
+            content = content.replace(reg, '['+elderly.name+ ']');
           } else if (RegExp.$1 == '药品清单') {
-            content = content.replace(reg, drugListContent);
+            content = content.replace(reg, '['+drugListContent+ ']');
           } else {
             if (content.indexOf('${')) {
               return;

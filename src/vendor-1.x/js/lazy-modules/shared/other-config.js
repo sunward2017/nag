@@ -43,7 +43,8 @@
         vmh.shareService.d('D3031'),
         vmh.shareService.d('D3040'),
         vmh.shareService.d('D3041'),
-        vmh.shareService.d('D3028')
+        vmh.shareService.d('D3028'),
+        vmh.shareService.d('D3043'),
       ]).then(function (results) {
         vm.other_configs = results[0][0].other_config;
         console.log('--->',vm.other_configs)
@@ -118,6 +119,7 @@
         vm.selectBinding.psn_meal_biz_modes = results[5];
         vm.psn_meal_periods = _.map(vm.selectBinding.psn_meal_periods, function(o){return _.contains(vm.other_configs.psn_meal_periods||[], o.value) ? o.value : '';})
         vm.selectBinding.psn_drug_stock_out_modes = results[6];
+        vm.selectBinding.psn_drug_stock_alarm_low_mode = results[7];
       });
     }
 

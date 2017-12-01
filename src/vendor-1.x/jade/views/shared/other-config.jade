@@ -124,6 +124,13 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                             span.text-danger(ng-show="utils.vinput(this.theForm,'psn_drug_stock_alarm_low_day','min')") {{ "validator.MIN" | translate:{min:0} }}
                             span.text-danger(ng-show="utils.vinput(this.theForm,'psn_drug_stock_alarm_low_day','max')") {{ "validator.MAX" | translate:{max:50} }}
                     fieldset: .form-group
+                        <!--药品低库存提醒方式-->
+                        label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-PSN_DRUG_STOCK_ALARM_LOW_MODE') | translate}}:
+                        .col-md-10
+                            .btn-group
+                                .btn.btn-primary(name='psn_drug_stock_alarm_low_mode',ng-repeat='mode in vm.selectBinding.psn_drug_stock_alarm_low_mode',ng-model='vm.other_configs.psn_drug_stock_alarm_low_mode',btn-radio="mode.value",required='') {{mode.name}}
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'psn_drug_stock_alarm_low_mode','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset: .form-group
                         <!--药品低库存通知模版-->
                         label.col-md-2.control-label {{ vm.moduleTranslatePath('TAB1-LABEL-ALARM_D3016_A2000_SETTING_CONTENT_TEMPLATE') | translate}}:
                         .col-md-10

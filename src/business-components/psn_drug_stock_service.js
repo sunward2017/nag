@@ -1209,13 +1209,21 @@ module.exports = {
           }
         }
         console.log('如果有药品不足,则生成通知...');
-        var lowStockDrugStats = [], drugStockStat;
+        var lowStockDrugStats = [], drugStockStat, psn_drug_stock_alarm_low_mode = tenant.other_config.psn_drug_stock_alarm_low_mode;
         for (var drugId in elderlyStockObject) {
           drugStockStat = elderlyStockObject[drugId];
           if (drugStockStat.is_warning) {
             //判断库存不足后还需要判断该药没有被停用,还在出库
             if (self.ctx._.contains(drugIds, drugId.toString())) {
-              lowStockDrugStats.push(drugStockStat);
+              if(psn_drug_stock_alarm_low_mode === 'A0002'){
+                var resultSatus = yield self.ctx.pub_alarm_service.checkDrugSendableByName(drugStockStat.drug_name, elderly, tenant);
+                console.log('resultSatus:',resultSatus);
+                if(resultSatus.ret) {
+                  lowStockDrugStats.push(drugStockStat);
+                }
+              }else {
+                lowStockDrugStats.push(drugStockStat);
+              }
             }
           }
         }

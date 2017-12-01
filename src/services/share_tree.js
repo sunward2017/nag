@@ -688,30 +688,39 @@ module.exports = {
                             });
                             console.log('meals:',meals);
 
-                            var mealGroupNodes,mealGroupNodesObj={};
+                            var mealGroupNodes,mealGroupNodesObj={},otherMeal=[];
                             app._.each(meals,(o) => {
                                 "use strict";
+                                if(!o.py){
+                                    otherMeal.push(o);
+                                    console.log('no py item~');
+                                    return;
+                                }
                                 var firstLetter = o.py[0];
                                 if(initials.indexOf(firstLetter)!= -1){
+                                    firstLetter = firstLetter.toUpperCase();
                                     if(!mealGroupNodesObj[firstLetter]){
                                         mealGroupNodesObj[firstLetter]=[];
                                     }
                                     mealGroupNodesObj[firstLetter].push(o);
                                 }else {
-                                    if(!mealGroupNodesObj['其他']){
-                                        mealGroupNodesObj['其他']=[];
+                                    otherMeal.push(o);
+                                }
+                            });
+                            if(otherMeal.length>0){
+                                mealGroupNodesObj['其他']=otherMeal;
+                            }
+                            if(mealGroupNodesObj['其他'] && app._.size(mealGroupNodesObj)==1){
+                                mealGroupNodes = mealGroupNodesObj['其他'];
+                            }else {
+                                mealGroupNodes = app._.map(mealGroupNodesObj, function (o, key) {
+                                    return {
+                                      _id: key,
+                                      name: key,
+                                      children: o
                                     }
-                                    mealGroupNodesObj['其他'].push(o);
-                                }
-                            });
-
-                            mealGroupNodes = app._.map(mealGroupNodesObj,function (o,key) {
-                                return {
-                                  _id:key,
-                                  name:key,
-                                  children:o
-                                }
-                            });
+                                });
+                            }
                             console.log('mealGroupNodes:',mealGroupNodes);
 
                             this.body = app.wrapper.res.rows(mealGroupNodes);

@@ -1215,10 +1215,10 @@ module.exports = {
           if (drugStockStat.is_warning) {
             //判断库存不足后还需要判断该药没有被停用,还在出库
             if (self.ctx._.contains(drugIds, drugId.toString())) {
-              if(psn_drug_stock_alarm_low_mode === 'A0002'){
+              if(psn_drug_stock_alarm_low_mode === DIC.D3043.ALARM_ONLY_ONCE){
                 var resultSatus = yield self.ctx.pub_alarm_service.checkDrugSendableByName(drugStockStat.drug_name, elderly, tenant);
-                console.log('resultSatus:',resultSatus);
-                if(resultSatus.ret) {
+                // console.log('resultSatus:',resultSatus);
+                if(resultSatus) {
                   lowStockDrugStats.push(drugStockStat);
                 }
               }else {

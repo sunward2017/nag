@@ -505,7 +505,7 @@ module.exports = {
           resultStatus = true;
         }
 
-        return self.ctx.wrapper.res.ret(resultStatus);
+        return resultStatus;
       } catch (e) {
         console.log(e);
         self.logger.error(e.message);

@@ -157,5 +157,9 @@
   "D3041": {
     "PRE_BOOKING": "A0001",
     "REAL_TIME": "A0003"
+  },
+  "D3043":{
+    "EVERYTIME_ALARM":"A0001",
+    "ALARM_ONLY_ONCE":"A0002"
   }
 }

@@ -464,5 +464,52 @@ module.exports = {
         self.logger.error(e.message);
       }
     }).catch(self.ctx.coOnError);
+  },
+  checkDrugSendableByName:function (drug_name, elderly, tenant) {
+    var self = this;
+    return co(function*() {
+      try {
+        console.log('drug_name:',drug_name,'elderly:',elderly,'tenant:',tenant);
+        var alarm_low_day = tenant.other_config.psn_drug_stock_alarm_low_day;
+        var now = self.ctx.moment() ,before = self.ctx.moment(now).add(-alarm_low_day+1, 'days');
+        console.log('before:',before);
+
+        var pub_alarm_D3016_A2000_setting = self.ctx._.find(tenant.other_config.pub_alarm_D3016_settings, (o) => {
+              return o.reason == DIC.D3016.DRUG_STOCK_LOW
+            }) || {
+              reason: DIC.D3016.DRUG_STOCK_LOW,
+              level: DIC.D3029.BLUE,
+              modes: [DIC.D3030.PHONE, DIC.D3030.SMS, DIC.D3030.WX]
+            };
+        var keywordReg = new RegExp(drug_name);
+        console.log('keywordReg',keywordReg);
+        var result = yield self.ctx.modelFactory().model_query(self.ctx.models['pub_alarm'], {
+          select: 'object_name reason content level tenantId',
+          where:{
+            subject: self.ctx.modelVariables.ALARM_SUBJECT_SYSTEM_ROLE.SYSTEM.ID,
+            object: 'psn_elderly',
+            objectId: elderly._id,
+            reason: pub_alarm_D3016_A2000_setting.reason,
+            level: pub_alarm_D3016_A2000_setting.level,
+            content:keywordReg,
+            status:1,
+            check_in_time: {'$gte': before},
+            tenantId: elderly.tenantId
+          }
+        });
+        console.log('checkDrugSendableByName result:',result);
+        var resultStatus;
+        if(result && result.length>0){
+          resultStatus = false;
+        }else {
+          resultStatus = true;
+        }
+
+        return self.ctx.wrapper.res.ret(resultStatus);
+      } catch (e) {
+        console.log(e);
+        self.logger.error(e.message);
+      }
+    }).catch(self.ctx.coOnError);
   }
 };

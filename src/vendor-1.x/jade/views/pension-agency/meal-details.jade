@@ -11,11 +11,11 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                         <!--菜品组名称-->
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-NAME') | translate}}:
                         .col-md-8
-                            input.form-control(type='text', name='name',ng-model='vm.model.name',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-NAME")|translate}}' ,required='',ui-validate-async="{alreadyExists: 'vm.notExist({name:$value})'}",ng-change="vm.getInitial()")
+                            input.form-control(type='text', name='name',ng-model='vm.model.name',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-NAME")|translate}}' ,required='',ui-validate-async="{alreadyExists: 'vm.notExist({name:$value,tenantId:vm.tenantId,status: 1})'}",ng-change="vm.getInitial()")
                             span.text-danger(ng-show="utils.vinput(this.theForm,'name','required')") {{ "validator.REQUIRED" | translate}}
                             span.text-danger(ng-show="utils.vinput(this.theForm,'name','alreadyExists')") {{ "validator.ALREADY-EXISTS" | translate:{item:"餐名"} }}
                         .col-md-2
-                            input.form-control(type='text', name='py',ng-model='vm.model.py',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-PY")|translate}}' ,required='',ui-validate-async="{alreadyExists: 'vm.notExist({name:$value})'}")
+                            input.form-control(type='text', name='py',ng-model='vm.model.py',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-PY")|translate}}' ,required='')
                             span.text-danger(ng-show="utils.vinput(this.theForm,'py','required')") {{ "validator.REQUIRED" | translate}}
                     fieldset: .form-group
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-MEMBERS') | translate}}:

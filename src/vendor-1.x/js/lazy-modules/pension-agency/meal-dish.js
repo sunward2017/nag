@@ -22,7 +22,14 @@
 
         function init() {
             vm.init({removeDialog: ngDialog});
+            vm.batchCreatePy = batchCreatePy;
             vm.query();
+        }
+
+        function batchCreatePy() {
+          vmh.psnService.batchCreatePy(vm.tenantId,'psn_mealDish','name').then(function () {
+            vmh.alertSuccess();
+          });
         }
     }
 

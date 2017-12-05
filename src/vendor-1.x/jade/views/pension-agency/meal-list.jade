@@ -47,6 +47,8 @@
                                     i.glyphicon.glyphicon-plus
                                 a.btn.btn-primary.btn-sm(title="{{'button.REMOVE'|translate}}",ng-click="vm.disable()")
                                     i.glyphicon.glyphicon-minus
+                            .btn-group
+                                a.btn.btn-success.btn-sm(ng-click="vm.batchCreatePy()") {{ vm.viewTranslatePath('BTN-BATCH-CREATE-MEAL-PY') | translate}}
                     .col-md-8
                         pagination.pagination-sm.pull-right(total-items="vm.page.totals",ng-model="vm.page.no",max-size="5",items-per-page="vm.page.size",boundary-links="true" ,ng-change="vm.paging()")
 

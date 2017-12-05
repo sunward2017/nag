@@ -31,6 +31,7 @@
 
       vm.readElderlyArchive = readElderlyArchive;
       vm.exportExcelForEldelryPrintQRLabel = exportExcelForEldelryPrintQRLabel;
+      vm.batchCreatePy = batchCreatePy;
       vm.query();
     }
 
@@ -40,6 +41,12 @@
 
     function exportExcelForEldelryPrintQRLabel() {
       vmh.psnService.exportExcelForEldelryPrintQRLabel('老人二维码打印信息表(' + vm.tenant_name + '-' + moment().format('YYYY.MM.DD') + ')', vm.tenantId);
+    }
+
+    function batchCreatePy() {
+      vmh.psnService.batchCreatePy(vm.tenantId,'psn_elderly','name').then(function () {
+        vmh.alertSuccess();
+      });
     }
   }
 

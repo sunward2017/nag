@@ -3,6 +3,7 @@
  * 养老机构接口
  */
 var crypto = require('crypto');
+var transliteration = require('transliteration');
 var DIC = require('../pre-defined/dictionary-constants.json');
 
 module.exports = {
@@ -7792,9 +7793,51 @@ module.exports = {
             yield next;
           };
         }
-      }
+      },
       /**********************其他*****************************/
+      {
+        method: 'batchCreatePy',
+        verb: 'post',
+        url: this.service_url_prefix + "/batchCreatePy", //生成表单指定对象的首拼
+        handler: function (app, options) {
+          return function*(next) {
+            try {
+              console.log('body:',this.request.body);
+              var tenantId = this.request.body.tenantId;
+              var targetObj = this.request.body.targetObj;
+              var dbTable = this.request.body.dbTable;
+              var select = targetObj+' '+'py';
+              console.log('select:',select);
+              var targetBd = yield app.modelFactory().model_query(app.models[dbTable],{
+                select:select,
+                where: {
+                  status:1,
+                  py:{$in: [null, undefined]},
+                  tenantId: tenantId
+                }
+              });
+              console.log('targetBd:',targetBd);
 
+              var dbItem,initialArr;
+              for(var i=0,len=targetBd.length;i<len;i++){
+                dbItem = targetBd[i];
+                initialArr= transliteration.slugify(dbItem[targetObj]).split('-');
+                dbItem.py = app._.map(initialArr,function (o) {
+                  return o[0];
+                }).join('');
+                yield  dbItem.save();
+              }
+              console.log('targetBd after transliteration:',targetBd);
+
+              this.body = app.wrapper.res.default();
+            } catch (e) {
+              self.logger.error(e.message);
+              this.body = app.wrapper.res.error(e);
+            }
+            yield next;
+          };
+        }
+      }
     ];
 
     return this;

@@ -97,7 +97,8 @@
         "TITLE": "养老机构-老人管理-在院-列表",
         "LABEL-ARCHIVE": "全档案",
         "TITLE-ARCHIVE": "综合了老人在机构内部多个维度的数据",
-        "BTN-EXPORT-EXCEL-FOR-ELDERLY-PRINT-QR-LABEL": "老人标签打印Excel"
+        "BTN-EXPORT-EXCEL-FOR-ELDERLY-PRINT-QR-LABEL": "老人标签打印Excel",
+        "BTN-BATCH-CREATE-ELDERLY-PY":"生成全体老人姓名首拼"
       },
       "details": {
         "TITLE": "养老机构-老人管理-在院-详情",
@@ -633,7 +634,8 @@
     },
     "meal-dish": {
       "list": {
-        "TITLE": "养老机构-餐饮管理-菜品管理-列表"
+        "TITLE": "养老机构-餐饮管理-菜品管理-列表",
+        "BTN-BATCH-CREATE-MEAL-DISH-PY":"生成全部菜品首拼"
       },
       "details": {
         "TITLE": "养老机构-餐饮管理-菜品管理-详情",
@@ -651,7 +653,8 @@
     },
     "meal": {
       "list": {
-        "TITLE": "养老机构-餐饮管理-配餐-列表"
+        "TITLE": "养老机构-餐饮管理-配餐-列表",
+        "BTN-BATCH-CREATE-MEAL-PY":"生成全部配餐首拼"
       },
       "details": {
         "TITLE": "养老机构-餐饮管理-配餐-详情",

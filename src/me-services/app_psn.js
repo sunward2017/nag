@@ -375,22 +375,26 @@ module.exports = {
           return function*(next) {
             try {
               var tenantId = this.request.body.tenantId;
-              var barcode = this.request.body.barcode;
+              var barcode = this.request.body.barcode; //条码或名称
 
               console.log("body", this.request.body);
 
-              var psnDrug = yield app.modelFactory().model_one(app.models['psn_drugDirectory'], {
+              var psnDrug = yield app.modelFactory().model_query(app.models['psn_drugDirectory'], {
                 where: {
                   status: 1,
                   tenantId: tenantId,
-                  barcode: barcode
+                  $or :[
+                    {barcode: barcode},
+                    {full_name: barcode},
+                    {short_name:barcode}
+                  ]
                 }
               });
               console.log("psnDrug", psnDrug);
-              if (!psnDrug) {
+              if (psnDrug.length<=0) {
                 var pubDrug_json = yield app.modelFactory().model_one(app.models['pub_drug'], {where: {barcode: barcode}});
                 if (pubDrug_json) {
-                  psnDrug = {
+                  var pubDrug = {
                     barcode: pubDrug_json.barcode, //条形码 added by zppro 2017.5.12
                     // drug_no: pubDrug_json.approval_no,// 药品编码
                     full_name: pubDrug_json.name,
@@ -409,7 +413,7 @@ module.exports = {
                     // drugSourceId: pubDrug_json.id,//关联公共的药品库
                     tenantId: tenantId //关联机构
                   };
-                  this.body = app.wrapper.res.ret(psnDrug);
+                  this.body = app.wrapper.res.ret([pubDrug]);
                 } else {
                   this.body = app.wrapper.res.default();
                 }

@@ -16,7 +16,7 @@
         'qiniu': ['vendor/plupload/js/plupload.full.min.js', 'vendor/plupload/js/i18n/zh_CN.js', 'vendor/qiniu/dist/qiniu.min.js'],
         'file-saver': ['vendor/file-saver/FileSaver.min.js'],
         'socket.io-client': ['vendor/socket.io-client/dist/socket.io.min.js'],
-        'transliteration':['vendor/transliteration/lib/browser/transliteration.min.js']
+        'transliteration':['https://unpkg.com/transliteration/lib/browser/transliteration.min.js']
       },
       // Angular based script (use the right module name)
       modules: [

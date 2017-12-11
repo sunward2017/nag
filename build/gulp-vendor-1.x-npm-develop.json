@@ -1,4 +1,3 @@
 [
-  "node_modules/socket.io-client/dist/socket.io.min.js",
-  "node_modules/transliteration/lib/browser/transliteration.min.js"
+  "node_modules/socket.io-client/dist/socket.io.min.js"
 ]

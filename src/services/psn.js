@@ -7671,6 +7671,9 @@ module.exports = {
                   }
                 },
                 {
+                  $sort: {'elderly.room_name': 1, 'elderly.bed_no':1}
+                },
+                {
                   $group: {
                     _id: {date: '$date', districtId: '$districtId', period: '$period', mealId: '$mealId'},
                     elderlys: {$push: '$elderly'}

@@ -626,7 +626,8 @@
           mealOrderRecord: mealOrderRecord,
           mealOrderRecordStat: mealOrderRecordStat,
           mealOrderRecordStat2:mealOrderRecordStat2,
-          dataByClient:dataByClient
+          dataByClient:dataByClient,
+          batchCreatePy:batchCreatePy
         };
 
         function roomStatusInfo(tenantId) {
@@ -1320,6 +1321,14 @@
           return $http.post(baseUrl + 'vitalSign$MingZhong$updateElderlyUsers', {
             tenantId: tenantId,
             doctAccountId: doctAccountId
+          });
+        }
+
+        function batchCreatePy(tenantId,dbTable,targetObj) {
+          return $http.post(baseUrl + 'batchCreatePy', {
+            tenantId: tenantId,
+            dbTable: dbTable,
+            targetObj:targetObj
           });
         }
       }]

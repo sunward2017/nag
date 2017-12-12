@@ -2330,6 +2330,9 @@ module.exports = {
             $match: where
           },
           {
+            $unwind: '$repeat_values'
+          },
+          {
             $group: {
               _id: {drugId: '$drugId', unit: '$unit'},
               quantity: {$sum: '$quantity'}

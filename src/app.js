@@ -605,6 +605,11 @@ co(function*() {
   // });
   // var ret = yield app.psn_drug_stock_service.elderlyDrugUseMergedWithStockList('58a6abf9a03cc7229a8f261a', '58cb68b69e6ed631d3ac0605')
   // console.log('elderlyDrugUseMergedWithStockList: >>> ', ret)
+  // var tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], '591e9d730d904a7f1c3589e9');
+  // var elderly = yield app.modelFactory().model_read(app.models['psn_elderly'], '59bb3b7371baa142f8e09b0c');
+  // var o = yield app.psn_drug_stock_service._elderlyDrugUseOneDay(tenant, elderly);
+  // console.log('use one day:', o);
+
   /* // 多级分组 查询关键词:mealOrderRecordStat2
   var DIC = require('./pre-defined/dictionary-constants.json');
   var tenantId = app.ObjectId("599bade9859e102d8b72f2ba");

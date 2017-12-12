@@ -178,6 +178,20 @@ module.exports = {
                             if (!data.select)
                                 data.select = '_id name';
 
+                            //解析keyword正则字段
+                            var _matches_ = data.where && data.where._matches_;
+                            console.log('_matches_:',_matches_);
+                            if(_matches_ && _matches_.keyword && _matches_.col_names && _matches_.col_names.length > 0) {
+                              var keywordReg = new RegExp(_matches_.keyword);
+                              data.where.$or = app._.map(_matches_.col_names, function (col_name) {
+                                var keywordRegObj = {};
+                                keywordRegObj[col_name] = keywordReg;
+                                return keywordRegObj;
+                              });
+                              this.request.body.where._matches_ = undefined;
+                            }
+                            console.log('query request.body2:', this.request.body.where);
+
                             var rows  = app.modelFactory().model_query(app.models[modelOption.model_name], data);
                             var populates = data.populates;
                             if (populates) {

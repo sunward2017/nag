@@ -19,6 +19,7 @@ module.exports = function(ctx,name) {
             operated_by: {type: mongoose.Schema.Types.ObjectId, ref:'pub_user'},
             operated_on: {type: Date, default: Date.now},
             status: {type: Number, min: 0, max: 1, default: 1},
+            // subject_type:{},//需点餐人员类型
             elderlyId:{type: mongoose.Schema.Types.ObjectId,ref:'psn_elderly'},//关联老人
             elderly_name: {type: String,  maxlength: 20},
             x_axis:{type: Date,required: true},

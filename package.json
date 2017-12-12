@@ -1,6 +1,6 @@
 {
   "name": "nag",
-  "version": "1.7.6",
+  "version": "1.7.8",
   "description": "",
   "main": "src/app.js",
   "scripts": {
@@ -87,7 +87,7 @@
     "soap": "^0.17.0",
     "socket.io": "^1.7.2",
     "thunkify": "^2.1.2",
-    "transliteration": "0.2.1",
+    "transliteration": "^0.2.1",
     "underscore": "^1.8.3",
     "xml2js": "^0.4.17"
   }

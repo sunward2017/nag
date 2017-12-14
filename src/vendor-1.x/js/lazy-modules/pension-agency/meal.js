@@ -27,9 +27,9 @@
     }
 
     function batchCreatePy() {
-      vmh.psnService.batchCreatePy(vm.tenantId,'psn_meal','name').then(function () {
+      vmh.blocking(vmh.psnService.batchCreatePy(vm.tenantId,'psn_meal','name').then(function () {
         vmh.alertSuccess();
-      });
+      }));
     }
   }
 
@@ -154,22 +154,23 @@
     }
 
     function meatsSearch() {
-      var mealsPromise = mealSearch(vm.meatsPy,'A0000');
-      // console.log('mealsPromise:',mealsPromise);
-      vmh.parallel([mealsPromise]).then(function (results) {
-        // console.log('meats search results:',results[0]);
-        buildTrees(0,results[0],vegetables);
-      });
+      // var mealsPromise = mealSearch(vm.meatsPy,'A0000');
+      // vmh.parallel([mealsPromise]).then(function (results) {
+      //   // console.log('meats search results:',results[0]);
+      //   buildTrees(0,results[0],vegetables);
+      // });
+      buildTrees(0,localSearch(vm.meatsPy,meats),vegetables);
     }
 
     function vegetablesSearch() {
-      vmh.parallel([mealSearch(vm.vegetablesPy,'A0001')]).then(function (results) {
-        // console.log('vegetables search results :',results[0]);
-        buildTrees(1,meats ,results[0]);
-      });
+      // vmh.parallel([mealSearch(vm.vegetablesPy,'A0001')]).then(function (results) {
+      //   console.log('vegetables search results :',results[0]);
+      //   buildTrees(1,meats ,results[0]);
+      // });
+      buildTrees(1,meats,localSearch(vm.vegetablesPy,vegetables));
     }
 
-    function mealSearch(py,dishes) {
+    function mealSearch(py,dishes) { //服务器搜索
       var _matches_;
       if(py){
         var regIn = '^';
@@ -197,6 +198,36 @@
       });
     }
 
+    function localSearch(py,dishes) {//本地过滤搜索
+      var filterNodes=[];
+      if(py){
+        var regIn = '^';
+        _.each(py,function (o) {
+          var oLower = o.toLowerCase();
+          console.log('o:',o);
+          if(o!=oLower){
+            regIn += '['+o+oLower+']';
+          }else {
+            regIn += '['+o+']';
+          }
+        });
+        console.log('regIn:',regIn);
+        var reg = new RegExp(regIn);
+        var fNodes= _.filter(dishes,function (o) {
+          return o.py.match(reg) ||o.name.match(reg)
+        });
+        _.each(fNodes, function (o){
+          var newone = angular.copy(o);
+          filterNodes.push(newone);
+          // o.name = '1234'+o.name;
+        });
+      }else {
+        filterNodes = dishes;
+      }
+      console.log('filterNodes:',filterNodes);
+      return filterNodes;
+    }
+
     function buildTrees(index,treeData1,treeData2) {
       if(vm.trees && vm.trees.length == 2 && index >= 0){
         var treeId = index == 0 ? 'tree1': 'tree2';
@@ -218,10 +249,11 @@
           return meat._id == o._id;
         });
         if(isChecked != -1){
-          console.log('vm.trees[index].inputCheckedIndex:',vm.trees[index].inputCheckedIndex);
-          vm.trees[index].inputCheckedIndex[isChecked]=true;
+          // vm.trees[index].inputCheckedIndex[isChecked]=true;
           vm.trees[index].checkedNodes.push(o);
-          console.log('after?',vm.trees[index].inputCheckedIndex);
+          // console.log('o.attrs.index:', o.attrs.index)
+          // vm.trees[index].check(o.attrs.index)
+          // console.log('after?',vm.trees[index].inputCheckedIndex);
         }
       });
       console.log('showCheckedMeals vm.trees----:',vm.trees);

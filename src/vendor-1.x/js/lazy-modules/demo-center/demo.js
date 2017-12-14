@@ -12,6 +12,7 @@
         .controller('DemoGridBasicDetailsController', DemoGridBasicDetailsController)
         .controller('DemoTreeBasicController', DemoTreeBasicController)
         .controller('DemoTreeExtendController', DemoTreeExtendController)
+        .controller('DemoTreeSearchController',DemoTreeSearchController)
         .controller('DemoTreeDirectiveController', DemoTreeDirectiveController)
         .controller('DemoTreeNavController', DemoTreeNavController)
         .controller('DemoTreeTileController', DemoTreeTileController)
@@ -528,6 +529,135 @@
             });
         }
 
+    }
+
+    DemoTreeSearchController.$inject = ['$scope','vmh', 'instanceVM'];
+
+    function DemoTreeSearchController($scope, vmh, vm) {
+
+      $scope.vm = vm;
+      vm.searchBox = searchBox;
+      var tNodes =[];
+
+      init();
+      function init() {
+        vm.init();
+
+        var subsystemURL = 'server/district.json' + '?v=' + (new Date().getTime()); // jumps cache
+
+        vmh.http
+            .get(subsystemURL)
+            .success(function (treeNodes) {
+              tNodes = treeNodes;
+              console.log('tNodes:',tNodes);
+              vm.trees = [new vmh.treeFactory.sTree('tree1', treeNodes),
+                new vmh.treeFactory.sTree('tree2', treeNodes, {mode: 'check', checkCascade: false})
+              ];
+              console.log('vm.trees:',vm.trees);
+
+              //vm.trees[0].selectedNode = vm.trees[0].findNode('0-2-1'); //by $index
+              vm.trees[0].selectedNode = vm.trees[0].findNodeById('120404');//by _id
+              //vm.trees[0].setNodeChecked([vm.trees[0].findNodeById('120103'),vm.trees[0].findNodeById('120304')]);
+              vm.checkedNodes=vm.trees[1].checkedNodes = [vm.trees[1].findNodeById('1201'), vm.trees[1].findNodeById('120304'), vm.trees[1].findNodeById('120305')];
+              vm.lastChecked = vm.checkedNodes.slice(0);
+              console.log('initial vm.lastChecked:',vm.lastChecked);
+
+            });
+
+        $scope.$on('tree:node:select', function ($event, node) {
+          //console.log(node);
+        });
+
+        $scope.$on('tree:node:checkChange', function ($event, checkedNodes,$index){
+          console.log('checkedNodes:',checkedNodes);
+          console.log('vm.lastChecked:',vm.lastChecked);
+          if(checkedNodes.length <vm.lastChecked.length){
+            _.each(vm.lastChecked,function (o) {
+              var isChecked = _.findIndex(checkedNodes,function (checked) {
+                return checked._id == o._id;
+              });
+              if(isChecked == -1){
+                var unCheckedIdx = _.findIndex(vm.checkedNodes,function (one) {
+                  return one._id == o._id;
+                });
+                vm.checkedNodes.splice(unCheckedIdx,1);
+              }
+            });
+          }else{
+            _.each(checkedNodes,function (o) {
+              var isChecked = _.findIndex(vm.checkedNodes,function (checked) {
+                return checked._id == o._id;
+              });
+              if(isChecked == -1){
+                vm.checkedNodes.push(o);
+              }
+            });
+          }
+          console.log('vm.checkedNodes:',vm.checkedNodes);
+          vm.lastChecked = checkedNodes;
+        });
+      }
+
+      function searchBox(value,idx) {
+        var tree = idx==0 ? 'tree1' :'tree2';
+        var nodes =[];
+        if(value){
+          var reg = new RegExp('^'+value);
+          console.log('reg:',reg);
+          var filterNodes = regMatch(reg);
+          console.log('filterNodes:',filterNodes);
+          nodes = filterNodes;
+        }else {
+          nodes =tNodes;
+          console.log('nodes:',nodes);
+        }
+        vm.trees[idx] = idx==0 ? new vmh.treeFactory.sTree(tree, nodes) : new vmh.treeFactory.sTree(tree, nodes, {mode: 'check', checkCascade: false});
+        if(idx==1){
+          showCheckedNodes(idx);
+        }
+      }
+
+      function regMatch(reg) {
+        var filterNodes=[], fNodes;
+        for(var i=0,pLen= tNodes.length; i<pLen; i++) {
+          var province = tNodes[i];
+          if(province.name.match(reg)){
+            fNodes = angular.copy(province);
+            filterNodes.push(fNodes);
+            continue;
+          }
+          if(province.children ){
+            for(var j=0,cLen = province.children.length; j<cLen; j++) {
+              var city = province.children[j];
+              if(city.name.match(reg)){
+                fNodes = angular.copy(city);
+                filterNodes.push(fNodes);
+                continue;
+              }
+              if(city.children){
+                for(var k=0,dLen=city.children.length;k<dLen;k++) {
+                  var district =city.children[k];
+                  if(district.name.match(reg)){
+                    fNodes = angular.copy(district);
+                    filterNodes.push(fNodes);
+                    continue;
+                  }
+                }
+              }
+            }
+          }
+        }
+        return filterNodes;
+      }
+      
+      function showCheckedNodes(idx) {
+        _.each(vm.checkedNodes,function (o) {
+          if(vm.trees[idx].findNodeById(o._id)){
+            vm.trees[idx].checkedNodes.push(vm.trees[idx].findNodeById(o._id));
+          }
+        });
+        vm.lastChecked = vm.trees[idx].checkedNodes;
+      }
     }
 
     DemoTreeDirectiveController.$inject = ['$scope','vmh', 'instanceVM'];

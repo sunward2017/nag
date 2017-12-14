@@ -27,9 +27,9 @@
         }
 
         function batchCreatePy() {
-          vmh.psnService.batchCreatePy(vm.tenantId,'psn_mealDish','name').then(function () {
+          vmh.blocking(vmh.psnService.batchCreatePy(vm.tenantId,'psn_mealDish','name').then(function () {
             vmh.alertSuccess();
-          });
+          }));
         }
     }
 

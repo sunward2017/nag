@@ -132,6 +132,23 @@
                     }
                 }
             })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.DEMO_CENTER + 'tree-search', {
+              url: '/tree-search',
+              access_level: AUTH_ACCESS_LEVELS.ADMIN,
+              views: {
+                "module-header": {
+                  templateUrl: helper.basepath(MODEL_VARIABLES.HEAD_TEMPLATES.DEMO_CENTER),
+                  controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER
+                },
+                "module-content": {
+                  templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.DEMO_CENTER + 'tree-search.html'),
+                  controller: 'DemoTreeSearchController',
+                  resolve: {
+                    instanceVM: helper.buildInstanceVM(MODEL_VARIABLES.VM_PREFIXS.DEMO_CENTER + 'tree-search')
+                  }
+                }
+              }
+            })
             .state(MODEL_VARIABLES.STATE_PREFIXS.DEMO_CENTER + 'tree-directive', {
                 url: '/tree-directive',
                 access_level: AUTH_ACCESS_LEVELS.ADMIN,

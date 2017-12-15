@@ -27,6 +27,9 @@
     "tree-extend": {
       "TITLE": "演示中心-树-扩展功能"
     },
+    "tree-search": {
+      "TITLE": "演示中心-树-搜索功能"
+    },
     "tree-directive": {
       "TITLE": "演示中心-树-指令"
     },

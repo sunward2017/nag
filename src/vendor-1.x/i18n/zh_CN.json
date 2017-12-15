@@ -321,6 +321,7 @@
       "TREE": "树",
       "TREE-BASIC": "树-基本功能",
       "TREE-EXTEND": "树-扩展功能",
+      "TREE-SEARCH":"树-搜索功能",
       "TREE-DIRECTIVE": "树-指令",
       "TREE-NAV": "树-导航",
       "TREE-TILE": "树-平铺",

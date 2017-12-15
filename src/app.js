@@ -610,6 +610,12 @@ co(function*() {
   // var o = yield app.psn_drug_stock_service._elderlyDrugUseOneDay(tenant, elderly);
   // console.log('use one day:', o);
 
+  // var num=1;
+  // var ret = yield app.models['pub_tenant'].update({ _id: app.ObjectId('599bade9859e102d8b72f2ba') }, {
+  //   $inc: {'other_config.pub_alarm_limit_settings.sms_remains': -num}
+  // });
+  // console.log('update >>', ret);
+
   /* // 多级分组 查询关键词:mealOrderRecordStat2
   var DIC = require('./pre-defined/dictionary-constants.json');
   var tenantId = app.ObjectId("599bade9859e102d8b72f2ba");

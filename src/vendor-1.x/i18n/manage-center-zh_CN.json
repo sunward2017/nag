@@ -13,6 +13,7 @@
         "TAB1": "基本信息",
         "TAB2": "缴费历史",
         "TAB3": "图片",
+        "TAB4":"其他配置",
         "TAB1-LABEL-NAME": "租户名称",
         "TAB1-PLACEHOLDER-NAME": "XX市XX旅行社..",
         "TAB1-LABEL-PHONE": "手机号码",
@@ -40,7 +41,11 @@
         "TAB1-LABEL-ADDRESS":"机构地址",
         "TAB1-PLACEHOLDER-ADDRESS":"XX市XX..",
         "TAB3-LABEL-SPLASH_IMG":"添加图片",
-        "TAB3-PLACEHOLDER-SPLASH_IMG": "https://img2.okertrip.com/splash-image/2016-2-8-0.jpg.."
+        "TAB3-PLACEHOLDER-SPLASH_IMG": "https://img2.okertrip.com/splash-image/2016-2-8-0.jpg..",
+        "TAB4-LABEL-SMS_FLAG":"短信发送限额",
+        "TAB4-LABEL-SMS_FLAG-ACTIVE":"设置",
+        "TAB4-LABEL-SMS_REMAINS":"短信发送限额数量",
+        "TAB4-PLACEHOLDER-SMS_REMAINS":"限额数量>=0,为0时将不发送短信"
       }
     },
     "tenant-user-manage": {

@@ -44,9 +44,9 @@
     }
 
     function batchCreatePy() {
-      vmh.psnService.batchCreatePy(vm.tenantId,'psn_elderly','name').then(function () {
+      vmh.blocking(vmh.psnService.batchCreatePy(vm.tenantId,'psn_elderly','name').then(function () {
         vmh.alertSuccess();
-      });
+      }));
     }
   }
 

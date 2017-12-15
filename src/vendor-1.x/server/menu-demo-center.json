@@ -29,6 +29,11 @@
         "sref": "app.demo-center.tree-extend"
       },
       {
+        "_id": "menu.demo-center.TREE-SEARCH",
+        "name": "树-搜索功能",
+        "sref": "app.demo-center.tree-search"
+      },
+      {
         "_id": "menu.demo-center.TREE-DIRECTIVE",
         "name": "树-指令",
         "sref": "app.demo-center.tree-directive"

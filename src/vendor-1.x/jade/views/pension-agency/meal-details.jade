@@ -29,20 +29,22 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                     fieldset: .form-group
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-MEMBERS') | translate}}:
                         .col-md-4
-                            .col-md-12
-                                span.col-md-4.text-left  荤菜:
+                            .row
+                                span.col-md-2.col-sm-3.text-left  荤:
                                 .col-md-8
                                     input.form-control(type='text', name='meatsPy',ng-model='vm.meatsPy',placeholder='{{vm.viewTranslatePath("TAB1-INITIAL-SEARCH")|translate}}',ng-change="vm.meatsSearch()")
+                            .row-split
                             //span.text-center 荤菜:
                             //.tree.tree-basic(s-tree,s-tree-data="vm.treeDataPromiseOfDishesMeat",s-tree-height="300", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{mode:'check', selectNodeFormat:'object', nodeIdKey: '_id'}",ng-model="vm.meats" ,on-check-change="vm.priceChange()")
                             .tree.tree-basic#tree1(ng-style="{height:vm.size.h-260}")
                                 ul
                                     li.repeat-modify(ng-repeat='node in vm.trees[0].treeData',ng-include="'tree-basic-renderer.html'",ng-init="tIndex=0;nIndex = $index")
                         .col-md-4
-                            .col-md-12
-                                span.col-md-4.text-left  蔬菜:
+                            .row
+                                span.col-md-2.col-sm-3.text-left  素:
                                 .col-md-8
                                     input.form-control(type='text', name='vegetablesPy',ng-model='vm.vegetablesPy',placeholder='{{vm.viewTranslatePath("TAB1-INITIAL-SEARCH")|translate}}',ng-change="vm.vegetablesSearch()")
+                            .row-split
                             //span.text-center 蔬菜:
                             //.tree.tree-basic(s-tree,s-tree-data="vm.treeDataPromiseOfDishesVegetable",s-tree-height="300", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{mode:'check', selectNodeFormat:'object', nodeIdKey: '_id'}",ng-model="vm.vegetables" ,on-check-change="vm.priceChange()")
                             .tree.tree-basic#tree2(ng-style="{height:vm.size.h-260}")

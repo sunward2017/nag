@@ -1499,7 +1499,7 @@ module.exports = {
 
               app._.extend(dynamicFilter, {
                 status: 1,
-                tenantId: tenantId,
+                tenantId: app.ObjectId(tenantId),
                 live_in_flag: true,
                 begin_exit_flow: {$ne: true}
               });
@@ -1531,14 +1531,47 @@ module.exports = {
                 var elderlyIdsOrdered = app._.map(rows, (o) => o._id);
                 dynamicFilter['_id'] = {$nin: elderlyIdsOrdered};
               }
-              var elderly = yield app.modelFactory().model_query(app.models['psn_elderly'], {
-                select: 'name birthday room_summary avatar room_value',
-                where: dynamicFilter,
-                sort:{'room_value.districtId': 1}
-              });
+              // var elderly = yield app.modelFactory().model_query(app.models['psn_elderly'], {
+              //   select: 'name birthday room_summary avatar room_value',
+              //   where: dynamicFilter,
+              //   sort:{'room_value.districtId': 1}
+              // });
+              var elderly = yield app.modelFactory().model_aggregate(app.models['psn_elderly'],[
+                {
+                  $match: dynamicFilter
+                },
+                {
+                  $lookup: {
+                    from: "psn_room",
+                    localField: "room_value.roomId",
+                    foreignField: "_id",
+                    as: "roomObj"
+                  }
+                },
+                {
+                  $unwind: '$roomObj'
+                },
+                {
+                  $project: {
+                    id:'$_id',
+                    name: '$name',
+                    birthday: '$birthday',
+                    room_summary:'$room_summary',
+                    avatar:'$avatar',
+                    room_value:'$room_value',
+                    roomObj:{floor:'$roomObj.floor',number_in_floor:'$roomObj.number_in_floor',name:'$roomObj.name'}
+                  }
+                },
+                {
+                  $sort:{'room_value.districtId': 1,'roomObj.name':1,'room_value.bed_no': 1}
+                },
+              ]);
+              // console.log('elderly:',elderly);
               var elderlyToObj = [];
-              app._.each(elderly,function (oneElderly) {
-                var o = oneElderly.toObject();
+              app._.each(elderly,function (o) {
+                // console.log('oneElderly:',oneElderly);
+                // var o = oneElderly.toObject();
+                // console.log('o:',o);
                 var oRoom = o.room_summary.split('-');
                 o.district = oRoom[0];
                 o.room = oRoom[1] + '-' + oRoom[2] + '-' + oRoom[3];

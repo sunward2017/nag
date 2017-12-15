@@ -147,6 +147,27 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                                             img(ng-src="{{tenant_img}}")
                                         .uploader-area(qiniu-uploader, button-text="选择图片" bucket='4gimg',user='vm.model.name',ng-uploaded-url="vm.tenant_imgs[$index]")
                                     input.form-control(type='text', name='tenant_img',ng-model='vm.tenant_imgs[$index]',placeholder='{{vm.viewTranslatePath("TAB3-PLACEHOLDER-SPLASH_IMG")|translate}}')
+            tab(active="vm.tab4.active")
+                tab-heading
+                    | {{ vm.viewTranslatePath('TAB4') | translate}}
+                    span.text-danger(title="{{'validator.FIELD-INVALID'|translate}}" , ng-show="utils.vtab('contentTab4')")
+                        i.glyphicon.glyphicon-minus-sign
+                div#contentTab4
+                    fieldset: .form-group
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB4-LABEL-SMS_FLAG') | translate}}:
+                        .col-md-2
+                            .checkbox.c-checkbox
+                                label
+                                    input#smsFlag(type='checkbox',ng-model='vm.model.other_config.pub_alarm_limit_settings.sms_flag')
+                                    span.fa.fa-check
+                            label(for="smsFlag") {{ vm.viewTranslatePath('TAB4-LABEL-SMS_FLAG-ACTIVE') | translate}}
+                    fieldset(ng-if="vm.model.other_config.pub_alarm_limit_settings.sms_flag"): .form-group
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB4-LABEL-SMS_REMAINS') | translate}}:
+                        .col-md-10
+                            input.form-control(type='number',name='sms_remains' ,ng-model='vm.model.other_config.pub_alarm_limit_settings.sms_remains',placeholder='{{vm.viewTranslatePath("TAB4-PLACEHOLDER-SMS_REMAINS")|translate}}', ui-validate="'$value>=0'" ,required='')
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'sms_remains','number')") {{ "validator.NUMBER" | translate}}
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'sms_remains','validator')") {{ "validator.MIN" | translate:{min:0} }}
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'sms_remains','required')") {{ "validator.REQUIRED" | translate}}
     .text-right.mt-lg
         button.btn.btn-warning(type="button",ng-click="vm.cancel()") {{'button.CANCEL'|translate}}
         button.btn.btn-success(type="submit") {{'button.SAVE'|translate}}

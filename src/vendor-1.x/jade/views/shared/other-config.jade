@@ -201,6 +201,10 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                                         input(id="ALARM_D3016_A2000_MODE_A0007_{{receiver_type.value}}" type='checkbox',ng-model='vm.pub_alarm_D3016_A2000_modes_receivers_obj["A0007"][receiver_type.value]')
                                         span.fa.fa-check
                                 label(for="ALARM_D3016_A2000_MODE_A0007_{{receiver_type.value}}" ) {{ receiver_type.name}}
+                    fieldset: .form-group
+                        label.col-md-2.control-label {{vm.moduleTranslatePath('TAB1-LABEL-SMS_REMAINS') | translate}}:
+                        .col-md-10
+                            .form-readable {{vm.sms_remains}}
             tab(active="vm.tab2.active")
                 tab-heading
                     | {{ vm.moduleTranslatePath('TAB2') | translate}}

@@ -97,6 +97,10 @@ module.exports = function(ctx,name) {
         psn_bed_monitor_timeout: {type: Number, default: 5.00},//睡眠带超时时间设置，单位：分钟，默认5分钟
         psn_bed_monitor_timeout_alarm_begin: {type: String, minlength: 5, maxlength: 5, default: '22:00'},//睡眠带报警时间范围，起始时间,22:00
         psn_bed_monitor_timeout_alarm_end: {type: String, minlength: 5, maxlength: 5, default: '06:00'},//睡眠带报警时间范围，结束时间,06:00
+        pub_alarm_limit_settings: {
+          sms_flag: {type: Boolean, default: false}, //短信发送是否具有限额
+          sms_remains:  {type: Number}, //短信发送限额 当sms_flag=true 程序检测这个字段<=0就放弃发送
+        },
         pub_alarm_D3016_settings: [{
           reason: {type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3016"])},
           content_template: {type: String},
@@ -120,7 +124,8 @@ module.exports = function(ctx,name) {
     });
 
     tenantSchema.pre('update', function (next) {
-      this.model.findById(this._compiledUpdate.$set._id).exec().then(function (document) {
+
+      this._compiledUpdate.$set && this.model.findById(this._compiledUpdate.$set._id).exec().then(function (document) {
         if (needRefreshToken(document)) {
           document.save();
         }

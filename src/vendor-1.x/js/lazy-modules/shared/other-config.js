@@ -51,6 +51,11 @@
         vm.tenant_name = results[0][0].name;
         vm.head_of_agency = results[0][0].head_of_agency || {};
 
+        if(vm.other_configs&&vm.other_configs.pub_alarm_limit_settings && vm.other_configs.pub_alarm_limit_settings.sms_flag){
+          vm.sms_remains = vm.other_configs.pub_alarm_limit_settings.sms_remains;
+        }else {
+          vm.sms_remains = '不限';
+        }
         _.each(results[2], function (mode) {
           vm.pub_alarm_D3016_A1000_modes_receivers_obj[mode.value] = {};
           vm.pub_alarm_D3016_A2000_modes_receivers_obj[mode.value] = {};

@@ -376,7 +376,7 @@ module.exports = {
             check_in_time: {'$gte': before, '$lt': now}
           },
           sort: 'check_in_time'
-        }).populate('tenantId', 'name');
+        }).populate('tenantId', 'name other_config');
         var alarms = alarm ? [alarm] : [];
         // console.log('sendAlarmLast24HoursCircle alarms:', alarms);
         yield self._sendAlarms(alarms);
@@ -401,7 +401,7 @@ module.exports = {
             check_in_time: {'$gte': before, '$lt': now}
           },
           sort: 'check_in_time'
-        }).populate('tenantId', 'name');
+        }).populate('tenantId', 'name other_config');
 
         // console.log('sendAlarmLast24HoursAtMoment  alarms:', alarms);
         yield self._sendAlarms(alarms);
@@ -415,9 +415,15 @@ module.exports = {
     var self = this;
     return co(function*() {
       try {
-        var alarm, repeat_count, sendTitle, vmsContent, smsContent, smsSuffix, mode, sendResult;
+        var alarm, repeat_count, sendTitle, vmsContent, smsContent, smsSuffix, mode, sendResult,smsTenantRemainsObj={};
         for (var i = 0, len = alarms.length; i < len; i++) {
           alarm = alarms[i];
+          if(alarm.tenantId.other_config && alarm.tenantId.other_config.pub_alarm_limit_settings
+              && alarm.tenantId.other_config.pub_alarm_limit_settings.sms_flag
+              && alarm.tenantId.other_config.pub_alarm_limit_settings.sms_remains <= 0 ) {
+            self.logger.warn('离床报警短信已到限额!');
+            return;
+          }
           if (alarm.modes.length > 0) {
             smsContent = vmsContent = alarm.content;
             if (alarm.level == DIC.D3029.ORANGE) {
@@ -427,13 +433,16 @@ module.exports = {
             }
             for (var j = 0, jLen = alarm.modes.length; j < jLen; j++) {
               mode = alarm.modes[j], sendResult = undefined;
+              var to_send_count = 0;
               if (mode.send_tos.length > 0) {
                 if (mode.value == DIC.D3030.PHONE) {
+                  to_send_count = mode.send_tos.length;
                   sendTitle = D3016[alarm.reason].name;
                   sendResult = yield self.ctx.send_wodong_service.vms(mode.send_tos, sendTitle, vmsContent);
                 } else if (mode.value == DIC.D3030.SMS) {
                   if (alarm.sended_count === 0) {
                     // 短信仅仅在第一次发送,之后久全部忽略了
+                    to_send_count = mode.send_tos.length;
                     smsSuffix = alarm.tenantId.name || '浙江梧斯源'
                     smsContent = '【' + smsSuffix + '】' + smsContent;
                     sendResult = yield self.ctx.send_wodong_service.sms(mode.send_tos, smsContent);
@@ -449,6 +458,13 @@ module.exports = {
                     alarmId: alarm._id,
                     tenantId: alarm.tenantId._id
                   });
+                  if(alarm.tenantId.other_config&&alarm.tenantId.other_config.pub_alarm_limit_settings && alarm.tenantId.other_config.pub_alarm_limit_settings.sms_flag){
+                    if(!smsTenantRemainsObj[_id]){
+                      smsTenantRemainsObj[_id] = to_send_count;
+                    }else {
+                      smsTenantRemainsObj[_id] += to_send_count;
+                    }
+                  }
                 }
               }
             }
@@ -458,6 +474,13 @@ module.exports = {
             alarm.sended_flag = true;
             yield alarm.save();
           }
+        }
+        for(var oId in smsTenantRemainsObj){
+          var ret = yield self.ctx.models['pub_tenant'].update({ _id: self.ctx.ObjectId(oId) }, {
+            $inc: {'other_config.pub_alarm_limit_settings.sms_remains': -smsTenantRemainsObj[oId]}
+          });
+          console.log('update >>', ret);
+
         }
       } catch (e) {
         console.log(e);

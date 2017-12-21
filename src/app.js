@@ -560,7 +560,7 @@ co(function*() {
   // }
   //
   // var tenant = tae.ret.t, elderly = tae.ret.e;
-  
+
   ////查询低库存和离床报警
 
 

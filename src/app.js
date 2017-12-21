@@ -550,6 +550,20 @@ co(function*() {
 
   console.log('listening...');
 
+
+  // var tenantId = '591e9d730d904a7f1c3589e9';
+  // var elderlyId = '5923c119c541547215f8cb34';
+  // var tae = yield app.psn_drug_stock_service._getTenantAndElderly(tenantId, elderlyId);
+  // console.log('tae:', tae);
+  // if (!tae.success) {
+  //   return tae
+  // }
+  //
+  // var tenant = tae.ret.t, elderly = tae.ret.e;
+
+  ////查询低库存和离床报警
+
+
   // console.log(moment().weekday(0).add(7, 'days').add(1, 'days').format('ddd'))
 
   // var net = require('net');

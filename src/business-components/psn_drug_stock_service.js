@@ -2330,6 +2330,14 @@ module.exports = {
             $match: where
           },
           {
+            $project: {
+              drugId: '$drugId',
+              unit: '$unit',
+              quantity: '$quantity',
+              repeat_values: { $cond : [ { $eq : [ "$repeat_values", [] ] }, [1], '$repeat_values' ] }
+            }
+          },
+          {
             $unwind: '$repeat_values'
           },
           {

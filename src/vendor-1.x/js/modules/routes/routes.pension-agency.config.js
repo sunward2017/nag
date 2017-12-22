@@ -295,13 +295,13 @@
               label: '老人',
               name: 'elderly_name',
               type: 'string',
-              width: 80,
+              width: 50,
               sortable: true
             }, {
               label: '入院登记号',
               name: 'code',
               type: 'string',
-              width: 100,
+              width: 80,
               sortable: true
             }, {
               label: '入院日期',
@@ -316,6 +316,12 @@
               width: 60,
               sortable: true
             }, {
+              label: '出院原因',
+              name: 'cause_name',
+              type: 'string',
+              width: 50,
+              sortable: true
+            },{
               label: '当前步骤',
               name: 'current_step_name',
               type: 'string',

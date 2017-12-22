@@ -3901,7 +3901,9 @@ module.exports = {
 
               for (var i = 0; i < roomStatus.occupied.length; i++) {
                 var occupy = roomStatus.occupied[i];
-                if (elderly._id.equals(occupy.elderlyId) && elderly.room_value.bed_no == occupy.bed_no && occupy.bed_status == 'A0003') {
+                if (elderly._id.equals(occupy.elderlyId) && elderly.room_value.bed_no == occupy.bed_no
+                    && (occupy.bed_status == 'A0002' ||  occupy.bed_status == 'A0003')
+                ) {
                   console.log('update roomOccupy')
                   occupy.bed_status = 'A0001';
                   occupy.elderlyId = undefined;

@@ -4,6 +4,7 @@
  */
 var mongoose = require('mongoose');
 var D3004 = require('../../pre-defined/dictionary.json')['D3004'];
+var D3025 = require('../../pre-defined/dictionary.json')['D3025'];
 
 module.isloaded = false;
 
@@ -124,6 +125,13 @@ module.exports = function(ctx,name) {
                 return D3004[this.current_step].name;
             }
             return '';
+        });
+
+        exitSchema.virtual('cause_name').get(function () {
+          if (this.cause) {
+            return D3025[this.cause].name;
+          }
+          return '';
         });
         
         exitSchema.pre('update', function (next) {

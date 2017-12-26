@@ -86,6 +86,8 @@
     modelNode.factory('pub-bedMonitor');
     modelNode.factory('pub-drug');
     modelNode.factory('pub-dataPermission');
+    modelNode.factory('pub-evaluationItem');
+    modelNode.factory('pub-evaluationTemplate');
 
     //het
     modelNode.factory('het-member');

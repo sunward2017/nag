@@ -116,6 +116,16 @@
         "_id": "menu.manage-center.DATA-CLEAR",
         "name": "数据清理",
         "sref": "app.manage-center.data-clear"
+      },
+      {
+        "_id": "menu.manage-center.EVALUATION-ITEM",
+        "name": "评估库",
+        "sref": "app.manage-center.evaluation-item.list"
+      },
+      {
+        "_id": "menu.manage-center.EVALUATION-TEMPLATE",
+        "name": "评估模板",
+        "sref": "app.manage-center.evaluation-template.list"
       }
     ]
   },

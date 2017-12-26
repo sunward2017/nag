@@ -307,6 +307,8 @@
       "DATA-MANAGE": "数据管理",
       "DRUG": "药品库",
       "DATA-CLEAR": "数据清理",
+      "EVALUATION-ITEM":"评估库",
+      "EVALUATION-TEMPLATE":"评估模板",
       "------------": "",
       "METADATA-MANAGE": "元数据管理",
       "DICTIONARY-MANAGE": "字典管理",

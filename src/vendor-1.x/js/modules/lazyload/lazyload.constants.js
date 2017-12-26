@@ -124,6 +124,8 @@
         {name: 'subsystem.manage-center.app-clientside-update.js', files: ['app/js/lazy-modules/manage-center/app-clientside-update.js']},
         {name: 'subsystem.manage-center.drug.js', files: ['app/js/lazy-modules/manage-center/drug.js']},
         {name: 'subsystem.manage-center.data-clear.js', files: ['app/js/lazy-modules/manage-center/data-clear.js']},
+        {name: 'subsystem.manage-center.evaluation-item.js', files: ['app/js/lazy-modules/manage-center/evaluation-item.js']},
+        {name: 'subsystem.manage-center.evaluation-template.js', files: ['app/js/lazy-modules/manage-center/evaluation-template.js']},
         {name: 'subsystem.manage-center.bed-monitor-status.js', files: ['app/js/lazy-modules/manage-center/bed-monitor-status.js']},
         {name: 'subsystem.demo-center.', files: ['app/js/lazy-modules/demo-center/demo.js']}
       ]

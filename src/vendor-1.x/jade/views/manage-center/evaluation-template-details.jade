@@ -1,0 +1,167 @@
+//Created by hcl on 17-12-19.
+form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="vm.doSubmit()")
+    .panel
+        tabset(justified="true")
+            tab(active="vm.tab1.active")
+                tab-heading
+                    | {{ vm.viewTranslatePath('TAB1') | translate}}
+                    span.text-danger(title="{{'validator.FIELD-INVALID'|translate}}" , ng-show="utils.vtab('contentTab1')")
+                        i.glyphicon.glyphicon-minus-sign
+                div#contentTab1
+                    fieldset: .form-group
+                        <!--题目-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-NAME') | translate}}:
+                        .col-md-10
+                            input.form-control(type='text', name='name',ng-model='vm.model.name',required='')
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'name','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset: .form-group
+                        <!--题表-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-SECTION') | translate}}:
+                        .col-md-10
+                            .panel.panel-default.panel-grid
+                                table.grid.table.table-bordered.table-striped.table-hover
+                                    thead
+                                        tr
+                                            th.text-center(ng-if="!vm.readonly",check-all,width="30")
+                                                .checkbox.c-checkbox(data-toggle="tooltip",data-title="Check All")
+                                                    label(ng-click="vm.checkOptionMemberAll($event)")
+                                                        input(type='checkbox')
+                                                        span.fa.fa-check
+                                            th.text-center(width="60")
+                                                | {{ vm.viewTranslatePath('TAB1-LABEL-SECTION-RANK') | translate}}
+                                            th.text-center(width="120")
+                                                | {{ vm.viewTranslatePath('TAB1-LABEL-SECTION-TITLE') | translate}}
+                                            th.text-center(width="190")
+                                                | {{ vm.viewTranslatePath('TAB1-LABEL-ITEM-TOPICS') | translate}}
+                                            th.text-center(width="80")
+                                    tbody
+                                        tr(ng-repeat="row in vm.model.sections" ng-click="vm.grid.selectRow($event,row)",ng-dblclick="vm.grid.dblclickRow(row.id)")
+                                            td.text-center(ng-if="!vm.readonly")
+                                                .checkbox.c-checkbox(ng-if="!row.$editing")
+                                                    label
+                                                        input(type='checkbox',ng-model="row.checked" )
+                                                        span.fa.fa-check
+                                            td.text-left
+                                                span(ng-if="!row.$editing") {{::row.rank}}
+                                                input.form-control(name="row$rank",type="text",ng-if="row.$editing",ng-model='row.rank',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-SECTION-RANK")|translate}}',required='')
+                                                span.text-danger(ng-if="row.$editing",ng-show="row.rankFlag&&!row.rank") {{ "validator.REQUIRED" | translate}}
+                                            td.text-left
+                                                span.break-word(ng-if="!row.$editing") {{::row.title}}
+                                                input.form-control(name="row$title",type="text",ng-if="row.$editing",ng-model='row.title',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-SECTION-TITLE")|translate}}',required='')
+                                                span.text-danger(ng-if="row.$editing",ng-show="row.titleFlag&&!row.title") {{ "validator.REQUIRED" | translate}}
+                                            td.text-left
+                                                a.btn.btn-primary.btn-xs(title="{{'button.ADD'|translate}}",ng-click="vm.chooseTopicItem(row)",ng-if="row.$editing")
+                                                        i.glyphicon.glyphicon-plus
+                                                span.break-word {{ row.topics|topicsArrayMemberFilter:'topicId'}}
+                                            td(ng-if="!vm.readonly")
+                                                .btn-group(ng-if="!vm.readonly && !row.$editing")
+                                                    a.btn.btn-primary.btn-xs(title="{{'button.EDIT'|translate}}",ng-click="vm.editSectionMember(row)")
+                                                        i.glyphicon.glyphicon-pencil
+                                                .btn-group(ng-if="row.$editing")
+                                                    a.btn.btn-primary.btn-xs(title="{{'button.SAVE'|translate}}",ng-click="vm.saveSectionMember(row)")
+                                                        i.glyphicon.glyphicon-ok-sign
+                                                .btn-group(ng-if="row.$editing")
+                                                    a.btn.btn-primary.btn-xs(title="{{'button.CANCEL'|translate}}",ng-click="vm.cancelSectionMember(row)")
+                                                        i.glyphicon.glyphicon-remove-sign
+                                                .btn-group(ng-if="row.$editing && row.topics && row.topics.length>0")
+                                                    a.btn.btn-primary.btn-xs(title='{{vm.viewTranslatePath("TAB1-BUTTON-SORT")|translate}}',ng-click="vm.sortTopicItem(row)")
+                                                        i.glyphicon.glyphicon-sort-by-attributes
+                                .panel-footer
+                                    .row
+                                        .col-md-4.text-left
+                                            .btn-toolbar(ng-if="!vm.readonly")
+                                                .btn-group
+                                                    a.btn.btn-primary.btn-sm(title="{{'button.ADD'|translate}}",ng-click="vm.addSectionMember()")
+                                                        i.glyphicon.glyphicon-plus
+                                                    a.btn.btn-primary.btn-sm(title="{{'button.REMOVE'|translate}}",ng-click="vm.removeSectionMember()")
+                                                        i.glyphicon.glyphicon-minus
+                    fieldset: .form-group
+                        <!--停用标志-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-FLAG-COLLECTION') | translate}}:
+                        .col-md-2
+                            .checkbox.c-checkbox
+                                label
+                                    input#stopFlag(type='checkbox',ng-model='vm.model.stop_flag')
+                                    span.fa.fa-check
+                            label(for="stopFlag") {{ vm.viewTranslatePath('TAB1-LABEL-STOP_FLAG') | translate}}
+    .text-right.mt-lg
+        button.btn.btn-warning(type="button",ng-click="vm.cancel()") {{'button.CANCEL'|translate}}
+        button.btn.btn-success(type="submit") {{'button.SAVE'|translate}}
+
+script(type="text/ng-template", id="topic-item-choose.html")
+    .ngdialog-title
+        i.glyphicon.glyphicon-info-sign
+        | 挑选题目
+    .ngdialog-body.backfiller
+        .search-form
+            .col-md-6
+            .col-md-5
+                .input-group.page-search
+                    label.input-group-addon {{'grid.LABEL-SEARACH'|translate}}
+                    input.form-control(type="text",ng-model="vm.keyword")
+            .col-md-1
+                a.btn.btn-primary.btn-sm(title="{{'button.SEARCH'|translate}}",ng-click="vm.search(vm.keyword)")
+                    i.glyphicon.glyphicon-search
+            .clearfix
+    .ngdialog-input(style="margin-top: 5px;")
+        .panel.panel-default.panel-grid
+            table.grid.table.table-bordered.table-hover.table-striped
+                thead
+                    tr
+                        th.text-center(check-all,width="20" , ng-if="!vm.readonly")
+                            .checkbox.c-checkbox(data-toggle="tooltip",data-title="Check All")
+                                label
+                                    input(type='checkbox' ng-model="vm.all" ng-change="vm.selectAll()")
+                                    span.fa.fa-check
+                        th.text-center(width="80")
+                            | {{ vm.viewTranslatePath('TAB1-LABEL-TOPIC-NAME') | translate}}
+                        th.text-center(width="20")
+                            | {{ vm.viewTranslatePath('TAB1-LABEL-TYPE_NAME') | translate}}
+                tbody
+                    tr(ng-repeat="row in vm.filterTopics " )
+                        td.text-center
+                            .checkbox.c-checkbox
+                                label
+                                    input(type='checkbox',ng-model="row.checked" )
+                                    span.fa.fa-check
+                        td {{row.name}}
+                        td.text-center {{row.type_name}}
+                    tr(ng-if="vm.paged.length==0")
+                        td(colspan="{{utils.noResultsColspan(vm)}}") {{ 'grid.NO-RESULTS' | translate}}
+    .text-right.mt-lg
+        button.btn.btn-success(ng-click="vm.doSubmit()" ) {{'button.CONFIRM'|translate}}
+
+script(type="text/ng-template", id="topic-item-sort.html")
+    form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="vm.doSubmit()")
+        .ngdialog-title
+            i.glyphicon.glyphicon-info-sign
+            | {{ vm.viewTranslatePath('TOPIC-ITEM-SORT') | translate }}
+        .ngdialog-input
+            .col-md-12
+                fieldset: .form-group
+                    .panel.panel-default.panel-grid
+                        table.grid.table.table-bordered.table-hover.table-striped
+                            thead
+                                tr
+                                    th.text-center(width="80")
+                                        | {{ vm.viewTranslatePath('TAB1-LABEL-TOPIC-NAME') | translate}}
+                                    th.text-center(width="20")
+                                        | {{ vm.viewTranslatePath('TAB1-LABEL-TYPE_NAME') | translate}}
+                                    th.text-center(width="20")
+                                        | {{ vm.viewTranslatePath('TAB1-LABEL-ORDER') | translate}}
+                                    th.text-center(width="5")
+                            tbody
+                                tr(ng-repeat="row in vm.sortedTopics track by $index" )
+                                    td {{row.topic.name}}
+                                    td.text-center {{row.topic.type_name}}
+                                    td
+                                        .input-group.charge-item
+                                            input(type='number',ng-model='row.order',ui-validate="'$value>=1' ",min="1")
+                                        span.text-danger(ng-show="!row.order") {{ "validator.MIN" | translate:{min:1} }}
+                                    td.text-center
+                                        a.btn.btn-primary.btn-xs(title="{{'button.REMOVE'|translate}}",ng-click="vm.removeTopic($index)")
+                                            i.glyphicon.glyphicon-remove-circle
+                                tr(ng-if="vm.paged.length==0")
+                                    td(colspan="{{utils.noResultsColspan(vm)}}") {{ 'grid.NO-RESULTS' | translate}}
+        .text-right.mt-lg
+            button.btn.btn-success(type="submit") {{'button.CONFIRM'|translate}}

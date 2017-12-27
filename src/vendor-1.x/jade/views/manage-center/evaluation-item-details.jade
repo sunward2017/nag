@@ -1,0 +1,106 @@
+//Created by hcl on 17-12-19.
+form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="vm.doSubmit()")
+    .panel
+        tabset(justified="true")
+            tab(active="vm.tab1.active")
+                tab-heading
+                    | {{ vm.viewTranslatePath('TAB1') | translate}}
+                    span.text-danger(title="{{'validator.FIELD-INVALID'|translate}}" , ng-show="utils.vtab('contentTab1')")
+                        i.glyphicon.glyphicon-minus-sign
+                div#contentTab1
+                    fieldset: .form-group
+                        <!--题目-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-NAME') | translate}}:
+                        .col-md-10
+                            input.form-control(type='text', name='name',ng-model='vm.model.name',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-NAME")|translate}}',required='')
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'name','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset: .form-group
+                        <!--题干-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-DESCRIPTION') | translate}}:
+                        .col-md-10
+                            textarea.form-control(name='description',ng-model='vm.model.description',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-DESCRIPTION")|translate}}',required='')
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'description','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset: .form-group
+                        <!--类型:文字，音频，视频-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-TYPE') | translate}}:
+                        .col-md-10
+                            .btn-group
+                                .btn.btn-primary(name='type',ng-repeat='type_item in vm.selectBinding.type',ng-model='vm.model.type',btn-radio="type_item.value",required='') {{type_item.name}}
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'type','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset(ng-if="vm.model.type && vm.model.type!== 'A0001' "): .form-group
+                        <!--语音或视频资源url-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-URL') | translate}}:
+                        .col-md-10
+                            input.form-control(type='number',name='url' , ng-model='vm.model.url',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-URL")|translate}}' ,required='')
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'url','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset: .form-group
+                        <!--选项-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-OPTIONS') | translate}}:
+                        .col-md-10
+                            .panel.panel-default.panel-grid
+                                table.grid.table.table-bordered.table-striped.table-hover
+                                    thead
+                                        tr
+                                            th.text-center(ng-if="!vm.readonly",check-all,width="30")
+                                                .checkbox.c-checkbox(data-toggle="tooltip",data-title="Check All")
+                                                    label(ng-click="vm.checkOptionMemberAll($event)")
+                                                        input(type='checkbox')
+                                                        span.fa.fa-check
+                                            th.text-center(width="60")
+                                                | {{ vm.viewTranslatePath('TAB1-LABEL-OPTION-NAME') | translate}}
+                                            th.text-center(width="230")
+                                                | {{ vm.viewTranslatePath('TAB1-LABEL-OPTION-VALUE') | translate}}
+                                            th.text-center(width="80")
+                                                | {{ vm.viewTranslatePath('TAB1-LABEL-OPTION-SCORE') | translate}}
+                                            th.text-center(width="80")
+                                    tbody
+                                        tr(ng-repeat="row in vm.model.options" ng-click="vm.grid.selectRow($event,row)",ng-dblclick="vm.grid.dblclickRow(row.id)")
+                                            td.text-center(ng-if="!vm.readonly")
+                                                .checkbox.c-checkbox(ng-if="!row.$editing")
+                                                    label
+                                                        input(type='checkbox',ng-model="row.checked" )
+                                                        span.fa.fa-check
+                                            td.text-left
+                                                span(ng-if="!row.$editing") {{::row.name}}
+                                                input.form-control(name="row$name",type="text",ng-if="row.$editing",ng-model='row.name',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-OPTION-NAME")|translate}}' ,required='')
+                                                span.text-danger(ng-if="row.$editing",ng-show="row.nameFlag && !row.name") {{ "validator.REQUIRED" | translate}}
+                                            td.text-left
+                                                span(ng-if="!row.$editing") {{::row.value}}
+                                                input.form-control(name="row$value",type="text",ng-if="row.$editing",ng-model='row.value',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-OPTION-VALUE")|translate}}',required='')
+                                                span.text-danger(ng-if="row.$editing",ng-show="row.valueFlag && !row.value") {{ "validator.REQUIRED" | translate}}
+                                            td.text-left
+                                                span(ng-if="!row.$editing") {{::row.score}}
+                                                input.form-control(name="row$score",type="number",ng-if="row.$editing",ng-model='row.score',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-OPTION-SCORE")|translate}}' ,required='')
+                                                span.text-danger(ng-if="row.$editing",ng-show="row.scoreFlag && !(row.score>=0)") {{ "validator.REQUIRED" | translate}}
+                                                span.text-danger(ng-if="row.$editing",ng-show="utils.vinput(this.theForm,'row$score','number')") {{ "validator.NUMBER" | translate}}
+                                            td(ng-if="!vm.readonly")
+                                                .btn-group(ng-if="!vm.readonly && !row.$editing")
+                                                    a.btn.btn-primary.btn-xs(title="{{'button.EDIT'|translate}}",ng-click="vm.editOptionMember(row)")
+                                                        i.glyphicon.glyphicon-pencil
+                                                .btn-group(ng-if="row.$editing")
+                                                    a.btn.btn-primary.btn-xs(title="{{'button.SAVE'|translate}}",ng-click="vm.saveOptionMember(row)")
+                                                        i.glyphicon.glyphicon-ok-sign
+                                                .btn-group(ng-if="row.$editing")
+                                                    a.btn.btn-primary.btn-xs(title="{{'button.CANCEL'|translate}}",ng-click="vm.cancelOptionMember(row)")
+                                                        i.glyphicon.glyphicon-remove-sign
+                                .panel-footer
+                                    .row
+                                        .col-md-4.text-left
+                                            .btn-toolbar(ng-if="!vm.readonly")
+                                                .btn-group
+                                                    a.btn.btn-primary.btn-sm(title="{{'button.ADD'|translate}}",ng-click="vm.addOptionMember()")
+                                                        i.glyphicon.glyphicon-plus
+                                                    a.btn.btn-primary.btn-sm(title="{{'button.REMOVE'|translate}}",ng-click="vm.removeOptionMember()")
+                                                        i.glyphicon.glyphicon-minus
+                    fieldset: .form-group
+                        <!--停用标志-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-FLAG-COLLECTION') | translate}}:
+                        .col-md-2
+                            .checkbox.c-checkbox
+                                label
+                                    input#stopFlag(type='checkbox',ng-model='vm.model.stop_flag')
+                                    span.fa.fa-check
+                            label(for="stopFlag") {{ vm.viewTranslatePath('TAB1-LABEL-STOP_FLAG') | translate}}
+    .text-right.mt-lg
+        button.btn.btn-warning(type="button",ng-click="vm.cancel()") {{'button.CANCEL'|translate}}
+        button.btn.btn-success(type="submit") {{'button.SAVE'|translate}}

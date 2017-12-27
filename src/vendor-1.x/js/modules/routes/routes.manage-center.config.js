@@ -1527,6 +1527,135 @@
                 }
                 , resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.MANAGE_CENTER + 'data-clear.js')
             })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.MANAGE_CENTER + 'evaluation-item', {
+              url: '/evaluation-item',
+              title: '评估库',
+              abstract: true,
+              views: {
+                "module-header": {
+                  templateUrl: helper.basepath(MODEL_VARIABLES.HEAD_TEMPLATES.MANAGE_CENTER),
+                  controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER
+                },
+                "module-content": {
+                  template: '<div class="data-ui-view"></div><div class="clearfix"></div>'
+                }
+              },
+              resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.MANAGE_CENTER + 'evaluation-item.js')
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.MANAGE_CENTER + 'evaluation-item.list', {
+              url: '/list/:action',
+              templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.MANAGE_CENTER + 'evaluation-item-list.html'),
+              access_level: AUTH_ACCESS_LEVELS.ADMIN,
+              controller: 'EvaluationItemGridController',
+              resolve: {
+                entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.MANAGE_CENTER + 'evaluation-item.list', {
+                  modelName: 'pub-evaluationItem',
+                  searchForm: { "status": 1 },
+                  serverPaging: true,
+                  keyword_match_cols: ['type','name','type_name'],
+                  blockUI: true,
+                  columns: [{
+                    label: '题目',
+                    name: 'name',
+                    type: 'string',
+                    width: 140,
+                    sortable: true
+                  }, {
+                    label: '类型',
+                    name: 'type',
+                    type: 'String',
+                    width: 50,
+                    sortable: true
+                  },  {
+                    label: '停用',
+                    name: 'stop_flag',
+                    type: 'Boolean',
+                    width: 50,
+                    sortable: true
+                  }, {
+                    label: '操作',
+                    name: 'actions',
+                    sortable: false,
+                    width: 60
+                  }]
+                })
+              }
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.MANAGE_CENTER + 'evaluation-item.details', {
+              url: '/details/:action/:_id',
+              templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.MANAGE_CENTER + 'evaluation-item-details.html'),
+              controller: 'EvaluationItemDetailsController',
+              access_level: AUTH_ACCESS_LEVELS.ADMIN,
+              resolve: {
+                entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.MANAGE_CENTER + 'evaluation-item.details', {
+                  modelName: 'pub-evaluationItem',
+                  blockUI: true,
+                  model: {
+                    type: 'A0001'
+                  }
+                })
+              }
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.MANAGE_CENTER + 'evaluation-template', {
+              url: '/evaluation-template',
+              title: '评估模板',
+              abstract: true,
+              views: {
+                "module-header": {
+                  templateUrl: helper.basepath(MODEL_VARIABLES.HEAD_TEMPLATES.MANAGE_CENTER),
+                  controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER
+                },
+                "module-content": {
+                  template: '<div class="data-ui-view"></div><div class="clearfix"></div>'
+                }
+              },
+              resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.MANAGE_CENTER + 'evaluation-template.js')
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.MANAGE_CENTER + 'evaluation-template.list', {
+              url: '/list/:action',
+              templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.MANAGE_CENTER + 'evaluation-template-list.html'),
+              access_level: AUTH_ACCESS_LEVELS.ADMIN,
+              controller: 'EvaluationTemplateGridController',
+              resolve: {
+                entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.MANAGE_CENTER + 'evaluation-template.list', {
+                  modelName: 'pub-evaluationTemplate',
+                  searchForm: { "status": 1 },
+                  serverPaging: true,
+                  keyword_match_cols: ['name'],
+                  blockUI: true,
+                  columns: [{
+                    label: '模板名称',
+                    name: 'name',
+                    type: 'string',
+                    width: 160,
+                    sortable: true
+                  }, {
+                    label: '停用',
+                    name: 'stop_flag',
+                    type: 'Boolean',
+                    width: 40,
+                    sortable: true
+                  }, {
+                    label: '操作',
+                    name: 'actions',
+                    sortable: false,
+                    width: 40
+                  }]
+                })
+              }
+            })
+            .state(MODEL_VARIABLES.STATE_PREFIXS.MANAGE_CENTER + 'evaluation-template.details', {
+              url: '/details/:action/:_id',
+              templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.MANAGE_CENTER + 'evaluation-template-details.html'),
+              controller: 'EvaluationTemplateDetailsController',
+              access_level: AUTH_ACCESS_LEVELS.ADMIN,
+              resolve: {
+                entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.MANAGE_CENTER + 'evaluation-template.details', {
+                  modelName: 'pub-evaluationTemplate',
+                  blockUI: true
+                })
+              }
+            })
             .state('app.manage-center.metadata-dictionary-manage', {
                 url: '/metadata-dictionary-manage',
                 title: '字典管理',

@@ -15,7 +15,7 @@ module.exports = function(ctx,name) {
     module.isloaded = true;
 
     var sectionSchema = new mongoose.Schema({
-      rank:{type: Number, required: true},//章节排列
+      rank:{type: String, required: true},//章节排列
       title:{type: String},//章节标题
       // captions:[mongoose.Schema.Types.Mixed], //章节内分类小章节,Mixed类型
       topics:[{

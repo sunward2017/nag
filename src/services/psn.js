@@ -7799,6 +7799,29 @@ module.exports = {
           };
         }
       },
+      /************************评估管理***************************/
+      {
+        method:'copyRemoteTempTopics',
+        verb:'post',
+        url: this.service_url_prefix + "/copyRemoteTempTopics",
+        handler: function (app, options) {
+          return function*(next) {
+            try {
+              console.log('body:',this.request.body);
+              var tenantId = this.request.body.tenantId;
+              var remoteTempSections = this.request.body.remoteTempSections;
+
+
+
+              this.body = app.wrapper.res.default();
+            } catch (e) {
+              self.logger.error(e.message);
+              this.body = app.wrapper.res.error(e);
+            }
+            yield next;
+          };
+        }
+      },
       /**********************其他*****************************/
       {
         method: 'batchCreatePy',

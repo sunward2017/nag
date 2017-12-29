@@ -627,7 +627,8 @@
           mealOrderRecordStat: mealOrderRecordStat,
           mealOrderRecordStat2:mealOrderRecordStat2,
           dataByClient:dataByClient,
-          batchCreatePy:batchCreatePy
+          batchCreatePy:batchCreatePy,
+          copyRemoteTempTopics:copyRemoteTempTopics
         };
 
         function roomStatusInfo(tenantId) {
@@ -1329,6 +1330,13 @@
             tenantId: tenantId,
             dbTable: dbTable,
             targetObj:targetObj
+          });
+        }
+
+        function copyRemoteTempTopics(tenantId,remoteTempSections) {
+          return $http.post(baseUrl + 'copyRemoteTempTopics', {
+            tenantId: tenantId,
+            remoteTempSections: remoteTempSections
           });
         }
       }]

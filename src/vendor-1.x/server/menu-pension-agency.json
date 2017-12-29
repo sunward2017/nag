@@ -48,6 +48,16 @@
         "_id": "menu.pension-agency.ASSESSMENT-REGULAR",
         "name": "定期评估",
         "sref": "app.pension-agency.assessment-regular.list"
+      },
+      {
+        "_id": "menu.pension-agency.EVALUATION-ITEM",
+        "name": "评估库",
+        "sref": "app.pension-agency.evaluation-item.list"
+      },
+      {
+        "_id": "menu.pension-agency.EVALUATION-TEMPLATE",
+        "name": "评估模板",
+        "sref": "app.pension-agency.evaluation-template.list"
       }
     ]
   },

@@ -1550,7 +1550,7 @@
               resolve: {
                 entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.MANAGE_CENTER + 'evaluation-item.list', {
                   modelName: 'pub-evaluationItem',
-                  searchForm: { "status": 1 },
+                  searchForm: { "status": 1,"tenantId":{$in: [null, undefined]} },
                   serverPaging: true,
                   keyword_match_cols: ['type','name','type_name'],
                   blockUI: true,
@@ -1591,7 +1591,8 @@
                   modelName: 'pub-evaluationItem',
                   blockUI: true,
                   model: {
-                    type: 'A0001'
+                    type: 'A0001',
+                    mode:'A0001'
                   }
                 })
               }
@@ -1619,7 +1620,7 @@
               resolve: {
                 entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.MANAGE_CENTER + 'evaluation-template.list', {
                   modelName: 'pub-evaluationTemplate',
-                  searchForm: { "status": 1 },
+                  searchForm: { "status": 1, "tenantId":{$in: [null, undefined]}},
                   serverPaging: true,
                   keyword_match_cols: ['name'],
                   blockUI: true,

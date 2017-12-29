@@ -189,6 +189,8 @@
       "ASSESSMENT": "评估管理",
       "ASSESSMENT-ENTER": "入院评估",
       "ASSESSMENT-REGULAR": "定期评估",
+      "EVALUATION-ITEM":"评估库",
+      "EVALUATION-TEMPLATE":"评估模板",
       "------------": "",
       "NURSING-MANAGE": "照护管理",
       "NURSING-STATION": "护士台",

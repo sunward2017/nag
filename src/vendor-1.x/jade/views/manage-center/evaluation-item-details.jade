@@ -34,6 +34,13 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                             input.form-control(type='number',name='url' , ng-model='vm.model.url',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-URL")|translate}}' ,required='')
                             span.text-danger(ng-show="utils.vinput(this.theForm,'url','required')") {{ "validator.REQUIRED" | translate}}
                     fieldset: .form-group
+                        <!--方式：问答，选择-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-MODE') | translate}}:
+                        .col-md-10
+                            .btn-group
+                                .btn.btn-primary(name='mode',ng-repeat='mode in vm.selectBinding.mode',ng-model='vm.model.mode',btn-radio="mode.value",required='') {{mode.name}}
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'mode','required')") {{ "validator.REQUIRED" | translate}}
+                    fieldset(ng-if="vm.model.mode && vm.model.mode=== 'A0001' "): .form-group
                         <!--选项-->
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-OPTIONS') | translate}}:
                         .col-md-10

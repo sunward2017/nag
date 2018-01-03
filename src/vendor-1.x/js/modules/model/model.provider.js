@@ -1333,10 +1333,11 @@
           });
         }
 
-        function copyRemoteTempTopics(tenantId,remoteTempSections) {
+        function copyRemoteTempTopics(tenantId,remoteData,modeSections) {
           return $http.post(baseUrl + 'copyRemoteTempTopics', {
             tenantId: tenantId,
-            remoteTempSections: remoteTempSections
+            remoteData: remoteData,
+            modeSections:modeSections
           });
         }
       }]

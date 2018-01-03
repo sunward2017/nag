@@ -7809,11 +7809,65 @@ module.exports = {
             try {
               console.log('body:',this.request.body);
               var tenantId = this.request.body.tenantId;
-              var remoteTempSections = this.request.body.remoteTempSections;
+              var remoteData = this.request.body.remoteData;
+              var modeSections = this.request.body.modeSections;
+              var topics=[],topicsId;
+              if(remoteData.section){
+                app._.each(remoteData.section,function (o) {
+                  topics = topics.concat(o.topics);
+                });
+              }
+              if(remoteData.newSectionTopics){
+                topics = topics.concat(remoteData.newSectionTopics);
+              }
+              console.log('topics:',topics);
 
+              topicsId = app._.map(topics,function (o) {
+                return o.topicId;
+              });
+              var remoteRows = yield app.modelFactory().model_query(app.models['pub_evaluationItem'],{
+                where: {
+                  status:1,
+                  _id:{$in:topicsId},
+                  tenantId:{$in: [null, undefined]}
+                }
+              });
+              var toSaveRows=app._.map(remoteRows,function (o) {
+                return {
+                  name:o.name,
+                  description:o.description,
+                  type:o.type,
+                  url:o.url,
+                  mode:o.mode,
+                  options:o.options,
+                  sourceId:o._id,
+                  tenantId:tenantId
+                }
+              });
+              console.log('toSaveRows:',toSaveRows);
+              var ret = yield app.modelFactory().model_bulkInsert(app.models['pub_evaluationItem'], {
+                rows: toSaveRows
+              });
+              console.log('ret:',ret);
 
-
-              this.body = app.wrapper.res.default();
+              //把拷贝到本地库的topic的_id复制到模板中的topicId
+              app._.each(modeSections,function (o) {
+                if(o.remote){
+                  app._.each(o.topics,function (topic) {
+                    var idx = app._.findIndex(ret,function (retItem) {
+                      return retItem.sourceId == topic.topicId;
+                    });
+                    console.log('idx:',idx);
+                    if(idx!=-1){
+                      console.log('before:',topic.topicId);
+                      topic.topicId = ret[idx]._id;
+                      console.log('after:',topic.topicId);
+                    }
+                  });
+                }
+              });
+              console.log('modeSections:',modeSections);
+              this.body = app.wrapper.res.ret(modeSections);
             } catch (e) {
               self.logger.error(e.message);
               this.body = app.wrapper.res.error(e);

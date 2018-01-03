@@ -29,7 +29,7 @@ module.exports = function(ctx,name) {
         value:{type: String, required: true},//选项内容
         score: {type: Number, required: true, min: 0} //选项分值
       }],
-      sourceId:{ype: mongoose.Schema.Types.ObjectId},//本地库从远程库复制模板时导入本地题库的远程题id
+      sourceId:{type: mongoose.Schema.Types.ObjectId},//本地库从远程库复制模板时导入本地题库的远程题id
       tenantId: {type: mongoose.Schema.Types.ObjectId} //中央题库与本地题库分离
     }, {
       toObject: {

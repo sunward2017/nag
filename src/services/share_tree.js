@@ -745,7 +745,36 @@ module.exports = {
                         yield next;
                     };
                 }
+            },
+          {
+            method: 'fetch-T3015',
+            verb: 'post',
+            url: this.service_url_prefix + "/T3015", //机构账户:评估管理-评估模板- 模板选题树
+            handler: function (app, options) {
+              return function * (next) {
+                try {
+                  var data = this.request.body;
+                  console.log('data:',data);
+
+                  var templates = yield app.modelFactory().model_query(app.models['pub_evaluationTemplate'], {
+                    where: data.where,
+                    select: data.select
+                  });
+                  console.log('templates:',templates);
+
+                  var templateGroupNodes;
+                  templateGroupNodes=[{_id:'模板',name:'模板',children:templates},{_id:'题库',name:'题库',children:[]}];
+                  console.log('templateGroupNodes:',templateGroupNodes);
+
+                  this.body = app.wrapper.res.rows(templateGroupNodes);
+                } catch (e) {
+                  self.logger.error(e);
+                  this.body = app.wrapper.res.error(e);
+                }
+                yield next;
+              };
             }
+          }
         ];
 
         return this;

@@ -74,7 +74,7 @@
           if (ret.value != '$document' && ret.value != '$closeButton' && ret.value != '$escape') {
             vm.model.name=ret.value.name;
             if(ret.value.remoteTemp){//从远程模板导入
-              vm.hasRemoteTopics=ret.value.sections;
+              vm.hasRemoteTopics=angular.copy(ret.value.sections);//存放远程导入的section
               _.each(ret.value.sections,function (o) {
                 o.remote = true;//标记此section是从远程拷贝
               });
@@ -121,12 +121,14 @@
         var selectedRemote = _.filter(selected,function (row) {
           return row.remote;
         });
-        if(selectedRemote.length>0){//存在从远程拷贝的section
+        if(selectedRemote.length>0){//存在从远程拷贝topic的section
           _.each(selectedRemote,function (selected) {
             var idx = _.findIndex(vm.hasRemoteTopics,function (o) {
               return selected._id == o._id;
             });
-            vm.hasRemoteTopics.splice(idx,1);
+            if(idx!=-1){
+              vm.hasRemoteTopics.splice(idx,1);
+            }
           });
         }
       });
@@ -177,7 +179,8 @@
       var sortedTopicIds = _.map(rowTopics,function (o) {
         return o.topicId
       });
-      console.log('sortedTopicIds :',sortedTopicIds );
+      // console.log('sortedTopicIds :',sortedTopicIds );
+      // console.log('vm.hasRemoteTopics:',vm.hasRemoteTopics);
       vmh.fetch(vm.modelNode.services['pub-evaluationItem'].query({status:1,stop_flag:false,_id:{$in:sortedTopicIds}}, '_id name type')).then(function (ret) {
         _.each(rowTopics,function (o) {
           var idx = _.findIndex(ret,function (r) {
@@ -199,16 +202,31 @@
           if (ret.value != '$document' && ret.value != '$closeButton' && ret.value != '$escape') {
             row.topics = ret.value.ret;
             if(row.remote&& ret.value.rm  &&ret.value.rm.length>0){
-              var idx = _.findIndex(vm.hasRemoteTopics,function (o) {
-                return o._id == row._id;
-              });
-              console.log('vm.hasRemoteTopics[idx]:',vm.hasRemoteTopics[idx]);
-              _.each(ret.value.rm,function (o) {
-                var i = _.findIndex(vm.hasRemoteTopics[idx].topics,function (ele) {
-                  return ele.topicId==o.topicId
+              if(row._id){
+                var idx = _.findIndex(vm.hasRemoteTopics,function (o) {
+                  return o._id == row._id;
                 });
-                vm.hasRemoteTopics[idx].topics.splice(i,1);
-              });
+                console.log('vm.hasRemoteTopics[idx]:',vm.hasRemoteTopics[idx]);
+                _.each(ret.value.rm,function (o) {
+                  var i = _.findIndex(vm.hasRemoteTopics[idx].topics,function (ele) {
+                    return ele.topicId==o.topicId
+                  });
+                  console.log('i:',i);
+                  if(i!=-1){
+                    vm.hasRemoteTopics[idx].topics.splice(i,1);
+                  }
+                });
+              }else {//row._id不存在
+                _.each(ret.value.rm,function (o) {
+                  var i = _.findIndex(row.newRemote,function (ele) {
+                    return ele.topicId==o.topicId
+                  });
+                  if(i!=-1){
+                    row.newRemote.splice(i,1);
+                  }
+                });
+              }
+              console.log('row:',row);
             }
           }
         });
@@ -217,38 +235,59 @@
 
     function chooseTopicItem(row) {
       console.log('choose item`````row:',row);
-      vmh.parallel([vm.modelNode.services['pub-evaluationItem'].query({status:1,stop_flag:false,tenantId:{$in: [null, undefined]}}, 'name type'),
-        vm.modelNode.services['pub-evaluationItem'].query({status:1,stop_flag:false,tenantId:vm.tenantId}, 'name type')]).then(function (ret) {
-        console.log('ret:',ret);
+      var selectedTopicIds = _.map(row.topics,function (o) {
+        return o.topicId
+      });
+      vmh.parallel([vm.modelNode.services['pub-evaluationItem'].query({status:1,stop_flag:false,tenantId:{$in: [null, undefined]},_id:{$nin:selectedTopicIds}}, 'name type tenantId'),
+        vm.modelNode.services['pub-evaluationItem'].query({status:1,stop_flag:false,tenantId:vm.tenantId,_id:{$nin:selectedTopicIds}}, 'name type tenantId')]).then(function (ret) {
         ngDialog.open({
           template: 'topic-item-choose.html',
           controller: 'topicItemChooseController',
           className: 'ngdialog-theme-default ngdialog-backfiller-default-picker ngdialog-meal-weekly-menu-picker',
           data: {
             vmh: vmh,
+            tenantId : vm.tenantId,
             moduleTranslatePathRoot: vm.viewTranslatePath(),
-            topicData:ret[0],
-            topicLocalData:ret[1],
-            rowData:row
+            selectedTopicIds:selectedTopicIds,
+            remoteTopics:ret[0],
+            localTopics:ret[1]
           }
         }).closePromise.then(function (ret) {
           console.log('closePromise ret:',ret);
           if (ret.value != '$document' && ret.value != '$closeButton' && ret.value != '$escape') {
-            row.topics =[];
-            _.each(ret.value.ret,function (o,idx) {
-              row.topics.push({topicId:o._id,order:idx+1});
+            if(!row.topics){
+              row.topics =[];
+            }
+            var len = row.topics.length;
+            _.each(ret.value,function (o,idx) {
+              row.topics.push({topicId:o._id,order:len+idx+1});
             });
             console.log('row.topics:',row.topics);
-            if(row.remote){
-              var idx = _.findIndex(vm.hasRemoteTopics,function (o) {
-                return o._id == row._id;
-              });
-              // console.log('vm.hasRemoteTopics[idx]:',vm.hasRemoteTopics[idx]);
-              var remoteRet = _.map(ret.value.remoteRet,function (o) {
+            if(!ret.value[0].tenantId){//tenantId不存在时，新增题来自中央库
+              //具体情况包括：新增section(row._id不存在),修改section(包括row.remote新增和修改)
+              var remoteRet = _.map(ret.value,function (o) {
                 return {topicId:o._id}
               });
               // console.log('remoteRet:',remoteRet);
-              vm.hasRemoteTopics[idx].topics=remoteRet;
+              if(row._id){
+                var idx = _.findIndex(vm.hasRemoteTopics,function (o) {
+                  return o._id == row._id;
+                });
+                if(idx==-1){
+                  row.remote = true; //此section存在从远程拷贝的topic
+                  vm.hasRemoteTopics.push({_id:row._id,topics:remoteRet});
+                }else {
+                  // console.log('vm.hasRemoteTopics[idx]:',vm.hasRemoteTopics[idx]);
+                  vm.hasRemoteTopics[idx].topics=vm.hasRemoteTopics[idx].topics.concat(remoteRet);
+                }
+              }else {//row._id不存在
+                if(!row.newRemote){
+                  row.remote = true;
+                  row.newRemote = [];
+                }
+                row.newRemote=row.newRemote.concat(remoteRet);
+              }
+              console.log('row:',row);
             }
           }
         });
@@ -258,11 +297,21 @@
     function doSubmit() {
       if ($scope.theForm.$valid) {
         console.log('vm.model:', vm.model);
-        if(vm.hasRemoteTopics && vm.hasRemoteTopics.length>0){
+        _.each(vm.model.sections,function (o) {
+          if(o.newRemote){
+            if(!vm.newSectionTopics){
+              vm.newSectionTopics=[];
+            }
+            vm.newSectionTopics=vm.newSectionTopics.concat(o.newRemote);
+          }
+        });
+        if((vm.hasRemoteTopics && vm.hasRemoteTopics.length>0) || (vm.newSectionTopics && vm.newSectionTopics.length>0)){
           console.log('vm.hasRemoteTopics:',vm.hasRemoteTopics);
-          vmh.psnService.copyRemoteTempTopics(vm.tenantId,vm.hasRemoteTopics).then(function (ret) {
-            //修改section中topics的topicId为指向本地题库_id
-            // vm.save();
+          vmh.psnService.copyRemoteTempTopics(vm.tenantId,{section:vm.hasRemoteTopics,newSectionTopics:vm.newSectionTopics},vm.model.sections).then(function (ret) {
+            console.log('copy finish...ret:',ret);
+            vm.model.sections = ret;
+            console.log('mode:',vm.model);
+            vm.save();
           });
         }else {
           vm.save();
@@ -287,28 +336,79 @@
       vm.viewTranslatePath = function (key) {
         return vm.moduleTranslatePathRoot + '.' + key;
       };
-      vm.topics = $scope.ngDialogData.topicData;
-      vm.filterTopics=vm.topics;
-      vm.topicsLocal = $scope.ngDialogData.topicLocalData;
-      vm.filterLocalTopics=vm.topicsLocal;
-      vm.selectedTopics = $scope.ngDialogData.rowData.topics;
-      _.each(vm.selectedTopics,function (o) {
-        var index = _.findIndex(vm.topics,function (topic) {
-          return topic._id == o.topicId;
-        });
-        var idx = _.findIndex(vm.topicsLocal,function (topic) {
-          return topic._id == o.topicId;
-        });
-        if(index!=-1){
-          vm.topics[index].checked = true;
-        }else if(idx!=-1){
-          vm.topicsLocal[idx].checked = true;
+      vm.isLocalTemplate = true;
+      vm.tenantId = $scope.ngDialogData.tenantId;
+      vm.selectedTopicIds = $scope.ngDialogData.selectedTopicIds;
+      vm.localTopics = $scope.ngDialogData.localTopics;
+      vm.remoteTopics = $scope.ngDialogData.remoteTopics;
+
+      // vm.treeDataPromise = vmh.shareService.tmp('T3001/pub-evaluationTemplate', 'name sections', {tenantId: vm.tenantId, status: 1, stop_flag: false}).then(function (results) {
+      //   console.log('results:',results);
+      //   results.push({name:'其余非模板内题目'});
+      //   return results;
+      // });
+      vm.localTempsPromise=vmh.shareService.tmp('T3015', 'name sections', {tenantId: vm.tenantId, status: 1, stop_flag: false}).then(function (nodes) {
+        // console.log('localTemps nodes :',nodes);
+        return nodes;
+      });
+
+      $scope.$on('tree:node:select', function ($event, node) {
+        console.log('select node:',node);
+        if(vm.all){
+          vm.all=false;
+        }
+        if(node._id != '模板'){
+          if(node._id == '题库'){
+            if(vm.isLocalTemplate){
+              vm.filterTopics=vm.topics=angular.copy(vm.localTopics);
+            }else {
+              vm.filterTopics=vm.topics=angular.copy(vm.remoteTopics);
+            }
+            return;
+          }
+          var topicsArr=[],topicIds;
+          _.each(node.sections,function (o) {
+            if(o.topics){
+              topicsArr=topicsArr.concat(o.topics);
+            }
+          });
+          topicIds=_.map(topicsArr,function (o) {
+            var idx = vm.selectedTopicIds.indexOf(o.topicId);
+            if(idx==-1){
+              return o.topicId;
+            }
+          });
+          console.log('topicIds:',topicIds);
+          var where={status: 1, stop_flag: false,_id:{$in:topicIds}};
+          if(vm.isLocalTemplate){
+            where.tenantId=vm.tenantId;
+          }else {
+            where.tenantId={$in: [null, undefined]}
+          }
+          vmh.shareService.tmp('T3001/pub-evaluationItem', 'name type tenantId', where).then(function (results) {
+            console.log('item nodes:',results);
+            vm.filterTopics=vm.topics=angular.copy(results);
+          });
         }
       });
+      vm.showLocalTemplate = showLocalTemplate;
+      vm.showRemoteTemplate = showRemoteTemplate;
       vm.doSubmit = doSubmit;
       vm.search = search;
       vm.selectAll = selectAll;
-      vm.selectAllLocal = selectAllLocal;
+    }
+
+    function showLocalTemplate() {
+      vm.isLocalTemplate = true;
+    }
+    function showRemoteTemplate() {
+      vm.isLocalTemplate = false;
+      if(!vm.remoteTempsPromise){
+        vm.remoteTempsPromise= vmh.shareService.tmp('T3015', 'name sections', {tenantId: {$in: [null, undefined]}, status: 1, stop_flag: false}).then(function (nodes) {
+          console.log('nodes :',nodes);
+          return nodes;
+        });
+      }
     }
 
     function search(keyword) {
@@ -318,14 +418,9 @@
         var fNodes= _.filter(vm.topics,function (o) {
           return o.name.match(reg)
         });//浅复制，过滤后数组的变化会反应到原始数组的变化
-        var fNodesLocal= _.filter(vm.topicsLocal,function (o) {
-          return o.name.match(reg)
-        });
         vm.filterTopics=fNodes;
-        vm.filterLocalTopics=fNodesLocal;
       }else {
         vm.filterTopics=vm.topics;
-        vm.filterLocalTopics =vm.topicsLocal;
       }
       console.log('vm.topics:',vm.topics);
     }
@@ -336,30 +431,20 @@
       }
     }
 
-    function selectAllLocal() {
-      for (var i = 0, len = vm.topicsLocal.length; i < len; i++) {
-        vm.topicsLocal[i].checked = vm.allLocal;
-      }
-    }
-
     function selectedTopics() {
       var selected=  _.filter(vm.topics, function (o) {
         return o.checked;
       });
-      var selectedLocal =  _.filter(vm.topicsLocal, function (o) {
-        return o.checked;
-      });
-      vm.selectedTopics = selected.concat(selectedLocal);
-      return selected;
+      vm.selectedTopics = selected;
     }
 
     function doSubmit() {
-      var remote=selectedTopics();
+      selectedTopics();
       if (vm.selectedTopics.length == 0) {
         vmh.alertWarning('notification.SELECT-NONE-WARNING', true);
         return;
       }
-      $scope.closeThisDialog({ret:vm.selectedTopics,remoteRet:remote});
+      $scope.closeThisDialog(vm.selectedTopics);
     }
   }
 
@@ -376,9 +461,7 @@
         return vm.moduleTranslatePathRoot + '.' + key;
       };
       vm.sortedTopics = $scope.ngDialogData.sortedTopics;
-      console.log('vm.sortedTopics:',vm.sortedTopics);
-
-
+      // console.log('vm.sortedTopics:',vm.sortedTopics);
       vm.doSubmit = doSubmit;
       vm.removeTopic = removeTopic;
     }
@@ -389,7 +472,7 @@
       if(!vm.rmTopics){
         vm.rmTopics = [];
       }
-      vm.rmTopics.push(rm);
+      vm.rmTopics.push(rm[0]);//包含被删的本地或中央库的topic
     }
 
     function doSubmit() {

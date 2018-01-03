@@ -96,6 +96,9 @@ script(type="text/ng-template", id="topic-item-choose.html")
   .ngdialog-body.backfiller
     .search-form
       .col-md-6
+        .btn-group
+          a.btn.btn-sm(ng-class="vm.isLocalTemplate?'btn-warning':'btn-primary'",ng-click="vm.showLocalTemplate()") {{vm.viewTranslatePath('LOCAL-TEMPLATE') | translate}}
+          a.btn.btn-sm(ng-class="vm.isLocalTemplate?'btn-primary':'btn-warning'",ng-click="vm.showRemoteTemplate()") {{vm.viewTranslatePath('REMOTE-TEMPLATE') | translate}}
       .col-md-5
         .input-group.page-search
           label.input-group-addon {{'grid.LABEL-SEARACH'|translate}}
@@ -104,37 +107,10 @@ script(type="text/ng-template", id="topic-item-choose.html")
         a.btn.btn-primary.btn-sm(title="{{'button.SEARCH'|translate}}",ng-click="vm.search(vm.keyword)")
           i.glyphicon.glyphicon-search
       .clearfix
-  div
-    .col-md-6
-      span 本地库:
-    .col-md-6
-      span 中央库:
-  .ngdialog-input.col-md-6(style="margin-top: 5px;")
-    .panel.panel-default.panel-grid
-      table.grid.table.table-bordered.table-hover.table-striped
-        thead
-          tr
-            th.text-center(check-all,width="10" )
-              .checkbox.c-checkbox(data-toggle="tooltip",data-title="Check All")
-                label
-                  input(type='checkbox' ng-model="vm.allLocal" ng-change="vm.selectAllLocal()")
-                  span.fa.fa-check
-            th.text-center(width="80")
-              | {{ vm.viewTranslatePath('TAB1-LABEL-ITEM-TOPICS') | translate}}
-            th.text-center(width="20")
-              | {{ vm.viewTranslatePath('TAB1-LABEL-TYPE_NAME') | translate}}
-        tbody
-          tr(ng-repeat="row in vm.filterLocalTopics " )
-            td.text-center
-              .checkbox.c-checkbox
-                label
-                  input(type='checkbox',ng-model="row.checked" )
-                  span.fa.fa-check
-            td {{row.name}}
-            td.text-center {{row.type_name}}
-          tr(ng-if="vm.filterLocalTopics.length==0")
-            td.text-center(colspan="3") {{ 'grid.NO-RESULTS' | translate}}
-  .ngdialog-input.col-md-6(style="margin-top: 5px;")
+  .col-md-4(style="margin-top: 5px;")
+    .tree.tree-basic(ng-if="vm.isLocalTemplate",s-tree,s-tree-data="vm.localTempsPromise",s-tree-height="300", s-tree-template-url='tree-directive-default-renderer.html', ng-model="vm.selectedNode")
+    .tree.tree-basic(ng-if="!vm.isLocalTemplate",s-tree,s-tree-data="vm.remoteTempsPromise",s-tree-height="300", s-tree-template-url='tree-directive-default-renderer.html', ng-model="vm.selectedNode")
+  .ngdialog-input.col-md-8(style="margin-top: 5px;")
     .panel.panel-default.panel-grid
       table.grid.table.table-bordered.table-hover.table-striped
         thead

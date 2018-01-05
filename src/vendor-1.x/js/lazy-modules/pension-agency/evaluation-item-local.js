@@ -1,19 +1,19 @@
 /**
- * Created by hcl on 17-12-19.
+ * Created by hcl on 17-12-26.
  */
 (function() {
   'use strict';
 
   angular
       .module('subsystem.pension-agency')
-      .controller('EvaluationItemGridController', EvaluationItemGridController)
-      .controller('EvaluationItemDetailsController', EvaluationItemDetailsController)
+      .controller('EvaluationItemLocalGridController', EvaluationItemLocalGridController)
+      .controller('EvaluationItemLocalDetailsController', EvaluationItemLocalDetailsController)
   ;
 
 
-  EvaluationItemGridController.$inject = ['$scope', 'ngDialog', 'vmh', 'entryVM'];
+  EvaluationItemLocalGridController.$inject = ['$scope', 'ngDialog', 'vmh', 'entryVM'];
 
-  function EvaluationItemGridController($scope, ngDialog, vmh, vm) {
+  function EvaluationItemLocalGridController($scope, ngDialog, vmh, vm) {
 
     $scope.vm = vm;
     $scope.utils = vmh.utils.g;
@@ -28,9 +28,9 @@
 
   }
 
-  EvaluationItemDetailsController.$inject = ['$scope', 'ngDialog', 'vmh', 'entityVM'];
+  EvaluationItemLocalDetailsController.$inject = ['$scope', 'ngDialog', 'vmh', 'entityVM'];
 
-  function EvaluationItemDetailsController($scope, ngDialog, vmh, vm) {
+  function EvaluationItemLocalDetailsController($scope, ngDialog, vmh, vm) {
 
     var vm = $scope.vm = vm;
     $scope.utils = vmh.utils.v;
@@ -104,13 +104,13 @@
         }
       });
     }
-    
+
     function editOptionMember(row) {
       vm.editingRow = angular.copy(row);
       row.$editing = true;
       vm.$gridEditingOfOptionMember = true;
     }
-    
+
     function saveOptionMember(row) {
       if(!row.name || !row.value ||!(row.score>=0)){
         if(!row.name){
@@ -137,7 +137,7 @@
       row.$editing = false;
       vm.$gridEditingOfOptionMember = false;
     }
-    
+
     function cancelOptionMember(row) {
       if (row.isNew) {
         vm.model.options.splice(vm.model.options.length - 1, 1);

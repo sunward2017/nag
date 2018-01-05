@@ -20,14 +20,16 @@ module.exports = function(ctx,name) {
       status: {type: Number, min: 0, max: 1, default: 1},
       name:{type: String, required: true},//题目标题
       description:{type: String, required: true},//题干
-      type:{type: String, minlength: 1, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3044"])},//选项类别：文字，音频，视频
+      type:{type: String, minlength: 1, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3044"])},//题类型：文字，音频，视频
       url:{type:String},//语音或视频资源
+      mode:{type: String, minlength: 1, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D3045"])},//方式：问答，选择
       stop_flag: {type: Boolean, default: false},//开通标志
       options: [{
         name: {type: String, required: true},// 选项
         value:{type: String, required: true},//选项内容
         score: {type: Number, required: true, min: 0} //选项分值
       }],
+      sourceId:{type: mongoose.Schema.Types.ObjectId},//本地库从远程库复制模板时导入本地题库的远程题id
       tenantId: {type: mongoose.Schema.Types.ObjectId} //中央题库与本地题库分离
     }, {
       toObject: {

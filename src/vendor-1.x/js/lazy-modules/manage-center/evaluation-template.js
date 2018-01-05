@@ -52,6 +52,7 @@
       vm.cancelSectionMember = cancelSectionMember;
       vm.sortTopicItem = sortTopicItem;
       vm.chooseTopicItem = chooseTopicItem;
+      vm.showBubble = showBubble;
 
       vm.load();
     }
@@ -186,6 +187,19 @@
         });
       });
     }
+    
+    function showBubble(e,data) {
+      console.log('e:',e);
+      vm.bubbleUp = true;
+      vm.bubbleX = e.pageX-220-80+'px';
+      vm.bubbleY=e.pageY-45+'px';
+      vmh.fetch(vm.modelNode.services['pub-evaluationItem'].query({_id:data.topicId}, 'name type')).then(function (ret) {
+        // console.log('bubble ret:',ret);
+        vm.bubble = ret[0];
+        vm.bubble.order=data.order;
+        vm.bubble.shortId = e.currentTarget.innerText;
+      })
+    }
 
     function doSubmit() {
       if ($scope.theForm.$valid) {
@@ -295,6 +309,7 @@
 
     function doSubmit() {
       if ($scope.theForm.$valid) {
+        vm.sortedTopics=_.sortBy(vm.sortedTopics,'order');
         $scope.closeThisDialog(vm.sortedTopics);
       }
     }
@@ -308,11 +323,9 @@
     return topicsArrayMember;
   }
   function topicsArrayMember(cellObject, key) {
-    if (!cellObject || !angular.isArray(cellObject) || cellObject.length === 0)
+    if (!cellObject || !angular.isObject(cellObject))
       return '';
-    return cellObject.map(function (o) {
-      return o[key].slice(0,6);
-    }).join()
+    return cellObject[key].slice(-6);
   }
 
 })();

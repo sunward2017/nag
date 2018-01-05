@@ -35,7 +35,7 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                                                 | {{ vm.viewTranslatePath('TAB1-LABEL-ITEM-TOPICS') | translate}}
                                             th.text-center(width="80")
                                     tbody
-                                        tr(ng-repeat="row in vm.model.sections" ng-click="vm.grid.selectRow($event,row)",ng-dblclick="vm.grid.dblclickRow(row.id)")
+                                        tr(ng-repeat="row in vm.model.sections |orderBy:'rank' " ng-click="vm.grid.selectRow($event,row)",ng-dblclick="vm.grid.dblclickRow(row.id)")
                                             td.text-center(ng-if="!vm.readonly")
                                                 .checkbox.c-checkbox(ng-if="!row.$editing")
                                                     label
@@ -50,22 +50,24 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                                                 input.form-control(name="row$title",type="text",ng-if="row.$editing",ng-model='row.title',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-SECTION-TITLE")|translate}}',required='')
                                                 span.text-danger(ng-if="row.$editing",ng-show="row.titleFlag&&!row.title") {{ "validator.REQUIRED" | translate}}
                                             td.text-left
-                                                a.btn.btn-primary.btn-xs(title="{{'button.ADD'|translate}}",ng-click="vm.chooseTopicItem(row)",ng-if="row.$editing")
-                                                        i.glyphicon.glyphicon-plus
-                                                span.break-word {{ row.topics|topicsArrayMemberFilter:'topicId'}}
+                                                span(ng-repeat="topic in row.topics",style='display:inline-table;width:60px;text-decoration:underline;',ng-mouseenter="vm.showBubble($event,topic)",ng-mouseleave="vm.bubbleUp=false") {{ topic|topicsArrayMemberFilter:'topicId'}}
                                             td(ng-if="!vm.readonly")
                                                 .btn-group(ng-if="!vm.readonly && !row.$editing")
                                                     a.btn.btn-primary.btn-xs(title="{{'button.EDIT'|translate}}",ng-click="vm.editSectionMember(row)")
                                                         i.glyphicon.glyphicon-pencil
+                                                .btn-group(ng-if="row.$editing")
+                                                    a.btn.btn-success.btn-xs(title="{{vm.viewTranslatePath('TAB1-BUTTON-ADD-TOPIC')|translate}}",ng-click="vm.chooseTopicItem(row)")
+                                                        i.glyphicon.glyphicon-plus
+                                                .btn-group(ng-if="row.$editing")
+                                                    a.btn.btn-success.btn-xs(ng-if="row.topics && row.topics.length>0",title='{{vm.viewTranslatePath("TAB1-BUTTON-SORT")|translate}}',ng-click="vm.sortTopicItem(row)")
+                                                        i.glyphicon.glyphicon-sort-by-attributes
                                                 .btn-group(ng-if="row.$editing")
                                                     a.btn.btn-primary.btn-xs(title="{{'button.SAVE'|translate}}",ng-click="vm.saveSectionMember(row)")
                                                         i.glyphicon.glyphicon-ok-sign
                                                 .btn-group(ng-if="row.$editing")
                                                     a.btn.btn-primary.btn-xs(title="{{'button.CANCEL'|translate}}",ng-click="vm.cancelSectionMember(row)")
                                                         i.glyphicon.glyphicon-remove-sign
-                                                .btn-group(ng-if="row.$editing && row.topics && row.topics.length>0")
-                                                    a.btn.btn-primary.btn-xs(title='{{vm.viewTranslatePath("TAB1-BUTTON-SORT")|translate}}',ng-click="vm.sortTopicItem(row)")
-                                                        i.glyphicon.glyphicon-sort-by-attributes
+
                                 .panel-footer
                                     .row
                                         .col-md-4.text-left
@@ -114,7 +116,7 @@ script(type="text/ng-template", id="topic-item-choose.html")
                                     input(type='checkbox' ng-model="vm.all" ng-change="vm.selectAll()")
                                     span.fa.fa-check
                         th.text-center(width="80")
-                            | {{ vm.viewTranslatePath('TAB1-LABEL-TOPIC-NAME') | translate}}
+                            | {{ vm.viewTranslatePath('TAB1-LABEL-ITEM-TOPICS') | translate}}
                         th.text-center(width="20")
                             | {{ vm.viewTranslatePath('TAB1-LABEL-TYPE_NAME') | translate}}
                 tbody
@@ -144,14 +146,14 @@ script(type="text/ng-template", id="topic-item-sort.html")
                             thead
                                 tr
                                     th.text-center(width="80")
-                                        | {{ vm.viewTranslatePath('TAB1-LABEL-TOPIC-NAME') | translate}}
+                                        | {{ vm.viewTranslatePath('TAB1-LABEL-ITEM-TOPICS') | translate}}
                                     th.text-center(width="20")
                                         | {{ vm.viewTranslatePath('TAB1-LABEL-TYPE_NAME') | translate}}
                                     th.text-center(width="20")
                                         | {{ vm.viewTranslatePath('TAB1-LABEL-ORDER') | translate}}
                                     th.text-center(width="5")
                             tbody
-                                tr(ng-repeat="row in vm.sortedTopics track by $index" )
+                                tr(ng-repeat="($index,row) in vm.sortedTopics |orderBy:'order' " )
                                     td {{row.topic.name}}
                                     td.text-center {{row.topic.type_name}}
                                     td
@@ -165,3 +167,19 @@ script(type="text/ng-template", id="topic-item-sort.html")
                                     td(colspan="{{utils.noResultsColspan(vm)}}") {{ 'grid.NO-RESULTS' | translate}}
         .text-right.mt-lg
             button.btn.btn-success(type="submit") {{'button.CONFIRM'|translate}}
+
+
+table.grid.table.table-bordered.table-condensed(ng-if="vm.bubbleUp",style="position:absolute;width:160px;background-color:white;",ng-style="{top:vm.bubbleY,left:vm.bubbleX}")
+    tbody
+        tr
+            td.text-center(width="40") {{ vm.viewTranslatePath('TAB1-LABEL-ITEM-CODE') | translate}}
+            td(width="120") {{vm.bubble.shortId}}
+        tr
+            td.text-center {{ vm.viewTranslatePath('TAB1-LABEL-ITEM-TOPICS') | translate}}
+            td {{vm.bubble.name}}
+        tr
+            td.text-center {{ vm.viewTranslatePath('TAB1-LABEL-TYPE_NAME') | translate}}
+            td {{vm.bubble.type_name}}
+        tr
+            td.text-center {{vm.viewTranslatePath('TAB1-LABEL-ITEM-ORDER') | translate}}
+            td {{vm.bubble.order}}

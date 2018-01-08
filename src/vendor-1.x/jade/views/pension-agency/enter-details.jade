@@ -13,7 +13,7 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                         i.glyphicon.glyphicon-calendar
             input.read-control-underline(ng-if="vm.readonly",readonly,value="{{vm.model.enter_on|date}}")
     .row-split
-    .panel
+    .panel(block-ui="list-block")
         tabset(justified="true")
             tab(active="vm.tab1.active")
                 tab-heading

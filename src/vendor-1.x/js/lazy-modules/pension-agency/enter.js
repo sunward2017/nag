@@ -112,7 +112,7 @@
         function init() {
 
             vm.init({removeDialog: ngDialog});
-            // vm.blocker.start();
+            vm.blocker.start();
             vm.serverSideCheck = serverSideCheck;
             vm.setBoardSummary = setBoardSummary;
             vm.setNursingSummary = setNursingSummary;
@@ -260,7 +260,7 @@
 
                 addElderlyFamilyMember();
             }).finally(function () {
-              // vm.blocker.stop();
+              vm.blocker.stop();
             });
 
 

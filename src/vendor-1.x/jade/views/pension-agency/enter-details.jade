@@ -1,4 +1,4 @@
-form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="vm.doSubmit()",block-ui="list-block")
+form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="vm.doSubmit()")
     .row
         .col-md-1.control-label {{ vm.viewTranslatePath('HEAD-LABEL-CODE') | translate}}:
         .col-md-3
@@ -189,7 +189,8 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                                         span.text-danger(ng-if="row.$editing",ng-show="utils.vinput(this.theForm,'row$phone','phone')") {{ "validator.FORMAT" | translate:{item:"手机号码"} }}
                                     td.text-left
                                         span(ng-if="!row.$editing") {{::row.address}}
-                                        input.form-control(type="text",ng-if="row.$editing",ng-model='row.address',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-ELDERLY-FAMILY-MEMBER-ADDRESS")|translate}}' ,required='')
+                                        input.form-control(name="row$address",type="text",ng-if="row.$editing",ng-model='row.address',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-ELDERLY-FAMILY-MEMBER-ADDRESS")|translate}}' ,required='')
+                                        span.text-danger(ng-if="row.$editing",ng-show="utils.vinput(this.theForm,'row$address','required')") {{ "validator.REQUIRED" | translate}}
                                     td
                                         .btn-group(ng-if="!vm.readonly && !row.$editing")
                                             a.btn.btn-primary.btn-xs(title="{{'button.EDIT'|translate}}",ng-click="vm.editElderlyFamilyMember(row)")

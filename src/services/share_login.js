@@ -28,7 +28,7 @@ module.exports = {
       {
         method: 'signinMedical',
         verb: 'post',
-        url: this.service_url_prefix + "/signinMedical",
+        url: this.service_url_prefix + "/medical/signin",
         handler: function (app, options) {
           return function *(next) {
             try {
@@ -94,9 +94,8 @@ module.exports = {
 
                 //日期字符 保证token当日有效
                 // sign with default (HMAC SHA256)
-                var token = jwt.sign(user, app.conf.secure.authSecret + ':' + (new Date().f('yyyy-MM-dd').toString()));
-
-                console.log(token);
+                user = user.toObject();
+                var token = jwt.sign(user, app.conf.secure.authSecret + ':' +  (new Date().f('yyyy-MM-dd').toString()));
 
                 this.body = app.wrapper.res.ret(_.defaults(_.pick(user, '_id', 'name'), {
                   tenant: tenant,
@@ -107,6 +106,24 @@ module.exports = {
                 this.body = app.wrapper.res.error({message: '无效的的登录名密码!'});
               }
 
+            } catch (e) {
+              self.logger.error(e.message);
+              this.body = app.wrapper.res.error(e);
+            }
+            yield next;
+          };
+        }
+      },
+      {
+        method: 'validateTokenMedical',
+        verb: 'post',
+        url: this.service_url_prefix + "/medical/validateToken",
+        handler: function (app, options) {
+          return function *(next) {
+            try {
+              var user = jwt.verify(this.request.body.token, app.conf.secure.authSecret + ':' + (new Date().f('yyyy-MM-dd').toString()));
+              // console.log('medical/validateToken:', user);
+              this.body = app.wrapper.res.ret(user._id);
             } catch (e) {
               self.logger.error(e.message);
               this.body = app.wrapper.res.error(e);

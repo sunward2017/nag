@@ -66,7 +66,7 @@ app.conf = {
         // ignorePaths: ['/me-services/app/psn']
     },
     crossDomainInterceptor:{
-        toPaths:['/services/share/login/signinMedical', '/me-services/api', '/me-services/trv', '/me-services/weixin/open', '/me-services/weixin/open', '/me-services/qiniu/open/uploadToken']
+        toPaths:['/services/share/login/medical/signin', '/services/share/login/medical/validateToken', '/me-services/api', '/me-services/trv', '/me-services/weixin/open', '/me-services/weixin/open', '/me-services/qiniu/open/uploadToken']
     },
     db: {
         //mssql数据库配置

@@ -23,7 +23,8 @@ module.exports = function(ctx,name) {
             y_axis: {type: String, minlength: 5, maxlength: 5, required: true, enum: ctx._.rest(ctx.dictionary.keys["D3040"])}, //早中晚夜轴
             aggr_value: {
                 mealId:{type: mongoose.Schema.Types.ObjectId, required: true, ref: 'psn_meal'},
-                quantity: {type: Number, min: 0,default: 1} //餐组剩余数量
+                quantity: {type: Number, min: 0,default: 1}, //餐组剩余数量
+                target_users:[String] //指定给某类病症的人群,psn-disease
             },
             tenantId: {type: mongoose.Schema.Types.ObjectId}
         }, {

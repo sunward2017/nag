@@ -24,6 +24,7 @@ module.exports = function(ctx,name) {
             }], //餐组菜品组成
             price:{type: Number, min: 0}, //餐组价格
             stop_flag: {type: Boolean, default: false},//餐组是否可用
+            inappropriate:[String],//不适宜症,psn-disease
             img:{type:String},
             py: {type: String},//拼音首字母，用于排序
             tenantId: {type: mongoose.Schema.Types.ObjectId}

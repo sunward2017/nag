@@ -102,6 +102,7 @@
         {name: 'subsystem.pension-agency.room.js', files: ['app/js/lazy-modules/pension-agency/room.js']},
         {name: 'subsystem.pension-agency.district.js', files: ['app/js/lazy-modules/pension-agency/district.js']},
         {name: 'subsystem.pension-agency.nursing-level.js', files: ['app/js/lazy-modules/pension-agency/nursing-level.js']},
+        {name: 'subsystem.pension-agency.disease.js', files: ['app/js/lazy-modules/pension-agency/disease.js']},
         {name: 'subsystem.pension-agency.meal.js', files: ['app/js/lazy-modules/pension-agency/meal.js']},
         {name: 'subsystem.pension-agency.meal-dish.js', files: ['app/js/lazy-modules/pension-agency/meal-dish.js']},
         {name: 'subsystem.pension-agency.meal-menu.js', files: ['app/js/lazy-modules/pension-agency/meal-menu.js']},

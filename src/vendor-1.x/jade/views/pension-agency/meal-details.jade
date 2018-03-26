@@ -19,7 +19,7 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                             span.text-danger(ng-show="utils.vinput(this.theForm,'py','required')") {{ "validator.REQUIRED" | translate}}
                     fieldset: .form-group
                         <!--test-->
-                        label.col-md-2.control-label 选中的菜
+                        label.col-md-2.control-label 选中的菜:
                         .col-md-4
                             ul
                                 li.repeat-modify(ng-repeat='node in vm.meats') {{ node.name}}
@@ -58,6 +58,10 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                             span.text-danger(ng-show="utils.vinput(this.theForm,'price','required')") {{ "validator.REQUIRED" | translate}}
                             span.text-danger(ng-show="utils.vinput(this.theForm,'price','validator')") {{ "validator.MIN" | translate:{min:0} }}
                             span.text-danger(ng-show="utils.vinput(this.theForm,'price','number')") {{ "validator.NUMBER" | translate}}
+                    //fieldset: .form-group
+                    //    label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-INAPPROPRIATE') | translate}}:
+                    //    .col-md-10
+                    //        .tree.tree-dropdown(name='inappropriate',s-tree,s-tree-data="vm.inappropriatePromise",s-tree-height="200", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{mode:'check',layout:'dropdown',readonly:false }",ng-model="vm.model.inappropriate")
                     fieldset: .form-group
                         <!--套餐图片-->
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-IMG') | translate}}:

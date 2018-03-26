@@ -3794,6 +3794,63 @@
           })
         }
       })
+      .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'disease', {
+        url: '/disease',
+        title: '病症管理',
+        abstract: true,
+        views: {
+          "module-header": {
+            templateUrl: helper.basepath(MODEL_VARIABLES.HEAD_TEMPLATES.PENSION_AGENCY),
+            controller: MODEL_VARIABLES.CONTROLLER_NAMES.MODULE_HEADER_FOR_TENANT
+          },
+          "module-content": {
+            template: '<div class="data-ui-view"></div><div class="clearfix"></div>'
+          }
+        },
+        data: {
+          func_id: MODEL_VARIABLES.BIZ_FUNC_PREFIXS.PENSION_AGENCY + 'DISEASE' //业务系统使用
+        },
+        resolve: helper.resolveFor(MODEL_VARIABLES.RES_PREFIXS.PENSION_AGENCY + 'disease.js')
+      })
+      .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'disease.list', {
+        url: '/list/:action',
+        templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'disease-list.html'),
+        access_level: AUTH_ACCESS_LEVELS.USER,
+        controller: 'DiseaseGridController',
+        resolve: {
+          entryVM: helper.buildEntryVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'disease.list', {
+            modelName: 'psn-disease',
+            searchForm: {"status": 1},
+            serverPaging: true,
+            keyword_match_cols: ['name'],
+            blockUI: true,
+            columns: [{
+              label: '疾病名称',
+              name: 'name',
+              type: 'string',
+              width: 300,
+              sortable: true
+            }, {
+              label: '',
+              name: 'actions',
+              sortable: false,
+              width: 60
+            }]
+          })
+        }
+      })
+      .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'disease.details', {
+        url: '/details/:action/:_id',
+        templateUrl: helper.basepath(MODEL_VARIABLES.CONTENT_TEMPLATES.PENSION_AGENCY + 'disease-details.html'),
+        access_level: AUTH_ACCESS_LEVELS.USER,
+        controller: 'DiseaseDetailsController',
+        resolve: {
+          entityVM: helper.buildEntityVM(MODEL_VARIABLES.VM_PREFIXS.PENSION_AGENCY + 'disease.details', {
+            modelName: 'psn-disease',
+            blockUI: true
+          })
+        }
+      })
       .state(MODEL_VARIABLES.STATE_PREFIXS.PENSION_AGENCY + 'charge-standard', {
         url: '/charge-standard',
         title: '收费标准',

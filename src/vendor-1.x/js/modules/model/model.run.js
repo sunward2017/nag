@@ -50,6 +50,7 @@
     modelNode.factory('psn-nursingShift');
     modelNode.factory('psn-district');
     modelNode.factory('psn-nursingLevel');
+    modelNode.factory('psn-disease');
     modelNode.factory('psn-room');
     modelNode.factory('psn-roomOccupancyChangeHistory');
     modelNode.factory('psn-mealDish');

@@ -37,6 +37,7 @@
       vm.importTemplate = importTemplate;
       vm.saveAsTemplate = saveAsTemplate;
       vm.addQuantity = addQuantity;
+      vm.dbClickSetTargetUsers = dbClickSetTargetUsers;
       vm.dbClickAddQuantity = dbClickAddQuantity;
       vm.tab1 = {cid: 'contentTab1'};
 
@@ -150,6 +151,7 @@
             id: mealShiftObject.id,
             name: mealShiftObject.name,
             quantity: MenuScheduleItem.aggr_value.quantity,
+            target_users:MenuScheduleItem.aggr_value.target_users,
             py:mealShiftObject.py
           });
         }
@@ -350,6 +352,17 @@
         }
       });
     }
+    
+    function dbClickSetTargetUsers(row, col, cellData) {
+      if (cellData.length < 1) {
+        return;
+      }
+      var toAddQuantityRows = [];
+      _.each(cellData, function (o) {
+        toAddQuantityRows.push({x_axis: col.value, y_axis: row.value, y_axis_value: row.name, aggr_value: {mealId: o, target_users: o.target_users}});
+      });
+      openDialog(toAddQuantityRows,'A0001');
+    }
 
     function addQuantity() {
       var toAddQuantityRows = [];
@@ -392,12 +405,13 @@
       openDialog(toAddQuantityRows);
     }
 
-    function openDialog(toAddQuantityRows) {
+    function openDialog(toAddQuantityRows,mealMode) {
       ngDialog.open({
         template: 'add-meal-quantity.html',
         controller: 'AddMealQuantityController',
         className: 'ngdialog-theme-default ngdialog-meal-weekly-menu-picker',
         data: {
+          mealMode:mealMode,
           vmh: vmh,
           moduleTranslatePathRoot: vm.moduleTranslatePath(),
           toAddQuantityRows: toAddQuantityRows,
@@ -544,8 +558,8 @@
     }
   }
 
-  AddMealQuantityController.$inject = ['$scope', 'ngDialog'];
-  function AddMealQuantityController($scope, ngDialog) {
+  AddMealQuantityController.$inject = ['$scope', 'ngDialog','$timeout'];
+  function AddMealQuantityController($scope, ngDialog,$timeout) {
     var vm = $scope.vm = {};
     var vmh = $scope.ngDialogData.vmh;
     $scope.utils = vmh.utils.v;
@@ -558,10 +572,28 @@
       };
       vm.tenantId = $scope.ngDialogData.tenantId;
       vm.toAddQuantityRows = $scope.ngDialogData.toAddQuantityRows;
+      vm.mealMode = $scope.ngDialogData.mealMode;
       console.log('toAddQuantityRows :', vm.toAddQuantityRows);
       vm.doSubmit = doSubmit;
       vm.removeMeal = removeMeal;
+      if(vm.mealMode){
+        vm.diseasePromise = vmh.shareService.tmp('T3001/psn-disease', 'name', {tenantId: vm.tenantId, status: 1}).then(function (nodes) {
+          nodes.push({_id:'normal',name:'正常'});
+          return nodes;
+        });
+        addPlaceholder();
+      }
 
+    }
+    function addPlaceholder() {
+      $timeout(function(){
+        var placeholder=angular.element('#setForm').find('input.form-control').attr('placeholder','正常');
+        // console.log('addPlaceholder...');
+        if(!placeholder.length){
+          console.log('addPlaceholder...again');
+          addPlaceholder();
+        }
+      },5);
     }
 
     function removeMeal(index) {

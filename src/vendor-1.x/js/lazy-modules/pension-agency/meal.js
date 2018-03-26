@@ -70,6 +70,9 @@
         });
         return nodes;
       });
+      vm.inappropriatePromise = vmh.shareService.tmp('T3001/psn-disease', 'name', {tenantId: vm.tenantId, status: 1}).then(function (nodes) {
+        return nodes;
+      });
 
       vmh.q.all([mealsPromise,vm.load()])
       .then(function () {

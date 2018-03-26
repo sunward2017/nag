@@ -46,6 +46,7 @@ module.exports = function(ctx,name) {
       financial_status: {type: String, required: true, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D1011"])},
       hobbies: [String],//字典D1013
       medical_histories: [String],//字典D1014
+      disease:[String],//所属病症psn-disease. 用于在小程序点餐时过滤不适合此症人群的食物
       board_summary: {type: String, required: true},
       room_value: {
         districtId: {type: String},

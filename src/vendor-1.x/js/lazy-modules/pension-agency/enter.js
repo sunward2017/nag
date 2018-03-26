@@ -274,6 +274,10 @@
                 return medical_histories;
             });
 
+            vm.diseasePromise = vmh.shareService.tmp('T3001/psn-disease', 'name', {tenantId: vm.tenantId, status: 1}).then(function (nodes) {
+              return nodes;
+            });
+
             vm.selectBinding.periodValues = _.range(1, 7);
             vm.load().then(function () {
                 //if (!vm.model.period_value_in_advance) {

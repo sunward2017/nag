@@ -247,6 +247,7 @@
       "ROOM": "房间管理",
       "DISTRICT": "片区管理",
       "NURSING-LEVEL": "照护级别",
+      "DISEASE":"病症管理",
       "CHARGE-STANDARD": "收费标准",
       "CHARGE-ITEM-CUSTOMIZED": "特色服务",
       "------------": "",

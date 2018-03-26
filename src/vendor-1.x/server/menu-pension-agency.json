@@ -364,6 +364,11 @@
         "sref": "app.pension-agency.nursing-level.list"
       },
       {
+        "_id": "menu.pension-agency.DISEASE",
+        "name": "病症管理",
+        "sref": "app.pension-agency.disease.list"
+      },
+      {
         "_id": "menu.pension-agency.CHARGE-STANDARD",
         "name": "收费标准",
         "sref": "app.pension-agency.charge-standard"

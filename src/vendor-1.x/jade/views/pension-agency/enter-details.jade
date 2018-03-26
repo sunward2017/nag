@@ -137,6 +137,11 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                             .tree.tree-dropdown(name='elderly$medical_histories',s-tree,s-tree-data="vm.medical_historiesPromise",s-tree-height="200", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{mode:'check',layout:'dropdown',readonly:{{vm.readonly}} }",ng-model="vm.elderlyModel.medical_histories",required='')
                             span.text-danger(ng-show="utils.vinput(this.theForm,'elderly$medical_histories','required')") {{ "validator.REQUIRED" | translate}}
                     fieldset: .form-group
+                        <!--病症人群-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-DISEASE') | translate}}:
+                        .col-md-10
+                            .tree.tree-dropdown(name='disease',s-tree,s-tree-data="vm.diseasePromise",s-tree-height="200", s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{mode:'check',layout:'dropdown',readonly:{{vm.readonly}} }",ng-model="vm.elderlyModel.disease")
+                    fieldset: .form-group
                         <!--备注-->
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-REMARK') | translate}}:
                         .col-md-10(ng-if="!vm.readonly")

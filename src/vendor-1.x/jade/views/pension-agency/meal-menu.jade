@@ -44,7 +44,7 @@
                     td.text-left(ng-if="vm.mealMode == 'A0002' ",ng-repeat="col in vm.xAxisData",width="100",style="vertical-align:top;", ng-class='{"grid-cell-selected": vm.cells[row.value][col._id] }',ng-click="vm.selectGridCell(row.value,col._id)",ng-dblclick="vm.dbClickAddQuantity(row,col,vm.aggrData[row.value][col._id])")
                         ul.list-unstyled
                             li(ng-repeat="mealData in vm.aggrData[row.value][col._id] ") • {{ mealData.name+'('+mealData.quantity+')'}}
-                    td.text-left(ng-if="vm.mealMode == 'A0001' ",ng-repeat="col in vm.xAxisData",width="100",style="vertical-align:top;", ng-class='{"grid-cell-selected": vm.cells[row.value][col._id] }',ng-click="vm.selectGridCell(row.value,col._id)")
+                    td.text-left(ng-if="vm.mealMode == 'A0001' ",ng-repeat="col in vm.xAxisData",width="100",style="vertical-align:top;", ng-class='{"grid-cell-selected": vm.cells[row.value][col._id] }',ng-click="vm.selectGridCell(row.value,col._id)",ng-dblclick="vm.dbClickSetTargetUsers(row,col,vm.aggrData[row.value][col._id])")
                         //span {{(vm.aggrData[row.value][col._id]) | mealArrayMember:'name':'quantity' }}
                         ul.list-unstyled
                             li(ng-repeat="mealData in vm.aggrData[row.value][col._id] ") • {{ mealData.name}}
@@ -65,7 +65,7 @@ script(type="text/ng-template", id="nursing-worker-schedule-save-as-template.htm
 
 
 script(type="text/ng-template", id="add-meal-quantity.html")
-    form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="vm.doSubmit()")
+    form#setForm.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="vm.doSubmit()")
         .ngdialog-title
             i.glyphicon.glyphicon-info-sign
             | {{ vm.moduleTranslatePath('TAB1') | translate }}
@@ -83,12 +83,12 @@ script(type="text/ng-template", id="add-meal-quantity.html")
                                                 span.fa.fa-check
                                     th.text-center(width="40")
                                         | {{ vm.moduleTranslatePath('TAB1-LABEL-DATE') | translate}}
-                                    th.text-center(width="60")
+                                    th.text-center(width="40")
                                         | {{ vm.moduleTranslatePath('TAB1-LABEL-MEAL_PERIOD') | translate}}
-                                    th.text-center(width="80")
+                                    th.text-center(width="70")
                                         | {{ vm.moduleTranslatePath('TAB1-LABEL-MEAL') | translate}}
-                                    th.text-center(width="60")
-                                        | {{ vm.moduleTranslatePath('TAB1-LABEL-QUANTITY') | translate}}
+                                    th.text-center(width="90")
+                                        | {{ vm.mealMode?vm.moduleTranslatePath('TAB1-LABEL-TARGET_USERS'):vm.moduleTranslatePath('TAB1-LABEL-QUANTITY') | translate}}
                             tbody
                                 tr(ng-repeat="row in vm.toAddQuantityRows track by $index" )
                                     td.text-center
@@ -99,12 +99,15 @@ script(type="text/ng-template", id="add-meal-quantity.html")
                                     td.text-center {{row.x_axis}}
                                     td.text-center {{row.y_axis_value}}
                                     td.text-center {{row.aggr_value.mealId.name }}
-                                    td
+                                    td(ng-if="vm.mealMode != 'A0001' ")
                                         .input-group.charge-item
                                             input(type='number',ng-model='row.aggr_value.quantity',ui-validate="'$value>=1' ",min="1")
                                             span 份
                                             .btn-group
                                                 a.btn.btn-danger.btn-xs(type="button",ng-click="vm.removeMeal($index)") {{'button.REMOVE'|translate}}
                                         span.text-danger(ng-show="!row.aggr_value.quantity") {{ "validator.MIN" | translate:{min:1} }}
+                                    td(ng-if="vm.mealMode == 'A0001' ")
+                                        .btn-group
+                                            .tree.tree-dropdown(name='disease',s-tree,s-tree-data="vm.diseasePromise",s-tree-height="150",s-tree-template-url='tree-directive-default-renderer.html',s-tree-option="{mode:'check',layout:'dropdown',readonly:false }",ng-model="row.aggr_value.target_users")
         .text-right.mt-lg
             button.btn.btn-success(type="submit" ) {{vm.moduleTranslatePath('FINISH-SET-QUANTITY') |translate}}

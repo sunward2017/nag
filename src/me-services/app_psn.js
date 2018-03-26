@@ -1293,6 +1293,18 @@ module.exports = {
                 //提前预订
                 var x_axis_start = app.moment(app.moment().weekday(0).add(7, 'days').format('YYYY-MM-DD'));
                 var x_axis_end = app.moment(app.moment().weekday(0).add(14, 'days').format('YYYY-MM-DD'));
+                var elderlyId = this.request.body.elderlyId;
+                var elderly = yield app.modelFactory().model_one(app.models['psn_elderly'], {
+                  select:'disease',
+                  where:{
+                    _id:elderlyId
+                  }
+                });
+                var targetUsersMatch =[ {'aggr_value.target_users':{$elemMatch:{$in:elderly.disease}}} ];
+                if(elderly.disease.length===0){
+                  elderly.disease.push('normal');
+                  targetUsersMatch.push({'aggr_value.target_users':{$eq:[]}});
+                }
 
                 var rows = yield app.modelFactory().model_aggregate(app.models['psn_mealMenu'], [
                   {
@@ -1300,7 +1312,8 @@ module.exports = {
                       tenantId: app.ObjectId(tenantId),
                       status: 1,
                       x_axis: {$gte: x_axis_start.toDate(), $lt: x_axis_end.toDate()},
-                      y_axis: {$in: psn_meal_periods}
+                      y_axis: {$in: psn_meal_periods},
+                      $or:targetUsersMatch
                     }
                   },
                   {

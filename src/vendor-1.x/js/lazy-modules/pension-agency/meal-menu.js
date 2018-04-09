@@ -578,7 +578,9 @@
       vm.removeMeal = removeMeal;
       if(vm.mealMode){
         vm.diseasePromise = vmh.shareService.tmp('T3001/psn-disease', 'name', {tenantId: vm.tenantId, status: 1}).then(function (nodes) {
-          nodes.push({_id:'normal',name:'正常'});
+          if(nodes[nodes.length-1]._id !== 'normal'){
+            nodes.push({_id:'normal',name:'正常'});
+          }
           return nodes;
         });
         addPlaceholder();

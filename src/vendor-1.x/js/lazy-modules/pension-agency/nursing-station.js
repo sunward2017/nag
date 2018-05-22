@@ -262,6 +262,8 @@
     }
 
     function openAlarmDialog(alarm) {
+      if(!vm.larmAudio ) vm.larmAudio =document.getElementById("alarm-audio") ;
+      vm.larmAudio.play();
       ngDialog.open({
         template: 'nursing-station-alarm.html',
         controller: 'NursingStationAlarmDialogController',
@@ -287,6 +289,7 @@
             vmh.alertSuccess('button.CLOSE', true);
           }
         }
+        vm.larmAudio.pause();
         vmh.timeout(function () {
           processAlarmQueue();
         }, 1000);

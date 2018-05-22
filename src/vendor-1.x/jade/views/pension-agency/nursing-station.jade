@@ -41,6 +41,9 @@ form.search-form
             div(ng-class='vm.elderlyStatusMonitor[elderly.id].status' ng-click="vm.openAlarmDialogByMonitorObject(elderly.id)")
                 .name.text-center {{ elderly.name }}
                     span.age ({{utils.age(elderly.birthday)}})
+audio#alarm-audio(loop="loop")
+    source(src="https://img2.okertrip.com/warning.mp3",type="audio/mpeg")
+    source(src="https://img2.okertrip.com/audio/warning.wav",type="audio/wav")
 .clearfix
 script(type="text/ng-template", id="nursing-station-elderly.html")
     .ngdialog-title
